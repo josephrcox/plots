@@ -1,5 +1,5 @@
 <script>
-	import { options } from './PlotTypeOptions';
+	import { options } from './jsonObjects/PlotTypeOptions.js';
 	import { DB, modifyPlotMenuOptions, unique } from './store';
 
 	export let data = {

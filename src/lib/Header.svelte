@@ -12,25 +12,55 @@
 			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		}
 	}
-	let tableRowCounter = 0;
 </script>
 
 <div class="header noselect">
 	<div class="header__left">
 		<div class="heading_l" on:dblclick={changeName}>{$DB.towninfo.name}</div>
 		<div class="subheading_m">double click to change name</div>
+        <div>(day {$DB.environment.day})</div>
 	</div>
+	<div class="header__center">
+		<div>
+			<div class="subheading_m">Population</div>
+			<div class="text_m">
+				{$DB.towninfo.population_count}/{$DB.towninfo.population_max}
+			</div>
+		</div>
+		<div>
+			<div class="subheading_m">Employees</div>
+			<div class="text_m">
+				{$DB.towninfo.employees}/{($DB.towninfo.population_count)}
+			</div>
+		</div>
+        <div>
+			<div class="subheading_m">Gold</div>
+			<div class="text_m">
+				{$DB.towninfo.gold}
+			</div>
+		</div>
+        <div>
+			<div class="subheading_m">Happiness</div>
+			<div class="text_m">
+				{Math.round($DB.towninfo.happiness)}
+			</div>
+		</div>
+        <div>
+			<div class="subheading_m">Health</div>
+			<div class="text_m">
+				{$DB.towninfo.health}
+			</div>
+		</div>
+        <div>
+			<div class="subheading_m">Total visitors</div>
+			<div class="text_m">
+				{$DB.towninfo.total_visitors}
+			</div>
+		</div>
+	</div>
+
 	<div class="header__right">
-		<table>
-			{#each Object.entries($DB.towninfo) as [info, value]}
-				{#if info !== 'name'}
-					<tr>
-						<td>{info}</td>
-						<td>{value}</td>
-					</tr>
-				{/if}
-			{/each}
-		</table>
+		
 	</div>
 </div>
 
@@ -40,15 +70,30 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 16px;
-		background-color: #161616;
+		background-color: #161f30;
 		border-bottom: 1px solid black;
 		color: white;
+        /* Pin to the top of the screen at all times */
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        width: 100%;
 	}
 
 	.header__left {
 		display: flex;
 		flex-direction: column;
 	}
+
+    .header__center {
+        display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-gap: 16px;
+    }
+
+    .header__center >div>.subheading_m {
+        text-align: center;
+    }
 
 	.header__right {
 		display: flex;
@@ -57,6 +102,7 @@
 
 	.subheading_m {
 		color: white;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.228);
 	}
 
 	table,

@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { default_db } from './defaults/def_DB.js';
+import { default_db } from './defaults/default_DB.js';
 
 export const DATABASE_NAME = 'plots_db';
 
