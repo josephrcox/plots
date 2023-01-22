@@ -1,5 +1,6 @@
 export const default_db = {
 	plots: [],
+	lastChangeDay: 0,
 	towninfo: {
 		name: 'Your town',
 		gold: 1000,
@@ -15,12 +16,15 @@ export const default_db = {
 		health: 1,
 		visitors: 1,
 	},
-	plotCounts: [[0,0]], 
-	// [plotTypeIndex, count]
+	economy_and_laws: {
+		tax_rate: 0,
+	},
+	plotCounts: [], 
 	environment: {
-		day: 1,
+		day: 0,
 		year: 1,
 		climate: -1,
 		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
+	townLog: ""
 };

@@ -1,6 +1,6 @@
 <script>
 	import { options } from './jsonObjects/PlotTypeOptions.js';
-	import { DB, modifyPlotMenuOptions, unique } from './store';
+	import { DB, modifyPlotMenuOptions, unique, paused } from './store';
 
 	export let data = {
 		id: 0,
@@ -12,19 +12,23 @@
 	export let canBeUpgraded = false;
 
 	function openMenu() {
-		if (!data.active && !canBeUpgraded) {
-			$unique = {};
-			$modifyPlotMenuOptions.visible = false;
-		} else {
-			$modifyPlotMenuOptions.x = data.x;
-			$modifyPlotMenuOptions.y = data.y;
-			$modifyPlotMenuOptions.visible = true;
+		if ($paused == false) {
+			if (!data.active && !canBeUpgraded) {
+				$unique = {};
+				$modifyPlotMenuOptions.visible = false;
+			} else {
+				$modifyPlotMenuOptions.x = data.x;
+				$modifyPlotMenuOptions.y = data.y;
+				$modifyPlotMenuOptions.visible = true;
+			}
 		}
 	}
 
 	export function changePlotType(type) {
-		$DB.plots[data.x][data.y].type = type;
-		$modifyPlotMenuOptions.visible = false;
+		if ($paused == false) {
+			$DB.plots[data.x][data.y].type = type;
+			$modifyPlotMenuOptions.visible = false;
+		}
 	}
 </script>
 

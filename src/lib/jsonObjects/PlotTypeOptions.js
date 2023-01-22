@@ -2,7 +2,8 @@ export const options = [
     {
         title: 'Residential',
         subtitle: 'level 1',
-        description: 'A few basic homes',
+        description: 'A few basic homes that can hold 16 people',
+        revenue_per_week: 0,
         requirements: {
             gold: 200,
             plots: [], 
@@ -24,7 +25,8 @@ export const options = [
     {
         title: 'Residential',
         subtitle: 'level 2',
-        description: 'A few high-density buildings',
+        description: 'A few high-density buildings that can hold 64 people',
+        revenue_per_week: 0,
         requirements: {
             gold: 400,
             plots: [], 
@@ -46,7 +48,8 @@ export const options = [
     {
         title: 'Residential',
         subtitle: 'level 3',
-        description: 'Many high-density buildings',
+        description: 'Many high-density buildings that can hold 256 people',
+        revenue_per_week: 0,
         requirements: {
             gold: 1400,
             plots: [], 
@@ -69,6 +72,7 @@ export const options = [
         title: 'Coffee Shop',
         subtitle: 'for recreation',
         description: 'People love this stuff',
+        revenue_per_week: 12,
         requirements: {
             gold: 100,
             plots: [], 
@@ -91,6 +95,7 @@ export const options = [
         title: 'Grocery store',
         subtitle: 'for living',
         description: 'People get hungry',
+        revenue_per_week: 20,
         requirements: {
             gold: 320,
             plots: [], 

@@ -23,38 +23,22 @@
 	}
 
 	function clearPlot() {
-		let z = $DB;
-		z.plots[x][y].type = -1;
-		z.plots[x][y].active = false;
-		DB.set(z);
-		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		const plotOptions = document.querySelectorAll('.plotOption');
 		plotOptions.forEach((plotOption) => {
 			plotOption.classList.remove('active');
 		});
+		reverseClear(x, y);
 	}
 
 	function choosePlotOption(e) {
-		if (e.target.classList.contains('plotOption')) {
-			// remove active class from all plot options
+		if (e.currentTarget.classList.contains('plotOption')) {
 			const plotOptions = document.querySelectorAll('.plotOption');
 			plotOptions.forEach((plotOption) => {
 				plotOption.classList.remove('active');
 			});
-			e.target.classList.add('active');
-			// find what index the clicked element is in the plotOptions array
-			const plotOptionIndex = Array.from(plotOptions).indexOf(e.target);
-
-			// let z = $DB;
-			// z.plots[x][y].type = plotOptionIndex;
-			// if (plotOptionIndex === -1) {
-			// 	z.plots[x][y].active = false;
-			// } else {
-			// 	z.plots[x][y].active = true;
-			// }
+			e.currentTarget.classList.add('active');
+			const plotOptionIndex = Array.from(plotOptions).indexOf(e.currentTarget);
 			purchasePlot(x, y, plotOptionIndex);
-			// DB.set(z);
-			// localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		}
 	}
 
@@ -91,7 +75,6 @@
 
 	export function purchasePlot(x, y, typeIndex) {
 		let z = $DB;
-		console.log(options[typeIndex]);
 		let plotChosen = options[typeIndex];
 
 		// go over requirements
@@ -105,6 +88,11 @@
 		}
 
 		if (requirementsMet === true) {
+			// Check if the plot is already set to a type. If so, reverse the effects of that type.
+			if (z.plots[x][y].type !== -1) {
+				reverseClear(x, y);
+			}
+
 			tempMessage = '';
 			console.log('met');
 			z.plots[x][y].type = typeIndex;
@@ -134,6 +122,16 @@
 			// Employeer modifications
 			z.towninfo.employees += plotChosen.requirements.employees;
 
+			// Plot count
+			if (
+				z.plotCounts[typeIndex] === undefined ||
+				z.plotCounts[typeIndex] === null
+			) {
+				z.plotCounts[typeIndex] = 0;
+			}
+			z.plotCounts[typeIndex]++;
+			z.lastChangeDay = z.environment.day;
+
 			DB.set(z);
 			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		} else {
@@ -143,6 +141,51 @@
 				plotOption.classList.remove('active');
 			});
 		}
+	}
+
+	export function reverseClear(x, y) {
+		let z = $DB;
+		let oldPlotType = z.plots[x][y].type;
+		z.plots[x][y].type = -1;
+		z.plots[x][y].active = false;
+
+		// Immediate variable changes
+		z.towninfo.population_count -=
+			options[oldPlotType].immediate_variable_changes.population;
+		z.towninfo.population_max -=
+			options[oldPlotType].immediate_variable_changes.population;
+		z.towninfo.happiness -=
+			options[oldPlotType].immediate_variable_changes.happiness;
+		z.towninfo.health -= options[oldPlotType].immediate_variable_changes.health;
+		z.towninfo.visitors -=
+			options[oldPlotType].immediate_variable_changes.visitors;
+		// Effect modifiers
+		z.modifiers.happiness = roundTo(
+			z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
+			3
+		);
+		z.modifiers.health = roundTo(
+			z.modifiers.health / options[oldPlotType].effect_modifiers.health,
+			3
+		);
+		z.modifiers.visitors = roundTo(
+			z.modifiers.visitors / options[oldPlotType].effect_modifiers.visitors,
+			3
+		);
+		// Employeer modifications
+		z.towninfo.employees -= options[oldPlotType].requirements.employees;
+
+		if (
+			z.plotCounts[oldPlotType] === undefined ||
+			z.plotCounts[oldPlotType] === null
+		) {
+			z.plotCounts[oldPlotType] = 0;
+		}
+		z.plotCounts[oldPlotType]--;
+		z.lastChangeDay = z.environment.day;
+
+		DB.set(z);
+		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 	}
 
 	function roundTo(n, digits) {
@@ -183,8 +226,19 @@
 						<br />
 						<span class="subheading_m">{option.subtitle}</span>
 						<br />
-						<span class="text_m">{option.description}</span>
+						<span class="text_s">{option.description}</span>
 					</div>
+					{#if option.revenue_per_week > 0}
+						<div>
+							<span class="subheading_m">Profits</span>
+							<br />
+							<span class="text_m"
+								><span class="strikethrough">{option.revenue_per_week}</span> 
+								{roundTo($DB.economy_and_laws.tax_rate * option.revenue_per_week, 2)} gold (with tax rate)</span
+							>
+						</div>
+					{/if}
+
 					<div>
 						<span class="subheading_m">Requirements</span>
 						<br />
@@ -229,9 +283,9 @@
 
 	.plotOption {
 		border: 1px solid black;
-		width: 10em;
-		height: 10em;
-		min-width: 10em;
+		width: 12em;
+		height: 12em;
+		min-width: 12em;
 		padding: 5px;
 		background-color: #f2f2f2;
 		display: flex;
@@ -245,6 +299,7 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		display: flex;
+		z-index: 10;
 	}
 
 	.dialog-content {
@@ -264,13 +319,6 @@
 		top: 30px;
 		right: 0;
 		margin: 1em;
-	}
-	.message {
-		color: white;
-		background-color: gray;
-		padding: 3px;
-		width: fit-content;
-		margin-bottom: 10px;
 	}
 	.cost_label {
 		color: green;
