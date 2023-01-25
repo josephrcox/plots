@@ -69,9 +69,9 @@ export const options = [
         }
     },
     {
-        title: 'Coffee Shop',
-        subtitle: 'for recreation',
-        description: 'People love this stuff',
+        title: 'Small café',
+        subtitle: 'for recreation & food',
+        description: 'Great for eating & relaxing, not great for longterm health',
         revenue_per_week: 12,
         requirements: {
             gold: 100,
@@ -80,9 +80,9 @@ export const options = [
             climate: null,
         },
         effect_modifiers: {
-            happiness: 1.001,
-            health: 0.999,
-            visitors: 1.001,
+            happiness: 1.01,
+            health: 0.99,
+            visitors: 1.01,
         },
         immediate_variable_changes: {
             happiness: 5,
@@ -95,7 +95,7 @@ export const options = [
         title: 'Grocery store',
         subtitle: 'for living',
         description: 'People get hungry',
-        revenue_per_week: 20,
+        revenue_per_week: 30,
         requirements: {
             gold: 320,
             plots: [], 
@@ -103,12 +103,12 @@ export const options = [
             climate: null,
         },
         effect_modifiers: {
-            happiness: 1.003,
-            health: 1.001,
+            happiness: 1.02,
+            health: 1.01,
             visitors: 1,
         },
         immediate_variable_changes: {
-            happiness: 5,
+            happiness: 10,
             health: 0,
             visitors: 0,
             population: 0,

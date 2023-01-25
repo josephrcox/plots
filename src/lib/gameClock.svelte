@@ -5,31 +5,24 @@
 	import { options } from './jsonObjects/PlotTypeOptions.js';
 
 	export function mainGameThreadLoop() {
-		// check town money
-		// check for new visitors
-		// check population happiness
-		// check population health
 		if ($paused == false) {
 			let z = $DB;
 			z.environment.day += 1;
 
 			// check if day is divisible by 30
 			if (z.environment.day % 7 == 0) {
-				z.towninfo.happiness = z.towninfo.happiness * z.modifiers.happiness;
-
 				// Adjust happiness based on unemployment rate
 				let unemployed = z.towninfo.population_count - z.towninfo.employees;
+				let unemployedPercentage = unemployed / z.towninfo.population_count;
 				if (unemployed > 0) {
-					z.towninfo.happiness = Math.floor(
-						(z.towninfo.happiness -=
-							(unemployed / z.towninfo.population_count) * Math.random() * 10)
-					);
+					z.modifiers.happiness =
+						z.modifiers.happiness * (0.9999 * (unemployedPercentage / 4));
 					addToTownLog(messages.unemployment);
 				}
 
 				// If nothing has happened for a while, lower the happiness modifier due to boredom
-				if (z.lastChangeDay + ((Math.random() * 90) + 30)  < z.environment.day) {
-					z.modifiers.happiness = z.modifiers.happiness * 0.9995;
+				if (z.lastChangeDay + (Math.random() * 365 + 150) < z.environment.day) {
+					z.modifiers.happiness = z.modifiers.happiness * 0.9999;
 					addToTownLog(messages.bored);
 				}
 
@@ -37,12 +30,16 @@
 				if (z.towninfo.happiness < 0) {
 					z.towninfo.happiness = 0;
 				}
+				// Keep health a positive number
+				if (z.towninfo.health < 0) {
+					z.towninfo.health = 0;
+				}
 
 				// Recommend building more buildings
 				if (z.towninfo.population_max == 0) {
 					addToTownLog(messages.nobody_home);
 				}
-				
+
 				// See if we can add new people
 				if (z.towninfo.population_count < z.towninfo.population_max) {
 					if (z.towninfo.happiness > 50) {
@@ -78,20 +75,37 @@
 					addToTownLog(unhappyPeople + messages.leave_town_num);
 				} else {
 					if (z.towninfo.population_count == z.towninfo.population_max) {
-						addToTownLog(messages.people_want_to_move_in);
+						// addToTownLog(messages.people_want_to_move_in);
 					}
 				}
 
 				// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
-				let profits = 0;
 				for (let i = 0; i < z.plots.length; i++) {
 					for (let j = 0; j < z.plots[i].length; j++) {
 						if (z.plots[i][j].active == true) {
-							profits += options[z.plots[i][j].type].revenue_per_week * z.economy_and_laws.tax_rate;
+							let profitsFromThisPlot =
+								options[z.plots[i][j].type].revenue_per_week *
+								z.economy_and_laws.tax_rate;
+
+							z.towninfo.gold += roundTo(profitsFromThisPlot, 2);
+
+							// push object to the start of the balance sheet history array instead of the end
+							if (profitsFromThisPlot > 0) {
+								z.balanceSheetHistory = [
+									{
+										day: z.environment.day,
+										plot: `${i},${j}`,
+										profits: roundTo(profitsFromThisPlot, 2),
+										balance: roundTo(z.towninfo.gold, 2),
+									},
+									...z.balanceSheetHistory,
+								];
+							}
 						}
 					}
 				}
-				z.towninfo.gold += Math.floor(profits);
+
+				z.towninfo.gold = Math.round(z.towninfo.gold);
 
 				// Adjust happiness based on tax rate. Lower than 10% is good, 10-20% is neutral, 20-30% is bad, 30%+ is very bad
 				if (z.economy_and_laws.tax_rate < 0.1) {
@@ -113,6 +127,12 @@
 					);
 					addToTownLog(messages.very_high_tax_rate);
 				}
+			} else if (z.environment.day % 60 == 0) {
+				z.towninfo.happiness = roundTo(
+					z.towninfo.happiness * z.modifiers.happiness,
+					2
+				);
+				z.towninfo.health = roundTo(z.towninfo.health * z.modifiers.health, 2);
 			}
 
 			DB.set(z);
@@ -127,6 +147,17 @@
 
 		DB.set(z);
 		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+	}
+
+	function roundTo(n, digits) {
+		if (digits === undefined) {
+			digits = 0;
+		}
+
+		var multiplicator = Math.pow(10, digits);
+		n = parseFloat((n * multiplicator).toFixed(11));
+		var test = Math.round(n) / multiplicator;
+		return +test.toFixed(digits);
 	}
 
 	onMount(async () => {

@@ -19,12 +19,13 @@ export const default_db = {
 	economy_and_laws: {
 		tax_rate: 0,
 	},
-	plotCounts: [], 
+	plotCounts: [],
+	balanceSheetHistory: [], // array of string events where we lost or gained money
 	environment: {
 		day: 0,
 		year: 1,
 		climate: -1,
 		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
-	townLog: ""
+	townLog: '',
 };

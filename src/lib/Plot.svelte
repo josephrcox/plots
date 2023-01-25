@@ -20,6 +20,7 @@
 				$modifyPlotMenuOptions.x = data.x;
 				$modifyPlotMenuOptions.y = data.y;
 				$modifyPlotMenuOptions.visible = true;
+				
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from './store.js';
-	import { options } from './jsonObjects/PlotTypeOptions.js';
+	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
+	import { options } from '../jsonObjects/PlotTypeOptions.js';
 
 	export let x = 0;
 	export let y = 0;
@@ -109,15 +109,15 @@
 			// Effect modifiers
 			z.modifiers.happiness = roundTo(
 				z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
-				3
+				2
 			);
 			z.modifiers.health = roundTo(
 				z.modifiers.health * plotChosen.effect_modifiers.health,
-				3
+				2
 			);
 			z.modifiers.visitors = roundTo(
 				z.modifiers.visitors * plotChosen.effect_modifiers.visitors,
-				3
+				2
 			);
 			// Employeer modifications
 			z.towninfo.employees += plotChosen.requirements.employees;
@@ -162,15 +162,15 @@
 		// Effect modifiers
 		z.modifiers.happiness = roundTo(
 			z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
-			3
+			2
 		);
 		z.modifiers.health = roundTo(
 			z.modifiers.health / options[oldPlotType].effect_modifiers.health,
-			3
+			2
 		);
 		z.modifiers.visitors = roundTo(
 			z.modifiers.visitors / options[oldPlotType].effect_modifiers.visitors,
-			3
+			2
 		);
 		// Employeer modifications
 		z.towninfo.employees -= options[oldPlotType].requirements.employees;
@@ -232,9 +232,12 @@
 						<div>
 							<span class="subheading_m">Profits</span>
 							<br />
-							<span class="text_m"
-								><span class="strikethrough">{option.revenue_per_week}</span> 
-								{roundTo($DB.economy_and_laws.tax_rate * option.revenue_per_week, 2)} gold (with tax rate)</span
+							<span class="text_s"
+								><span class="strikethrough">{option.revenue_per_week}</span>
+								{roundTo(
+									$DB.economy_and_laws.tax_rate * option.revenue_per_week,
+									2
+								)} gold (with tax rate)</span
 							>
 						</div>
 					{/if}
@@ -244,11 +247,11 @@
 						<br />
 						{#if option.requirements.gold !== 0}
 							{#if $DB.towninfo.gold < option.requirements.gold}
-								<span class="text_m cost_label" style="color: red"
+								<span class="text_s cost_label" style="color: red"
 									>{option.requirements.gold} gold</span
 								>
 							{:else}
-								<span class="text_m cost_label"
+								<span class="text_s cost_label"
 									>{option.requirements.gold} gold</span
 								>
 							{/if}
@@ -258,11 +261,11 @@
 
 						{#if option.requirements.employees !== 0}
 							{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
-								<span class="text_m cost_label" style="color: red"
+								<span class="text_s cost_label" style="color: red"
 									>{option.requirements.employees} employees
 								</span>
 							{:else}
-								<span class="text_m cost_label"
+								<span class="text_s cost_label"
 									>{option.requirements.employees} employees
 								</span>
 							{/if}

@@ -1,6 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, DATABASE_NAME, speed } from './store.js';
+	import { DB, DATABASE_NAME, speed, showBalanceSheet } from './store.js';
+
+    let year = Math.floor($DB.environment.day / 365) + 1;
+    let day = $DB.environment.day % 365;
+    // change day and year whenever $DB.environment.day changes
+    $: {
+        year = Math.floor($DB.environment.day / 365) + 1;
+        day = $DB.environment.day % 365;
+    }
 
 	function changeName() {
 		let newName = prompt('Enter a new name for your town (under 200 chars)');
@@ -60,7 +68,8 @@
 		<div class="subheading_m">double click to change name</div>
 		<div>
 			<span on:click={slowDown}>⏪ </span> <span on:click={speedUp}> ⏩</span>
-			{speedMultiplier}x - day {$DB.environment.day}
+            
+			{speedMultiplier}x - year {year} day {day}
 		</div>
 		<div class="townLog message">{$DB.townLog}</div>
 	</div>
@@ -79,7 +88,11 @@
 				{$DB.towninfo.employees}/{$DB.towninfo.population_count}
 			</div>
 		</div>
-		<div>
+		<div on:click={() => {
+            let show = $showBalanceSheet;
+            show = !show;
+            showBalanceSheet.set(show);
+        }}>
 			<div class="subheading_m">Gold</div>
 			<div class="text_m">
 				{$DB.towninfo.gold}
@@ -88,13 +101,14 @@
 		<div>
 			<div class="subheading_m">Happiness</div>
 			<div class="text_m">
-				{Math.round($DB.towninfo.happiness)}
+				{Math.round($DB.towninfo.happiness)} <span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span>
 			</div>
+            
 		</div>
 		<div>
 			<div class="subheading_m">Health</div>
 			<div class="text_m">
-				{$DB.towninfo.health}
+				{$DB.towninfo.health} <span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
 			</div>
 		</div>
 		<div>

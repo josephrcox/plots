@@ -37,6 +37,17 @@ body {
 	margin: 0;
 	text-align: center;
 }
+.text_ss {
+	font-size: 0.7rem;
+	font-weight: 300;
+	margin: 0;
+	text-align: center;
+}
+
+.gray {
+    color: rgba(255, 255, 255, 0.327);
+}
+
 .message {
 	color: white;
 	background-color: #37496c;

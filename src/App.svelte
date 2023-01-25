@@ -2,9 +2,10 @@
 	import PlotController from './lib/PlotController.svelte';
 	import GameClock from './lib/gameClock.svelte';
 	import Header from './lib/Header.svelte';
-	import PauseMenu from './lib/PauseMenu.svelte';
-	import { DATABASE_NAME, paused } from './lib/store';
+	import PauseMenu from './lib/menus/PauseMenu.svelte';
+	import { DATABASE_NAME, paused, showBalanceSheet } from './lib/store';
 	import { modifyPlotMenuOptions } from './lib/store';
+  import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
@@ -16,8 +17,10 @@
 				$modifyPlotMenuOptions.visible = false;
 			}
 		} else if (e.key.toLowerCase() == 'escape') {
-			localStorage.removeItem(DATABASE_NAME);
-			location.reload();
+			if (prompt("Are you sure?") == "yes") {
+				localStorage.removeItem(DATABASE_NAME);
+				location.reload();
+			}
 		} else {
 			console.log(e.key)
 		}
@@ -27,6 +30,11 @@
 {#if $paused == true}
 	<PauseMenu />
 {/if}
+
+{#if $showBalanceSheet == true}
+	<BalanceSheetMenu />
+{/if}
+
 
 <Header />
 <GameClock />

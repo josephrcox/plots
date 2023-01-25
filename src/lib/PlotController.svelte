@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import ModifyPlotMenu from './ModifyPlotMenu.svelte';
+	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique } from './store.js';
 

@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { default_db } from './defaults/default_DB.js';
+import { default_db } from './jsonObjects/defaults/default_DB.js';
 
 export const DATABASE_NAME = 'plots_db';
 
@@ -35,6 +35,7 @@ export let modifyPlotMenuOptions = writable({
 
 export let unique = writable({});
 export let paused = writable(false);
+export let showBalanceSheet = writable(false);
 export let speed = writable(2000);
 
 
