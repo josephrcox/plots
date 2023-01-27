@@ -4,7 +4,12 @@
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique } from './store.js';
 
-	function checkIfPlotCanBeUpgraded(plot) {
+	export function checkIfPlotCanBeUpgraded(x, y) {
+		let plot = {
+			x: x,
+			y: y,
+		};
+		
 		// the only exception is plot 0,0, which can be upgraded from the start
 		if (plot.x === 0 && plot.y === 0) {
 			return true;
@@ -33,18 +38,28 @@
 	}
 
 	export function restartModifyPlotMenu() {
-        $unique = {};
+		$unique = {};
 	}
-    function test(e) {
-        restartModifyPlotMenu();
-    }
+
+	// check if ?dev=true is in the url
+	if (window.location.search.includes('dev=true')) {
+		let z = $DB;
+		z.towninfo.name = 'DevTown';
+		z.towninfo.gold = 10000;
+		z.towninfo.population = 0;
+		z.towninfo.happiness = 100000;
+		z.towninfo.health = 100000;
+		z.modifiers.happiness = 100000;
+		z.modifiers.health = 100000;
+		$DB = z;
+	}
 </script>
 
 <div class="grid">
 	{#each $DB.plots as plotRow}
-		<div class="row" on:click={test}>
+		<div class="row" on:click={restartModifyPlotMenu}>
 			{#each plotRow as plot}
-				<Plot data={plot} canBeUpgraded={checkIfPlotCanBeUpgraded(plot)} />
+				<Plot data={plot} canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)} />
 			{/each}
 		</div>
 	{/each}
@@ -52,10 +67,7 @@
 
 {#key $unique}
 	{#if $modifyPlotMenuOptions.visible}
-		<ModifyPlotMenu
-			x={$modifyPlotMenuOptions.x}
-			y={$modifyPlotMenuOptions.y}
-		/>
+		<ModifyPlotMenu x={$modifyPlotMenuOptions.x} y={$modifyPlotMenuOptions.y} />
 	{/if}
 {/key}
 

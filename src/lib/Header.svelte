@@ -2,13 +2,13 @@
 	import { onMount } from 'svelte';
 	import { DB, DATABASE_NAME, speed, showBalanceSheet } from './store.js';
 
-    let year = Math.floor($DB.environment.day / 365) + 1;
-    let day = $DB.environment.day % 365;
-    // change day and year whenever $DB.environment.day changes
-    $: {
-        year = Math.floor($DB.environment.day / 365) + 1;
-        day = $DB.environment.day % 365;
-    }
+	let year = Math.floor($DB.environment.day / 365) + 1;
+	let day = $DB.environment.day % 365;
+	// change day and year whenever $DB.environment.day changes
+	$: {
+		year = Math.floor($DB.environment.day / 365) + 1;
+		day = $DB.environment.day % 365;
+	}
 
 	function changeName() {
 		let newName = prompt('Enter a new name for your town (under 200 chars)');
@@ -60,6 +60,8 @@
 		var test = Math.round(n) / multiplicator;
 		return +test.toFixed(digits);
 	}
+
+	let intervalId;
 </script>
 
 <div class="header noselect">
@@ -68,7 +70,7 @@
 		<div class="subheading_m">double click to change name</div>
 		<div>
 			<span on:click={slowDown}>⏪ </span> <span on:click={speedUp}> ⏩</span>
-            
+
 			{speedMultiplier}x - year {year} day {day}
 		</div>
 		<div class="townLog message">{$DB.townLog}</div>
@@ -86,13 +88,22 @@
 			<div class="subheading_m">Employees</div>
 			<div class="text_m">
 				{$DB.towninfo.employees}/{$DB.towninfo.population_count}
+				<br />
+				<!-- Show number of unemployed if there are any unemployed -->
+				{#if $DB.towninfo.population_count - $DB.towninfo.employees > 0}
+					<span class="text_ss gray"
+						>({$DB.towninfo.population_count - $DB.towninfo.employees} unemployed)</span
+					>
+				{/if}
 			</div>
 		</div>
-		<div on:click={() => {
-            let show = $showBalanceSheet;
-            show = !show;
-            showBalanceSheet.set(show);
-        }}>
+		<div
+			on:click={() => {
+				let show = $showBalanceSheet;
+				show = !show;
+				showBalanceSheet.set(show);
+			}}
+		>
 			<div class="subheading_m">Gold</div>
 			<div class="text_m">
 				{$DB.towninfo.gold}
@@ -101,20 +112,16 @@
 		<div>
 			<div class="subheading_m">Happiness</div>
 			<div class="text_m">
-				{Math.round($DB.towninfo.happiness)} <span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span>
+				{Math.round($DB.towninfo.happiness)}
+				<span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span
+				>
 			</div>
-            
 		</div>
 		<div>
 			<div class="subheading_m">Health</div>
 			<div class="text_m">
-				{$DB.towninfo.health} <span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
-			</div>
-		</div>
-		<div>
-			<div class="subheading_m">Total visitors</div>
-			<div class="text_m">
-				{$DB.towninfo.total_visitors}
+				{$DB.towninfo.health}
+				<span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
 			</div>
 		</div>
 	</div>
@@ -128,16 +135,103 @@
 			bind:value={$DB.economy_and_laws.tax_rate}
 			on:change={setTaxRate}
 		/>
-		<div class="text_m" on:dblclick={() => {
-            let newTaxRate = parseFloat(prompt("Set a new tax rate (0-1)"));
-            if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
-                let z = $DB;
-                z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
-                DB.set(z);
-                localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-            }
-        }}>
-			{$DB.economy_and_laws.tax_rate}%
+		<!-- Button on left and right to increase or decrease by 0.01 when clicked.  -->
+		<!-- Holding down should increase quickly by 0.01 at about 0.1 a second -->
+		<!-- <div class="incrementalButtons">
+			<button
+				on:click={() => {
+					let z = $DB;
+					z.economy_and_laws.tax_rate = roundTo(
+						z.economy_and_laws.tax_rate - 0.01,
+						2
+					);
+					DB.set(z);
+					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				}}
+			>
+				-
+			</button>
+			<div
+				class="text_m"
+				on:dblclick={() => {
+					let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
+					if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
+						let z = $DB;
+						z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
+						DB.set(z);
+						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+					}
+				}}
+			>
+				{$DB.economy_and_laws.tax_rate}%
+			</div>
+			<button
+				on:click={() => {
+					let z = $DB;
+					z.economy_and_laws.tax_rate = roundTo(
+						z.economy_and_laws.tax_rate + 0.01,
+						2
+					);
+					DB.set(z);
+					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				}}
+			>
+				+
+			</button>
+		</div> -->
+
+		<div class="incrementalButtons">
+			<button on:mousedown={() => {
+				intervalId = setInterval(() => {
+					let z = $DB;
+					z.economy_and_laws.tax_rate = roundTo(
+						z.economy_and_laws.tax_rate - 0.01,
+						2
+					);
+					DB.set(z);
+					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				}, 100);
+			}}
+			on:mouseup={() => {
+				clearInterval(intervalId);
+			}}
+		>
+			-
+		</button>
+
+
+			<div
+				class="text_m"
+				on:dblclick={() => {
+					let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
+					if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
+						let z = $DB;
+						z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
+						DB.set(z);
+						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+					}
+				}}
+			>
+				{$DB.economy_and_laws.tax_rate}%
+			</div>
+
+			<button on:mousedown={() => {
+				intervalId = setInterval(() => {
+					let z = $DB;
+					z.economy_and_laws.tax_rate = roundTo(
+						z.economy_and_laws.tax_rate + 0.01,
+						2
+					);
+					DB.set(z);
+					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				}, 100);
+			}}
+			on:mouseup={() => {
+				clearInterval(intervalId);
+			}}
+		>
+			+
+		</button>
 		</div>
 	</div>
 </div>
@@ -189,5 +283,14 @@
 		background-color: #37496c;
 		padding: 15px;
 		border-radius: 3px;
+	}
+
+	.incrementalButtons {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		width: 100%;
+		margin-bottom: 5px;
+		margin-top: 5px;
 	}
 </style>

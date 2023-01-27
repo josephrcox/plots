@@ -9,15 +9,14 @@ export const default_db = {
 		employees: 0,
 		happiness: 100,
 		health: 100,
-		total_visitors: 0,
 	},
 	modifiers: {
 		happiness: 1,
 		health: 1,
-		visitors: 1,
 	},
 	economy_and_laws: {
 		tax_rate: 0,
+		max_tax_rate: 1,
 	},
 	plotCounts: [],
 	balanceSheetHistory: [], // array of string events where we lost or gained money

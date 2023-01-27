@@ -16,41 +16,46 @@
 		<div class="heading_m">Balance Sheet</div>
 		<br />
 		{#if $DB.balanceSheetHistory.length == 0}
-			<div class="text-center padding-sides">No data to display yet. Build some buildings and make sure that the tax rate is above 0%.</div>
+			<div class="text-center padding-sides">
+				No data to display yet. Build some buildings and make sure that the tax
+				rate is above 0%.
+			</div>
 		{:else}
-		<table>
-			<thead>
-				<tr>
-					<th>Day</th>
-					<th>Plot</th>
-					<th>Profits</th>
-					<th>Balance</th>
-				</tr>
-			</thead>
-			<tbody>
-				<!-- Loop through the balance sheet data -->
-				{#each $DB.balanceSheetHistory as row}
+			<table>
+				<thead>
 					<tr>
-						<td>{row.day}</td>
-						<th
-							class="plot_link"
-							on:click={() => {
-								openMenu(row.plot);
-							}}>{row.plot}</th
-						>
-
-						<td>{row.profits}</td>
-						<td>{row.balance}</td>
+						<th>Day</th>
+						<th>Plot</th>
+						<th>Profits</th>
+						<th>Balance</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					<!-- Loop through the balance sheet data -->
+					{#each $DB.balanceSheetHistory as row}
+						<tr>
+							<td>{row.day}</td>
+							<th
+								class="plot_link"
+								on:click={() => {
+									openMenu(row.plot);
+								}}>{row.plot}</th
+							>
+
+							<td>{row.profits}</td>
+							<td>{row.balance}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 		{/if}
-		
 	</div>
 </div>
 
 <style>
+	.heading_m {
+		padding-left: 5px;
+	}
 	.dialog {
 		position: fixed;
 		top: 180px;

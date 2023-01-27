@@ -5,8 +5,11 @@ export const DATABASE_NAME = 'plots_db';
 
 if (!localStorage.getItem(DATABASE_NAME)) {
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(default_db));
-	let default_plots = [];
+	let json = JSON.parse(localStorage.getItem(DATABASE_NAME));
+	// set max tax rate, number between 0.2 and 0.5
+	json.economy_and_laws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	// create 25 x 25 plots
+	let default_plots = [];
 	for (let i = 0; i < 25; i++) {
 		default_plots.push([]);
 		for (let j = 0; j < 25; j++) {
@@ -20,7 +23,7 @@ if (!localStorage.getItem(DATABASE_NAME)) {
 		}
 	}
 
-	let json = JSON.parse(localStorage.getItem(DATABASE_NAME));
+
 	json.plots = default_plots;
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(json));
 }

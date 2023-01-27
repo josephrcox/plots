@@ -77,27 +77,24 @@
 					}
 				}
 
-				// Adjust happiness based on tax rate. Lower than 10% is good, 10-20% is neutral, 20-30% is bad, 30%+ is very bad
-				if (z.economy_and_laws.tax_rate < 0.1) {
-					// do nothing
-				} else if (z.economy_and_laws.tax_rate < 0.3) {
-					// do nothing
-				} else if (z.economy_and_laws.tax_rate < 0.4) {
-					z.towninfo.happiness = Math.floor(
-						(z.towninfo.happiness -= Math.random() * 2)
-					);
-					addToTownLog(messages.high_tax_rate);
-				} else {
-					z.towninfo.happiness = Math.floor(
-						(z.towninfo.happiness -= Math.random() * 10)
-					);
-					addToTownLog(messages.very_high_tax_rate);
+				// Adjust happiness based on tax rate. If the tax rate is higher than the max_tax_rate, then send message.high_tax_rate. If more than double then send message.very_high_tax_rate
+				if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate) {
+					if (
+						z.economy_and_laws.tax_rate >
+						z.economy_and_laws.max_tax_rate * 2
+					) {
+						z.modifiers.happiness -= 0.03;
+						addToTownLog(messages.very_high_tax_rate + "  (" + z.economy_and_laws.tax_rate + "%)");
+					} else {
+						z.modifiers.happiness -= 0.01;
+						addToTownLog(messages.high_tax_rate + "  (" + z.economy_and_laws.tax_rate + "%)");
+					}
 				}
 
 				// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
 				for (let i = 0; i < z.plots.length; i++) {
 					for (let j = 0; j < z.plots[i].length; j++) {
-						if (z.plots[i][j].active == true) {
+						if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
 							let profitModifiers = z.towninfo.happiness / 100;
 							if (profitModifiers > 1.25) {
 								profitModifiers = 1.25;
@@ -105,8 +102,9 @@
 								profitModifiers = 0.75;
 							}
 							let profitsFromThisPlot =
-								(options[z.plots[i][j].type].revenue_per_week *
-								z.economy_and_laws.tax_rate) * profitModifiers;
+								options[z.plots[i][j].type].revenue_per_week *
+								z.economy_and_laws.tax_rate *
+								profitModifiers;
 
 							z.towninfo.gold += roundTo(profitsFromThisPlot, 2);
 

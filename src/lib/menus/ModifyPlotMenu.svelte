@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
 	import { options } from '../jsonObjects/PlotTypeOptions.js';
-	import Draggable from '../Draggable.svelte';
 
 	export let x = 0;
 	export let y = 0;
@@ -14,10 +13,43 @@
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
-		if ($DB.plots[x][y].type !== -1) {
+		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type !== -2) {
 			plotOptions[$DB.plots[x][y].type].classList.add('active');
 		}
 	});
+
+	export function checkIfPlotCanBeUpgraded(x, y) {
+		let plot = {
+			x: x,
+			y: y,
+		};
+
+		// the only exception is plot 0,0, which can be upgraded from the start
+		if (plot.x === 0 && plot.y === 0) {
+			return true;
+		}
+		// you can only upgrade a plot if it is adjacent to a plot that already is {active:true}.
+
+		const adjacentPlots = [
+			{ x: plot.x - 1, y: plot.y },
+			{ x: plot.x + 1, y: plot.y },
+			{ x: plot.x, y: plot.y - 1 },
+			{ x: plot.x, y: plot.y + 1 },
+		];
+		return adjacentPlots.some((adjacentPlot) => {
+			// check if adjacent plot is outside of the 25x25 grid
+			if (
+				adjacentPlot.x < 0 ||
+				adjacentPlot.x > 24 ||
+				adjacentPlot.y < 0 ||
+				adjacentPlot.y > 24
+			) {
+				return false;
+			}
+			const adjacentPlotData = $DB.plots[adjacentPlot.x][adjacentPlot.y];
+			return adjacentPlotData.active;
+		});
+	}
 
 	function close() {
 		$modifyPlotMenuOptions.visible = false;
@@ -44,6 +76,9 @@
 	}
 
 	export function canBulldoze(x, y) {
+		if (window.location.href.includes('dev=true')) {
+			return true;
+		}
 		// if the plot has zero or one adjacent neighbors (above, below, left, right), it can be bulldozed.
 		// if the plot has two or more adjacent neighbors, it cannot be bulldozed.
 		let neighbors = 0;
@@ -88,6 +123,59 @@
 			requirementsMet = false;
 		}
 
+		if (plotChosen.requirements.size != null && requirementsMet) {
+			// Usually, plots only take up one plot. If they specify a size, then they take up at least a 2x2 square.
+			// Check if there is room for the larger plot to be placed, and then set the plots around it in the square to be unusable.
+			let size = plotChosen.requirements.size;
+			let possibleSquares = [];
+
+			for (let i = 0; i < 4; i++) {
+				let square = [[x, y]];
+
+				if (i === 0) {
+					square.push([x - (size - 1), y - (size - 1)]);
+					square.push([x - (size - 1), y]);
+					square.push([x, y - (size - 1)]);
+				} else if (i === 1) {
+					square.push([x, y - (size - 1)]);
+					square.push([x + (size - 1), y - (size - 1)]);
+					square.push([x + (size - 1), y]);
+				} else if (i === 2) {
+					square.push([x - (size - 1), y]);
+					square.push([x - (size - 1), y + (size - 1)]);
+					square.push([x, y + (size - 1)]);
+				} else if (i === 3) {
+					square.push([x, y + (size - 1)]);
+					square.push([x + (size - 1), y + (size - 1)]);
+					square.push([x + (size - 1), y]);
+				}
+				possibleSquares.push(square);
+			}
+
+			// Check if any of the possible squares have entirely active==false plots that are within the bounds of the map.
+			possibleSquares = possibleSquares.filter((square) => {
+				return square.every((plot) => {
+					return (
+						plot[0] >= 0 &&
+						plot[0] <= 24 &&
+						plot[1] >= 0 &&
+						plot[1] <= 24 &&
+						!z.plots[plot[0]][plot[1]].active &&
+						checkIfPlotCanBeUpgraded(plot[0], plot[1]) == true
+					);
+				});
+			});
+			if (possibleSquares.length === 0) {
+				requirementsMet = false;
+			} else if (possibleSquares.length > 0) {
+				let chosenSquare = possibleSquares[0];
+				chosenSquare.forEach((plot) => {
+					z.plots[plot[0]][plot[1]].active = true;
+					z.plots[plot[0]][plot[1]].type = -2; // This is marking them as unusable.
+				});
+			}
+		}
+
 		if (requirementsMet === true) {
 			// Check if the plot is already set to a type. If so, reverse the effects of that type.
 			if (z.plots[x][y].type !== -1) {
@@ -105,7 +193,6 @@
 				plotChosen.immediate_variable_changes.population;
 			z.towninfo.happiness += plotChosen.immediate_variable_changes.happiness;
 			z.towninfo.health += plotChosen.immediate_variable_changes.health;
-			z.towninfo.visitors += plotChosen.immediate_variable_changes.visitors;
 			// Effect modifiers
 			z.modifiers.happiness = roundTo(
 				z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
@@ -113,10 +200,6 @@
 			);
 			z.modifiers.health = roundTo(
 				z.modifiers.health * plotChosen.effect_modifiers.health,
-				2
-			);
-			z.modifiers.visitors = roundTo(
-				z.modifiers.visitors * plotChosen.effect_modifiers.visitors,
 				2
 			);
 			// Employeer modifications
@@ -159,41 +242,38 @@
 		z.plots[x][y].type = -1;
 		z.plots[x][y].active = false;
 
-		// Immediate variable changes
-		z.towninfo.population_count -=
-			options[oldPlotType].immediate_variable_changes.population;
-		z.towninfo.population_max -=
-			options[oldPlotType].immediate_variable_changes.population;
-		z.towninfo.happiness -=
-			options[oldPlotType].immediate_variable_changes.happiness;
-		z.towninfo.health -= options[oldPlotType].immediate_variable_changes.health;
-		z.towninfo.visitors -=
-			options[oldPlotType].immediate_variable_changes.visitors;
-		// Effect modifiers
-		z.modifiers.happiness = roundTo(
-			z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
-			2
-		);
-		z.modifiers.health = roundTo(
-			z.modifiers.health / options[oldPlotType].effect_modifiers.health,
-			2
-		);
-		z.modifiers.visitors = roundTo(
-			z.modifiers.visitors / options[oldPlotType].effect_modifiers.visitors,
-			2
-		);
-		// Employeer modifications
-		z.towninfo.employees -= options[oldPlotType].requirements.employees;
+		if (oldPlotType !== -2) {
+			// Immediate variable changes
+			z.towninfo.population_count -=
+				options[oldPlotType].immediate_variable_changes.population;
+			z.towninfo.population_max -=
+				options[oldPlotType].immediate_variable_changes.population;
+			z.towninfo.happiness -=
+				options[oldPlotType].immediate_variable_changes.happiness;
+			z.towninfo.health -=
+				options[oldPlotType].immediate_variable_changes.health;
+			// Effect modifiers
+			z.modifiers.happiness = roundTo(
+				z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
+				2
+			);
+			z.modifiers.health = roundTo(
+				z.modifiers.health / options[oldPlotType].effect_modifiers.health,
+				2
+			);
+			// Employeer modifications
+			z.towninfo.employees -= options[oldPlotType].requirements.employees;
 
-		if (
-			z.plotCounts[oldPlotType] === undefined ||
-			z.plotCounts[oldPlotType] === null
-		) {
-			z.plotCounts[oldPlotType] = 0;
+			if (
+				z.plotCounts[oldPlotType] === undefined ||
+				z.plotCounts[oldPlotType] === null
+			) {
+				z.plotCounts[oldPlotType] = 0;
+			}
+			z.plotCounts[oldPlotType]--;
 		}
-		z.plotCounts[oldPlotType]--;
-		z.lastChangeDay = z.environment.day;
 
+		z.lastChangeDay = z.environment.day;
 		DB.set(z);
 		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 	}
@@ -345,9 +425,9 @@
 
 	.dialog {
 		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+		bottom: 0;
+		right: 0;
+		margin: 1em;
 		display: flex;
 		z-index: 10;
 	}

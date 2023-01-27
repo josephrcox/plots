@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { options } from './jsonObjects/PlotTypeOptions.js';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store';
 
@@ -8,7 +9,31 @@
 		x: 0,
 		y: 0,
 		type: -1,
+		styling: '',
 	};
+
+	$: onChange(data);
+
+	function onChange(...args) {
+		refreshStyling();
+	}
+	let specialStylingString = data.styling;
+
+	onMount(async () => {
+		if (data.type >= 0 && options[data.type].styling) {
+			specialStylingString = options[data.type].styling;
+		}
+	});
+
+	function refreshStyling() {
+		if (data.type >= 0 && options[data.type].styling) {
+			specialStylingString = options[data.type].styling;
+		}
+		if (data.type < 0) {
+			specialStylingString = "";
+		}
+	}
+
 	export let canBeUpgraded = false;
 
 	function openMenu() {
@@ -18,7 +43,7 @@
 				$unique = {};
 				$modifyPlotMenuOptions.visible = false;
 				plots.forEach((plot) => {
-					plot.classList.remove('active');
+					plot.classList.remove('selected');
 				});
 			} else {
 				$modifyPlotMenuOptions.x = data.x;
@@ -26,12 +51,12 @@
 				$modifyPlotMenuOptions.visible = true;
 
 				plots.forEach((plot) => {
-					plot.classList.remove('active');
+					plot.classList.remove('selected');
 				});
 				// Highlight a plot when it's clicked on
 				document
 					.querySelector(`.plot_container[data-id="${data.id}"]`)
-					.classList.add('active');
+					.classList.add('selected');
 			}
 		}
 	}
@@ -50,10 +75,15 @@
 	data-id={data.id}
 	on:click={openMenu}
 	data-canbeupgraded={canBeUpgraded}
+	style={specialStylingString}
 >
 	{#if data.type !== -1}
-		{options[data.type].title}
-		{options[data.type].subtitle}
+		{#if data.type === -2}
+			(part of a park)
+		{:else}
+			{options[data.type].title}
+			{options[data.type].subtitle}
+		{/if}
 	{/if}
 </div>
 
@@ -70,6 +100,10 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+		font-size: 0.8em;
+		padding: 6px;
+
 		/* no select */
 		-webkit-touch-callout: none; /* iOS Safari */
 		-webkit-user-select: none; /* Safari */
@@ -78,6 +112,9 @@
 		-ms-user-select: none; /* Internet Explorer/Edge */
 		user-select: none; /* Non-prefixed version, currently
                               supported by Chrome, Opera and Firefox */
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
 	}
 	.plot_container[data-active='true'] {
 		background-color: rgba(0, 0, 255, 0.243);
