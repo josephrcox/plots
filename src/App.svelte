@@ -5,7 +5,7 @@
 	import PauseMenu from './lib/menus/PauseMenu.svelte';
 	import { DATABASE_NAME, paused, showBalanceSheet } from './lib/store';
 	import { modifyPlotMenuOptions } from './lib/store';
-  import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
+	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
@@ -17,17 +17,14 @@
 				$modifyPlotMenuOptions.visible = false;
 			}
 		} else if (e.key.toLowerCase() == 'escape') {
-			if (prompt("Are you sure?") == "yes") {
+			if (prompt('Are you sure?') == 'yes') {
 				localStorage.removeItem(DATABASE_NAME);
 				location.reload();
 			}
 		} else {
-			console.log(e.key)
+			console.log(e.key);
 		}
 	});
-
-	let screenWidth = window.innerWidth;
-	let screenHeight = window.innerHeight;
 </script>
 
 {#if $paused == true}
@@ -35,9 +32,8 @@
 {/if}
 
 {#if $showBalanceSheet == true}
-	<BalanceSheetMenu/>
+	<BalanceSheetMenu />
 {/if}
-
 
 <Header />
 <GameClock />
@@ -52,8 +48,8 @@
 		overflow-x: scroll;
 		overflow-y: scroll;
 	}
-	.plot_grid[data-marginright="true"] {
+	.plot_grid[data-marginright='true'] {
 		/* This is for when the balanceSheet is being shown. */
-		margin-right: 224px; 
+		margin-right: 224px;
 	}
 </style>
