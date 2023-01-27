@@ -35,7 +35,7 @@ export let modifyPlotMenuOptions = writable({
 
 export let unique = writable({});
 export let paused = writable(false);
-export let showBalanceSheet = writable(false);
+export let showBalanceSheet = writable(true);
 export let speed = writable(2000);
 
 

@@ -12,15 +12,26 @@
 	export let canBeUpgraded = false;
 
 	function openMenu() {
+		let plots = document.querySelectorAll('.plot_container');
 		if ($paused == false) {
 			if (!data.active && !canBeUpgraded) {
 				$unique = {};
 				$modifyPlotMenuOptions.visible = false;
+				plots.forEach((plot) => {
+					plot.classList.remove('active');
+				});
 			} else {
 				$modifyPlotMenuOptions.x = data.x;
 				$modifyPlotMenuOptions.y = data.y;
 				$modifyPlotMenuOptions.visible = true;
-				
+
+				plots.forEach((plot) => {
+					plot.classList.remove('active');
+				});
+				// Highlight a plot when it's clicked on
+				document
+					.querySelector(`.plot_container[data-id="${data.id}"]`)
+					.classList.add('active');
 			}
 		}
 	}
@@ -36,6 +47,7 @@
 <div
 	class="plot_container"
 	data-active={data.active}
+	data-id={data.id}
 	on:click={openMenu}
 	data-canbeupgraded={canBeUpgraded}
 >

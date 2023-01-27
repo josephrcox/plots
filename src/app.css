@@ -6,6 +6,7 @@ body {
 	font-size: 1.3rem;
 	font-weight: 400;
 	margin: 0;
+	padding-inline: 3px;
 }
 
 .heading_l {
@@ -48,6 +49,10 @@ body {
     color: rgba(255, 255, 255, 0.327);
 }
 
+.gold {
+	color: #c6a217;
+}
+
 .message {
 	color: white;
 	background-color: #37496c;
@@ -71,11 +76,21 @@ body {
 }
 
 .message:hover {
-	max-height: 125px;
+	max-height: 78px;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 .message::before {
 	content: '💡';
+}
+
+.text-center {
+	text-align: center;
+}
+
+.padding-sides {
+	padding-inline: 5px;
 }
 
 .strikethrough {

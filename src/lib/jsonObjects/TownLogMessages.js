@@ -1,5 +1,5 @@
 export const messages = {
-    unemployment: "People can't find jobs.",
+    unemployment_num: " people can't find jobs.",
     bored: "People are bored. Try making some new buildings.",
     vairety: "People don't like going to the same places over and over again. Try making some new buildings.",
     nobody_home: "Nobody can live here. Build some residential buildings.",

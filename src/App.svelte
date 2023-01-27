@@ -25,6 +25,9 @@
 			console.log(e.key)
 		}
 	});
+
+	let screenWidth = window.innerWidth;
+	let screenHeight = window.innerHeight;
 </script>
 
 {#if $paused == true}
@@ -32,13 +35,13 @@
 {/if}
 
 {#if $showBalanceSheet == true}
-	<BalanceSheetMenu />
+	<BalanceSheetMenu/>
 {/if}
 
 
 <Header />
 <GameClock />
-<div class="plot_grid">
+<div class="plot_grid" data-marginright={$showBalanceSheet}>
 	<PlotController />
 </div>
 
@@ -48,5 +51,9 @@
 		max-height: 100%;
 		overflow-x: scroll;
 		overflow-y: scroll;
+	}
+	.plot_grid[data-marginright="true"] {
+		/* This is for when the balanceSheet is being shown. */
+		margin-right: 224px; 
 	}
 </style>

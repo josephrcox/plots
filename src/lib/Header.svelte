@@ -119,7 +119,7 @@
 		</div>
 	</div>
 	<div class="taxInfo">
-		<div class="subheading_m">Tax rate (more tax, less happiness)</div>
+		<div class="subheading_m">Tax rate (more tax = less happiness)</div>
 		<input
 			type="range"
 			min="0"
@@ -156,6 +156,7 @@
 		top: 0;
 		z-index: 1;
 		overflow-x: scroll;
+		height: 150px;
 	}
 
 	.header__left {
@@ -179,17 +180,6 @@
 	.subheading_m {
 		color: white;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.228);
-	}
-
-	table,
-	td,
-	tr {
-		border: 1px solid rgba(128, 128, 128, 0.246);
-		border-collapse: collapse;
-		border-spacing: 0;
-		padding: 3px;
-		padding-inline: 6px;
-		text-align: start;
 	}
 
 	.taxInfo {
