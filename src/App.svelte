@@ -1,30 +1,109 @@
-<script>
+<script lang="ts">
 	import PlotController from './lib/PlotController.svelte';
 	import GameClock from './lib/gameClock.svelte';
 	import Header from './lib/Header.svelte';
 	import PauseMenu from './lib/menus/PauseMenu.svelte';
-	import { DATABASE_NAME, paused, showBalanceSheet } from './lib/store';
+	import { DATABASE_NAME, paused, showBalanceSheet, unique } from './lib/store';
 	import { modifyPlotMenuOptions } from './lib/store';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
-		if (e.key.toLowerCase() == 'p') {
-			if ($paused == true) {
-				paused.set(false);
-			} else {
-				paused.set(true);
-				$modifyPlotMenuOptions.visible = false;
-			}
-		} else if (e.key.toLowerCase() == 'escape') {
-			if (prompt('Are you sure?') == 'yes') {
-				localStorage.removeItem(DATABASE_NAME);
-				location.reload();
-			}
-		} else {
-			console.log(e.key);
+		let key = e.key.toLowerCase();
+		switch(key) {
+			case 'p':
+				if ($paused == true) {
+					paused.set(false);
+				} else {
+					paused.set(true);
+					$modifyPlotMenuOptions.visible = false;
+				}
+				break;
+			case 'escape':
+				if (prompt('Are you sure?') == 'yes') {
+					localStorage.removeItem(DATABASE_NAME);
+					location.reload();
+				}
+				break;
+			case 'arrowleft':
+				e.preventDefault();
+				changeSelectedPlot(0, -1);
+				break;
+			case 'arrowright':
+				e.preventDefault();
+				changeSelectedPlot(0, 1);
+				break;
+			case 'arrowup':
+				e.preventDefault();
+				changeSelectedPlot(-1, 0);
+				break;
+			case 'arrowdown':
+				e.preventDefault();
+				changeSelectedPlot(1, 0);
+				break;
+			default:
+				break;
 		}
+
 	});
+
+	function changeSelectedPlot(changeX, changeY) {
+		if ($modifyPlotMenuOptions.visible == false) {
+			openPlotMenu(0, 0);
+		} else {
+			let x = $modifyPlotMenuOptions.x;
+			let y = $modifyPlotMenuOptions.y;
+			if (x + changeX < 0) {
+				x = 0;
+			} else if (x + changeX > 25) {
+				x = 25;
+			} else {
+				x += changeX;
+			}
+			if (y + changeY < 0) {
+				y = 0;
+			} else if (y + changeY > 25) {
+				y = 25;
+			} else {
+				y += changeY;
+			}
+			openPlotMenu(x, y);
+			console.log(x,y);
+		}
+		
+	}
+
+	export function openPlotMenu(x,y) {
+		let plots = document.querySelectorAll('.plot_container') as NodeListOf<HTMLDivElement>;
+		let plot;
+		plots.forEach((p) => {
+			if (p.dataset?.x == x && p.dataset.y == y) {
+				plot = p;
+			}
+		});
+		if ($paused == false) {
+			if (plot.dataset.active === "true" && plot.dataset.canBeUpgraded === "true") {
+				$modifyPlotMenuOptions.visible = false;
+				plots.forEach((plot) => {
+					plot.classList.remove('selected');
+				});
+			} else {
+				$modifyPlotMenuOptions.x = x;
+				$modifyPlotMenuOptions.y = y;
+				$modifyPlotMenuOptions.visible = true;
+
+				plots.forEach((plot) => {
+					plot.classList.remove('selected');
+				});
+				// Highlight a plot when it's clicked on
+				plot
+					.classList.add('selected');
+				// Scroll the plot into view
+				plot.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+				$unique = {};
+			}
+		}
+	}
 </script>
 
 {#if $paused == true}

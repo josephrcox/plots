@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
-	import { DB, modifyPlotMenuOptions, unique } from './store.js';
+	import { DB, modifyPlotMenuOptions, unique, paused } from './store.js';
 
 	export function checkIfPlotCanBeUpgraded(x, y) {
 		let plot = {

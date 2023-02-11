@@ -73,6 +73,8 @@
 	class="plot_container"
 	data-active={data.active}
 	data-id={data.id}
+	data-x={data.x}
+	data-y={data.y}
 	on:click={openMenu}
 	data-canbeupgraded={canBeUpgraded}
 	style={specialStylingString}

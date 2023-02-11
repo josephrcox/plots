@@ -12,9 +12,15 @@
 	onMount(() => (mounted = true));
 
 	onMount(() => {
+		console.log('mounted');
 		const plotOptions = document.querySelectorAll('.plotOption');
 		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type !== -2) {
 			plotOptions[$DB.plots[x][y].type].classList.add('active');
+			// scroll to the active plot option
+			plotOptions[$DB.plots[x][y].type].scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+			});
 		}
 	});
 
@@ -302,104 +308,108 @@
 		{/if}
 		Modify plot: {y}, {x}
 		<br />
-		<button on:click={close} id="close">Close</button>
-		<br />
-		<label for="plotType">Plot Type</label>
-		{#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
+		{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
 			<button on:click={clearPlot} id="bulldoze">🔥</button>
 		{/if}
+		<button on:click={close} id="close">Close</button>
+		<br />
+		<div class="scrollable-y">
+			<label for="plotType">Plot Type</label>
 
-		<div class="plotOptions">
-			{#each PlotTypeOptions as option (option)}
-				<div
-					class="plotOption background-lightgray"
-					data-active={option.selected}
-					on:click={choosePlotOption}
-				>
-					<div>
-						<span class="heading_m">{option.title}</span>
-						<br />
-						<span class="subheading_m">{option.subtitle}</span>
-						<br />
-						<span class="text_s">{option.description}</span>
-					</div>
-					{#if option.revenue_per_week > 0}
+			<div class="plotOptions">
+				{#each PlotTypeOptions as option (option)}
+					<div
+						class="plotOption background-lightgray"
+						data-active={option.selected}
+						on:click={choosePlotOption}
+					>
 						<div>
-							<span class="subheading_m">Profits</span>
+							<span class="heading_m">{option.title}</span>
 							<br />
-							<span class="text_s gold"
-								><span class="strikethrough">{option.revenue_per_week}</span>
-								{roundTo(
-									$DB.economy_and_laws.tax_rate * option.revenue_per_week,
-									2
-								)} gold (with tax rate)</span
-							>
+							<span class="subheading_m">{option.subtitle}</span>
+							<br />
+							<span class="text_s">{option.description}</span>
 						</div>
-					{/if}
-
-					<div class="reqs_and_mods">
-						<div>
-							<span class="subheading_m">Requirements</span>
-							<br />
-							{#if option.requirements.gold !== 0}
-								{#if $DB.towninfo.gold < option.requirements.gold}
-									<span class="text_s cost_label" style="color: red"
-										>{option.requirements.gold} gold</span
-									>
-								{:else}
-									<span class="text_s cost_label"
-										>{option.requirements.gold} gold</span
-									>
-								{/if}
-
+						{#if option.revenue_per_week > 0}
+							<div>
+								<span class="subheading_m">Profits</span>
 								<br />
-							{/if}
+								<span class="text_s gold"
+									><span class="strikethrough">{option.revenue_per_week}</span>
+									{roundTo(
+										$DB.economy_and_laws.tax_rate * option.revenue_per_week,
+										2
+									)} gold (with tax rate)</span
+								>
+							</div>
+						{/if}
 
-							{#if option.requirements.employees !== 0}
-								{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
-									<span class="text_s cost_label" style="color: red"
-										>{option.requirements.employees} employees
-									</span>
-								{:else}
-									<span class="text_s cost_label"
-										>{option.requirements.employees} employees
-									</span>
+						<div class="reqs_and_mods">
+							<div>
+								<span class="subheading_m">Requirements</span>
+								<br />
+								{#if option.requirements.gold !== 0}
+									{#if $DB.towninfo.gold < option.requirements.gold}
+										<span class="text_s cost_label" style="color: red"
+											>{option.requirements.gold} gold</span
+										>
+									{:else}
+										<span class="text_s cost_label"
+											>{option.requirements.gold} gold</span
+										>
+									{/if}
+
+									<br />
 								{/if}
-							{/if}
-						</div>
-						<div>
-							<span class="subheading_m">Effects (multiplier)</span>
-							<br />
-							<!-- {JSON.stringify(option.effect_modifiers)} -->
-							{#if option.effect_modifiers.happiness == 1.0}
-								<span class="text_s" data-positive="true"
-									>Happiness: no effect</span
-								>
-							{:else}
-								<span
-									class="text_s"
-									data-positive={option.effect_modifiers.happiness >= 1}
-									>Happiness: {formatNumber(
-										option.effect_modifiers.happiness
-									)}</span
-								>
-							{/if}
-							<br />
-							{#if option.effect_modifiers.health == 1.0}
-								<span class="text_s" data-positive="true"
-									>Health: no effect</span
-								>
-							{:else}
-								<span
-									class="text_s"
-									data-positive={option.effect_modifiers.health >= 1}
-									>Health: {formatNumber(option.effect_modifiers.health)}</span
-								>
-							{/if}
+
+								{#if option.requirements.employees !== 0}
+									{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
+										<span class="text_s cost_label" style="color: red"
+											>{option.requirements.employees} employees
+										</span>
+									{:else}
+										<span class="text_s cost_label"
+											>{option.requirements.employees} employees
+										</span>
+									{/if}
+								{/if}
+							</div>
+							<div>
+								<span class="subheading_m">Effects (multiplier)</span>
+								<br />
+								<!-- {JSON.stringify(option.effect_modifiers)} -->
+								{#if option.effect_modifiers.happiness == 1.0}
+									<span class="text_s" data-positive="true"
+										>Happiness: no effect</span
+									>
+								{:else}
+									<span
+										class="text_s"
+										data-positive={option.effect_modifiers.happiness >= 1}
+										>Happiness: {formatNumber(
+											option.effect_modifiers.happiness
+										)}</span
+									>
+								{/if}
+								<br />
+								{#if option.effect_modifiers.health == 1.0}
+									<span class="text_s" data-positive="true"
+										>Health: no effect</span
+									>
+								{:else}
+									<span
+										class="text_s"
+										data-positive={option.effect_modifiers.health >= 1}
+										>Health: {formatNumber(
+											option.effect_modifiers.health
+										)}</span
+									>
+								{/if}
+							</div>
 						</div>
 					</div>
-				</div>
-			{/each}
+				{/each}
+			</div>
 		</div>
 	</div>
 </div>
@@ -438,7 +448,11 @@
 		border-radius: 0.5em;
 		box-shadow: 0 0 10px rgba(45, 35, 35, 0.3);
 		height: 547px;
+	}
+
+	.scrollable-y {
 		overflow-y: scroll;
+		height: 95%;
 	}
 
 	.dialog-content:hover {
@@ -453,8 +467,8 @@
 	}
 	#bulldoze {
 		position: absolute;
-		top: 30px;
-		right: 0;
+		top: 0px;
+		right: 70px;
 		margin: 1em;
 	}
 	.cost_label {
