@@ -9,6 +9,7 @@ export const default_db = {
 		employees: 0,
 		happiness: 100,
 		health: 100,
+		knowledge_points: 0,
 	},
 	modifiers: {
 		happiness: 1,

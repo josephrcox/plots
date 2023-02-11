@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
 	import { options } from '../jsonObjects/PlotTypeOptions.js';
@@ -412,12 +412,12 @@
 	}
 
 	.plotOption {
-		border: 1px solid black;
+		border: 1px solid rgb(123, 114, 101);
 		width: 14em;
 		height: 12em;
 		min-width: 12em;
 		padding: 5px;
-		background-color: #f2f2f2;
+		background-color: rgb(31, 34, 35);
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
@@ -433,12 +433,17 @@
 	}
 
 	.dialog-content {
-		background: white;
+		background: rgb(24, 26, 27);
 		padding: 1em;
 		border-radius: 0.5em;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-		height: 500px;
+		box-shadow: 0 0 10px rgba(45, 35, 35, 0.3);
+		height: 547px;
 		overflow-y: scroll;
+	}
+
+	.dialog-content:hover {
+		/* Create inner border 1px black */
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), inset 0 0 0 1px black;
 	}
 	#close {
 		position: absolute;
@@ -453,7 +458,7 @@
 		margin: 1em;
 	}
 	.cost_label {
-		color: green;
+		color: rgb(114, 255, 114);
 		font-size: 14px;
 	}
 	.reqs_and_mods {
@@ -461,7 +466,7 @@
 		justify-content: space-between;
 	}
 	.reqs_and_mods > div:first-child {
-		border-right: 1px solid rgb(200, 200, 200);
+		border-right: 1px solid rgb(118, 109, 97);
 		padding-right: 5px;
 	}
 	.reqs_and_mods > div:nth-child(2) {
@@ -472,7 +477,7 @@
 	}
 	/* data-positive */
 	[data-positive='true'] {
-		color: green;
+		color: rgb(114, 255, 114);
 	}
 	[data-positive='false'] {
 		color: red;

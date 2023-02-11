@@ -79,22 +79,27 @@
 
 	<div class="header__right">
 		<div>
-			<div class="subheading_m">Population</div>
+			<div class="subheading_m">👪 Population</div>
 			<div class="text_m">
 				{$DB.towninfo.population_count}/{$DB.towninfo.population_max}
 			</div>
 		</div>
 		<div>
-			<div class="subheading_m">Employees</div>
+			<div class="subheading_m">🧑‍🌾 Employees</div>
 			<div class="text_m">
 				{$DB.towninfo.employees}/{$DB.towninfo.population_count}
 				<br />
-				<!-- Show number of unemployed if there are any unemployed -->
 				{#if $DB.towninfo.population_count - $DB.towninfo.employees > 0}
 					<span class="text_ss gray"
 						>({$DB.towninfo.population_count - $DB.towninfo.employees} unemployed)</span
 					>
 				{/if}
+			</div>
+		</div>
+		<div>
+			<div class="subheading_m">🧠 Knowledge</div>
+			<div class="text_m">
+				{$DB.towninfo.knowledge_points}
 			</div>
 		</div>
 		<div
@@ -104,13 +109,13 @@
 				showBalanceSheet.set(show);
 			}}
 		>
-			<div class="subheading_m">Gold</div>
+			<div class="subheading_m">💰 Gold</div>
 			<div class="text_m">
 				{$DB.towninfo.gold}
 			</div>
 		</div>
 		<div>
-			<div class="subheading_m">Happiness</div>
+			<div class="subheading_m">😁 Happiness</div>
 			<div class="text_m">
 				{Math.round($DB.towninfo.happiness)}
 				<span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span
@@ -118,7 +123,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="subheading_m">Health</div>
+			<div class="subheading_m">🩺 Health</div>
 			<div class="text_m">
 				{$DB.towninfo.health}
 				<span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
@@ -135,22 +140,26 @@
 			bind:value={$DB.economy_and_laws.tax_rate}
 			on:change={setTaxRate}
 		/>
-		<!-- Button on left and right to increase or decrease by 0.01 when clicked.  -->
-		<!-- Holding down should increase quickly by 0.01 at about 0.1 a second -->
-		<!-- <div class="incrementalButtons">
+		<div class="incrementalButtons">
 			<button
-				on:click={() => {
-					let z = $DB;
-					z.economy_and_laws.tax_rate = roundTo(
-						z.economy_and_laws.tax_rate - 0.01,
-						2
-					);
-					DB.set(z);
-					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				on:mousedown={() => {
+					intervalId = setInterval(() => {
+						let z = $DB;
+						z.economy_and_laws.tax_rate = roundTo(
+							z.economy_and_laws.tax_rate - 0.01,
+							2
+						);
+						DB.set(z);
+						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+					}, 100);
+				}}
+				on:mouseup={() => {
+					clearInterval(intervalId);
 				}}
 			>
 				-
 			</button>
+
 			<div
 				class="text_m"
 				on:dblclick={() => {
@@ -165,73 +174,25 @@
 			>
 				{$DB.economy_and_laws.tax_rate}%
 			</div>
+
 			<button
-				on:click={() => {
-					let z = $DB;
-					z.economy_and_laws.tax_rate = roundTo(
-						z.economy_and_laws.tax_rate + 0.01,
-						2
-					);
-					DB.set(z);
-					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				on:mousedown={() => {
+					intervalId = setInterval(() => {
+						let z = $DB;
+						z.economy_and_laws.tax_rate = roundTo(
+							z.economy_and_laws.tax_rate + 0.01,
+							2
+						);
+						DB.set(z);
+						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+					}, 100);
+				}}
+				on:mouseup={() => {
+					clearInterval(intervalId);
 				}}
 			>
 				+
 			</button>
-		</div> -->
-
-		<div class="incrementalButtons">
-			<button on:mousedown={() => {
-				intervalId = setInterval(() => {
-					let z = $DB;
-					z.economy_and_laws.tax_rate = roundTo(
-						z.economy_and_laws.tax_rate - 0.01,
-						2
-					);
-					DB.set(z);
-					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-				}, 100);
-			}}
-			on:mouseup={() => {
-				clearInterval(intervalId);
-			}}
-		>
-			-
-		</button>
-
-
-			<div
-				class="text_m"
-				on:dblclick={() => {
-					let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
-					if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
-						let z = $DB;
-						z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
-						DB.set(z);
-						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-					}
-				}}
-			>
-				{$DB.economy_and_laws.tax_rate}%
-			</div>
-
-			<button on:mousedown={() => {
-				intervalId = setInterval(() => {
-					let z = $DB;
-					z.economy_and_laws.tax_rate = roundTo(
-						z.economy_and_laws.tax_rate + 0.01,
-						2
-					);
-					DB.set(z);
-					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-				}, 100);
-			}}
-			on:mouseup={() => {
-				clearInterval(intervalId);
-			}}
-		>
-			+
-		</button>
 		</div>
 	</div>
 </div>
@@ -242,9 +203,9 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 16px;
-		background-color: #161f30;
+		background-color: rgb(11, 16, 24);
 		border-bottom: 1px solid black;
-		color: white;
+		color: rgb(232, 230, 227);
 		/* Pin to the top of the screen at all times */
 		position: sticky;
 		top: 0;

@@ -3,6 +3,7 @@
 	import { DB, DATABASE_NAME, paused, speed } from './store.js';
 	import { messages } from './jsonObjects/TownLogMessages.js';
 	import { options } from './jsonObjects/PlotTypeOptions.js';
+  import Plot from './Plot.svelte';
 
 	export function mainGameThreadLoop() {
 		if ($paused == false) {
@@ -20,7 +21,7 @@
 
 				// If nothing has happened for a while, lower the happiness modifier due to boredom
 				if (z.lastChangeDay + (Math.random() * 365 + 150) < z.environment.day) {
-					z.modifiers.happiness = z.modifiers.happiness * 0.9999;
+					z.modifiers.happiness = z.modifiers.happiness * 0.98;
 					addToTownLog(messages.bored);
 				}
 
@@ -84,10 +85,20 @@
 						z.economy_and_laws.max_tax_rate * 2
 					) {
 						z.modifiers.happiness -= 0.03;
-						addToTownLog(messages.very_high_tax_rate + "  (" + z.economy_and_laws.tax_rate + "%)");
+						addToTownLog(
+							messages.very_high_tax_rate +
+								'  (' +
+								z.economy_and_laws.tax_rate +
+								'%)'
+						);
 					} else {
 						z.modifiers.happiness -= 0.01;
-						addToTownLog(messages.high_tax_rate + "  (" + z.economy_and_laws.tax_rate + "%)");
+						addToTownLog(
+							messages.high_tax_rate +
+								'  (' +
+								z.economy_and_laws.tax_rate +
+								'%)'
+						);
 					}
 				}
 
@@ -95,6 +106,8 @@
 				for (let i = 0; i < z.plots.length; i++) {
 					for (let j = 0; j < z.plots[i].length; j++) {
 						if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
+							// Iterate through all plots and do actions based on their conditions
+							let plotOptionForPlot = options[z.plots[i][j].type];
 							let profitModifiers = z.towninfo.happiness / 100;
 							if (profitModifiers > 1.25) {
 								profitModifiers = 1.25;
@@ -102,7 +115,7 @@
 								profitModifiers = 0.75;
 							}
 							let profitsFromThisPlot =
-								options[z.plots[i][j].type].revenue_per_week *
+								plotOptionForPlot.revenue_per_week *
 								z.economy_and_laws.tax_rate *
 								profitModifiers;
 
@@ -125,12 +138,46 @@
 				}
 
 				z.towninfo.gold = Math.round(z.towninfo.gold);
-			} else if (z.environment.day % 60 == 0) {
+			} 
+			if (z.environment.day % 60 == 0) {
 				z.towninfo.happiness = roundTo(
 					z.towninfo.happiness * z.modifiers.happiness,
 					2
 				);
 				z.towninfo.health = roundTo(z.towninfo.health * z.modifiers.health, 2);
+			} 
+			if (z.environment.day % 30 === 0) {
+				for (let i = 0; i < z.plots.length; i++) {
+					for (let j = 0; j < z.plots[i].length; j++) {
+						if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
+							let plotOptionForPlot = options[z.plots[i][j].type];
+							if (
+								plotOptionForPlot.knowledge_points_per_month != null
+							) {
+								z.towninfo.knowledge_points += plotOptionForPlot.knowledge_points_per_month;
+							}
+						}
+					}
+				}
+			}
+
+			// for each property in z.towninfo that is a number type, round to 2 decimal places
+			z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
+			z.towninfo.health = roundTo(z.towninfo.health, 2);
+			z.towninfo.gold = roundTo(z.towninfo.gold, 0);
+			z.towninfo.employees = roundTo(z.towninfo.employees, 0);
+			// set minimum of all stats to 0
+			if (z.towninfo.happiness < 0) {
+				z.towninfo.happiness = 0;
+			}
+			if (z.towninfo.health < 0) {
+				z.towninfo.health = 0;
+			}
+			if (z.towninfo.gold < 0) {
+				z.towninfo.gold = 0;
+			}
+			if (z.towninfo.employees < 0) {
+				z.towninfo.employees = 0;
 			}
 
 			DB.set(z);

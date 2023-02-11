@@ -49,8 +49,6 @@
 		z.towninfo.population = 0;
 		z.towninfo.happiness = 100000;
 		z.towninfo.health = 100000;
-		z.modifiers.happiness = 100000;
-		z.modifiers.health = 100000;
 		$DB = z;
 	}
 </script>

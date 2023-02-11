@@ -2,6 +2,10 @@ body {
 	margin: 0;
 }
 
+html, body {
+	color: #e8e6e3;
+}
+
 .heading_m {
 	font-size: 1.3rem;
 	font-weight: 400;
@@ -18,11 +22,11 @@ body {
 	font-size: 0.8rem;
 	font-weight: 300;
 	margin: 0;
-	color: rgba(0, 0, 0, 0.686);
+	color: rgba(232, 230, 227, 0.69);
 	width: 100%;
 	margin-bottom: 6px;
 	padding-bottom: 1px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.098);
+	border-bottom: 1px solid rgba(31, 48, 117, 0.23);
 }
 
 .text_m {
@@ -94,8 +98,8 @@ body {
 
 .strikethrough {
 	text-decoration: line-through;
-	text-decoration-thickness: 1px;
-	text-decoration-color: black;
+	text-decoration-thickness: 3px;
+	text-decoration-color: rgb(33, 33, 33);
 }
 
 .active {
@@ -103,8 +107,16 @@ body {
 }
 
 .selected {
-	border: 3px solid green !important;;
+	border: 3px solid green !important;
+	/* bold text */
+	font-weight: 600;
 }
+
+button {
+	background-color: black;
+	color:white;
+	border-radius: 5px;
+  }
 
 .noselect {
 	-webkit-touch-callout: none; /* iOS Safari */
@@ -115,3 +127,4 @@ body {
 	user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
 }
+

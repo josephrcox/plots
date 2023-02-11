@@ -30,7 +30,7 @@
 			specialStylingString = options[data.type].styling;
 		}
 		if (data.type < 0) {
-			specialStylingString = "";
+			specialStylingString = '';
 		}
 	}
 
@@ -81,8 +81,11 @@
 		{#if data.type === -2}
 			(part of a park)
 		{:else}
-			{options[data.type].title}
-			{options[data.type].subtitle}
+			<div>
+				<span>{options[data.type].title}</span>
+				<!-- <br />
+				<span>{data.x},{data.y}</span> -->
+			</div>
 		{/if}
 	{/if}
 </div>
@@ -92,7 +95,7 @@
 		width: 100px;
 		height: 100px;
 		border: 1px solid rgb(100, 100, 100);
-		background-color: rgb(232, 231, 231);
+		background-color: rgb(37, 40, 42);
 
 		text-align: center;
 		word-wrap: normal;
@@ -121,5 +124,14 @@
 	}
 	.plot_container[data-canbeupgraded='false'] {
 		background-color: black;
+		border: none;
+	}
+
+	.plot_container > div {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		gap: 10px;
+		color: black;
 	}
 </style>
