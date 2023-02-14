@@ -12,7 +12,6 @@
 	onMount(() => (mounted = true));
 
 	onMount(() => {
-		console.log('mounted');
 		const plotOptions = document.querySelectorAll('.plotOption');
 		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type !== -2) {
 			plotOptions[$DB.plots[x][y].type].classList.add('active');

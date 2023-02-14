@@ -3,11 +3,11 @@
 	import { DB, DATABASE_NAME, paused, speed } from './store.js';
 	import { messages } from './jsonObjects/TownLogMessages.js';
 	import { options } from './jsonObjects/PlotTypeOptions.js';
-  import Plot from './Plot.svelte';
+	import Plot from './Plot.svelte';
 
 	export function mainGameThreadLoop() {
+		let z = $DB;
 		if ($paused == false) {
-			let z = $DB;
 			z.environment.day += 1;
 
 			// check if day is divisible by 30
@@ -138,51 +138,56 @@
 				}
 
 				z.towninfo.gold = Math.round(z.towninfo.gold);
-			} 
+			}
 			if (z.environment.day % 60 == 0) {
 				z.towninfo.happiness = roundTo(
 					z.towninfo.happiness * z.modifiers.happiness,
 					2
 				);
 				z.towninfo.health = roundTo(z.towninfo.health * z.modifiers.health, 2);
-			} 
+			}
 			if (z.environment.day % 30 === 0) {
 				for (let i = 0; i < z.plots.length; i++) {
 					for (let j = 0; j < z.plots[i].length; j++) {
 						if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
 							let plotOptionForPlot = options[z.plots[i][j].type];
-							if (
-								plotOptionForPlot.knowledge_points_per_month != null
-							) {
-								z.towninfo.knowledge_points += plotOptionForPlot.knowledge_points_per_month;
+							if (plotOptionForPlot.knowledge_points_per_month != null) {
+								z.towninfo.knowledge_points +=
+									plotOptionForPlot.knowledge_points_per_month;
 							}
 						}
 					}
 				}
 			}
-
-			// for each property in z.towninfo that is a number type, round to 2 decimal places
-			z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
-			z.towninfo.health = roundTo(z.towninfo.health, 2);
-			z.towninfo.gold = roundTo(z.towninfo.gold, 0);
-			z.towninfo.employees = roundTo(z.towninfo.employees, 0);
-			// set minimum of all stats to 0
-			if (z.towninfo.happiness < 0) {
-				z.towninfo.happiness = 0;
-			}
-			if (z.towninfo.health < 0) {
-				z.towninfo.health = 0;
-			}
-			if (z.towninfo.gold < 0) {
-				z.towninfo.gold = 0;
-			}
-			if (z.towninfo.employees < 0) {
-				z.towninfo.employees = 0;
-			}
-
-			DB.set(z);
-			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		}
+		// for each property in z.towninfo that is a number type, round to 2 decimal places
+		z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
+		z.towninfo.health = roundTo(z.towninfo.health, 2);
+		z.towninfo.gold = roundTo(z.towninfo.gold, 0);
+		z.towninfo.employees = roundTo(z.towninfo.employees, 0);
+		// set minimum of all stats to 0
+		if (z.towninfo.happiness < 0) {
+			z.towninfo.happiness = 0;
+		}
+		if (z.towninfo.health < 0) {
+			z.towninfo.health = 0;
+		}
+		if (z.towninfo.gold < 0) {
+			z.towninfo.gold = 0;
+		}
+		if (z.towninfo.employees < 0) {
+			z.towninfo.employees = 0;
+		}
+		if (z.towninfo.knowledge_points < 0) {
+			z.towninfo.knowledge_points = 0;
+		}
+		if (z.towninfo.population_count < 0) {
+			z.towninfo.population_count = 0;
+		}
+		
+
+		DB.set(z);
+		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 	}
 
 	function addToTownLog(message) {

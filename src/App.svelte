@@ -48,7 +48,7 @@
 	});
 
 	function changeSelectedPlot(changeX, changeY) {
-		if ($modifyPlotMenuOptions.visible == false) {
+		if ($modifyPlotMenuOptions.visible === false && $modifyPlotMenuOptions.x === 0 && $modifyPlotMenuOptions.y === 0) {
 			openPlotMenu(0, 0);
 		} else {
 			let x = $modifyPlotMenuOptions.x;
@@ -68,7 +68,6 @@
 				y += changeY;
 			}
 			openPlotMenu(x, y);
-			console.log(x,y);
 		}
 		
 	}
@@ -77,31 +76,29 @@
 		let plots = document.querySelectorAll('.plot_container') as NodeListOf<HTMLDivElement>;
 		let plot;
 		plots.forEach((p) => {
-			if (p.dataset?.x == x && p.dataset.y == y) {
+			if (p.dataset.x == x && p.dataset.y == y) {
 				plot = p;
 			}
 		});
 		if ($paused == false) {
-			if (plot.dataset.active === "true" && plot.dataset.canBeUpgraded === "true") {
-				$modifyPlotMenuOptions.visible = false;
-				plots.forEach((plot) => {
-					plot.classList.remove('selected');
-				});
-			} else {
-				$modifyPlotMenuOptions.x = x;
-				$modifyPlotMenuOptions.y = y;
+			if (plot.dataset.canbeupgraded === "true") {
 				$modifyPlotMenuOptions.visible = true;
-
-				plots.forEach((plot) => {
-					plot.classList.remove('selected');
-				});
-				// Highlight a plot when it's clicked on
-				plot
-					.classList.add('selected');
-				// Scroll the plot into view
-				plot.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
-				$unique = {};
+			} else {
+				$modifyPlotMenuOptions.visible = false;
 			}
+			$modifyPlotMenuOptions.x = x;
+			$modifyPlotMenuOptions.y = y;
+
+			plots.forEach((plot) => {
+				plot.classList.remove('selected');
+			});
+			// Highlight a plot when it's clicked on
+			plot
+				.classList.add('selected');
+			// Scroll the plot into view
+			plot.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+			$unique = {};
+			
 		}
 	}
 </script>
