@@ -73,7 +73,6 @@
 		height: 100%;
 		overflow: auto;
 		padding-top: 10px;
-		max-width: 224px;
 		background-color: rgb(43, 43, 43);
 		color: white;
 	}

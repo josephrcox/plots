@@ -11,6 +11,7 @@
 		type: -1,
 		styling: '',
 	};
+	export let canBeUpgraded = false;
 
 	$: onChange(data);
 
@@ -33,8 +34,6 @@
 			specialStylingString = '';
 		}
 	}
-
-	export let canBeUpgraded = false;
 
 	function openMenu() {
 		let plots = document.querySelectorAll('.plot_container');

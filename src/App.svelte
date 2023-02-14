@@ -10,6 +10,7 @@
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
 		let key = e.key.toLowerCase();
+		console.log(key)
 		switch(key) {
 			case 'p':
 				if ($paused == true) {
@@ -25,19 +26,19 @@
 					location.reload();
 				}
 				break;
-			case 'arrowleft':
+			case 'arrowleft': case 'a':
 				e.preventDefault();
 				changeSelectedPlot(0, -1);
 				break;
-			case 'arrowright':
+			case 'arrowright': case 'd':
 				e.preventDefault();
 				changeSelectedPlot(0, 1);
 				break;
-			case 'arrowup':
+			case 'arrowup': case 'w':
 				e.preventDefault();
 				changeSelectedPlot(-1, 0);
 				break;
-			case 'arrowdown':
+			case 'arrowdown': case 's':
 				e.preventDefault();
 				changeSelectedPlot(1, 0);
 				break;
