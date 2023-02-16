@@ -18,9 +18,10 @@ export const default_db = {
 	economy_and_laws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
+		balanceSheetHistory: [], 
+		lastMonthProfit: 0,
 	},
 	plotCounts: [],
-	balanceSheetHistory: [], // array of string events where we lost or gained money
 	environment: {
 		day: 0,
 		year: 1,

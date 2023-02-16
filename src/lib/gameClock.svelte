@@ -15,13 +15,13 @@
 				// Adjust happiness based on unemployment rate
 				let unemployed = z.towninfo.population_count - z.towninfo.employees;
 				if (unemployed > 0) {
-					z.modifiers.happiness -= unemployed * 0.0005;
+					z.modifiers.happiness -= unemployed * 0.0009;
 					addToTownLog(unemployed + messages.unemployment_num);
 				}
 
 				// If nothing has happened for a while, lower the happiness modifier due to boredom
-				if (z.lastChangeDay + (Math.random() * 365 + 150) < z.environment.day) {
-					z.modifiers.happiness = z.modifiers.happiness * 0.98;
+				if (z.lastChangeDay + (Math.random() * 365 + 365) < z.environment.day) {
+					z.modifiers.happiness = z.modifiers.happiness * 0.998;
 					addToTownLog(messages.bored);
 				}
 
@@ -101,43 +101,50 @@
 						);
 					}
 				}
-
+				z.economy_and_laws.lastMonthProfit = 0;
 				// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
 				for (let i = 0; i < z.plots.length; i++) {
 					for (let j = 0; j < z.plots[i].length; j++) {
 						if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
 							// Iterate through all plots and do actions based on their conditions
 							let plotOptionForPlot = options[z.plots[i][j].type];
-							let profitModifiers = z.towninfo.happiness / 100;
-							if (profitModifiers > 1.25) {
-								profitModifiers = 1.25;
-							} else if (profitModifiers < 0.75) {
-								profitModifiers = 0.75;
-							}
-							let profitsFromThisPlot =
-								plotOptionForPlot.revenue_per_week *
-								z.economy_and_laws.tax_rate *
-								profitModifiers;
-
-							z.towninfo.gold += roundTo(profitsFromThisPlot, 2);
+							let profit = getProfit(plotOptionForPlot.revenue_per_week);
+							z.towninfo.gold += profit;
+							z.economy_and_laws.lastMonthProfit += profit;
 
 							// push object to the start of the balance sheet history array instead of the end
-							if (profitsFromThisPlot > 0) {
-								z.balanceSheetHistory = [
+							if (profit > 0) {
+								z.economy_and_laws.balanceSheetHistory = [
 									{
 										day: z.environment.day,
 										plot: `${i},${j}`,
-										profits: roundTo(profitsFromThisPlot, 2),
-										balance: Math.round(z.towninfo.gold),
+										profits: profit,
+										taxRate: z.economy_and_laws.tax_rate,
 									},
-									...z.balanceSheetHistory,
+									...z.economy_and_laws.balanceSheetHistory,
 								];
 							}
 						}
 					}
 				}
 
-				z.towninfo.gold = Math.round(z.towninfo.gold);
+				z.towninfo.gold = roundTo(z.towninfo.gold, 2);
+
+				// Every 30 days, if happiness mod is above 1.5, then get closer to 1.5, never going below 1.5
+				if (z.modifiers.happiness > 1.00) {
+					z.modifiers.happiness -= 0.05;
+					if (z.modifiers.happiness < 1.00) {
+						z.modifiers.happiness = 1.00;
+					}
+					console.log("bringing happiness lower")
+				}
+				if (z.modifiers.health > 1.00) {
+					z.modifiers.health -= 0.05;
+					if (z.modifiers.health < 1.00) {
+						z.modifiers.health = 1.00;
+					}
+					console.log("bringing health lower")
+				}
 			}
 			if (z.environment.day % 60 == 0) {
 				z.towninfo.happiness = roundTo(
@@ -163,7 +170,7 @@
 		// for each property in z.towninfo that is a number type, round to 2 decimal places
 		z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
 		z.towninfo.health = roundTo(z.towninfo.health, 2);
-		z.towninfo.gold = roundTo(z.towninfo.gold, 0);
+		z.towninfo.gold = roundTo(z.towninfo.gold, 2);
 		z.towninfo.employees = roundTo(z.towninfo.employees, 0);
 		// set minimum of all stats to 0
 		if (z.towninfo.happiness < 0) {
@@ -184,7 +191,13 @@
 		if (z.towninfo.population_count < 0) {
 			z.towninfo.population_count = 0;
 		}
-		
+		// set the maximum for some stats
+		if (z.towninfo.happiness > 300) {
+			z.towninfo.happiness = 300;
+		}
+		if (z.towninfo.health > 300) {
+			z.towninfo.health = 300;
+		}
 
 		DB.set(z);
 		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
@@ -197,6 +210,25 @@
 
 		DB.set(z);
 		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+	}
+
+	function getProfit(revenue) {
+		// This takes in revenue, and returns the gold profit.
+		// Profit is revenue * tax rate * percentage of population out of the max population
+		let z = $DB;
+		let profitModifiers = z.towninfo.happiness / 100;
+		if (profitModifiers > 1.25) {
+			profitModifiers = 1.25;
+		} else if (profitModifiers < 0.75) {
+			profitModifiers = 0.75;
+		}
+
+		let profit =
+			revenue *
+			z.economy_and_laws.tax_rate *
+			(z.towninfo.population_count / z.towninfo.population_max) *
+			profitModifiers;
+		return roundTo(profit, 2);
 	}
 
 	function roundTo(n, digits) {

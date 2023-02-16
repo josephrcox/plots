@@ -220,14 +220,14 @@
 			z.plotCounts[typeIndex]++;
 			z.lastChangeDay = z.environment.day;
 
-			z.balanceSheetHistory = [
+			z.economy_and_laws.balanceSheetHistory = [
 				{
 					day: z.environment.day,
 					plot: `${x},${y}`,
 					profits: plotChosen.requirements.gold * -1,
 					balance: roundTo(z.towninfo.gold, 2),
 				},
-				...z.balanceSheetHistory,
+				...z.economy_and_laws.balanceSheetHistory,
 			];
 
 			DB.set(z);
@@ -329,82 +329,120 @@
 							<br />
 							<span class="text_s">{option.description}</span>
 						</div>
-						{#if option.revenue_per_week > 0}
-							<div>
-								<span class="subheading_m">Profits</span>
-								<br />
-								<span class="text_s gold"
-									><span class="strikethrough">{option.revenue_per_week}</span>
-									{roundTo(
-										$DB.economy_and_laws.tax_rate * option.revenue_per_week,
-										2
-									)} gold (with tax rate)</span
-								>
-							</div>
-						{/if}
 
-						<div class="reqs_and_mods">
-							<div>
-								<span class="subheading_m">Requirements</span>
-								<br />
-								{#if option.requirements.gold !== 0}
-									{#if $DB.towninfo.gold < option.requirements.gold}
-										<span class="text_s cost_label" style="color: red"
-											>{option.requirements.gold} gold</span
-										>
-									{:else}
-										<span class="text_s cost_label"
-											>{option.requirements.gold} gold</span
-										>
-									{/if}
-
+						<div class="bottom">
+							{#if option.revenue_per_week > 0}
+								<div class="profits">
+									<span class="subheading_m">Profits</span>
 									<br />
-								{/if}
-
-								{#if option.requirements.employees !== 0}
-									{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
-										<span class="text_s cost_label" style="color: red"
-											>{option.requirements.employees} employees
-										</span>
-									{:else}
-										<span class="text_s cost_label"
-											>{option.requirements.employees} employees
-										</span>
+									<span class="text_s gold"
+										><span class="strikethrough">{option.revenue_per_week}</span
+										>
+										{roundTo(
+											$DB.economy_and_laws.tax_rate * option.revenue_per_week,
+											2
+										)} gold (with tax rate)</span
+									>
+								</div>
+							{/if}
+							<div class="reqs_and_mods">
+								<div>
+									<span class="subheading_m">Requirements</span>
+									<br />
+									{#if option.requirements.gold !== 0}
+										{#if $DB.towninfo.gold < option.requirements.gold}
+											<span class="red text_s cost_label "
+												>{option.requirements.gold} gold</span
+											>
+										{:else}
+											<span class="text_s cost_label"
+												>{option.requirements.gold} gold</span
+											>
+										{/if}
+										<br />
 									{/if}
-								{/if}
+
+									{#if option.requirements.employees !== 0}
+										{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
+											<span class="text_s cost_label red" 
+												>{option.requirements.employees} employees
+											</span>
+										{:else}
+											<span class="text_s cost_label"
+												>{option.requirements.employees} employees
+											</span>
+										{/if}
+										<br />
+									{/if}
+
+									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
+										{#if $DB.towninfo.knowledge_points < option.requirements.knowledge}
+											<span class="text_s cost_label red" 
+												>{option.requirements.knowledge} knowledge
+											</span>
+										{:else}
+											<span class="text_s cost_label"
+												>{option.requirements.knowledge} knowledge
+											</span>
+										{/if}
+										<br />
+									{/if}
+								</div>
+								<div>
+									<span class="subheading_m">Effects (multiplier)</span>
+									<br />
+									<!-- {JSON.stringify(option.effect_modifiers)} -->
+									{#if option.effect_modifiers.happiness == 1.0}
+										<span class="text_s" data-positive="true"
+											>Happiness: no effect</span
+										>
+									{:else}
+										<span
+											class="text_s"
+											data-positive={option.effect_modifiers.happiness >= 1}
+											>Happiness: {formatNumber(
+												option.effect_modifiers.happiness
+											)}</span
+										>
+									{/if}
+									<br />
+									{#if option.effect_modifiers.health == 1.0}
+										<span class="text_s" data-positive="true"
+											>Health: no effect</span
+										>
+									{:else}
+										<span
+											class="text_s"
+											data-positive={option.effect_modifiers.health >= 1}
+											>Health: {formatNumber(
+												option.effect_modifiers.health
+											)}</span
+										>
+									{/if}
+								</div>
 							</div>
-							<div>
-								<span class="subheading_m">Effects (multiplier)</span>
-								<br />
-								<!-- {JSON.stringify(option.effect_modifiers)} -->
-								{#if option.effect_modifiers.happiness == 1.0}
-									<span class="text_s" data-positive="true"
-										>Happiness: no effect</span
-									>
-								{:else}
-									<span
-										class="text_s"
-										data-positive={option.effect_modifiers.happiness >= 1}
-										>Happiness: {formatNumber(
-											option.effect_modifiers.happiness
-										)}</span
-									>
-								{/if}
-								<br />
-								{#if option.effect_modifiers.health == 1.0}
-									<span class="text_s" data-positive="true"
-										>Health: no effect</span
-									>
-								{:else}
-									<span
-										class="text_s"
-										data-positive={option.effect_modifiers.health >= 1}
-										>Health: {formatNumber(
-											option.effect_modifiers.health
-										)}</span
-									>
-								{/if}
-							</div>
+							{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
+								<div class="immediate_changes">
+									<span class="subheading_m"
+										>Instant changes:
+										{#if option.immediate_variable_changes.happiness !== 0}
+											Happiness:
+											<span class="green"
+												>{option.immediate_variable_changes.happiness}</span
+											>
+										{/if}
+										{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
+											, 
+										{/if}
+										{#if option.immediate_variable_changes.health !== 0}
+											Health:
+											<span class="green"
+												>{option.immediate_variable_changes.health}</span
+											>
+										{/if}
+									</span>
+								</div>
+							{/if}
 						</div>
 					</div>
 				{/each}
@@ -423,7 +461,7 @@
 	.plotOption {
 		border: 1px solid rgb(123, 114, 101);
 		width: 14em;
-		height: 12em;
+		height: 15em;
 		min-width: 12em;
 		padding: 5px;
 		background-color: rgb(31, 34, 35);
@@ -439,6 +477,18 @@
 		margin: 1em;
 		display: flex;
 		z-index: 10;
+	}
+
+	.immediate_changes, .reqs_and_mods, .profits {
+		border-top: 1px solid rgb(118, 109, 97);
+		padding-top: 2px;
+		padding-bottom: 2px;
+		padding-left: 3px;
+		padding-right: 3px;
+	}
+
+	.bottom {
+		background-color: rgb(43, 47, 49);
 	}
 
 	.dialog-content {
@@ -493,6 +543,6 @@
 		color: rgb(114, 255, 114);
 	}
 	[data-positive='false'] {
-		color: red;
+		color: #ff5050;
 	}
 </style>

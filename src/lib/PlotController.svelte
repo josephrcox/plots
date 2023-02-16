@@ -65,8 +65,9 @@
 
 {#key $unique}
 	{#if $modifyPlotMenuOptions.visible}
-		<ModifyPlotMenu x={$modifyPlotMenuOptions.x} y={$modifyPlotMenuOptions.y} />
+		<ModifyPlotMenu x={$modifyPlotMenuOptions.x} y={$modifyPlotMenuOptions.y}/>
 	{/if}
+	
 {/key}
 
 <style>

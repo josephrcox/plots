@@ -15,7 +15,7 @@
 		<!-- Create an HTML table with columns for day, profits, balance -->
 		<div class="heading_m">Balance Sheet</div>
 		<br />
-		{#if $DB.balanceSheetHistory.length == 0}
+		{#if $DB.economy_and_laws.balanceSheetHistory.length == 0}
 			<div class="text-center padding-sides">
 				No data to display yet. Build some buildings and make sure that the tax
 				rate is above 0%.
@@ -27,12 +27,12 @@
 						<th>Day</th>
 						<th>Plot</th>
 						<th>Profits</th>
-						<th>Balance</th>
+						<th>Tax rate</th>
 					</tr>
 				</thead>
 				<tbody>
 					<!-- Loop through the balance sheet data -->
-					{#each $DB.balanceSheetHistory as row}
+					{#each $DB.economy_and_laws.balanceSheetHistory as row}
 						<tr>
 							<td>{row.day}</td>
 							<th
@@ -43,7 +43,7 @@
 							>
 
 							<td>{row.profits}</td>
-							<td>{row.balance}</td>
+							<td>{row.taxRate}</td>
 						</tr>
 					{/each}
 				</tbody>

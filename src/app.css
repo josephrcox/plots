@@ -26,7 +26,6 @@ html, body {
 	width: 100%;
 	margin-bottom: 6px;
 	padding-bottom: 1px;
-	border-bottom: 1px solid rgba(31, 48, 117, 0.23);
 }
 
 .text_m {
@@ -54,6 +53,18 @@ html, body {
 
 .gold {
 	color: #c6a217;
+}
+
+.green {
+	color: #00ff00;
+}
+
+.yellow {
+	color: #ffff00;
+}
+
+.red {
+	color: #ff5050 !important;
 }
 
 .message {

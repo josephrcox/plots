@@ -82,11 +82,7 @@
 			}
 		});
 		if ($paused == false) {
-			if (plot.dataset.canbeupgraded === "true") {
-				$modifyPlotMenuOptions.visible = true;
-			} else {
-				$modifyPlotMenuOptions.visible = false;
-			}
+			$modifyPlotMenuOptions.visible = true;
 			$modifyPlotMenuOptions.x = x;
 			$modifyPlotMenuOptions.y = y;
 
@@ -99,7 +95,6 @@
 			// Scroll the plot into view
 			plot.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
 			$unique = {};
-			
 		}
 	}
 </script>

@@ -1,6 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
 	import { DB, DATABASE_NAME, speed, showBalanceSheet } from './store.js';
+	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
+
+	let balanceSheetComponent;
 
 	let year = Math.floor($DB.environment.day / 365) + 1;
 	let day = $DB.environment.day % 365;
@@ -35,8 +38,8 @@
 		let cspeed = $speed;
 		cspeed = cspeed / 2;
 
-		if (cspeed <= 500) {
-			cspeed = 500;
+		if (cspeed <= 250) {
+			cspeed = 250;
 		}
 		$speed = cspeed;
 		console.log(cspeed);
@@ -73,7 +76,11 @@
 
 			{speedMultiplier}x - year {year} day {day}
 		</div>
-		<div class="townLog message">{$DB.townLog}</div>
+		<div class="townLog message" on:click={
+			() => {
+				$DB.townLog = '';
+			}
+		}>{$DB.townLog}</div>
 	</div>
 	<div class="header__center" />
 
@@ -111,7 +118,13 @@
 		>
 			<div class="subheading_m">💰 Gold</div>
 			<div class="text_m">
-				{$DB.towninfo.gold}
+				{$DB.towninfo.gold} 
+				<br/>
+				{#if $DB.economy_and_laws.lastMonthProfit >= 0}
+					 <span class="text_ss green">(+{$DB.economy_and_laws.lastMonthProfit} last 30d)</span>
+				{:else if $DB.economy_and_laws.lastMonthProfit < 0}
+					 <span class="text_ss red">({$DB.economy_and_laws.lastMonthProfit} last 30d)</span>
+				{/if}
 			</div>
 		</div>
 		<div>
@@ -120,6 +133,9 @@
 				{Math.round($DB.towninfo.happiness)}
 				<span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span
 				>
+				{#if $DB.towninfo.happiness >= 300}
+					<span class="yellow max_label">MAX</span>
+				{/if}
 			</div>
 		</div>
 		<div>
@@ -127,6 +143,9 @@
 			<div class="text_m">
 				{$DB.towninfo.health}
 				<span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
+				{#if $DB.towninfo.health >= 300}
+					<span class="yellow max_label">MAX</span>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -155,6 +174,14 @@
 				}}
 				on:mouseup={() => {
 					clearInterval(intervalId);
+				}}
+				on:click={() => {
+					// go down by 0.01
+					let z = $DB;
+					z.economy_and_laws.tax_rate = roundTo(
+						z.economy_and_laws.tax_rate - 0.01,
+						2
+					);
 				}}
 			>
 				-
@@ -190,6 +217,15 @@
 				on:mouseup={() => {
 					clearInterval(intervalId);
 				}}
+				on:click={() => {
+					let z = $DB;
+					z.economy_and_laws.tax_rate = roundTo(
+						z.economy_and_laws.tax_rate + 0.01,
+						2
+					);
+					DB.set(z);
+					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+				}}
 			>
 				+
 			</button>
@@ -212,6 +248,7 @@
 		z-index: 1;
 		overflow-x: scroll;
 		height: 150px;
+		gap: 21px;
 	}
 
 	.header__left {
@@ -228,6 +265,10 @@
 		padding-inline: 10px;
 	}
 
+	.header__right div {
+		min-width: 30px;
+	}
+
 	.header__right > div > .subheading_m {
 		text-align: center;
 	}
@@ -242,8 +283,13 @@
 		flex-direction: column;
 		align-items: center;
 		background-color: #37496c;
-		padding: 15px;
+		padding: 9px;
 		border-radius: 3px;
+	}
+
+	.max_label {
+		font-size: 12px;
+		font-style: italic;
 	}
 
 	.incrementalButtons {
