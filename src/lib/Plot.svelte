@@ -75,7 +75,7 @@
 	data-x={data.x}
 	data-y={data.y}
 	on:click={openMenu}
-	data-canbeupgraded={canBeUpgraded}
+	data-canbeupgraded={canBeUpgraded} 
 	style={specialStylingString}
 >
 	{#if data.type !== -1}

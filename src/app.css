@@ -118,7 +118,7 @@ html, body {
 }
 
 .selected {
-	border: 3px solid green !important;
+	border: 6px solid green !important;
 	/* bold text */
 	font-weight: 600;
 }

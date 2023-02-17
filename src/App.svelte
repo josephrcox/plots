@@ -10,8 +10,8 @@
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
 		let key = e.key.toLowerCase();
-		console.log(key)
-		switch(key) {
+		console.log(key);
+		switch (key) {
 			case 'p':
 				if ($paused == true) {
 					paused.set(false);
@@ -26,30 +26,37 @@
 					location.reload();
 				}
 				break;
-			case 'arrowleft': case 'a':
+			case 'arrowleft':
+			case 'a':
 				e.preventDefault();
 				changeSelectedPlot(0, -1);
 				break;
-			case 'arrowright': case 'd':
+			case 'arrowright':
+			case 'd':
 				e.preventDefault();
 				changeSelectedPlot(0, 1);
 				break;
-			case 'arrowup': case 'w':
+			case 'arrowup':
+			case 'w':
 				e.preventDefault();
 				changeSelectedPlot(-1, 0);
 				break;
-			case 'arrowdown': case 's':
+			case 'arrowdown':
+			case 's':
 				e.preventDefault();
 				changeSelectedPlot(1, 0);
 				break;
 			default:
 				break;
 		}
-
 	});
 
 	function changeSelectedPlot(changeX, changeY) {
-		if ($modifyPlotMenuOptions.visible === false && $modifyPlotMenuOptions.x === 0 && $modifyPlotMenuOptions.y === 0) {
+		if (
+			$modifyPlotMenuOptions.visible === false &&
+			$modifyPlotMenuOptions.x === 0 &&
+			$modifyPlotMenuOptions.y === 0
+		) {
 			openPlotMenu(0, 0);
 		} else {
 			let x = $modifyPlotMenuOptions.x;
@@ -70,11 +77,12 @@
 			}
 			openPlotMenu(x, y);
 		}
-		
 	}
 
-	export function openPlotMenu(x,y) {
-		let plots = document.querySelectorAll('.plot_container') as NodeListOf<HTMLDivElement>;
+	export function openPlotMenu(x, y) {
+		let plots = document.querySelectorAll(
+			'.plot_container'
+		) as NodeListOf<HTMLDivElement>;
 		let plot;
 		plots.forEach((p) => {
 			if (p.dataset.x == x && p.dataset.y == y) {
@@ -82,7 +90,11 @@
 			}
 		});
 		if ($paused == false) {
-			$modifyPlotMenuOptions.visible = true;
+			if (plot.dataset.canbeupgraded === 'true') {
+				$modifyPlotMenuOptions.visible = true;
+			} else {
+				$modifyPlotMenuOptions.visible = false;
+			}
 			$modifyPlotMenuOptions.x = x;
 			$modifyPlotMenuOptions.y = y;
 
@@ -90,10 +102,13 @@
 				plot.classList.remove('selected');
 			});
 			// Highlight a plot when it's clicked on
-			plot
-				.classList.add('selected');
+			plot.classList.add('selected');
 			// Scroll the plot into view
-			plot.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+			plot.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'center',
+			});
 			$unique = {};
 		}
 	}

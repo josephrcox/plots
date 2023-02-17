@@ -9,7 +9,7 @@
 			x: x,
 			y: y,
 		};
-		
+
 		// the only exception is plot 0,0, which can be upgraded from the start
 		if (plot.x === 0 && plot.y === 0) {
 			return true;
@@ -57,7 +57,10 @@
 	{#each $DB.plots as plotRow}
 		<div class="row" on:click={restartModifyPlotMenu}>
 			{#each plotRow as plot}
-				<Plot data={plot} canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)} />
+				<Plot
+					data={plot}
+					canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
+				/>
 			{/each}
 		</div>
 	{/each}
@@ -65,9 +68,8 @@
 
 {#key $unique}
 	{#if $modifyPlotMenuOptions.visible}
-		<ModifyPlotMenu x={$modifyPlotMenuOptions.x} y={$modifyPlotMenuOptions.y}/>
+		<ModifyPlotMenu x={$modifyPlotMenuOptions.x} y={$modifyPlotMenuOptions.y} />
 	{/if}
-	
 {/key}
 
 <style>

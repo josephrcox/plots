@@ -32,7 +32,7 @@
 				</thead>
 				<tbody>
 					<!-- Loop through the balance sheet data -->
-					{#each $DB.economy_and_laws.balanceSheetHistory as row}
+					{#each $DB.economy_and_laws.balanceSheetHistory as row} 
 						<tr>
 							<td>{row.day}</td>
 							<th
@@ -75,6 +75,7 @@
 		padding-top: 10px;
 		background-color: rgb(43, 43, 43);
 		color: white;
+		height: 75%;
 	}
 
 	table,

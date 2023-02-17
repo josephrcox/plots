@@ -21,7 +21,11 @@
 
 				// If nothing has happened for a while, lower the happiness modifier due to boredom
 				if (z.lastChangeDay + (Math.random() * 365 + 365) < z.environment.day) {
-					z.modifiers.happiness = z.modifiers.happiness * 0.998;
+					if (z.towninfo.population_count > 0) {
+						z.towninfo.population_count -= 1;
+						z.towninfo.employees -= 1;
+					}
+
 					addToTownLog(messages.bored);
 				}
 
@@ -123,6 +127,11 @@
 									},
 									...z.economy_and_laws.balanceSheetHistory,
 								];
+								// If balanceSheetHistory has over 250 items, set to only latest 250 entries
+								if (z.economy_and_laws.balanceSheetHistory.length > 250) {
+									z.economy_and_laws.balanceSheetHistory =
+										z.economy_and_laws.balanceSheetHistory.slice(0, 250);
+								}
 							}
 						}
 					}
@@ -131,19 +140,19 @@
 				z.towninfo.gold = roundTo(z.towninfo.gold, 2);
 
 				// Every 30 days, if happiness mod is above 1.5, then get closer to 1.5, never going below 1.5
-				if (z.modifiers.happiness > 1.00) {
+				if (z.modifiers.happiness > 1.0) {
 					z.modifiers.happiness -= 0.05;
-					if (z.modifiers.happiness < 1.00) {
-						z.modifiers.happiness = 1.00;
+					if (z.modifiers.happiness < 1.0) {
+						z.modifiers.happiness = 1.0;
 					}
-					console.log("bringing happiness lower")
+					console.log('bringing happiness lower');
 				}
-				if (z.modifiers.health > 1.00) {
+				if (z.modifiers.health > 1.0) {
 					z.modifiers.health -= 0.05;
-					if (z.modifiers.health < 1.00) {
-						z.modifiers.health = 1.00;
+					if (z.modifiers.health < 1.0) {
+						z.modifiers.health = 1.0;
 					}
-					console.log("bringing health lower")
+					console.log('bringing health lower');
 				}
 			}
 			if (z.environment.day % 60 == 0) {

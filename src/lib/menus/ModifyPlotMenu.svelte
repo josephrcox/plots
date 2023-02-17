@@ -364,7 +364,7 @@
 
 									{#if option.requirements.employees !== 0}
 										{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
-											<span class="text_s cost_label red" 
+											<span class="text_s cost_label red"
 												>{option.requirements.employees} employees
 											</span>
 										{:else}
@@ -377,7 +377,7 @@
 
 									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
 										{#if $DB.towninfo.knowledge_points < option.requirements.knowledge}
-											<span class="text_s cost_label red" 
+											<span class="text_s cost_label red"
 												>{option.requirements.knowledge} knowledge
 											</span>
 										{:else}
@@ -432,7 +432,7 @@
 											>
 										{/if}
 										{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
-											, 
+											,
 										{/if}
 										{#if option.immediate_variable_changes.health !== 0}
 											Health:
@@ -479,7 +479,9 @@
 		z-index: 10;
 	}
 
-	.immediate_changes, .reqs_and_mods, .profits {
+	.immediate_changes,
+	.reqs_and_mods,
+	.profits {
 		border-top: 1px solid rgb(118, 109, 97);
 		padding-top: 2px;
 		padding-bottom: 2px;
