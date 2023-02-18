@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
+	import {
+		DATABASE_NAME,
+		DB,
+		modifyPlotMenuOptions
+	} from '../store.js';
 	import { options } from '../jsonObjects/PlotTypeOptions.js';
 
 	export let x = 0;
@@ -298,153 +302,182 @@
 	function formatNumber(n) {
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
+
+	function checkIfAffordable(plotChosen) {
+		let z = $DB;
+		let requirementsMet = true;
+		if (plotChosen.requirements.gold > z.towninfo.gold) {
+			requirementsMet = false;
+		}
+		let availableEmployees = z.towninfo.employees - z.towninfo.population_count;
+		if (plotChosen.requirements.employees > availableEmployees) {
+			requirementsMet = false;
+		}
+		if (plotChosen.requirements.knowledge !== undefined) {
+			if (plotChosen.requirements.knowledge > z.towninfo.knowledge) {
+				requirementsMet = false;
+			}
+		}
+		return requirementsMet;
+	}
 </script>
 
 <div class="dialog">
 	<div class="dialog-content">
-		{#if tempMessage !== ''}
-			<div class="message">{tempMessage}</div>
-		{/if}
-		Modify plot: {y}, {x}
-		<br />
-		{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
-			<button on:click={clearPlot} id="bulldoze">🔥</button>
-		{/if}
-		<button on:click={close} id="close">Close</button>
-		<br />
+		<div class="header">
+			<div>
+				left side placeholder
+			</div>
+			<div>
+				<span class="heading_m">Modify plot: {y}, {x}</span>
+				{#if tempMessage !== ''}
+					<div class="message">{tempMessage}</div>
+				{/if}
+			</div>
+			<div>
+				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
+					<button on:click={clearPlot} id="bulldoze">🔥</button>
+				{/if}
+				<button on:click={close} id="close">Close</button>
+			</div>
+		</div>
 		<div class="scrollable-y">
-			<label for="plotType">Plot Type</label>
-
+			<label for="plotType">Plot options</label>
+			<br />
 			<div class="plotOptions">
 				{#each PlotTypeOptions as option (option)}
-					<div
-						class="plotOption background-lightgray"
-						data-active={option.selected}
-						on:click={choosePlotOption}
-					>
-						<div>
-							<span class="heading_m">{option.title}</span>
-							<br />
-							<span class="subheading_m">{option.subtitle}</span>
-							<br />
-							<span class="text_s">{option.description}</span>
-						</div>
-
-						<div class="bottom">
-							{#if option.revenue_per_week > 0}
-								<div class="profits">
-									<span class="subheading_m">Profits</span>
-									<br />
-									<span class="text_s gold"
-										><span class="strikethrough">{option.revenue_per_week}</span
-										>
-										{roundTo(
-											$DB.economy_and_laws.tax_rate * option.revenue_per_week,
-											2
-										)} gold (with tax rate)</span
-									>
-								</div>
-							{/if}
-							<div class="reqs_and_mods">
-								<div>
-									<span class="subheading_m">Requirements</span>
-									<br />
-									{#if option.requirements.gold !== 0}
-										{#if $DB.towninfo.gold < option.requirements.gold}
-											<span class="red text_s cost_label "
-												>{option.requirements.gold} gold</span
-											>
-										{:else}
-											<span class="text_s cost_label"
-												>{option.requirements.gold} gold</span
-											>
-										{/if}
-										<br />
-									{/if}
-
-									{#if option.requirements.employees !== 0}
-										{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
-											<span class="text_s cost_label red"
-												>{option.requirements.employees} employees
-											</span>
-										{:else}
-											<span class="text_s cost_label"
-												>{option.requirements.employees} employees
-											</span>
-										{/if}
-										<br />
-									{/if}
-
-									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
-										{#if $DB.towninfo.knowledge_points < option.requirements.knowledge}
-											<span class="text_s cost_label red"
-												>{option.requirements.knowledge} knowledge
-											</span>
-										{:else}
-											<span class="text_s cost_label"
-												>{option.requirements.knowledge} knowledge
-											</span>
-										{/if}
-										<br />
-									{/if}
-								</div>
-								<div>
-									<span class="subheading_m">Effects (multiplier)</span>
-									<br />
-									<!-- {JSON.stringify(option.effect_modifiers)} -->
-									{#if option.effect_modifiers.happiness == 1.0}
-										<span class="text_s" data-positive="true"
-											>Happiness: no effect</span
-										>
-									{:else}
-										<span
-											class="text_s"
-											data-positive={option.effect_modifiers.happiness >= 1}
-											>Happiness: {formatNumber(
-												option.effect_modifiers.happiness
-											)}</span
-										>
-									{/if}
-									<br />
-									{#if option.effect_modifiers.health == 1.0}
-										<span class="text_s" data-positive="true"
-											>Health: no effect</span
-										>
-									{:else}
-										<span
-											class="text_s"
-											data-positive={option.effect_modifiers.health >= 1}
-											>Health: {formatNumber(
-												option.effect_modifiers.health
-											)}</span
-										>
-									{/if}
-								</div>
+					<!-- Sort the options to show affordable ones first -->
+					{#if true}
+						<div
+							class="plotOption background-lightgray"
+							data-active={option.selected}
+							on:click={choosePlotOption}
+						>
+							<div>
+								<span class="heading_m">{option.title}</span>
+								<br />
+								<span class="subheading_m">{option.subtitle}</span>
+								<br />
+								<span class="text_s">{option.description}</span>
 							</div>
-							{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
-								<div class="immediate_changes">
-									<span class="subheading_m"
-										>Instant changes:
-										{#if option.immediate_variable_changes.happiness !== 0}
-											Happiness:
-											<span class="green"
-												>{option.immediate_variable_changes.happiness}</span
+
+							<div class="bottom">
+								{#if option.revenue_per_week > 0}
+									<div class="profits">
+										<span class="subheading_m">Profits</span>
+										<br />
+										<span class="text_s gold"
+											><span class="strikethrough"
+												>{option.revenue_per_week}</span
+											>
+											{roundTo(
+												$DB.economy_and_laws.tax_rate * option.revenue_per_week,
+												2
+											)} gold (with tax rate)</span
+										>
+									</div>
+								{/if}
+								<div class="reqs_and_mods">
+									<div>
+										<span class="subheading_m">Requirements</span>
+										<br />
+										{#if option.requirements.gold !== 0}
+											{#if $DB.towninfo.gold < option.requirements.gold}
+												<span class="red text_s cost_label "
+													>{option.requirements.gold} gold</span
+												>
+											{:else}
+												<span class="text_s cost_label"
+													>{option.requirements.gold} gold</span
+												>
+											{/if}
+											<br />
+										{/if}
+
+										{#if option.requirements.employees !== 0}
+											{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
+												<span class="text_s cost_label red"
+													>{option.requirements.employees} employees
+												</span>
+											{:else}
+												<span class="text_s cost_label"
+													>{option.requirements.employees} employees
+												</span>
+											{/if}
+											<br />
+										{/if}
+
+										{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
+											{#if $DB.towninfo.knowledge_points < option.requirements.knowledge}
+												<span class="text_s cost_label red"
+													>{option.requirements.knowledge} knowledge
+												</span>
+											{:else}
+												<span class="text_s cost_label"
+													>{option.requirements.knowledge} knowledge
+												</span>
+											{/if}
+											<br />
+										{/if}
+									</div>
+									<div>
+										<span class="subheading_m">Effects (multiplier)</span>
+										<br />
+										<!-- {JSON.stringify(option.effect_modifiers)} -->
+										{#if option.effect_modifiers.happiness == 1.0}
+											<span class="text_s" data-positive="true"
+												>Happiness: no effect</span
+											>
+										{:else}
+											<span
+												class="text_s"
+												data-positive={option.effect_modifiers.happiness >= 1}
+												>Happiness: {formatNumber(
+													option.effect_modifiers.happiness
+												)}</span
 											>
 										{/if}
-										{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
-											,
-										{/if}
-										{#if option.immediate_variable_changes.health !== 0}
-											Health:
-											<span class="green"
-												>{option.immediate_variable_changes.health}</span
+										<br />
+										{#if option.effect_modifiers.health == 1.0}
+											<span class="text_s" data-positive="true"
+												>Health: no effect</span
+											>
+										{:else}
+											<span
+												class="text_s"
+												data-positive={option.effect_modifiers.health >= 1}
+												>Health: {formatNumber(
+													option.effect_modifiers.health
+												)}</span
 											>
 										{/if}
-									</span>
+									</div>
 								</div>
-							{/if}
+								{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
+									<div class="immediate_changes">
+										<span class="subheading_m"
+											>Instant changes:
+											{#if option.immediate_variable_changes.happiness !== 0}
+												Happiness:
+												<span class="green"
+													>{option.immediate_variable_changes.happiness}</span
+												>
+											{/if}
+											{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
+												,
+											{/if}
+											{#if option.immediate_variable_changes.health !== 0}
+												Health:
+												<span class="green"
+													>{option.immediate_variable_changes.health}</span
+												>
+											{/if}
+										</span>
+									</div>
+								{/if}
+							</div>
 						</div>
-					</div>
+					{/if}
 				{/each}
 			</div>
 		</div>
@@ -479,6 +512,33 @@
 		z-index: 10;
 	}
 
+	.header {
+		display: flex;
+		flex-direction: row;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #393939;
+		margin-bottom: 10px;
+		justify-content: space-between;
+		flex: 0 0 25em;
+	}
+
+	.header > div {
+		display: flex;
+		flex-direction: column;
+		flex: 30% 0 0;
+		text-align: center;
+	}
+
+	/* last child on header */
+	.header > div:last-child {
+		text-align: end;
+		display: block;
+	}
+
+	#close, #bulldoze {
+		width: fit-content;
+	}
+
 	.immediate_changes,
 	.reqs_and_mods,
 	.profits {
@@ -509,18 +569,6 @@
 	.dialog-content:hover {
 		/* Create inner border 1px black */
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), inset 0 0 0 1px black;
-	}
-	#close {
-		position: absolute;
-		top: 0;
-		right: 0;
-		margin: 1em;
-	}
-	#bulldoze {
-		position: absolute;
-		top: 0px;
-		right: 70px;
-		margin: 1em;
 	}
 	.cost_label {
 		color: rgb(114, 255, 114);

@@ -76,11 +76,16 @@
 
 			{speedMultiplier}x - year {year} day {day}
 		</div>
-		<div class="townLog message" on:click={
-			() => {
-				$DB.townLog = '';
-			}
-		}>{$DB.townLog}</div>
+		{#if $DB.townLog.length > 0}
+			<div
+				class="townLog message"
+				on:click={() => {
+					$DB.townLog = '';
+				}}
+			>
+				{$DB.townLog}
+			</div>
+		{/if}
 	</div>
 	<div class="header__center" />
 
@@ -118,12 +123,16 @@
 		>
 			<div class="subheading_m">💰 Gold</div>
 			<div class="text_m">
-				{$DB.towninfo.gold} 
-				<br/>
+				{$DB.towninfo.gold}
+				<br />
 				{#if $DB.economy_and_laws.lastMonthProfit >= 0}
-					 <span class="text_ss green">(+{$DB.economy_and_laws.lastMonthProfit} last 30d)</span>
+					<span class="text_s green"
+						>(+{$DB.economy_and_laws.lastMonthProfit})</span
+					>
 				{:else if $DB.economy_and_laws.lastMonthProfit < 0}
-					 <span class="text_ss red">({$DB.economy_and_laws.lastMonthProfit} last 30d)</span>
+					<span class="text_s red"
+						>({$DB.economy_and_laws.lastMonthProfit})</span
+					>
 				{/if}
 			</div>
 		</div>

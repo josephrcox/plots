@@ -354,7 +354,7 @@ export const options = [
 			plots: [],
 			employees: 64,
 			climate: null,
-			size: 4,
+			size: 2,
 			knowledge: 100,
 		},
 		effect_modifiers: {
@@ -406,7 +406,7 @@ export const options = [
 		requirements: {
 			gold: 2000,
 			plots: [],
-			employees: 8,
+			employees: 64,
 			climate: null,
 			size: 1,
 			knowledge: 200,

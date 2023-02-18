@@ -5,13 +5,15 @@
 	import { options } from './jsonObjects/PlotTypeOptions.js';
 	import Plot from './Plot.svelte';
 
+	let z = $DB;
+
 	export function mainGameThreadLoop() {
-		let z = $DB;
 		if ($paused == false) {
 			z.environment.day += 1;
 
-			// check if day is divisible by 30
 			if (z.environment.day % 7 == 0) {
+				// Every 7 days
+
 				// Adjust happiness based on unemployment rate
 				let unemployed = z.towninfo.population_count - z.towninfo.employees;
 				if (unemployed > 0) {
@@ -136,7 +138,10 @@
 						}
 					}
 				}
-
+				z.economy_and_laws.lastMonthProfit = roundTo(
+					z.economy_and_laws.lastMonthProfit,
+					2
+				);
 				z.towninfo.gold = roundTo(z.towninfo.gold, 2);
 
 				// Every 30 days, if happiness mod is above 1.5, then get closer to 1.5, never going below 1.5
@@ -210,6 +215,10 @@
 
 		DB.set(z);
 		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+	}
+
+	function _unemployment() {
+
 	}
 
 	function addToTownLog(message) {

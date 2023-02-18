@@ -6,8 +6,8 @@ export const DATABASE_NAME = 'plots_db';
 if (!localStorage.getItem(DATABASE_NAME)) {
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(default_db));
 	let json = JSON.parse(localStorage.getItem(DATABASE_NAME));
-	// set max tax rate, number between 0.2 and 0.5
-	json.economy_and_laws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
+	// set max tax rate, number between 0.2 and 0.8
+	json.economy_and_laws.max_tax_rate = Math.random() * (0.9 - 0.2) + 0.2;
 	// create 25 x 25 plots
 	let default_plots = [];
 	for (let i = 0; i < 25; i++) {
@@ -40,6 +40,7 @@ export let unique = writable({});
 export let paused = writable(false);
 export let showBalanceSheet = writable(false);
 export let speed = writable(2000);
+export let showUnaffordablePlotOptions = writable(localStorage.getItem('showUnaffordablePlotOptions') === 'true' ? true : false);
 
 
 
