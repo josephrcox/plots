@@ -22,9 +22,13 @@
 				}
 				break;
 			case 'escape':
+				$paused = true;
 				if (prompt('Are you sure?') == 'yes') {
 					localStorage.removeItem(DATABASE_NAME);
 					location.reload();
+					$paused = false;
+				} else {
+					$paused = false;
 				}
 				break;
 			case 'arrowleft':
