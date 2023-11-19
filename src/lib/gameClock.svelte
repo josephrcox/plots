@@ -19,7 +19,6 @@
 				_applyModifiers();
 				_healthEffects();
 				_bringModifiersBackToNormal();
-				_bringStatsBackToNormal();
 			}
 			// Every 30 days
 			if (z.environment.day % 30 === 0) {
@@ -31,6 +30,7 @@
 			// Every 90 days
 			if (z.environment.day % 90 == 0) {
 				_boredom();
+				_bringStatsBackToNormal();
 			}
 		}
 		_fixVariables();
@@ -201,7 +201,9 @@
 		z.towninfo.population_count = roundTo(z.towninfo.population_count, 0);
 		z.towninfo.employees = roundTo(z.towninfo.employees, 0);
 		z.towninfo.population_max = roundTo(z.towninfo.population_max, 0);
+		console.log(z.towninfo.happiness);
 		z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
+		console.log(z.towninfo.happiness);
 		z.towninfo.health = roundTo(z.towninfo.health, 2);
 
 		if (z.towninfo.happiness > 300) {

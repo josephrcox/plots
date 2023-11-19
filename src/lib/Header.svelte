@@ -256,7 +256,7 @@
 					}
 				}}
 			>
-				{$DB.economy_and_laws.tax_rate * 100}%
+				{($DB.economy_and_laws.tax_rate * 100).toFixed(0)}%
 			</div>
 
 			<button
