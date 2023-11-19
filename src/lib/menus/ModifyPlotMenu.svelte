@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import {
-		DATABASE_NAME,
-		DB,
-		modifyPlotMenuOptions
-	} from '../store.js';
+	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
 	import { options } from '../jsonObjects/PlotTypeOptions.js';
+	import gameClock from '../gameClock.svelte';
 
 	export let x = 0;
 	export let y = 0;
@@ -17,7 +14,7 @@
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
-		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type !== -2) {
+		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type > -1) {
 			plotOptions[$DB.plots[x][y].type].classList.add('active');
 			// scroll to the active plot option
 			plotOptions[$DB.plots[x][y].type].scrollIntoView({
@@ -137,6 +134,8 @@
 			// Check if there is room for the larger plot to be placed, and then set the plots around it in the square to be unusable.
 			let size = plotChosen.requirements.size;
 			let possibleSquares = [];
+			let isSchool =
+				PlotTypeOptions[typeIndex].title.toLowerCase().indexOf('school') != -1;
 
 			for (let i = 0; i < 4; i++) {
 				let square = [[x, y]];
@@ -180,7 +179,8 @@
 				let chosenSquare = possibleSquares[0];
 				chosenSquare.forEach((plot) => {
 					z.plots[plot[0]][plot[1]].active = true;
-					z.plots[plot[0]][plot[1]].type = -2; // This is marking them as unusable.
+					z.plots[plot[0]][plot[1]].type = isSchool ? -3 : -2; // This is marking them as unusable.
+					z.plots[plot[0]][plot[1]].referencePlot = [x, y];
 				});
 			}
 		}
@@ -194,7 +194,9 @@
 			tempMessage = '';
 			z.plots[x][y].type = typeIndex;
 			z.plots[x][y].active = true;
+			z.plots[x][y].referencePlot = [];
 			z.towninfo.gold -= plotChosen.requirements.gold;
+			z.towninfo.gold = roundTo(z.towninfo.gold, 2);
 			// Immediate variable changes
 			z.towninfo.population_count +=
 				plotChosen.immediate_variable_changes.population;
@@ -205,11 +207,11 @@
 			// Effect modifiers
 			z.modifiers.happiness = roundTo(
 				z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
-				2
+				2,
 			);
 			z.modifiers.health = roundTo(
 				z.modifiers.health * plotChosen.effect_modifiers.health,
-				2
+				2,
 			);
 			// Employeer modifications
 			z.towninfo.employees += plotChosen.requirements.employees;
@@ -251,7 +253,7 @@
 		z.plots[x][y].type = -1;
 		z.plots[x][y].active = false;
 
-		if (oldPlotType !== -2) {
+		if (oldPlotType > -1) {
 			// Immediate variable changes
 			z.towninfo.population_count -=
 				options[oldPlotType].immediate_variable_changes.population;
@@ -264,11 +266,11 @@
 			// Effect modifiers
 			z.modifiers.happiness = roundTo(
 				z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
-				2
+				2,
 			);
 			z.modifiers.health = roundTo(
 				z.modifiers.health / options[oldPlotType].effect_modifiers.health,
-				2
+				2,
 			);
 			// Employeer modifications
 			z.towninfo.employees -= options[oldPlotType].requirements.employees;
@@ -306,18 +308,28 @@
 	function checkIfAffordable(plotChosen) {
 		let z = $DB;
 		let requirementsMet = true;
+
 		if (plotChosen.requirements.gold > z.towninfo.gold) {
 			requirementsMet = false;
 		}
-		let availableEmployees = z.towninfo.employees - z.towninfo.population_count;
-		if (plotChosen.requirements.employees > availableEmployees) {
-			requirementsMet = false;
-		}
-		if (plotChosen.requirements.knowledge !== undefined) {
-			if (plotChosen.requirements.knowledge > z.towninfo.knowledge) {
+		console.log(plotChosen);
+		console.log(requirementsMet);
+		let availableEmployees = z.towninfo.population_count - z.towninfo.employees;
+		if (
+			plotChosen.requirements.employees !== undefined &&
+			plotChosen.requirements.employees > 0
+		) {
+			if (plotChosen.requirements.employees > availableEmployees) {
 				requirementsMet = false;
 			}
 		}
+		console.log(availableEmployees, requirementsMet);
+		if (plotChosen.requirements.knowledge !== undefined) {
+			if (plotChosen.requirements.knowledge > z.towninfo.knowledge_points) {
+				requirementsMet = false;
+			}
+		}
+		console.log(requirementsMet);
 		return requirementsMet;
 	}
 </script>
@@ -325,9 +337,7 @@
 <div class="dialog">
 	<div class="dialog-content">
 		<div class="header">
-			<div>
-				left side placeholder
-			</div>
+			<div>left side placeholder</div>
 			<div>
 				<span class="heading_m">Modify plot: {y}, {x}</span>
 				{#if tempMessage !== ''}
@@ -351,6 +361,7 @@
 						<div
 							class="plotOption background-lightgray"
 							data-active={option.selected}
+							data-affordable={checkIfAffordable(option)}
 							on:click={choosePlotOption}
 						>
 							<div>
@@ -372,7 +383,7 @@
 											>
 											{roundTo(
 												$DB.economy_and_laws.tax_rate * option.revenue_per_week,
-												2
+												2,
 											)} gold (with tax rate)</span
 										>
 									</div>
@@ -383,7 +394,7 @@
 										<br />
 										{#if option.requirements.gold !== 0}
 											{#if $DB.towninfo.gold < option.requirements.gold}
-												<span class="red text_s cost_label "
+												<span class="red text_s cost_label"
 													>{option.requirements.gold} gold</span
 												>
 											{:else}
@@ -433,7 +444,7 @@
 												class="text_s"
 												data-positive={option.effect_modifiers.happiness >= 1}
 												>Happiness: {formatNumber(
-													option.effect_modifiers.happiness
+													option.effect_modifiers.happiness,
 												)}</span
 											>
 										{/if}
@@ -447,7 +458,7 @@
 												class="text_s"
 												data-positive={option.effect_modifiers.health >= 1}
 												>Health: {formatNumber(
-													option.effect_modifiers.health
+													option.effect_modifiers.health,
 												)}</span
 											>
 										{/if}
@@ -535,7 +546,8 @@
 		display: block;
 	}
 
-	#close, #bulldoze {
+	#close,
+	#bulldoze {
 		width: fit-content;
 	}
 
@@ -591,6 +603,9 @@
 	/* data-positive */
 	[data-positive='true'] {
 		color: rgb(114, 255, 114);
+	}
+	[data-affordable='false'] {
+		opacity: 0.2;
 	}
 	[data-positive='false'] {
 		color: #ff5050;

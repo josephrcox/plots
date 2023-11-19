@@ -4,6 +4,7 @@
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 
 	let balanceSheetComponent;
+	let showCityHallControls = false;
 
 	let year = Math.floor($DB.environment.day / 365) + 1;
 	let day = $DB.environment.day % 365;
@@ -22,7 +23,7 @@
 			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		}
 	}
-	let speedMultiplier = 1;
+	export let speedMultiplier = 1;
 
 	function slowDown() {
 		let cspeed = $speed;
@@ -32,6 +33,7 @@
 		}
 		$speed = cspeed;
 		speedMultiplier = 2000 / $speed;
+		console.log('multiplier: ' + speedMultiplier);
 	}
 
 	function speedUp() {
@@ -44,6 +46,7 @@
 		$speed = cspeed;
 		console.log(cspeed);
 		speedMultiplier = 2000 / $speed;
+		console.log('multiplier: ' + speedMultiplier);
 	}
 
 	function setTaxRate(e) {
@@ -64,7 +67,49 @@
 		return +test.toFixed(digits);
 	}
 
+	function checkForCityHall() {
+		let z = $DB;
+
+		let hasCityHall = false;
+		for (let i = 0; i < z.plotCounts.length; i++) {
+			console.log(z.plotCounts[18]);
+			if (
+				z.plotCounts[18] != null &&
+				z.plotCounts[18] != undefined &&
+				z.plotCounts[19] != 0
+			) {
+				hasCityHall = true;
+			}
+		}
+		if (hasCityHall) {
+			showCityHallControls = true;
+		}
+	}
+
+	document.addEventListener('keydown', (e) => {
+		let key = e.key.toLowerCase();
+		console.log(key);
+		switch (key) {
+			case '1':
+				e.preventDefault();
+				slowDown();
+				break;
+			case '2':
+				e.preventDefault();
+				speedUp();
+				break;
+			default:
+				break;
+		}
+	});
+
+	document.addEventListener('click', () => {
+		checkForCityHall();
+		console.log('checking');
+	});
+
 	let intervalId;
+	checkForCityHall();
 </script>
 
 <div class="header noselect">
@@ -87,7 +132,6 @@
 			</div>
 		{/if}
 	</div>
-	<div class="header__center" />
 
 	<div class="header__right">
 		<div>
@@ -144,6 +188,10 @@
 				>
 				{#if $DB.towninfo.happiness >= 300}
 					<span class="yellow max_label">MAX</span>
+				{:else if $DB.towninfo.happiness >= 150}
+					<span>👍</span>
+				{:else if $DB.towninfo.happiness < 150}
+					<span>👎</span>
 				{/if}
 			</div>
 		</div>
@@ -175,7 +223,7 @@
 						let z = $DB;
 						z.economy_and_laws.tax_rate = roundTo(
 							z.economy_and_laws.tax_rate - 0.01,
-							2
+							2,
 						);
 						DB.set(z);
 						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
@@ -189,7 +237,7 @@
 					let z = $DB;
 					z.economy_and_laws.tax_rate = roundTo(
 						z.economy_and_laws.tax_rate - 0.01,
-						2
+						2,
 					);
 				}}
 			>
@@ -208,7 +256,7 @@
 					}
 				}}
 			>
-				{$DB.economy_and_laws.tax_rate}%
+				{$DB.economy_and_laws.tax_rate * 100}%
 			</div>
 
 			<button
@@ -217,7 +265,7 @@
 						let z = $DB;
 						z.economy_and_laws.tax_rate = roundTo(
 							z.economy_and_laws.tax_rate + 0.01,
-							2
+							2,
 						);
 						DB.set(z);
 						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
@@ -230,7 +278,7 @@
 					let z = $DB;
 					z.economy_and_laws.tax_rate = roundTo(
 						z.economy_and_laws.tax_rate + 0.01,
-						2
+						2,
 					);
 					DB.set(z);
 					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
@@ -263,7 +311,7 @@
 	.header__left {
 		display: flex;
 		flex-direction: column;
-		min-width: fit-content;
+		width: 30%;
 	}
 
 	.header__right {

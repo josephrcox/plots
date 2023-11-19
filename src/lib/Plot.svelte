@@ -10,6 +10,7 @@
 		y: 0,
 		type: -1,
 		styling: '',
+		referencePlot: [],
 	};
 	export let canBeUpgraded = false;
 
@@ -35,27 +36,48 @@
 		}
 	}
 
-	function openMenu() {
+	function openMenu(e, a, b) {
 		let plots = document.querySelectorAll('.plot_container');
 		if ($paused == false) {
-			if (!data.active && !canBeUpgraded) {
+			if (
+				data.referencePlot != undefined &&
+				data.referencePlot[0] !== null &&
+				a == undefined &&
+				b == undefined &&
+				data.referencePlot[1] !== undefined
+			) {
+				console.log(data.referencePlot);
+				return openMenu(e, data.referencePlot[0], data.referencePlot[1]);
+			} else if (!data.active && !canBeUpgraded) {
 				$unique = {};
 				$modifyPlotMenuOptions.visible = false;
 				plots.forEach((plot) => {
 					plot.classList.remove('selected');
 				});
 			} else {
-				$modifyPlotMenuOptions.x = data.x;
-				$modifyPlotMenuOptions.y = data.y;
+				if (a != undefined && b != undefined) {
+					$modifyPlotMenuOptions.x = a;
+					$modifyPlotMenuOptions.y = b;
+				} else {
+					$modifyPlotMenuOptions.x = data.x;
+					$modifyPlotMenuOptions.y = data.y;
+				}
+
 				$modifyPlotMenuOptions.visible = true;
 
 				plots.forEach((plot) => {
 					plot.classList.remove('selected');
 				});
 				// Highlight a plot when it's clicked on
-				document
-					.querySelector(`.plot_container[data-id="${data.id}"]`)
-					.classList.add('selected');
+				if (a != undefined && b != undefined) {
+					document
+						.querySelector(`.plot_container[data-x="${a}"][data-y="${b}"]`)
+						.classList.add('selected');
+				} else {
+					document
+						.querySelector(`.plot_container[data-id="${data.id}"]`)
+						.classList.add('selected');
+				}
 			}
 		}
 	}
@@ -75,19 +97,25 @@
 	data-x={data.x}
 	data-y={data.y}
 	on:click={openMenu}
-	data-canbeupgraded={canBeUpgraded} 
+	data-canbeupgraded={canBeUpgraded}
 	style={specialStylingString}
+	data-type={data.type}
+	data-referencePlotX={data.referencePlot !== undefined
+		? data.referencePlot[0]
+		: null}
+	data-referencePlotY={data.referencePlot !== undefined
+		? data.referencePlot[1]
+		: null}
+	data-size={data.type > -1 ? options[data.type].requirements.size : null}
 >
-	{#if data.type !== -1}
-		{#if data.type === -2}
-			(part of a park)
-		{:else}
-			<div>
-				<span>{options[data.type].title}</span>
-				<!-- <br />
+	{#if data.type > -1}
+		<div>
+			<span data-size={options[data.type].requirements.size}
+				>{options[data.type].title}</span
+			>
+			<!-- <br />
 				<span>{data.x},{data.y}</span> -->
-			</div>
-		{/if}
+		</div>
 	{/if}
 </div>
 
@@ -95,7 +123,7 @@
 	.plot_container {
 		width: 100px;
 		height: 100px;
-		border: 1px solid rgb(100, 100, 100);
+		/* border: 1px solid rgb(100, 100, 100); */
 		background-color: rgb(37, 40, 42);
 
 		text-align: center;
@@ -121,11 +149,24 @@
 		-webkit-box-sizing: border-box;
 	}
 	.plot_container[data-active='true'] {
-		background-color: rgba(0, 0, 255, 0.243);
+		background-color: rgba(62, 62, 242, 0.7);
 	}
 	.plot_container[data-canbeupgraded='false'] {
 		background-color: black;
 		border: none;
+	}
+	.plot_container[data-type='-2'] {
+		background-color: rgba(152, 255, 95, 0.69);
+		border: none;
+	}
+
+	.plot_container[data-type='-3'] {
+		background-color: rgba(62, 62, 242, 0.7);
+		border: none;
+	}
+
+	span[data-size='2'] {
+		transform: translateX(50px) translateY(40px);
 	}
 
 	.plot_container > div {

@@ -1,3 +1,6 @@
+// -3: unusable, school background
+// -2: unusable, park background
+
 export const options = [
 	{
 		title: '🏠 Residential',
@@ -13,7 +16,7 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.01,
+			happiness: 1.0,
 			health: 1.0,
 		},
 		immediate_variable_changes: {
@@ -37,7 +40,7 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.01,
+			happiness: 1.0,
 			health: 1.0,
 		},
 		immediate_variable_changes: {
@@ -85,8 +88,8 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.1,
-			health: 0.99,
+			happiness: 1.05,
+			health: 0.95,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
@@ -109,8 +112,8 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.10,
-			health: 1.05,
+			happiness: 1.05,
+			health: 1.1,
 		},
 		immediate_variable_changes: {
 			happiness: 0,
@@ -123,7 +126,8 @@ export const options = [
 		title: '🍎 Apple orchard',
 		subtitle: 'for farming',
 		type: 'farm',
-		description: 'A bunch of trees that make apples, makes money by selling them and by selling apple-related products.',
+		description:
+			'A bunch of trees that make apples, makes money by selling them and by selling apple-related products.',
 		revenue_per_week: 8,
 		requirements: {
 			gold: 50,
@@ -133,8 +137,8 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.10,
-			health: 1.05,
+			happiness: 1.05,
+			health: 1.1,
 		},
 		immediate_variable_changes: {
 			happiness: 0,
@@ -157,8 +161,8 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.02,
-			health: 1.01,
+			happiness: 1.05,
+			health: 1.0,
 		},
 		immediate_variable_changes: {
 			happiness: 15,
@@ -204,11 +208,11 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.02,
+			happiness: 1.1,
 			health: 1.0,
 		},
 		immediate_variable_changes: {
-			happiness: 10,
+			happiness: 5,
 			health: 0,
 			population: 0,
 		},
@@ -228,14 +232,14 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.01,
-			health: 1.0,
+			health: 1.05,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgba(152, 255, 95, 0.24)',
+		styling: 'background: rgba(152, 255, 95, 0.69)',
 	},
 	{
 		title: '🛝 Medium park',
@@ -246,20 +250,20 @@ export const options = [
 		requirements: {
 			gold: 150,
 			plots: [],
-			employees: 1,
+			employees: 2,
 			climate: null,
 			knowledge: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.02,
-			health: 1.0,
+			health: 1.08,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgba(152, 255, 95, 0.24)',
+		styling: 'background: rgba(152, 255, 95, 0.69)',
 	},
 	{
 		title: '🎪 Large park',
@@ -278,14 +282,14 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.09,
-			health: 1.0,
+			health: 1.1,
 		},
 		immediate_variable_changes: {
 			happiness: 15,
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgba(152, 255, 95, 0.24)',
+		styling: 'background: rgba(152, 255, 95, 0.69)',
 	},
 	{
 		title: '📚 Small school',
@@ -304,8 +308,8 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.15,
-			health: 1.10,
+			happiness: 1.05,
+			health: 1.1,
 		},
 		immediate_variable_changes: {
 			happiness: 15,
@@ -318,8 +322,7 @@ export const options = [
 		title: '🚌 Large school',
 		subtitle: 'for learning',
 		type: 'education',
-		description:
-			'A larger school. Produces knowledge',
+		description: 'A larger school. Produces knowledge',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 8,
 		requirements: {
@@ -332,7 +335,7 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.05,
-			health: 1.00,
+			health: 1.0,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
@@ -345,8 +348,7 @@ export const options = [
 		title: '🏫 University',
 		subtitle: 'for learning',
 		type: 'education',
-		description:
-			'The supreme learning institution. Produces knowledge.',
+		description: 'The supreme learning institution. Produces knowledge.',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 25,
 		requirements: {
@@ -359,7 +361,7 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.25,
-			health: 1.00,
+			health: 1.0,
 		},
 		immediate_variable_changes: {
 			happiness: 25,
@@ -372,12 +374,11 @@ export const options = [
 		title: '🚑 Small hospital',
 		subtitle: 'for healing',
 		type: 'medical',
-		description:
-			'A great place to get fixed up from minor injuries.',
+		description: 'A great place to get fixed up from minor injuries.',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 200,
+			gold: 800,
 			plots: [],
 			employees: 8,
 			climate: null,
@@ -386,7 +387,7 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.25,
-			health: 1.50,
+			health: 1.5,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
@@ -399,12 +400,11 @@ export const options = [
 		title: '🏥 Large hospital',
 		subtitle: 'for healing',
 		type: 'medical',
-		description:
-			'A great place to get fixed up from all injuries.',
+		description: 'A great place to get fixed up from all injuries.',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 2000,
+			gold: 4000,
 			plots: [],
 			employees: 64,
 			climate: null,
@@ -413,7 +413,7 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.25,
-			health: 2.50,
+			health: 2.5,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
@@ -421,5 +421,60 @@ export const options = [
 			population: 0,
 		},
 		styling: null,
+	},
+	{
+		title: '🏦 Bank',
+		subtitle: 'for storing and accessing funds',
+		type: 'bank',
+		description: 'Rich get richer.',
+		revenue_per_week: 0,
+		knowledge_points_per_month: 0,
+		requirements: {
+			gold: 15000,
+			plots: [],
+			employees: 64,
+			climate: null,
+			size: 1,
+			knowledge: 300,
+		},
+		effect_modifiers: {
+			happiness: 0.8,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+		styling: null,
+	},
+	{
+		id: 'city-hall',
+		title: '🗳️ City Hall',
+		subtitle: 'for beaurocracy',
+		type: 'federal',
+		description: 'For running the government.',
+		revenue_per_week: 0,
+		knowledge_points_per_month: 0,
+		requirements: {
+			gold: 30000,
+			plots: [],
+			employees: 24,
+			climate: null,
+			size: 1,
+			knowledge: 500,
+		},
+		effect_modifiers: {
+			happiness: 0.8,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+		styling: null,
+		canDelete: false,
+		maxPerMap: 1,
 	},
 ];

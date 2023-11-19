@@ -14,14 +14,19 @@
 			// Every 7 days
 			if (z.environment.day % 7 == 0) {
 				_unemployment();
-				_movePeopleInMovePeopleOut();
 				_taxRateEffects();
 				_calculateProfits();
+				_applyModifiers();
+				_healthEffects();
+				_bringModifiersBackToNormal();
+				_bringStatsBackToNormal();
 			}
 			// Every 30 days
 			if (z.environment.day % 30 === 0) {
-				_applyModifiers();
 				_calculateKnowledge();
+				_movePeopleInMovePeopleOut();
+				_banksEffect();
+				_federalGovEffect();
 			}
 			// Every 90 days
 			if (z.environment.day % 90 == 0) {
@@ -42,8 +47,62 @@
 		}
 	}
 
+	function _banksEffect() {
+		let z = $DB;
+
+		// Check if there are any banks and store the count of banks
+		let numberOfBanks = 0;
+		for (let i = 0; i < z.plotCounts.length; i++) {
+			console.log(z.plotCounts[18]);
+			if (z.plotCounts[18] != null && z.plotCounts[18] != undefined) {
+				numberOfBanks = z.plotCounts[18];
+				// TODO: Make banks do something.
+			}
+		}
+	}
+
+	function _federalGovEffect() {
+		let z = $DB;
+
+		let hasCityHall = false;
+		for (let i = 0; i < z.plotCounts.length; i++) {
+			console.log(z.plotCounts[18]);
+			if (
+				z.plotCounts[18] != null &&
+				z.plotCounts[18] != undefined &&
+				z.plotCounts[19] != 0
+			) {
+				hasCityHall = true;
+				// TODO: Make fed gov do something.
+			}
+		}
+	}
+
+	function _healthEffects() {
+		let health = z.towninfo.health;
+		let peopleLeaving = 0;
+
+		if (health > 50) return;
+
+		if (health < Math.random() * 50) {
+			if (health < 25) {
+				addToTownLog(messages.sickAndDying);
+				z.towninfo.happiness -= 10;
+				// 10% of population
+				peopleLeaving = Math.round(z.towninfo.population_count * 0.1);
+			} else {
+				addToTownLog(messages.sickAndLeaving);
+				z.towninfo.happiness -= 5;
+				// 5%
+				peopleLeaving = Math.round(z.towninfo.population_count * 0.05);
+			}
+			z.towninfo.population_count -= peopleLeaving;
+			z.towninfo.employees -= peopleLeaving;
+		}
+	}
+
 	function _boredom() {
-		if (z.lastChangeDay + (Math.random() * 365 + 365) < z.environment.day) {
+		if (z.lastChangeDay + (Math.random() * 365 + 50) < z.environment.day) {
 			if (z.towninfo.population_count > 0) {
 				z.towninfo.population_count -= 1;
 				z.towninfo.employees -= 1;
@@ -60,7 +119,7 @@
 					z.towninfo.population_max - z.towninfo.population_count;
 				// add a number of people relative to the happiness where 100 is max happiness
 				let newPeople = Math.round(
-					(z.towninfo.happiness / 100) * availableSpots
+					(z.towninfo.happiness / 100) * availableSpots,
 				);
 				z.towninfo.population_count += newPeople;
 				if (z.towninfo.population_count > z.towninfo.population_max) {
@@ -86,7 +145,7 @@
 			addToTownLog(unhappyPeople + messages.leave_town_num);
 		} else {
 			if (z.towninfo.population_count == z.towninfo.population_max) {
-				// addToTownLog(messages.people_want_to_move_in);
+				addToTownLog(messages.people_want_to_move_in);
 			}
 		}
 	}
@@ -99,18 +158,18 @@
 					messages.very_high_tax_rate +
 						'  (' +
 						z.economy_and_laws.tax_rate +
-						'%)'
+						'%)',
 				);
 			} else {
 				z.modifiers.happiness -= 0.01;
 				addToTownLog(
-					messages.high_tax_rate + '  (' + z.economy_and_laws.tax_rate + '%)'
+					messages.high_tax_rate + '  (' + z.economy_and_laws.tax_rate + '%)',
 				);
 			}
 		}
 	}
 
-	function _fixVariables() {
+	export function _fixVariables() {
 		if (z.towninfo.happiness < 0) {
 			z.towninfo.happiness = 0;
 		}
@@ -135,7 +194,7 @@
 		}
 		z.economy_and_laws.lastMonthProfit = roundTo(
 			z.economy_and_laws.lastMonthProfit,
-			2
+			2,
 		);
 
 		z.towninfo.gold = roundTo(z.towninfo.gold, 2);
@@ -145,22 +204,12 @@
 		z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
 		z.towninfo.health = roundTo(z.towninfo.health, 2);
 
-		if (z.modifiers.happiness > 1.0) {
-			z.modifiers.happiness -= 0.05;
-			if (z.modifiers.happiness < 1.0) {
-				z.modifiers.happiness = 1.0;
-			}
-		}
-		if (z.modifiers.health > 1.0) {
-			z.modifiers.health -= 0.05;
-			if (z.modifiers.health < 1.0) {
-				z.modifiers.health = 1.0;
-			}
-		}
 		if (z.towninfo.happiness > 300) {
+			// Maxed out happiness
 			z.towninfo.happiness = 300;
 		}
 		if (z.towninfo.health > 300) {
+			// Maxed out health
 			z.towninfo.health = 300;
 		}
 		// If modifiers are below 0.50, set to 0.50
@@ -172,12 +221,51 @@
 		}
 	}
 
+	export function _bringModifiersBackToNormal() {
+		if (z.modifiers.happiness > 1.0) {
+			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
+			let percentAboveOne = z.modifiers.happiness - 1.0;
+			z.modifiers.happiness -= percentAboveOne * 0.08;
+			if (z.modifiers.happiness < 1.05) {
+				z.modifiers.happiness = 1.0;
+			}
+		}
+		if (z.modifiers.health > 1.0) {
+			// check % above 1.0 that z.modifiers.health is, and get it 8% closer to 1.0
+			let percentAboveOne = z.modifiers.health - 1.0;
+			z.modifiers.health -= percentAboveOne * 0.08;
+			if (z.modifiers.health < 1.05) {
+				z.modifiers.health = 1.0;
+			}
+		}
+	}
+
+	export function _bringStatsBackToNormal() {
+		const midpoint = 150;
+		if (z.towninfo.happiness > midpoint) {
+			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
+			let percentAboveOne = z.towninfo.happiness - midpoint;
+			z.towninfo.happiness -= percentAboveOne * 0.08;
+			if (z.towninfo.happiness < midpoint) {
+				z.towninfo.happiness = midpoint;
+			}
+		}
+		if (z.towninfo.health > midpoint) {
+			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
+			let percentAboveOne = z.towninfo.health - midpoint;
+			z.towninfo.health -= percentAboveOne * 0.08;
+			if (z.towninfo.health < midpoint) {
+				z.towninfo.health = midpoint;
+			}
+		}
+	}
+
 	function _calculateProfits() {
 		z.economy_and_laws.lastMonthProfit = 0;
 		// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
-				if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
+				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
 					// Iterate through all plots and do actions based on their conditions
 					let plotOptionForPlot = options[z.plots[i][j].type];
 					let profit = getProfit(plotOptionForPlot.revenue_per_week);
@@ -214,7 +302,7 @@
 	function _calculateKnowledge() {
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
-				if (z.plots[i][j].active == true && z.plots[i][j].type !== -2) {
+				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
 					let plotOptionForPlot = options[z.plots[i][j].type];
 					if (plotOptionForPlot.knowledge_points_per_month != null) {
 						z.towninfo.knowledge_points +=

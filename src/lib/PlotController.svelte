@@ -3,6 +3,7 @@
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.js';
+	checkForAvailablePlots();
 
 	export function checkIfPlotCanBeUpgraded(x, y) {
 		let plot = {
@@ -37,6 +38,21 @@
 		});
 	}
 
+	function checkForAvailablePlots() {
+		let available = [];
+		for (let x = 0; x < 25; x++) {
+			for (let y = 0; y < 25; y++) {
+				const canBeUpgraded = checkIfPlotCanBeUpgraded(x, y);
+				if (canBeUpgraded) {
+					if ($DB.plots[x][y].active == false) {
+						available.push($DB.plots[x][y]);
+					}
+				}
+			}
+		}
+		console.log(available);
+	}
+
 	export function restartModifyPlotMenu() {
 		$unique = {};
 	}
@@ -45,10 +61,13 @@
 	if (window.location.search.includes('dev=true')) {
 		let z = $DB;
 		z.towninfo.name = 'DevTown';
-		z.towninfo.gold = 10000;
+		z.towninfo.gold = 100000000;
 		z.towninfo.population = 0;
 		z.towninfo.happiness = 100000;
 		z.towninfo.health = 100000;
+		z.modifiers.happiness = 100000;
+		z.modifiers.health = 100000;
+		z.towninfo.knowledge_points = 10000;
 		$DB = z;
 	}
 </script>
