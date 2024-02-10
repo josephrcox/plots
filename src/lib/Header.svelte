@@ -200,7 +200,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="subheading_m">🩺 Health</div>
+			<div class="subheading_m">🏥 Health</div>
 			<div class="text_m">
 				{#if $DB.towninfo.health >= 50}
 					<span class="green">{$DB.towninfo.health}</span>

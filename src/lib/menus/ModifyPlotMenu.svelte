@@ -12,6 +12,7 @@
 	let filteredOptions = PlotTypeOptions;
 
 	let searchInput;
+	let totalAffordableOptionsCount;
 
 	onMount(async () => {
 		await tick(); // Ensures that DOM has been updated
@@ -25,15 +26,14 @@
 				option.title.toLowerCase().includes(searchQuery.toLowerCase()),
 			)
 		: PlotTypeOptions;
+	$: totalAffordableOptionsCount = filteredOptions.filter((option) =>
+		checkIfAffordable(option),
+	).length;
 
 	function handleInput(event) {
 		searchQuery = event.target.value;
 		event.stopPropagation(); // This will stop the event from propagating further
 	}
-
-	// if search-bar has current focus, then set localStorage isTyping to true, else false
-	localStorage.setItem('isTyping', `${searchInput == document.activeElement}`);
-	console.log(document.activeElement);
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
@@ -328,10 +328,6 @@
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
 
-	const totalAffordableOptionsCount = PlotTypeOptions.filter((option) =>
-		checkIfAffordable(option),
-	).length;
-
 	function checkIfAffordable(plotChosen) {
 		let z = $DB;
 		let requirementsMet = true;
@@ -364,20 +360,21 @@
 <div class="dialog">
 	<div class="dialog-content">
 		<div class="header">
-			<input
-				type="text"
-				id="search-bar"
-				placeholder="Search plots..."
-				value={searchQuery}
-				on:input={handleInput}
-				bind:this={searchInput}
-			/>
 			<div>
-				<span class="heading_m">Modify Plot: {y}-{x}</span>
+				<span class="heading_l">Modify Plot: {y + 1}-{x + 1}</span>
 				{#if tempMessage !== ''}
 					<div class="message">{tempMessage}</div>
 				{/if}
 			</div>
+			<input
+				type="text"
+				id="search-bar"
+				placeholder="Search Plot Options..."
+				value={searchQuery}
+				on:input={handleInput}
+				bind:this={searchInput}
+			/>
+
 			<div>
 				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
 					<button on:click={clearPlot} id="bulldoze">🔥</button>
@@ -387,13 +384,13 @@
 		</div>
 		<div class="scrollable-y">
 			<label for="plotType"
-				>PLOT OPTIONS
+				>options
 				{#if totalAffordableOptionsCount > 0}
 					<span class="text_s">({totalAffordableOptionsCount})</span>
 				{/if}
 				<!-- show plot options that are affordable -->
-				{#if filteredOptions.length === 0}
-					<span class="text_s">No plots found</span>
+				{#if filteredOptions.length == 0}
+					<span class="text_s">(0)</span>
 				{/if}
 			</label>
 			<br />
@@ -476,18 +473,18 @@
 										{/if}
 									</div>
 									<div>
-										<span class="subheading_m">Effects (multiplier)</span>
+										<span class="subheading_m">Multiplier</span>
 										<br />
 										<!-- {JSON.stringify(option.effect_modifiers)} -->
 										{#if option.effect_modifiers.happiness == 1.0}
 											<span class="text_s" data-positive="true"
-												>Happiness: no effect</span
+												>😁 No effect</span
 											>
 										{:else}
 											<span
 												class="text_s"
 												data-positive={option.effect_modifiers.happiness >= 1}
-												>Happiness: {formatNumber(
+												>😁 {formatNumber(
 													option.effect_modifiers.happiness,
 												)}</span
 											>
@@ -495,15 +492,13 @@
 										<br />
 										{#if option.effect_modifiers.health == 1.0}
 											<span class="text_s" data-positive="true"
-												>Health: no effect</span
+												>🏥 No effect</span
 											>
 										{:else}
 											<span
 												class="text_s"
 												data-positive={option.effect_modifiers.health >= 1}
-												>Health: {formatNumber(
-													option.effect_modifiers.health,
-												)}</span
+												>🏥 {formatNumber(option.effect_modifiers.health)}</span
 											>
 										{/if}
 									</div>
@@ -513,7 +508,7 @@
 										<span class="subheading_m"
 											>Instant changes:
 											{#if option.immediate_variable_changes.happiness !== 0}
-												Happiness:
+												😁
 												<span class="green"
 													>{option.immediate_variable_changes.happiness}</span
 												>
@@ -522,7 +517,7 @@
 												,
 											{/if}
 											{#if option.immediate_variable_changes.health !== 0}
-												Health:
+												🏥
 												<span class="green"
 													>{option.immediate_variable_changes.health}</span
 												>
@@ -552,11 +547,12 @@
 		flex-wrap: wrap;
 		gap: 10px;
 		justify-content: center;
+		padding-bottom: 100px;
 	}
 
 	.plotOption {
 		border: 1px solid rgb(123, 114, 101);
-		width: 14em;
+		width: 12em;
 		height: 15em;
 		min-width: 12em;
 		padding: 5px;
@@ -616,17 +612,17 @@
 		display: flex;
 		z-index: 10;
 		max-width: 70%;
+		width: 70%;
 	}
 
 	.dialog-content {
 		background: rgb(56 72 108);
 		padding: 1em;
-		/* top right radius */
 		border-top-right-radius: 0.5em;
-		/* top left radius */
-
 		box-shadow: 0 0 100px rgba(45, 35, 35, 1);
 		height: 70vh;
+		min-width: 95%;
+		width: 95%;
 	}
 
 	.scrollable-y {
@@ -637,12 +633,6 @@
 		scrollbar-width: none; /* Firefox */
 	}
 
-	.dialog-content:hover {
-		/* Create inner border 1px black */
-		box-shadow:
-			0 0 10px rgba(0, 0, 0, 0.3),
-			inset 0 0 0 1px black;
-	}
 	.cost_label {
 		color: rgb(114, 255, 114);
 		font-size: 14px;
@@ -650,6 +640,7 @@
 	.reqs_and_mods {
 		display: flex;
 		justify-content: space-between;
+		margin-bottom: 7px;
 	}
 	.reqs_and_mods > div:first-child {
 		border-right: 1px solid rgb(118, 109, 97);

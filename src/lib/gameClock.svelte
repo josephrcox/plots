@@ -102,10 +102,11 @@
 	}
 
 	function _boredom() {
-		if (z.lastChangeDay + (Math.random() * 365 + 50) < z.environment.day) {
+		if (z.lastChangeDay + (Math.random() * 160 + 50) < z.environment.day) {
 			if (z.towninfo.population_count > 0) {
 				z.towninfo.population_count -= 1;
 				z.towninfo.employees -= 1;
+				z.modifiers.happiness -= 0.01;
 			}
 
 			addToTownLog(messages.bored);

@@ -13,13 +13,13 @@ body {
 }
 
 .heading_m {
-	font-size: 1.3rem;
-	font-weight: 400;
+	font-size: 1rem;
+	font-weight: 500;
 	margin: 0;
 }
 
 .heading_l {
-	font-size: 1.6rem;
+	font-size: 1.4rem;
 	font-weight: 600;
 	margin: 0;
 }
@@ -41,13 +41,13 @@ body {
 	text-align: center;
 }
 .text_s {
-	font-size: 0.9rem;
+	font-size: 12px;
 	font-weight: 300;
 	margin: 0;
 	text-align: center;
 }
 .text_ss {
-	font-size: 0.7rem;
+	font-size: 9px;
 	font-weight: 300;
 	margin: 0;
 	text-align: center;
