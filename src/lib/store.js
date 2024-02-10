@@ -9,9 +9,10 @@ if (!localStorage.getItem(DATABASE_NAME)) {
 	// set max tax rate, number between 0.2 and 0.8
 	json.economy_and_laws.max_tax_rate = Math.random() * (0.9 - 0.2) + 0.2;
 	let default_plots = [];
-	for (let i = 0; i < 5; i++) {
+	const randomSize = Math.floor(Math.random() * 10) + 5;
+	for (let i = 0; i < randomSize; i++) {
 		default_plots.push([]);
-		for (let j = 0; j < 5; j++) {
+		for (let j = 0; j < randomSize; j++) {
 			default_plots[i][j] = {
 				id: Math.random().toString(36).substring(2, 9),
 				active: false,

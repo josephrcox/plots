@@ -1,16 +1,39 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
 	import { options } from '../jsonObjects/PlotTypeOptions.js';
 	import gameClock from '../gameClock.svelte';
 
 	export let x = 0;
 	export let y = 0;
+	let searchQuery = '';
 	let PlotTypeOptions = options;
 	export let tempMessage = '';
+	let filteredOptions = PlotTypeOptions;
 
-	let mounted = false;
-	onMount(() => (mounted = true));
+	let searchInput;
+
+	onMount(async () => {
+		await tick(); // Ensures that DOM has been updated
+		if (searchInput) {
+			searchInput.focus();
+		}
+	});
+
+	$: filteredOptions = searchQuery
+		? PlotTypeOptions.filter((option) =>
+				option.title.toLowerCase().includes(searchQuery.toLowerCase()),
+			)
+		: PlotTypeOptions;
+
+	function handleInput(event) {
+		searchQuery = event.target.value;
+		event.stopPropagation(); // This will stop the event from propagating further
+	}
+
+	// if search-bar has current focus, then set localStorage isTyping to true, else false
+	localStorage.setItem('isTyping', `${searchInput == document.activeElement}`);
+	console.log(document.activeElement);
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
@@ -305,6 +328,10 @@
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
 
+	const totalAffordableOptionsCount = PlotTypeOptions.filter((option) =>
+		checkIfAffordable(option),
+	).length;
+
 	function checkIfAffordable(plotChosen) {
 		let z = $DB;
 		let requirementsMet = true;
@@ -337,9 +364,16 @@
 <div class="dialog">
 	<div class="dialog-content">
 		<div class="header">
-			<div>left side placeholder</div>
+			<input
+				type="text"
+				id="search-bar"
+				placeholder="Search plots..."
+				value={searchQuery}
+				on:input={handleInput}
+				bind:this={searchInput}
+			/>
 			<div>
-				<span class="heading_m">Modify plot: {y}, {x}</span>
+				<span class="heading_m">Modify Plot: {y}-{x}</span>
 				{#if tempMessage !== ''}
 					<div class="message">{tempMessage}</div>
 				{/if}
@@ -352,10 +386,20 @@
 			</div>
 		</div>
 		<div class="scrollable-y">
-			<label for="plotType">Plot options</label>
+			<label for="plotType"
+				>PLOT OPTIONS
+				{#if totalAffordableOptionsCount > 0}
+					<span class="text_s">({totalAffordableOptionsCount})</span>
+				{/if}
+				<!-- show plot options that are affordable -->
+				{#if filteredOptions.length === 0}
+					<span class="text_s">No plots found</span>
+				{/if}
+			</label>
+			<br />
 			<br />
 			<div class="plotOptions">
-				{#each PlotTypeOptions as option (option)}
+				{#each filteredOptions as option (option)}
 					<!-- Sort the options to show affordable ones first -->
 					{#if true}
 						<div
@@ -496,10 +540,18 @@
 </div>
 
 <style>
+	#search-bar {
+		width: 100%;
+		padding: 0.5em;
+		margin-bottom: 1em;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+	}
 	.plotOptions {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		grid-gap: 16px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		justify-content: center;
 	}
 
 	.plotOption {
@@ -508,19 +560,10 @@
 		height: 15em;
 		min-width: 12em;
 		padding: 5px;
-		background-color: rgb(31, 34, 35);
+		background-color: rgb(0, 0, 0);
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-	}
-
-	.dialog {
-		position: fixed;
-		bottom: 0;
-		right: 0;
-		margin: 1em;
-		display: flex;
-		z-index: 10;
 	}
 
 	.header {
@@ -565,17 +608,33 @@
 		background-color: rgb(43, 47, 49);
 	}
 
+	.dialog {
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		margin-right: 10px;
+		display: flex;
+		z-index: 10;
+		max-width: 70%;
+	}
+
 	.dialog-content {
-		background: rgb(24, 26, 27);
+		background: rgb(56 72 108);
 		padding: 1em;
-		border-radius: 0.5em;
-		box-shadow: 0 0 10px rgba(45, 35, 35, 0.3);
-		height: 547px;
+		/* top right radius */
+		border-top-right-radius: 0.5em;
+		/* top left radius */
+
+		box-shadow: 0 0 100px rgba(45, 35, 35, 1);
+		height: 70vh;
 	}
 
 	.scrollable-y {
 		overflow-y: scroll;
 		height: 95%;
+		/* no scrollbar */
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
 	}
 
 	.dialog-content:hover {
@@ -607,7 +666,7 @@
 		color: rgb(114, 255, 114);
 	}
 	[data-affordable='false'] {
-		opacity: 0.2;
+		opacity: 0.3;
 	}
 	[data-positive='false'] {
 		color: #ff5050;

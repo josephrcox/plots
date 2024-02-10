@@ -123,7 +123,7 @@
 	.plot_container {
 		width: 100px;
 		height: 100px;
-		background-color: rgb(110, 93, 16);
+		background-color: rgb(65, 65, 65);
 		border: 1px solid rgba(0, 0, 0, 0.7);
 		text-align: center;
 		word-wrap: normal;
@@ -148,7 +148,7 @@
 		-webkit-box-sizing: border-box;
 	}
 	.plot_container[data-active='true'] {
-		background-color: rgb(62, 62, 242);
+		background-color: rgb(89 89 239);
 	}
 	.plot_container[data-canBeUpgraded='false'] {
 		background-color: rgb(24, 24, 24);

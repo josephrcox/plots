@@ -24,7 +24,7 @@ export const options = [
 			health: 0,
 			population: 16,
 		},
-		styling: 'background-color: #e15f00a3',
+		styling: 'background-color: #e15f00',
 	},
 	{
 		title: '🏘️ Residential (medium)',
@@ -48,7 +48,7 @@ export const options = [
 			health: 0,
 			population: 64,
 		},
-		styling: 'background-color: #e15f00a3',
+		styling: 'background-color: #e15f00',
 	},
 	{
 		title: '🏢 Residential (large)',
@@ -72,7 +72,7 @@ export const options = [
 			health: 0,
 			population: 256,
 		},
-		styling: 'background-color: #e15f00a3',
+		styling: 'background-color: #e15f00',
 	},
 	{
 		title: '☕️ Small café',
@@ -96,7 +96,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#ce21215c;',
+		styling: 'background-color:#d24646;',
 	},
 	{
 		title: '🥕 Carrot farm',
@@ -120,7 +120,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#c8a5535c;',
+		styling: 'background-color: #d24646;',
 	},
 	{
 		title: '🍎 Apple orchard',
@@ -145,7 +145,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#c8a5535c;',
+		styling: 'background-color:#d24646;',
 	},
 	{
 		title: '🏪 Grocery store',
@@ -169,7 +169,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#ce21215c;',
+		styling: 'background-color:#d24646;',
 	},
 	{
 		title: '📕 Library',
@@ -216,6 +216,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
+		styling: 'background: rgb(255, 255, 255)',
 	},
 	{
 		title: '🌲 Small park',

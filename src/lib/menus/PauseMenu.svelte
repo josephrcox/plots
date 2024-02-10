@@ -22,7 +22,7 @@
 	}
 
 	.dialog-content {
-		background: rgb(24, 26, 27);
+		background: rgb(56 72 108);
 		padding: 1em;
 		border-radius: 0.5em;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);

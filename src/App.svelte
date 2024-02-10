@@ -17,6 +17,12 @@
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
+		// if input then return
+		if (
+			document.activeElement.nodeName === 'INPUT' ||
+			document.activeElement.nodeName == 'TEXTAREA'
+		)
+			return;
 		let key = e.key.toLowerCase();
 		switch (key) {
 			case 'p':
@@ -214,18 +220,21 @@
 
 <Header />
 <GameClock />
-<div class="plot_grid" data-marginright={$showBalanceSheet}>
+<div class="plot_grid" data-marginRight={$showBalanceSheet}>
 	<PlotController />
 </div>
 
 <style>
 	.plot_grid {
-		max-width: 100%;
-		max-height: 100%;
+		max-width: 300%;
+		max-height: 300%;
 		overflow-x: scroll;
 		overflow-y: scroll;
+		width: 300%;
+		height: 300vh;
+		margin-top: 183px;
 	}
-	.plot_grid[data-marginright='true'] {
+	.plot_grid[data-marginRight='true'] {
 		/* This is for when the balanceSheet is being shown. */
 		margin-right: 224px;
 	}

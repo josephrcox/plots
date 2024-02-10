@@ -1,4 +1,9 @@
 body {
+	/* create a cool dotted pattern background */
+	background-image: radial-gradient(rgb(18, 23, 40) 1px, transparent 1px),
+		radial-gradient(rgb(255, 0, 0) 1px, transparent 1px);
+	background-color: #37496c;
+	background-size: 2px 6px;
 	margin: 0;
 }
 

@@ -309,12 +309,13 @@
 		border-bottom: 1px solid black;
 		color: rgb(232, 230, 227);
 		/* Pin to the top of the screen at all times */
-		position: sticky;
+		position: fixed;
 		top: 0;
 		z-index: 1;
 		overflow-x: scroll;
 		height: 150px;
 		gap: 21px;
+		width: 97.5%;
 	}
 
 	.header__left {
