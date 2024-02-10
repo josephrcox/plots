@@ -119,9 +119,8 @@ body {
 }
 
 .selected {
-	border: 4px solid #00800045 !important;
-	/* bold text */
-	font-weight: 600;
+	border: 4px solid #ffffff !important;
+	transition: all 0.2s;
 }
 
 button {

@@ -46,9 +46,9 @@
 			// check if adjacent plot is outside of the 25x25 grid
 			if (
 				adjacentPlot.x < 0 ||
-				adjacentPlot.x > 24 ||
+				adjacentPlot.x > $DB.plots.length ||
 				adjacentPlot.y < 0 ||
-				adjacentPlot.y > 24
+				adjacentPlot.y > $DB.plots.length
 			) {
 				return false;
 			}
@@ -580,7 +580,9 @@
 
 	.dialog-content:hover {
 		/* Create inner border 1px black */
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), inset 0 0 0 1px black;
+		box-shadow:
+			0 0 10px rgba(0, 0, 0, 0.3),
+			inset 0 0 0 1px black;
 	}
 	.cost_label {
 		color: rgb(114, 255, 114);

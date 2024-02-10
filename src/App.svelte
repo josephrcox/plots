@@ -3,7 +3,13 @@
 	import GameClock from './lib/gameClock.svelte';
 	import Header from './lib/Header.svelte';
 	import PauseMenu from './lib/menus/PauseMenu.svelte';
-	import { DATABASE_NAME, paused, showBalanceSheet, unique } from './lib/store';
+	import {
+		DATABASE_NAME,
+		paused,
+		showBalanceSheet,
+		unique,
+		DB,
+	} from './lib/store';
 	import { modifyPlotMenuOptions } from './lib/store';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 
@@ -68,15 +74,15 @@
 			let y = $modifyPlotMenuOptions.y;
 			if (x + changeX < 0) {
 				x = 0;
-			} else if (x + changeX > 25) {
-				x = 25;
+			} else if (x + changeX > $DB.plots.length) {
+				x = $DB.plots.length;
 			} else {
 				x += changeX;
 			}
 			if (y + changeY < 0) {
 				y = 0;
-			} else if (y + changeY > 25) {
-				y = 25;
+			} else if (y + changeY > $DB.plots.length) {
+				y = $DB.plots.length;
 			} else {
 				y += changeY;
 			}
@@ -103,13 +109,13 @@
 		}
 		if (x < 0) {
 			x = 0;
-		} else if (x > 25) {
-			x = 25;
+		} else if (x > $DB.plots.length) {
+			x = $DB.plots.length;
 		}
 		if (y < 0) {
 			y = 0;
-		} else if (y > 25) {
-			y = 25;
+		} else if (y > $DB.plots.length) {
+			y = $DB.plots.length;
 		}
 		console.log(x, y);
 		let plots = document.querySelectorAll(
@@ -122,22 +128,19 @@
 			}
 		});
 		if ($paused == false) {
-			if (plot.dataset.canbeupgraded === 'true') {
+			if (plot.dataset.canBeUpgraded === 'true') {
 				$modifyPlotMenuOptions.visible = true;
 			} else {
 				$modifyPlotMenuOptions.visible = false;
 			}
 			// check if it has a referencePlot variable, if so, use that instead of the X and Y provided here.
-			if (
-				plot.dataset.referenceplotx !== undefined &&
-				plot.dataset.referenceploty != ''
-			) {
+			if (plot.dataset.refPlotX !== undefined && plot.dataset.refPlotY != '') {
 				console.log(plot.dataset);
 				isOnReferencePlot = true;
 				plots.forEach((p) => {
 					if (
-						p.dataset.x == plot.dataset.referenceplotx &&
-						p.dataset.y == plot.dataset.referenceploty
+						p.dataset.x == plot.dataset.refPlotX &&
+						p.dataset.y == plot.dataset.refPlotY
 					) {
 						plot = p;
 						x = parseInt(plot.dataset.x);

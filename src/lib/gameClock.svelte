@@ -366,6 +366,3 @@
 		}
 	});
 </script>
-
-<style>
-</style>

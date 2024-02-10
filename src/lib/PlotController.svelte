@@ -3,7 +3,9 @@
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.js';
-	checkForAvailablePlots();
+	$: if ($DB) {
+		checkForAvailablePlots();
+	}
 
 	export function checkIfPlotCanBeUpgraded(x, y) {
 		let plot = {
@@ -27,9 +29,9 @@
 			// check if adjacent plot is outside of the 25x25 grid
 			if (
 				adjacentPlot.x < 0 ||
-				adjacentPlot.x > 24 ||
+				adjacentPlot.x >= $DB.plots.length || // Changed from '>' to '>='
 				adjacentPlot.y < 0 ||
-				adjacentPlot.y > 24
+				adjacentPlot.y >= $DB.plots[adjacentPlot.x].length // Assuming a square grid
 			) {
 				return false;
 			}
@@ -39,9 +41,10 @@
 	}
 
 	function checkForAvailablePlots() {
+		console.log($DB.plots.length);
 		let available = [];
-		for (let x = 0; x < 25; x++) {
-			for (let y = 0; y < 25; y++) {
+		for (let x = 0; x < $DB.plots.length; x++) {
+			for (let y = 0; y < $DB.plots.length; y++) {
 				const canBeUpgraded = checkIfPlotCanBeUpgraded(x, y);
 				if (canBeUpgraded) {
 					if ($DB.plots[x][y].active == false) {
@@ -59,37 +62,39 @@
 
 	// check if ?dev=true is in the url
 	if (window.location.search.includes('dev=true')) {
-		let z = $DB;
-		z.towninfo.name = 'DevTown';
-		z.towninfo.gold = 100000000;
-		z.towninfo.population = 0;
-		z.towninfo.happiness = 100000;
-		z.towninfo.health = 100000;
-		z.modifiers.happiness = 100000;
-		z.modifiers.health = 100000;
-		z.towninfo.knowledge_points = 10000;
-		$DB = z;
+		$DB.towninfo.name = 'DevTown';
+		$DB.towninfo.gold = 100000000;
+		$DB.towninfo.population = 0;
+		$DB.towninfo.happiness = 100000;
+		$DB.towninfo.health = 100000;
+		$DB.modifiers.happiness = 100000;
+		$DB.modifiers.health = 100000;
+		$DB.towninfo.knowledge_points = 10000;
 	}
 </script>
 
-<div class="grid">
-	{#each $DB.plots as plotRow}
-		<div class="row" on:click={restartModifyPlotMenu}>
-			{#each plotRow as plot}
-				<Plot
-					data={plot}
-					canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
-				/>
-			{/each}
-		</div>
-	{/each}
-</div>
-
-{#key $unique}
-	{#if $modifyPlotMenuOptions.visible}
-		<ModifyPlotMenu x={$modifyPlotMenuOptions.x} y={$modifyPlotMenuOptions.y} />
-	{/if}
-{/key}
+{#if $DB != null}
+	<div class="grid">
+		{#each $DB.plots as plotRow}
+			<div class="row" on:click={restartModifyPlotMenu}>
+				{#each plotRow as plot}
+					<Plot
+						data={plot}
+						canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
+					/>
+				{/each}
+			</div>
+		{/each}
+	</div>
+	{#key $unique}
+		{#if $modifyPlotMenuOptions.visible}
+			<ModifyPlotMenu
+				x={$modifyPlotMenuOptions.x}
+				y={$modifyPlotMenuOptions.y}
+			/>
+		{/if}
+	{/key}
+{/if}
 
 <style>
 	.grid {

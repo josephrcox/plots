@@ -97,7 +97,7 @@
 	data-x={data.x}
 	data-y={data.y}
 	on:click={openMenu}
-	data-canbeupgraded={canBeUpgraded}
+	data-canBeUpgraded={canBeUpgraded}
 	style={specialStylingString}
 	data-type={data.type}
 	data-referencePlotX={data.referencePlot !== undefined
@@ -123,9 +123,8 @@
 	.plot_container {
 		width: 100px;
 		height: 100px;
-		/* border: 1px solid rgb(100, 100, 100); */
-		background-color: rgb(37, 40, 42);
-
+		background-color: rgb(110, 93, 16);
+		border: 1px solid rgba(0, 0, 0, 0.7);
 		text-align: center;
 		word-wrap: normal;
 		min-width: 100px;
@@ -149,10 +148,10 @@
 		-webkit-box-sizing: border-box;
 	}
 	.plot_container[data-active='true'] {
-		background-color: rgba(62, 62, 242, 0.7);
+		background-color: rgb(62, 62, 242);
 	}
-	.plot_container[data-canbeupgraded='false'] {
-		background-color: black;
+	.plot_container[data-canBeUpgraded='false'] {
+		background-color: rgb(24, 24, 24);
 		border: none;
 	}
 	.plot_container[data-type='-2'] {

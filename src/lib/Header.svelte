@@ -183,7 +183,11 @@
 		<div>
 			<div class="subheading_m">😁 Happiness</div>
 			<div class="text_m">
-				{Math.round($DB.towninfo.happiness)}
+				{#if $DB.towninfo.happiness >= 50}
+					<span class="green">{$DB.towninfo.happiness}</span>
+				{:else}
+					<span class="red">{$DB.towninfo.happiness}</span>
+				{/if}
 				<span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span
 				>
 				{#if $DB.towninfo.happiness >= 300}
@@ -198,7 +202,12 @@
 		<div>
 			<div class="subheading_m">🩺 Health</div>
 			<div class="text_m">
-				{$DB.towninfo.health}
+				{#if $DB.towninfo.health >= 50}
+					<span class="green">{$DB.towninfo.health}</span>
+				{:else}
+					<span class="red">{$DB.towninfo.health}</span>
+				{/if}
+
 				<span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
 				{#if $DB.towninfo.health >= 300}
 					<span class="yellow max_label">MAX</span>

@@ -3,7 +3,7 @@
 
 export const options = [
 	{
-		title: '🏠 Residential',
+		title: '🏠 Residential (small)',
 		subtitle: 'for living',
 		type: 'residential',
 		description: 'A few basic homes that can hold 16 people.',
@@ -27,7 +27,7 @@ export const options = [
 		styling: 'background-color: #e15f00a3',
 	},
 	{
-		title: '🏘️ Residential',
+		title: '🏘️ Residential (medium)',
 		subtitle: 'for living',
 		type: 'residential',
 		description: 'A few high-density buildings that can hold 64 people.',
@@ -51,7 +51,7 @@ export const options = [
 		styling: 'background-color: #e15f00a3',
 	},
 	{
-		title: '🏢 Residential',
+		title: '🏢 Residential (large)',
 		subtitle: 'for living',
 		type: 'residential',
 		description: 'Many high-density buildings that can hold 256 people.',
@@ -451,7 +451,7 @@ export const options = [
 	{
 		id: 'city-hall',
 		title: '🗳️ City Hall',
-		subtitle: 'for beaurocracy',
+		subtitle: 'for bureaucracy',
 		type: 'federal',
 		description: 'For running the government.',
 		revenue_per_week: 0,

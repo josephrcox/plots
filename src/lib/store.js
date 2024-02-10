@@ -1,18 +1,17 @@
 import { writable } from 'svelte/store';
 import { default_db } from './jsonObjects/defaults/default_DB.js';
 
-export const DATABASE_NAME = 'plots_db';
+export const DATABASE_NAME = 'plots_db2';
 
 if (!localStorage.getItem(DATABASE_NAME)) {
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(default_db));
 	let json = JSON.parse(localStorage.getItem(DATABASE_NAME));
 	// set max tax rate, number between 0.2 and 0.8
 	json.economy_and_laws.max_tax_rate = Math.random() * (0.9 - 0.2) + 0.2;
-	// create 25 x 25 plots
 	let default_plots = [];
-	for (let i = 0; i < 25; i++) {
+	for (let i = 0; i < 5; i++) {
 		default_plots.push([]);
-		for (let j = 0; j < 25; j++) {
+		for (let j = 0; j < 5; j++) {
 			default_plots[i][j] = {
 				id: Math.random().toString(36).substring(2, 9),
 				active: false,
@@ -22,7 +21,6 @@ if (!localStorage.getItem(DATABASE_NAME)) {
 			};
 		}
 	}
-
 
 	json.plots = default_plots;
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(json));
@@ -40,7 +38,6 @@ export let unique = writable({});
 export let paused = writable(false);
 export let showBalanceSheet = writable(false);
 export let speed = writable(2000);
-export let showUnaffordablePlotOptions = writable(localStorage.getItem('showUnaffordablePlotOptions') === 'true' ? true : false);
-
-
-
+export let showUnaffordablePlotOptions = writable(
+	localStorage.getItem('showUnaffordablePlotOptions') === 'true' ? true : false,
+);
