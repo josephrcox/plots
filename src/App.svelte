@@ -12,6 +12,7 @@
 	} from './lib/store';
 	import { modifyPlotMenuOptions } from './lib/store';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
+	import EndGameMenu from './lib/menus/EndGameMenu.svelte';
 
 	let isOnReferencePlot = false;
 
@@ -220,6 +221,7 @@
 
 <Header />
 <GameClock />
+<EndGameMenu />
 <div class="plot_grid" data-marginRight={$showBalanceSheet}>
 	<PlotController />
 </div>

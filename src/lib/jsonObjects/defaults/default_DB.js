@@ -1,7 +1,7 @@
 export const default_db = {
 	plots: [],
 	lastChangeDay: 0,
-	towninfo: {
+	townInfo: {
 		name: 'Your town',
 		gold: 1000,
 		population_count: 0,
@@ -18,7 +18,7 @@ export const default_db = {
 	economy_and_laws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
-		balanceSheetHistory: [], 
+		balanceSheetHistory: [],
 		lastMonthProfit: 0,
 	},
 	plotCounts: [],
@@ -29,4 +29,5 @@ export const default_db = {
 		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
 	townLog: '',
+	endGameDetails: null,
 };

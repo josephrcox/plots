@@ -11,4 +11,7 @@ export const messages = {
 	very_high_tax_rate: 'People are extremely unhappy with the high tax rate.',
 	sickAndDying: 'People are sick and dying.',
 	sickAndLeaving: 'People are sick and leaving town.',
+	happiness_zero: 'The town has fallen into chaos due to extreme unhappiness.',
+	health_zero: 'The town has fallen into chaos due to extreme sickness.',
+	population_zero: 'The town has been condemned due to lack of population.',
 };

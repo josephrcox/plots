@@ -18,7 +18,7 @@
 		let newName = prompt('Enter a new name for your town (under 200 chars)');
 		if (newName && newName.length < 200) {
 			let z = $DB;
-			z.towninfo.name = newName;
+			z.townInfo.name = newName;
 			DB.set(z);
 			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		}
@@ -114,7 +114,7 @@
 
 <div class="header noselect">
 	<div class="header__left">
-		<div class="heading_l" on:dblclick={changeName}>{$DB.towninfo.name}</div>
+		<div class="heading_l" on:dblclick={changeName}>{$DB.townInfo.name}</div>
 		<div class="subheading_m">double click to change name</div>
 		<div>
 			<span on:click={slowDown}>⏪ </span> <span on:click={speedUp}> ⏩</span>
@@ -137,17 +137,17 @@
 		<div>
 			<div class="subheading_m">👪 Population</div>
 			<div class="text_m">
-				{$DB.towninfo.population_count}/{$DB.towninfo.population_max}
+				{$DB.townInfo.population_count}/{$DB.townInfo.population_max}
 			</div>
 		</div>
 		<div>
 			<div class="subheading_m">🧑‍🌾 Employees</div>
 			<div class="text_m">
-				{$DB.towninfo.employees}/{$DB.towninfo.population_count}
+				{$DB.townInfo.employees}/{$DB.townInfo.population_count}
 				<br />
-				{#if $DB.towninfo.population_count - $DB.towninfo.employees > 0}
+				{#if $DB.townInfo.population_count - $DB.townInfo.employees > 0}
 					<span class="text_ss gray"
-						>({$DB.towninfo.population_count - $DB.towninfo.employees} unemployed)</span
+						>({$DB.townInfo.population_count - $DB.townInfo.employees} unemployed)</span
 					>
 				{/if}
 			</div>
@@ -155,7 +155,7 @@
 		<div>
 			<div class="subheading_m">🧠 Knowledge</div>
 			<div class="text_m">
-				{$DB.towninfo.knowledge_points}
+				{$DB.townInfo.knowledge_points}
 			</div>
 		</div>
 		<div
@@ -167,7 +167,7 @@
 		>
 			<div class="subheading_m">💰 Gold</div>
 			<div class="text_m">
-				{$DB.towninfo.gold}
+				{$DB.townInfo.gold}
 				<br />
 				{#if $DB.economy_and_laws.lastMonthProfit >= 0}
 					<span class="text_s green"
@@ -183,18 +183,18 @@
 		<div>
 			<div class="subheading_m">😁 Happiness</div>
 			<div class="text_m">
-				{#if $DB.towninfo.happiness >= 50}
-					<span class="green">{$DB.towninfo.happiness}</span>
+				{#if $DB.townInfo.happiness >= 50}
+					<span class="green">{$DB.townInfo.happiness}</span>
 				{:else}
-					<span class="red">{$DB.towninfo.happiness}</span>
+					<span class="red">{$DB.townInfo.happiness}</span>
 				{/if}
 				<span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span
 				>
-				{#if $DB.towninfo.happiness >= 300}
+				{#if $DB.townInfo.happiness >= 300}
 					<span class="yellow max_label">MAX</span>
-				{:else if $DB.towninfo.happiness >= 150}
+				{:else if $DB.townInfo.happiness >= 150}
 					<span>👍</span>
-				{:else if $DB.towninfo.happiness < 150}
+				{:else if $DB.townInfo.happiness < 150}
 					<span>👎</span>
 				{/if}
 			</div>
@@ -202,14 +202,14 @@
 		<div>
 			<div class="subheading_m">🏥 Health</div>
 			<div class="text_m">
-				{#if $DB.towninfo.health >= 50}
-					<span class="green">{$DB.towninfo.health}</span>
+				{#if $DB.townInfo.health >= 50}
+					<span class="green">{$DB.townInfo.health}</span>
 				{:else}
-					<span class="red">{$DB.towninfo.health}</span>
+					<span class="red">{$DB.townInfo.health}</span>
 				{/if}
 
 				<span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
-				{#if $DB.towninfo.health >= 300}
+				{#if $DB.townInfo.health >= 300}
 					<span class="yellow max_label">MAX</span>
 				{/if}
 			</div>

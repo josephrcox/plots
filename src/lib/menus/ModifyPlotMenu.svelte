@@ -145,9 +145,9 @@
 		// go over requirements
 		let requirementsMet = true;
 		if (
-			plotChosen.requirements.gold > z.towninfo.gold ||
+			plotChosen.requirements.gold > z.townInfo.gold ||
 			plotChosen.requirements.employees >
-				z.towninfo.population_count - z.towninfo.employees
+				z.townInfo.population_count - z.townInfo.employees
 		) {
 			requirementsMet = false;
 		}
@@ -218,15 +218,15 @@
 			z.plots[x][y].type = typeIndex;
 			z.plots[x][y].active = true;
 			z.plots[x][y].referencePlot = [];
-			z.towninfo.gold -= plotChosen.requirements.gold;
-			z.towninfo.gold = roundTo(z.towninfo.gold, 2);
+			z.townInfo.gold -= plotChosen.requirements.gold;
+			z.townInfo.gold = roundTo(z.townInfo.gold, 2);
 			// Immediate variable changes
-			z.towninfo.population_count +=
+			z.townInfo.population_count +=
 				plotChosen.immediate_variable_changes.population;
-			z.towninfo.population_max +=
+			z.townInfo.population_max +=
 				plotChosen.immediate_variable_changes.population;
-			z.towninfo.happiness += plotChosen.immediate_variable_changes.happiness;
-			z.towninfo.health += plotChosen.immediate_variable_changes.health;
+			z.townInfo.happiness += plotChosen.immediate_variable_changes.happiness;
+			z.townInfo.health += plotChosen.immediate_variable_changes.health;
 			// Effect modifiers
 			z.modifiers.happiness = roundTo(
 				z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
@@ -237,7 +237,7 @@
 				2,
 			);
 			// Employeer modifications
-			z.towninfo.employees += plotChosen.requirements.employees;
+			z.townInfo.employees += plotChosen.requirements.employees;
 
 			// Plot count
 			if (
@@ -254,7 +254,7 @@
 					day: z.environment.day,
 					plot: `${x},${y}`,
 					profits: plotChosen.requirements.gold * -1,
-					balance: roundTo(z.towninfo.gold, 2),
+					balance: roundTo(z.townInfo.gold, 2),
 				},
 				...z.economy_and_laws.balanceSheetHistory,
 			];
@@ -278,13 +278,13 @@
 
 		if (oldPlotType > -1) {
 			// Immediate variable changes
-			z.towninfo.population_count -=
+			z.townInfo.population_count -=
 				options[oldPlotType].immediate_variable_changes.population;
-			z.towninfo.population_max -=
+			z.townInfo.population_max -=
 				options[oldPlotType].immediate_variable_changes.population;
-			z.towninfo.happiness -=
+			z.townInfo.happiness -=
 				options[oldPlotType].immediate_variable_changes.happiness;
-			z.towninfo.health -=
+			z.townInfo.health -=
 				options[oldPlotType].immediate_variable_changes.health;
 			// Effect modifiers
 			z.modifiers.happiness = roundTo(
@@ -296,7 +296,7 @@
 				2,
 			);
 			// Employeer modifications
-			z.towninfo.employees -= options[oldPlotType].requirements.employees;
+			z.townInfo.employees -= options[oldPlotType].requirements.employees;
 
 			if (
 				z.plotCounts[oldPlotType] === undefined ||
@@ -332,12 +332,12 @@
 		let z = $DB;
 		let requirementsMet = true;
 
-		if (plotChosen.requirements.gold > z.towninfo.gold) {
+		if (plotChosen.requirements.gold > z.townInfo.gold) {
 			requirementsMet = false;
 		}
 		console.log(plotChosen);
 		console.log(requirementsMet);
-		let availableEmployees = z.towninfo.population_count - z.towninfo.employees;
+		let availableEmployees = z.townInfo.population_count - z.townInfo.employees;
 		if (
 			plotChosen.requirements.employees !== undefined &&
 			plotChosen.requirements.employees > 0
@@ -348,7 +348,7 @@
 		}
 		console.log(availableEmployees, requirementsMet);
 		if (plotChosen.requirements.knowledge !== undefined) {
-			if (plotChosen.requirements.knowledge > z.towninfo.knowledge_points) {
+			if (plotChosen.requirements.knowledge > z.townInfo.knowledge_points) {
 				requirementsMet = false;
 			}
 		}
@@ -434,7 +434,7 @@
 										<span class="subheading_m">Requirements</span>
 										<br />
 										{#if option.requirements.gold !== 0}
-											{#if $DB.towninfo.gold < option.requirements.gold}
+											{#if $DB.townInfo.gold < option.requirements.gold}
 												<span class="red text_s cost_label"
 													>{option.requirements.gold} gold</span
 												>
@@ -447,7 +447,7 @@
 										{/if}
 
 										{#if option.requirements.employees !== 0}
-											{#if $DB.towninfo.population_count - $DB.towninfo.employees < option.requirements.employees}
+											{#if $DB.townInfo.population_count - $DB.townInfo.employees < option.requirements.employees}
 												<span class="text_s cost_label red"
 													>{option.requirements.employees} employees
 												</span>
@@ -460,7 +460,7 @@
 										{/if}
 
 										{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
-											{#if $DB.towninfo.knowledge_points < option.requirements.knowledge}
+											{#if $DB.townInfo.knowledge_points < option.requirements.knowledge}
 												<span class="text_s cost_label red"
 													>{option.requirements.knowledge} knowledge
 												</span>

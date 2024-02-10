@@ -8,7 +8,7 @@
 	let z = $DB;
 
 	export function mainGameThreadLoop() {
-		if ($paused == false) {
+		if ($paused == false && z.endGameDetails == null) {
 			z.environment.day += 1;
 
 			// Every 7 days
@@ -34,13 +34,29 @@
 			}
 		}
 		_fixVariables();
+		_checkIfGameOverSad();
 
 		DB.set(z);
 		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 	}
 
+	function _checkIfGameOverSad() {
+		if (z.townInfo.happiness <= 0) {
+			z.townInfo.happiness = 0;
+			z.endGameDetails = messages.happiness_zero;
+		}
+		if (z.townInfo.health <= 0) {
+			z.townInfo.health = 0;
+			z.endGameDetails = messages.health_zero;
+		}
+		if (z.townInfo.population_count <= 0 && z.townInfo.population_max > 0) {
+			z.townInfo.population_count = 0;
+			z.endGameDetails = messages.population_zero;
+		}
+	}
+
 	function _unemployment() {
-		let unemployed = z.towninfo.population_count - z.towninfo.employees;
+		let unemployed = z.townInfo.population_count - z.townInfo.employees;
 		if (unemployed > 0) {
 			z.modifiers.happiness -= unemployed * 0.0009;
 			addToTownLog(unemployed + messages.unemployment_num);
@@ -79,7 +95,7 @@
 	}
 
 	function _healthEffects() {
-		let health = z.towninfo.health;
+		let health = z.townInfo.health;
 		let peopleLeaving = 0;
 
 		if (health > 50) return;
@@ -87,25 +103,25 @@
 		if (health < Math.random() * 50) {
 			if (health < 25) {
 				addToTownLog(messages.sickAndDying);
-				z.towninfo.happiness -= 10;
+				z.townInfo.happiness -= 10;
 				// 10% of population
-				peopleLeaving = Math.round(z.towninfo.population_count * 0.1);
+				peopleLeaving = Math.round(z.townInfo.population_count * 0.1);
 			} else {
 				addToTownLog(messages.sickAndLeaving);
-				z.towninfo.happiness -= 5;
+				z.townInfo.happiness -= 5;
 				// 5%
-				peopleLeaving = Math.round(z.towninfo.population_count * 0.05);
+				peopleLeaving = Math.round(z.townInfo.population_count * 0.05);
 			}
-			z.towninfo.population_count -= peopleLeaving;
-			z.towninfo.employees -= peopleLeaving;
+			z.townInfo.population_count -= peopleLeaving;
+			z.townInfo.employees -= peopleLeaving;
 		}
 	}
 
 	function _boredom() {
 		if (z.lastChangeDay + (Math.random() * 160 + 50) < z.environment.day) {
-			if (z.towninfo.population_count > 0) {
-				z.towninfo.population_count -= 1;
-				z.towninfo.employees -= 1;
+			if (z.townInfo.population_count > 0) {
+				z.townInfo.population_count -= 1;
+				z.townInfo.employees -= 1;
 				z.modifiers.happiness -= 0.01;
 			}
 
@@ -114,38 +130,38 @@
 	}
 
 	function _movePeopleInMovePeopleOut() {
-		if (z.towninfo.population_count < z.towninfo.population_max) {
-			if (z.towninfo.happiness > 50) {
+		if (z.townInfo.population_count < z.townInfo.population_max) {
+			if (z.townInfo.happiness > 50) {
 				let availableSpots =
-					z.towninfo.population_max - z.towninfo.population_count;
+					z.townInfo.population_max - z.townInfo.population_count;
 				// add a number of people relative to the happiness where 100 is max happiness
 				let newPeople = Math.round(
-					(z.towninfo.happiness / 100) * availableSpots,
+					(z.townInfo.happiness / 100) * availableSpots,
 				);
-				z.towninfo.population_count += newPeople;
-				if (z.towninfo.population_count > z.towninfo.population_max) {
-					z.towninfo.population_count = z.towninfo.population_max;
+				z.townInfo.population_count += newPeople;
+				if (z.townInfo.population_count > z.townInfo.population_max) {
+					z.townInfo.population_count = z.townInfo.population_max;
 				}
 				// When people arrive, so does employment
-				z.towninfo.employees += newPeople;
-				if (z.towninfo.employees > z.towninfo.population_count) {
-					z.towninfo.employees = z.towninfo.population_count;
+				z.townInfo.employees += newPeople;
+				if (z.townInfo.employees > z.townInfo.population_count) {
+					z.townInfo.employees = z.townInfo.population_count;
 				}
 				addToTownLog(newPeople + messages.new_people_num);
 			}
 		}
-		if (z.towninfo.happiness < 50 && z.towninfo.population_count > 0) {
+		if (z.townInfo.happiness < 50 && z.townInfo.population_count > 0) {
 			// When the happiness is low, some people should leave
-			let unhappyPeople = Math.round((100 - z.towninfo.happiness) / 5);
-			z.towninfo.population_count -= unhappyPeople;
+			let unhappyPeople = Math.round((100 - z.townInfo.happiness) / 5);
+			z.townInfo.population_count -= unhappyPeople;
 			// When people leave, so does employmenet
-			if (z.towninfo.employees > 0) {
-				z.towninfo.employees -= unhappyPeople;
+			if (z.townInfo.employees > 0) {
+				z.townInfo.employees -= unhappyPeople;
 			}
 
 			addToTownLog(unhappyPeople + messages.leave_town_num);
 		} else {
-			if (z.towninfo.population_count == z.towninfo.population_max) {
+			if (z.townInfo.population_count == z.townInfo.population_max) {
 				addToTownLog(messages.people_want_to_move_in);
 			}
 		}
@@ -171,26 +187,26 @@
 	}
 
 	export function _fixVariables() {
-		if (z.towninfo.happiness < 0) {
-			z.towninfo.happiness = 0;
+		if (z.townInfo.happiness < 0) {
+			z.townInfo.happiness = 0;
 		}
-		if (z.towninfo.health < 0) {
-			z.towninfo.health = 0;
+		if (z.townInfo.health < 0) {
+			z.townInfo.health = 0;
 		}
-		if (z.towninfo.gold < 0) {
-			z.towninfo.gold = 0;
+		if (z.townInfo.gold < 0) {
+			z.townInfo.gold = 0;
 		}
-		if (z.towninfo.employees < 0) {
-			z.towninfo.employees = 0;
+		if (z.townInfo.employees < 0) {
+			z.townInfo.employees = 0;
 		}
-		if (z.towninfo.knowledge_points < 0) {
-			z.towninfo.knowledge_points = 0;
+		if (z.townInfo.knowledge_points < 0) {
+			z.townInfo.knowledge_points = 0;
 		}
-		if (z.towninfo.population_count < 0) {
-			z.towninfo.population_count = 0;
+		if (z.townInfo.population_count < 0) {
+			z.townInfo.population_count = 0;
 		}
 		// Recommend building more buildings
-		if (z.towninfo.population_max == 0) {
+		if (z.townInfo.population_max == 0) {
 			addToTownLog(messages.nobody_home);
 		}
 		z.economy_and_laws.lastMonthProfit = roundTo(
@@ -198,22 +214,22 @@
 			2,
 		);
 
-		z.towninfo.gold = roundTo(z.towninfo.gold, 2);
-		z.towninfo.population_count = roundTo(z.towninfo.population_count, 0);
-		z.towninfo.employees = roundTo(z.towninfo.employees, 0);
-		z.towninfo.population_max = roundTo(z.towninfo.population_max, 0);
-		console.log(z.towninfo.happiness);
-		z.towninfo.happiness = roundTo(z.towninfo.happiness, 2);
-		console.log(z.towninfo.happiness);
-		z.towninfo.health = roundTo(z.towninfo.health, 2);
+		z.townInfo.gold = roundTo(z.townInfo.gold, 2);
+		z.townInfo.population_count = roundTo(z.townInfo.population_count, 0);
+		z.townInfo.employees = roundTo(z.townInfo.employees, 0);
+		z.townInfo.population_max = roundTo(z.townInfo.population_max, 0);
+		console.log(z.townInfo.happiness);
+		z.townInfo.happiness = roundTo(z.townInfo.happiness, 2);
+		console.log(z.townInfo.happiness);
+		z.townInfo.health = roundTo(z.townInfo.health, 2);
 
-		if (z.towninfo.happiness > 300) {
+		if (z.townInfo.happiness > 300) {
 			// Maxed out happiness
-			z.towninfo.happiness = 300;
+			z.townInfo.happiness = 300;
 		}
-		if (z.towninfo.health > 300) {
+		if (z.townInfo.health > 300) {
 			// Maxed out health
-			z.towninfo.health = 300;
+			z.townInfo.health = 300;
 		}
 		// If modifiers are below 0.50, set to 0.50
 		if (z.modifiers.happiness < 0.5) {
@@ -245,20 +261,20 @@
 
 	export function _bringStatsBackToNormal() {
 		const midpoint = 150;
-		if (z.towninfo.happiness > midpoint) {
+		if (z.townInfo.happiness > midpoint) {
 			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
-			let percentAboveOne = z.towninfo.happiness - midpoint;
-			z.towninfo.happiness -= percentAboveOne * 0.08;
-			if (z.towninfo.happiness < midpoint) {
-				z.towninfo.happiness = midpoint;
+			let percentAboveOne = z.townInfo.happiness - midpoint;
+			z.townInfo.happiness -= percentAboveOne * 0.08;
+			if (z.townInfo.happiness < midpoint) {
+				z.townInfo.happiness = midpoint;
 			}
 		}
-		if (z.towninfo.health > midpoint) {
+		if (z.townInfo.health > midpoint) {
 			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
-			let percentAboveOne = z.towninfo.health - midpoint;
-			z.towninfo.health -= percentAboveOne * 0.08;
-			if (z.towninfo.health < midpoint) {
-				z.towninfo.health = midpoint;
+			let percentAboveOne = z.townInfo.health - midpoint;
+			z.townInfo.health -= percentAboveOne * 0.08;
+			if (z.townInfo.health < midpoint) {
+				z.townInfo.health = midpoint;
 			}
 		}
 	}
@@ -272,7 +288,7 @@
 					// Iterate through all plots and do actions based on their conditions
 					let plotOptionForPlot = options[z.plots[i][j].type];
 					let profit = getProfit(plotOptionForPlot.revenue_per_week);
-					z.towninfo.gold += profit;
+					z.townInfo.gold += profit;
 					z.economy_and_laws.lastMonthProfit += profit;
 
 					// push object to the start of the balance sheet history array instead of the end
@@ -298,8 +314,8 @@
 	}
 
 	function _applyModifiers() {
-		z.towninfo.happiness *= z.modifiers.happiness;
-		z.towninfo.health *= z.modifiers.health;
+		z.townInfo.happiness *= z.modifiers.happiness;
+		z.townInfo.health *= z.modifiers.health;
 	}
 
 	function _calculateKnowledge() {
@@ -308,7 +324,7 @@
 				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
 					let plotOptionForPlot = options[z.plots[i][j].type];
 					if (plotOptionForPlot.knowledge_points_per_month != null) {
-						z.towninfo.knowledge_points +=
+						z.townInfo.knowledge_points +=
 							plotOptionForPlot.knowledge_points_per_month;
 					}
 				}
@@ -333,7 +349,7 @@
 		// This takes in revenue, and returns the gold profit.
 		// Profit is revenue * tax rate * percentage of population out of the max population
 		let z = $DB;
-		let profitModifiers = z.towninfo.happiness / 100;
+		let profitModifiers = z.townInfo.happiness / 100;
 		if (profitModifiers > 1.25) {
 			profitModifiers = 1.25;
 		} else if (profitModifiers < 0.75) {
@@ -343,7 +359,7 @@
 		let profit =
 			revenue *
 			z.economy_and_laws.tax_rate *
-			(z.towninfo.population_count / z.towninfo.population_max) *
+			(z.townInfo.population_count / z.townInfo.population_max) *
 			profitModifiers;
 		return roundTo(profit, 2);
 	}

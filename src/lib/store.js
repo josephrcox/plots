@@ -6,8 +6,8 @@ export const DATABASE_NAME = 'plots_db2';
 if (!localStorage.getItem(DATABASE_NAME)) {
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(default_db));
 	let json = JSON.parse(localStorage.getItem(DATABASE_NAME));
-	// set max tax rate, number between 0.2 and 0.8
-	json.economy_and_laws.max_tax_rate = Math.random() * (0.9 - 0.2) + 0.2;
+	// set max tax rate, number between 0.2 and 0.5
+	json.economy_and_laws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	let default_plots = [];
 	const randomSize = Math.floor(Math.random() * 10) + 5;
 	for (let i = 0; i < randomSize; i++) {
