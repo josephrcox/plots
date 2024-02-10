@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, DATABASE_NAME, paused, speed } from './store.js';
+	import { DB, DATABASE_NAME, paused, speed, clearDB } from './store.js';
 	import { messages } from './jsonObjects/TownLogMessages.js';
 	import { options } from './jsonObjects/PlotTypeOptions.js';
 	import Plot from './Plot.svelte';
@@ -8,7 +8,8 @@
 	let z = $DB;
 
 	export function mainGameThreadLoop() {
-		if ($paused == false && z.endGameDetails == null) {
+		console.log(DB);
+		if ($paused == false && z.endGameDetails == null && DB != null) {
 			z.environment.day += 1;
 
 			// Every 7 days
@@ -377,6 +378,10 @@
 
 	onMount(async () => {
 		while (true) {
+			if (localStorage.reset == 'true') {
+				clearDB();
+				localStorage.setItem('reset', 'false');
+			}
 			// call mainGameThreadLoop ever $speed ms
 			mainGameThreadLoop();
 			await new Promise((r) => setTimeout(r, $speed));

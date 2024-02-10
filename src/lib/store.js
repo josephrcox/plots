@@ -1,15 +1,21 @@
 import { writable } from 'svelte/store';
 import { default_db } from './jsonObjects/defaults/default_DB.js';
 
-export const DATABASE_NAME = 'plots_db2';
+export const DATABASE_NAME = 'plots_db_v2';
 
-if (!localStorage.getItem(DATABASE_NAME)) {
+export function startGame(difficulty, endGoal) {
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(default_db));
 	let json = JSON.parse(localStorage.getItem(DATABASE_NAME));
-	// set max tax rate, number between 0.2 and 0.5
 	json.economy_and_laws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	let default_plots = [];
-	const randomSize = Math.floor(Math.random() * 10) + 5;
+	const randomSize =
+		difficulty == '0' // easiest
+			? Math.floor(Math.random() * 10) + 8
+			: difficulty == '1'
+			? Math.floor(Math.random() * 15) + 12
+			: difficulty == '2'
+			? Math.floor(Math.random() * 20) + 12
+			: 35; // undefined difficulty
 	for (let i = 0; i < randomSize; i++) {
 		default_plots.push([]);
 		for (let j = 0; j < randomSize; j++) {
@@ -25,9 +31,17 @@ if (!localStorage.getItem(DATABASE_NAME)) {
 
 	json.plots = default_plots;
 	localStorage.setItem(DATABASE_NAME, JSON.stringify(json));
+	location.reload();
 }
 
 export let DB = writable(JSON.parse(localStorage.getItem(DATABASE_NAME)));
+
+export function clearDB() {
+	console.log('RELOADING');
+	localStorage.removeItem(DATABASE_NAME);
+	DB = null;
+	location.reload();
+}
 
 export let modifyPlotMenuOptions = writable({
 	visible: false,

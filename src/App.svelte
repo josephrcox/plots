@@ -9,10 +9,12 @@
 		showBalanceSheet,
 		unique,
 		DB,
-	} from './lib/store';
-	import { modifyPlotMenuOptions } from './lib/store';
+		clearDB,
+		modifyPlotMenuOptions,
+	} from './lib/store.js';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 	import EndGameMenu from './lib/menus/EndGameMenu.svelte';
+	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
 
 	let isOnReferencePlot = false;
 
@@ -35,13 +37,10 @@
 				}
 				break;
 			case 'escape':
-				$paused = true;
-				if (prompt('Are you sure?') == 'yes') {
-					localStorage.removeItem(DATABASE_NAME);
-					location.reload();
-					$paused = false;
-				} else {
-					$paused = false;
+				// check if also holding shift
+				if (e.shiftKey) {
+					localStorage.setItem('reset', 'true');
+					clearDB();
 				}
 				break;
 			case 'arrowleft':
@@ -211,33 +210,37 @@
 	}
 </script>
 
-{#if $paused == true}
-	<PauseMenu />
+{#if $DB == null}
+	<StartGameMenu />
+{:else}
+	{#if $paused == true}
+		<PauseMenu />
+	{/if}
+
+	{#if $showBalanceSheet == true}
+		<BalanceSheetMenu />
+	{/if}
+
+	<Header />
+	<GameClock />
+	<EndGameMenu />
+	<div class="plot_grid" data-marginRight={$showBalanceSheet}>
+		<PlotController />
+	</div>
+
+	<style>
+		.plot_grid {
+			max-width: 300%;
+			max-height: 300%;
+			overflow-x: scroll;
+			overflow-y: scroll;
+			width: 300%;
+			height: 300vh;
+			margin-top: 183px;
+		}
+		.plot_grid[data-marginRight='true'] {
+			/* This is for when the balanceSheet is being shown. */
+			margin-right: 224px;
+		}
+	</style>
 {/if}
-
-{#if $showBalanceSheet == true}
-	<BalanceSheetMenu />
-{/if}
-
-<Header />
-<GameClock />
-<EndGameMenu />
-<div class="plot_grid" data-marginRight={$showBalanceSheet}>
-	<PlotController />
-</div>
-
-<style>
-	.plot_grid {
-		max-width: 300%;
-		max-height: 300%;
-		overflow-x: scroll;
-		overflow-y: scroll;
-		width: 300%;
-		height: 300vh;
-		margin-top: 183px;
-	}
-	.plot_grid[data-marginRight='true'] {
-		/* This is for when the balanceSheet is being shown. */
-		margin-right: 224px;
-	}
-</style>
