@@ -8,7 +8,7 @@
 		Unpause the game by pressing P
 		<br />
 		<br />
-		Reset the game by pressing escape
+		Reset the game by pressing SHIFT+ESC
 	</div>
 </div>
 

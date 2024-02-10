@@ -10,7 +10,7 @@
 			{$DB.endGameDetails}
 			<br />
 			<br />
-			Reset the game by pressing escape
+			Reset the game by pressing SHIFT+ESC
 		</div>
 	</div>
 {/if}
