@@ -24,6 +24,10 @@ body {
 	margin: 0;
 }
 
+.pointer {
+	cursor: pointer;
+}
+
 .subheading_m {
 	font-size: 0.8rem;
 	font-weight: 300;

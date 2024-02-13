@@ -14,4 +14,7 @@ export const messages = {
 	happiness_zero: 'The town has fallen into chaos due to extreme unhappiness.',
 	health_zero: 'The town has fallen into chaos due to extreme sickness.',
 	population_zero: 'The town has been condemned due to lack of population.',
+	win: {
+		land: 'You have filled the grid with buildings. You win!',
+	},
 };

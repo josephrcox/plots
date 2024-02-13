@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { options } from './jsonObjects/PlotTypeOptions.js';
+	import { options } from './objects/PlotTypeOptions.js';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store';
 
 	export let data = {
@@ -46,7 +46,6 @@
 				b == undefined &&
 				data.referencePlot[1] !== undefined
 			) {
-				console.log(data.referencePlot);
 				return openMenu(e, data.referencePlot[0], data.referencePlot[1]);
 			} else if (!data.active && !canBeUpgraded) {
 				$unique = {};
@@ -96,6 +95,7 @@
 	data-id={data.id}
 	data-x={data.x}
 	data-y={data.y}
+	data-optionIndex={data.optionIndex}
 	on:click={openMenu}
 	data-canBeUpgraded={canBeUpgraded}
 	style={specialStylingString}
@@ -123,7 +123,7 @@
 	.plot_container {
 		width: 100px;
 		height: 100px;
-		background-color: rgb(65, 65, 65);
+		background-color: rgb(126, 158, 255);
 		border: 1px solid rgba(0, 0, 0, 0.7);
 		text-align: center;
 		word-wrap: normal;
@@ -151,7 +151,7 @@
 		background-color: rgb(89 89 239);
 	}
 	.plot_container[data-canBeUpgraded='false'] {
-		background-color: rgb(24, 24, 24);
+		background-color: rgb(64, 64, 64);
 		border: none;
 	}
 	.plot_container[data-type='-2'] {

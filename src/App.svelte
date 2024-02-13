@@ -13,17 +13,35 @@
 		modifyPlotMenuOptions,
 	} from './lib/store.js';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
-	import EndGameMenu from './lib/menus/EndGameMenu.svelte';
+	import GameLostMenu from './lib/menus/GameLostMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
 
+	let dbInitialized = false;
+
+	$: if ($DB) {
+		dbInitialized = true;
+	} else {
+		dbInitialized = false;
+	}
+
 	let isOnReferencePlot = false;
+
+	// document.addEventListener('click', (e) => {
+	// 	if (
+	// 		(e.currentTarget as HTMLElement).classList.contains('plot_container') ===
+	// 		false
+	// 	) {
+	// 		$modifyPlotMenuOptions.visible = false;
+	// 	}
+	// });
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
 		// if input then return
 		if (
-			document.activeElement.nodeName === 'INPUT' ||
-			document.activeElement.nodeName == 'TEXTAREA'
+			(document.activeElement.nodeName === 'INPUT' ||
+				document.activeElement.nodeName == 'TEXTAREA') &&
+			e.key !== 'Escape'
 		)
 			return;
 		let key = e.key.toLowerCase();
@@ -40,7 +58,12 @@
 				// check if also holding shift
 				if (e.shiftKey) {
 					localStorage.setItem('reset', 'true');
+					location.reload();
 					clearDB();
+				} else {
+					if ($modifyPlotMenuOptions.visible == true) {
+						$modifyPlotMenuOptions.visible = false;
+					}
 				}
 				break;
 			case 'arrowleft':
@@ -123,7 +146,6 @@
 		} else if (y > $DB.plots.length) {
 			y = $DB.plots.length;
 		}
-		console.log(x, y);
 		let plots = document.querySelectorAll(
 			'.plot_container',
 		) as NodeListOf<HTMLDivElement>;
@@ -141,7 +163,6 @@
 			}
 			// check if it has a referencePlot variable, if so, use that instead of the X and Y provided here.
 			if (plot.dataset.refPlotX !== undefined && plot.dataset.refPlotY != '') {
-				console.log(plot.dataset);
 				isOnReferencePlot = true;
 				plots.forEach((p) => {
 					if (
@@ -210,37 +231,41 @@
 	}
 </script>
 
-{#if $DB == null}
-	<StartGameMenu />
-{:else}
-	{#if $paused == true}
-		<PauseMenu />
+{#if dbInitialized || $DB == null}
+	{#if $DB == null}
+		<StartGameMenu />
+	{:else}
+		{#if $paused == true}
+			<PauseMenu />
+		{/if}
+
+		{#if $showBalanceSheet == true}
+			<BalanceSheetMenu />
+		{/if}
+
+		<Header />
+		<GameClock />
+		<GameLostMenu />
+		<div class="plot_grid" data-marginRight={$showBalanceSheet}>
+			<PlotController />
+			<br />
+			outside of city
+		</div>
+
+		<style>
+			.plot_grid {
+				max-width: 300%;
+				max-height: 300%;
+				overflow-x: scroll;
+				overflow-y: scroll;
+				width: 300%;
+				height: 300vh;
+				margin-top: 183px;
+			}
+			.plot_grid[data-marginRight='true'] {
+				/* This is for when the balanceSheet is being shown. */
+				margin-right: 224px;
+			}
+		</style>
 	{/if}
-
-	{#if $showBalanceSheet == true}
-		<BalanceSheetMenu />
-	{/if}
-
-	<Header />
-	<GameClock />
-	<EndGameMenu />
-	<div class="plot_grid" data-marginRight={$showBalanceSheet}>
-		<PlotController />
-	</div>
-
-	<style>
-		.plot_grid {
-			max-width: 300%;
-			max-height: 300%;
-			overflow-x: scroll;
-			overflow-y: scroll;
-			width: 300%;
-			height: 300vh;
-			margin-top: 183px;
-		}
-		.plot_grid[data-marginRight='true'] {
-			/* This is for when the balanceSheet is being shown. */
-			margin-right: 224px;
-		}
-	</style>
 {/if}

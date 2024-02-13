@@ -41,7 +41,6 @@
 	}
 
 	function checkForAvailablePlots() {
-		console.log($DB.plots.length);
 		let available = [];
 		for (let x = 0; x < $DB.plots.length; x++) {
 			for (let y = 0; y < $DB.plots.length; y++) {
@@ -53,7 +52,6 @@
 				}
 			}
 		}
-		console.log(available);
 	}
 
 	export function restartModifyPlotMenu() {

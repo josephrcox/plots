@@ -1,14 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
 	import { DB, DATABASE_NAME, paused, speed, clearDB } from './store.js';
-	import { messages } from './jsonObjects/TownLogMessages.js';
-	import { options } from './jsonObjects/PlotTypeOptions.js';
+	import { messages } from './objects/TownLogMessages.js';
+	import { options } from './objects/PlotTypeOptions.js';
 	import Plot from './Plot.svelte';
+	import { winScenarios } from './objects/WinScenarios.js';
 
 	let z = $DB;
 
 	export function mainGameThreadLoop() {
-		console.log(DB);
 		if ($paused == false && z.endGameDetails == null && DB != null) {
 			z.environment.day += 1;
 
@@ -33,26 +33,71 @@
 				_boredom();
 				_bringStatsBackToNormal();
 			}
-		}
-		_fixVariables();
-		_checkIfGameOverSad();
+			_fixVariables();
+			_checkGameLost();
+			_checkGameWin();
 
-		DB.set(z);
-		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+			DB.set(z);
+			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+		}
 	}
 
-	function _checkIfGameOverSad() {
+	function _checkGameWin() {
+		const gameWinScenario = z.endGoal;
+
+		if (gameWinScenario == 'land') {
+			// Goal for the user is to fill up every plot, and to have happiness >= 100, health >= 100, and to have a full population.
+			if (
+				z.townInfo.population_max == z.townInfo.population_count &&
+				z.townInfo.happiness >=
+					winScenarios.land.requirements[z.difficulty].happiness &&
+				z.townInfo.health >=
+					winScenarios.land.requirements[z.difficulty].health &&
+				z.townInfo.employees / z.townInfo.population_count >=
+					winScenarios.land.requirements[z.difficulty].employment
+			) {
+				// iterate over the plots and see if every single one is filled.
+				let allPlotsFilled = true;
+				for (let i = 0; i < z.plots.length; i++) {
+					for (let j = 0; j < z.plots[i].length; j++) {
+						if (z.plots[i][j].active == false) {
+							allPlotsFilled = false;
+							break;
+						}
+					}
+				}
+				if (allPlotsFilled) {
+					z.endGameDetails = {
+						msg: winScenarios.land.win,
+						win: true,
+					};
+				}
+			}
+		}
+	}
+
+	function _checkGameLost() {
+		// GAME LOSS SCENARIOS
 		if (z.townInfo.happiness <= 0) {
 			z.townInfo.happiness = 0;
-			z.endGameDetails = messages.happiness_zero;
+			z.endGameDetails = {
+				msg: messages.happiness_zero,
+				win: false,
+			};
 		}
 		if (z.townInfo.health <= 0) {
 			z.townInfo.health = 0;
-			z.endGameDetails = messages.health_zero;
+			z.endGameDetails = {
+				msg: messages.health_zero,
+				win: false,
+			};
 		}
 		if (z.townInfo.population_count <= 0 && z.townInfo.population_max > 0) {
 			z.townInfo.population_count = 0;
-			z.endGameDetails = messages.population_zero;
+			z.endGameDetails = {
+				msg: messages.population_zero,
+				win: false,
+			};
 		}
 	}
 
@@ -68,30 +113,16 @@
 		let z = $DB;
 
 		// Check if there are any banks and store the count of banks
-		let numberOfBanks = 0;
-		for (let i = 0; i < z.plotCounts.length; i++) {
-			console.log(z.plotCounts[18]);
-			if (z.plotCounts[18] != null && z.plotCounts[18] != undefined) {
-				numberOfBanks = z.plotCounts[18];
-				// TODO: Make banks do something.
-			}
+		if (z.hasBank === true) {
+			// TODO
 		}
 	}
 
 	function _federalGovEffect() {
 		let z = $DB;
 
-		let hasCityHall = false;
-		for (let i = 0; i < z.plotCounts.length; i++) {
-			console.log(z.plotCounts[18]);
-			if (
-				z.plotCounts[18] != null &&
-				z.plotCounts[18] != undefined &&
-				z.plotCounts[19] != 0
-			) {
-				hasCityHall = true;
-				// TODO: Make fed gov do something.
-			}
+		if (z.hasCityHall === true) {
+			// TODO
 		}
 	}
 
@@ -219,9 +250,7 @@
 		z.townInfo.population_count = roundTo(z.townInfo.population_count, 0);
 		z.townInfo.employees = roundTo(z.townInfo.employees, 0);
 		z.townInfo.population_max = roundTo(z.townInfo.population_max, 0);
-		console.log(z.townInfo.happiness);
 		z.townInfo.happiness = roundTo(z.townInfo.happiness, 2);
-		console.log(z.townInfo.happiness);
 		z.townInfo.health = roundTo(z.townInfo.health, 2);
 
 		if (z.townInfo.happiness > 300) {
@@ -309,6 +338,13 @@
 								z.economy_and_laws.balanceSheetHistory.slice(0, 250);
 						}
 					}
+
+					if (plotOptionForPlot.enables_tourism == true) {
+						z.townInfo.gold_from_tourism +=
+							plotOptionForPlot.tourism_revenue_per_week *
+							z.economy_and_laws.tax_rate *
+							z.townInfo.population_count;
+					}
 				}
 			}
 		}
@@ -332,10 +368,6 @@
 			}
 		}
 	}
-
-	//
-	//
-	//
 
 	function addToTownLog(message) {
 		let z = $DB;

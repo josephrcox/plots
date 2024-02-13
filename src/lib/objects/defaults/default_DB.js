@@ -1,9 +1,11 @@
 export const default_db = {
 	plots: [],
 	lastChangeDay: 0,
+	townLog: '',
 	townInfo: {
 		name: 'Your town',
 		gold: 1000,
+		gold_from_tourism: 0,
 		population_count: 0,
 		population_max: 0,
 		employees: 0,
@@ -11,6 +13,8 @@ export const default_db = {
 		health: 100,
 		knowledge_points: 0,
 	},
+	hasCityHall: false,
+	hasBank: false,
 	modifiers: {
 		happiness: 1,
 		health: 1,
@@ -28,6 +32,7 @@ export const default_db = {
 		climate: -1,
 		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
-	townLog: '',
+	difficulty: 0, // 0 = easy, 1 = medium, 2 = hard
+	endGoal: 'land',
 	endGameDetails: null,
 };

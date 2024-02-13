@@ -7,7 +7,7 @@
 		<div class="dialog-content">
 			GAME OVER
 			<br />
-			{$DB.endGameDetails}
+			{$DB.endGameDetails.msg}
 			<br />
 			<br />
 			Reset the game by pressing SHIFT+ESC

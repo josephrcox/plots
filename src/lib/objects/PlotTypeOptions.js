@@ -3,6 +3,7 @@
 
 export const options = [
 	{
+		id: 'res_small',
 		title: '🏠 Residential (small)',
 		subtitle: 'for living',
 		type: 'residential',
@@ -27,6 +28,7 @@ export const options = [
 		styling: 'background-color: #e15f00',
 	},
 	{
+		id: 'res_medium',
 		title: '🏘️ Residential (medium)',
 		subtitle: 'for living',
 		type: 'residential',
@@ -51,6 +53,7 @@ export const options = [
 		styling: 'background-color: #e15f00',
 	},
 	{
+		id: 'res_large',
 		title: '🏢 Residential (large)',
 		subtitle: 'for living',
 		type: 'residential',
@@ -75,6 +78,7 @@ export const options = [
 		styling: 'background-color: #e15f00',
 	},
 	{
+		id: 'cafe',
 		title: '☕️ Small café',
 		subtitle: 'for recreation & food',
 		type: 'food',
@@ -99,6 +103,7 @@ export const options = [
 		styling: 'background-color:#d24646;',
 	},
 	{
+		id: 'carrot_farm',
 		title: '🥕 Carrot farm',
 		subtitle: 'for farming',
 		type: 'farm',
@@ -123,6 +128,7 @@ export const options = [
 		styling: 'background-color: #d24646;',
 	},
 	{
+		id: 'apple_orchard', // 'apple_orchard
 		title: '🍎 Apple orchard',
 		subtitle: 'for farming',
 		type: 'farm',
@@ -148,6 +154,32 @@ export const options = [
 		styling: 'background-color:#d24646;',
 	},
 	{
+		id: 'bakery',
+		title: '🥖 Bakery',
+		subtitle: 'for baking',
+		type: 'farm',
+		description: 'Makes money by selling bread.',
+		revenue_per_week: 12,
+		requirements: {
+			gold: 100,
+			plots: [],
+			employees: 3,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.11,
+			health: 0.92,
+		},
+		immediate_variable_changes: {
+			happiness: 25,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background-color: #d24646;',
+	},
+	{
+		id: 'grocery',
 		title: '🏪 Grocery store',
 		subtitle: 'for living',
 		type: 'food',
@@ -172,11 +204,39 @@ export const options = [
 		styling: 'background-color:#d24646;',
 	},
 	{
+		id: 'fishery',
+		title: '🐠 Fishery',
+		subtitle: 'for fishing',
+		type: 'food',
+		description:
+			'Carve out some land, pour some water, and fish for fun & food.',
+		revenue_per_week: 25,
+		requirements: {
+			gold: 400,
+			plots: [],
+			employees: 9,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.05,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 15,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background-color:#d24646;',
+	},
+	{
+		id: 'library',
 		title: '📕 Library',
 		subtitle: 'for reading',
 		type: 'recreation',
 		description: "Reading makes people very happy, but doesn't make money.",
 		revenue_per_week: 0,
+		knowledge_points_per_month: 1,
 		requirements: {
 			gold: 500,
 			plots: [],
@@ -195,6 +255,32 @@ export const options = [
 		},
 	},
 	{
+		id: 'pub',
+		title: '🍻 Pub',
+		subtitle: 'for hanging',
+		type: 'recreation',
+		description: 'Makes money, and somehow generates communal knowledge.',
+		revenue_per_week: 50,
+		knowledge_points_per_month: 1,
+		requirements: {
+			gold: 500,
+			plots: [],
+			employees: 6,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.2,
+			health: 0.7,
+		},
+		immediate_variable_changes: {
+			happiness: 10,
+			health: -25,
+			population: 0,
+		},
+	},
+	{
+		id: 'church',
 		title: '⛪️ Church',
 		subtitle: 'for worship & community',
 		type: 'recreation',
@@ -219,6 +305,86 @@ export const options = [
 		styling: 'background: rgb(255, 255, 255)',
 	},
 	{
+		id: 'stables',
+		title: '🐴 Stables',
+		subtitle: 'for friends',
+		type: 'recreation',
+		description:
+			'People love horses. This makes them happy, and can generate some money through lessons.',
+		revenue_per_week: 10,
+		requirements: {
+			gold: 220,
+			plots: [],
+			employees: 2,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.1,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 5,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background: rgb(255, 255, 255)',
+	},
+	{
+		id: 'blacksmith',
+		title: '⚔️ Blacksmith',
+		subtitle: 'for making shiny things',
+		type: 'shop',
+		description:
+			'Sometimes problems can only be dealt with by a hunk of metal. Makes money by selling weapons, tools, & armor.',
+		revenue_per_week: 50,
+		requirements: {
+			gold: 1300,
+			plots: [],
+			employees: 13,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 0.9,
+			health: 1.5,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background: rgb(255, 255, 255)',
+	},
+	{
+		id: 'inn',
+		title: '🛌 Village Inn',
+		subtitle: 'for a night out',
+		type: 'tourism',
+		description: 'Generates tourism gold that can be used if you have a bank.',
+		revenue_per_week: 0,
+		enables_tourism: true,
+		tourism_revenue_per_week: 15, // this is per citizen!
+		requirements: {
+			gold: 1500,
+			plots: [],
+			employees: 14,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 0.9,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background: rgb(255, 255, 255)',
+	},
+	{
+		id: 'park_small',
 		title: '🌲 Small park',
 		subtitle: 'for bringing your dog, or eating a sandwich',
 		type: 'recreation',
@@ -243,6 +409,7 @@ export const options = [
 		styling: 'background: rgba(152, 255, 95, 0.69)',
 	},
 	{
+		id: 'park_medium',
 		title: '🛝 Medium park',
 		subtitle: 'for bringing your dog, or eating a sandwich',
 		type: 'recreation',
@@ -267,6 +434,7 @@ export const options = [
 		styling: 'background: rgba(152, 255, 95, 0.69)',
 	},
 	{
+		id: 'park_large',
 		title: '🎪 Large park',
 		subtitle: 'for bringing your dog, or eating a sandwich',
 		type: 'recreation',
@@ -293,6 +461,7 @@ export const options = [
 		styling: 'background: rgba(152, 255, 95, 0.69)',
 	},
 	{
+		id: 'school_small',
 		title: '📚 Small school',
 		subtitle: 'for learning',
 		type: 'education',
@@ -320,6 +489,7 @@ export const options = [
 		styling: null,
 	},
 	{
+		id: 'school_large',
 		title: '🚌 Large school',
 		subtitle: 'for learning',
 		type: 'education',
@@ -346,6 +516,7 @@ export const options = [
 		styling: null,
 	},
 	{
+		id: 'university',
 		title: '🏫 University',
 		subtitle: 'for learning',
 		type: 'education',
@@ -372,6 +543,7 @@ export const options = [
 		styling: null,
 	},
 	{
+		id: 'small_hospital',
 		title: '🚑 Small hospital',
 		subtitle: 'for healing',
 		type: 'medical',
@@ -398,6 +570,7 @@ export const options = [
 		styling: null,
 	},
 	{
+		id: 'large_hospital',
 		title: '🏥 Large hospital',
 		subtitle: 'for healing',
 		type: 'medical',
@@ -424,6 +597,7 @@ export const options = [
 		styling: null,
 	},
 	{
+		id: 'bank',
 		title: '🏦 Bank',
 		subtitle: 'for storing and accessing funds',
 		type: 'bank',
@@ -431,7 +605,7 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 15000,
+			gold: 30000,
 			plots: [],
 			employees: 64,
 			climate: null,

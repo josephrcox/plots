@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { DB, DATABASE_NAME, speed, showBalanceSheet } from './store.js';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
+	import HowToPlayMenu from './menus/HowToPlayMenu.svelte';
 
 	let balanceSheetComponent;
 	let showCityHallControls = false;
@@ -33,7 +34,6 @@
 		}
 		$speed = cspeed;
 		speedMultiplier = 2000 / $speed;
-		console.log('multiplier: ' + speedMultiplier);
 	}
 
 	function speedUp() {
@@ -44,9 +44,7 @@
 			cspeed = 250;
 		}
 		$speed = cspeed;
-		console.log(cspeed);
 		speedMultiplier = 2000 / $speed;
-		console.log('multiplier: ' + speedMultiplier);
 	}
 
 	function setTaxRate(e) {
@@ -70,25 +68,26 @@
 	function checkForCityHall() {
 		let z = $DB;
 
-		let hasCityHall = false;
-		for (let i = 0; i < z.plotCounts.length; i++) {
-			console.log(z.plotCounts[18]);
-			if (
-				z.plotCounts[18] != null &&
-				z.plotCounts[18] != undefined &&
-				z.plotCounts[19] != 0
-			) {
-				hasCityHall = true;
-			}
-		}
-		if (hasCityHall) {
+		if (z.hasCityHall === true) {
 			showCityHallControls = true;
+		}
+	}
+
+	function transferFundsFromBank() {
+		let z = $DB;
+		// Checks gold_from_tourism and as long as you have a bank, it should transfer
+		if (z.hasABank === true) {
+			z.townInfo.gold += z.townInfo.gold_from_tourism;
+			z.townInfo.gold_from_tourism = 0;
+			DB.set(z);
+			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+		} else {
+			alert('You need a bank to transfer funds from tourism activities.');
 		}
 	}
 
 	document.addEventListener('keydown', (e) => {
 		let key = e.key.toLowerCase();
-		console.log(key);
 		switch (key) {
 			case '1':
 				e.preventDefault();
@@ -105,11 +104,12 @@
 
 	document.addEventListener('click', () => {
 		checkForCityHall();
-		console.log('checking');
 	});
 
 	let intervalId;
 	checkForCityHall();
+
+	let showHowToPlay = false;
 </script>
 
 <div class="header noselect">
@@ -180,6 +180,16 @@
 				{/if}
 			</div>
 		</div>
+		<div
+			on:click={() => {
+				transferFundsFromBank();
+			}}
+		>
+			<div class="subheading_m">💰 Tourism Gold</div>
+			<div class="text_m">
+				${$DB.townInfo.gold_from_tourism}
+			</div>
+		</div>
 		<div>
 			<div class="subheading_m">😁 Happiness</div>
 			<div class="text_m">
@@ -215,62 +225,88 @@
 			</div>
 		</div>
 	</div>
-	<div class="taxInfo">
-		<div class="subheading_m">Tax rate (more tax = less happiness)</div>
-		<input
-			type="range"
-			min="0"
-			max="1"
-			step="0.01"
-			bind:value={$DB.economy_and_laws.tax_rate}
-			on:change={setTaxRate}
-		/>
-		<div class="incrementalButtons">
-			<button
-				on:mousedown={() => {
-					intervalId = setInterval(() => {
+
+	<div>
+		<div
+			class="text_m pointer"
+			on:click={() => (showHowToPlay = !showHowToPlay)}
+		>
+			🏆 {#if showHowToPlay}
+				Close
+			{:else}
+				How to play
+			{/if}
+		</div>
+		<br />
+		<div class="taxInfo">
+			<div class="subheading_m">Tax rate (more tax = less happiness)</div>
+			<input
+				type="range"
+				min="0"
+				max="1"
+				step="0.01"
+				bind:value={$DB.economy_and_laws.tax_rate}
+				on:change={setTaxRate}
+			/>
+			<div class="incrementalButtons">
+				<button
+					on:mousedown={() => {
+						intervalId = setInterval(() => {
+							let z = $DB;
+							z.economy_and_laws.tax_rate = roundTo(
+								z.economy_and_laws.tax_rate - 0.01,
+								2,
+							);
+							DB.set(z);
+							localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+						}, 100);
+					}}
+					on:mouseup={() => {
+						clearInterval(intervalId);
+					}}
+					on:click={() => {
+						// go down by 0.01
 						let z = $DB;
 						z.economy_and_laws.tax_rate = roundTo(
 							z.economy_and_laws.tax_rate - 0.01,
 							2,
 						);
-						DB.set(z);
-						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-					}, 100);
-				}}
-				on:mouseup={() => {
-					clearInterval(intervalId);
-				}}
-				on:click={() => {
-					// go down by 0.01
-					let z = $DB;
-					z.economy_and_laws.tax_rate = roundTo(
-						z.economy_and_laws.tax_rate - 0.01,
-						2,
-					);
-				}}
-			>
-				-
-			</button>
+					}}
+				>
+					-
+				</button>
 
-			<div
-				class="text_m"
-				on:dblclick={() => {
-					let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
-					if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
-						let z = $DB;
-						z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
-						DB.set(z);
-						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-					}
-				}}
-			>
-				{($DB.economy_and_laws.tax_rate * 100).toFixed(0)}%
-			</div>
+				<div
+					class="text_m"
+					on:dblclick={() => {
+						let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
+						if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
+							let z = $DB;
+							z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
+							DB.set(z);
+							localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+						}
+					}}
+				>
+					{($DB.economy_and_laws.tax_rate * 100).toFixed(0)}%
+				</div>
 
-			<button
-				on:mousedown={() => {
-					intervalId = setInterval(() => {
+				<button
+					on:mousedown={() => {
+						intervalId = setInterval(() => {
+							let z = $DB;
+							z.economy_and_laws.tax_rate = roundTo(
+								z.economy_and_laws.tax_rate + 0.01,
+								2,
+							);
+							DB.set(z);
+							localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+						}, 100);
+					}}
+					on:mouseup={() => {
+						clearInterval(intervalId);
+					}}
+					on:click={() => {
 						let z = $DB;
 						z.economy_and_laws.tax_rate = roundTo(
 							z.economy_and_laws.tax_rate + 0.01,
@@ -278,26 +314,22 @@
 						);
 						DB.set(z);
 						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-					}, 100);
-				}}
-				on:mouseup={() => {
-					clearInterval(intervalId);
-				}}
-				on:click={() => {
-					let z = $DB;
-					z.economy_and_laws.tax_rate = roundTo(
-						z.economy_and_laws.tax_rate + 0.01,
-						2,
-					);
-					DB.set(z);
-					localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-				}}
-			>
-				+
-			</button>
+					}}
+				>
+					+
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
+
+{#if showHowToPlay}
+	<HowToPlayMenu />
+{/if}
+
+{#if $showBalanceSheet}
+	<BalanceSheetMenu />
+{/if}
 
 <style>
 	.header {
@@ -308,28 +340,33 @@
 		background-color: rgb(11, 16, 24);
 		border-bottom: 1px solid black;
 		color: rgb(232, 230, 227);
-		/* Pin to the top of the screen at all times */
 		position: fixed;
 		top: 0;
 		z-index: 1;
 		overflow-x: scroll;
-		height: 150px;
+		height: min-content;
 		gap: 21px;
 		width: 97.5%;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+		overflow-x: clip;
+		max-height: 141px;
 	}
 
 	.header__left {
 		display: flex;
 		flex-direction: column;
 		width: 30%;
+		max-height: 171px;
 	}
 
 	.header__right {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(4, 1fr);
 		grid-gap: 16px;
 		min-width: fit-content;
 		padding-inline: 10px;
+		max-height: 171px;
 	}
 
 	.header__right div {

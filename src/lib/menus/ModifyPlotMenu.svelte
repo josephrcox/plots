@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
-	import { options } from '../jsonObjects/PlotTypeOptions.js';
+	import { options } from '../objects/PlotTypeOptions.js';
 	import gameClock from '../gameClock.svelte';
 
 	export let x = 0;
 	export let y = 0;
 	let searchQuery = '';
 	let PlotTypeOptions = options;
-	export let tempMessage = '';
+	export let tooltip = '';
 	let filteredOptions = PlotTypeOptions;
 
 	let searchInput;
@@ -99,17 +99,12 @@
 				plotOption.classList.remove('active');
 			});
 			e.currentTarget.classList.add('active');
-			const plotOptionIndex = Array.from(plotOptions).indexOf(e.currentTarget);
-			purchasePlot(x, y, plotOptionIndex);
+			const plotOptionID = e.currentTarget.dataset.plotoptionid;
+			purchasePlot(x, y, plotOptionID);
 		}
 	}
 
 	export function canBulldoze(x, y) {
-		if (window.location.href.includes('dev=true')) {
-			return true;
-		}
-		// if the plot has zero or one adjacent neighbors (above, below, left, right), it can be bulldozed.
-		// if the plot has two or more adjacent neighbors, it cannot be bulldozed.
 		let neighbors = 0;
 		if (x > 0) {
 			if ($DB.plots[x - 1][y].type !== -1) {
@@ -131,15 +126,19 @@
 				neighbors++;
 			}
 		}
-		if (neighbors < 2) {
+		console.log(neighbors);
+		if (neighbors <= 4) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	export function purchasePlot(x, y, typeIndex) {
+	export function purchasePlot(x, y, typeID) {
 		let z = $DB;
+		// get the index from the typeID
+		const typeIndex = options.findIndex((option) => option.id === typeID);
+
 		let plotChosen = options[typeIndex];
 
 		// go over requirements
@@ -188,9 +187,9 @@
 				return square.every((plot) => {
 					return (
 						plot[0] >= 0 &&
-						plot[0] <= 24 &&
+						plot[0] <= z.plots.length &&
 						plot[1] >= 0 &&
-						plot[1] <= 24 &&
+						plot[1] <= z.plots.length &&
 						!z.plots[plot[0]][plot[1]].active &&
 						checkIfPlotCanBeUpgraded(plot[0], plot[1]) == true
 					);
@@ -214,7 +213,7 @@
 				reverseClear(x, y);
 			}
 
-			tempMessage = '';
+			tooltip = '';
 			z.plots[x][y].type = typeIndex;
 			z.plots[x][y].active = true;
 			z.plots[x][y].referencePlot = [];
@@ -259,10 +258,21 @@
 				...z.economy_and_laws.balanceSheetHistory,
 			];
 
+			switch (plotChosen.id) {
+				case 'city-hall':
+					z.hasCityHall = true;
+					break;
+				case 'bank':
+					z.hasBank = true;
+					break;
+				default:
+					break;
+			}
+
 			DB.set(z);
 			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
 		} else {
-			tempMessage = 'You do not have enough resources to purchase this plot.';
+			tooltip = 'You do not have enough resources to purchase this plot.';
 			const plotOptions = document.querySelectorAll('.plotOption');
 			plotOptions.forEach((plotOption) => {
 				plotOption.classList.remove('active');
@@ -335,8 +345,6 @@
 		if (plotChosen.requirements.gold > z.townInfo.gold) {
 			requirementsMet = false;
 		}
-		console.log(plotChosen);
-		console.log(requirementsMet);
 		let availableEmployees = z.townInfo.population_count - z.townInfo.employees;
 		if (
 			plotChosen.requirements.employees !== undefined &&
@@ -346,14 +354,16 @@
 				requirementsMet = false;
 			}
 		}
-		console.log(availableEmployees, requirementsMet);
 		if (plotChosen.requirements.knowledge !== undefined) {
 			if (plotChosen.requirements.knowledge > z.townInfo.knowledge_points) {
 				requirementsMet = false;
 			}
 		}
-		console.log(requirementsMet);
 		return requirementsMet;
+	}
+
+	function hasABank() {
+		// returns if there is a bank
 	}
 </script>
 
@@ -362,8 +372,8 @@
 		<div class="header">
 			<div>
 				<span class="heading_l">Modify Plot: {y + 1}-{x + 1}</span>
-				{#if tempMessage !== ''}
-					<div class="message">{tempMessage}</div>
+				{#if tooltip !== ''}
+					<div class="message">{tooltip}</div>
 				{/if}
 			</div>
 			<input
@@ -403,6 +413,7 @@
 							class="plotOption background-lightgray"
 							data-active={option.selected}
 							data-affordable={checkIfAffordable(option)}
+							data-plotOptionID={option.id}
 							on:click={choosePlotOption}
 						>
 							<div>
@@ -414,19 +425,41 @@
 							</div>
 
 							<div class="bottom">
-								{#if option.revenue_per_week > 0}
+								{#if option.revenue_per_week > 0 || option.tourism_revenue_per_week > 0}
 									<div class="profits">
 										<span class="subheading_m">Profits</span>
 										<br />
-										<span class="text_s gold"
-											><span class="strikethrough"
-												>{option.revenue_per_week}</span
+										{#if option.revenue_per_week > 0}
+											<span class="text_s gold"
+												><span class="strikethrough"
+													>{option.revenue_per_week}</span
+												>
+												{roundTo(
+													$DB.economy_and_laws.tax_rate *
+														option.revenue_per_week,
+													2,
+												)} gold (with tax rate)</span
 											>
-											{roundTo(
-												$DB.economy_and_laws.tax_rate * option.revenue_per_week,
-												2,
-											)} gold (with tax rate)</span
-										>
+											<br />
+										{/if}
+										{#if option.tourism_revenue_per_week > 0}
+											<span class="text_s gold"
+												><span class="strikethrough"
+													>{option.tourism_revenue_per_week}</span
+												>
+												{roundTo(
+													$DB.economy_and_laws.tax_rate *
+														option.tourism_revenue_per_week *
+														$DB.townInfo.population_count,
+													2,
+												)} tourism gold (
+												{#if $DB.hasABank !== true}
+													get a bank to cash out
+												{/if}
+
+												)</span
+											>
+										{/if}
 									</div>
 								{/if}
 								<div class="reqs_and_mods">
@@ -635,7 +668,7 @@
 
 	.cost_label {
 		color: rgb(114, 255, 114);
-		font-size: 14px;
+		font-size: 12px;
 	}
 	.reqs_and_mods {
 		display: flex;
