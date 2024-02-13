@@ -273,6 +273,8 @@
 
 			DB.set(z);
 			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+			// close modal
+			$modifyPlotMenuOptions.visible = false;
 		} else {
 			tooltip = 'You do not have enough resources to purchase this plot.';
 			const plotOptions = document.querySelectorAll('.plotOption');

@@ -200,19 +200,36 @@
 	}
 
 	function _taxRateEffects() {
+		const randomness = Math.random();
 		if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate) {
-			if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate * 2) {
-				z.modifiers.happiness -= 0.03;
-				addToTownLog(
-					messages.very_high_tax_rate +
-						'  (' +
-						z.economy_and_laws.tax_rate +
-						'%)',
-				);
+			const lenientChance = // higher == more lenient
+				z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
+			if (randomness < lenientChance) {
+				if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate * 2) {
+					z.modifiers.happiness -= 0.03;
+					addToTownLog(
+						messages.very_high_tax_rate +
+							'  (' +
+							z.economy_and_laws.tax_rate +
+							'%)',
+					);
+				} else {
+					z.modifiers.happiness -= 0.01;
+					addToTownLog(
+						messages.high_tax_rate +
+							'  (' +
+							z.economy_and_laws.tax_rate * 100 +
+							'%)',
+					);
+				}
 			} else {
+				// No leniency applied
 				z.modifiers.happiness -= 0.01;
 				addToTownLog(
-					messages.high_tax_rate + '  (' + z.economy_and_laws.tax_rate + '%)',
+					messages.high_tax_rate +
+						'  (' +
+						z.economy_and_laws.tax_rate * 100 +
+						'%)',
 				);
 			}
 		}

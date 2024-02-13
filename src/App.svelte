@@ -26,15 +26,6 @@
 
 	let isOnReferencePlot = false;
 
-	// document.addEventListener('click', (e) => {
-	// 	if (
-	// 		(e.currentTarget as HTMLElement).classList.contains('plot_container') ===
-	// 		false
-	// 	) {
-	// 		$modifyPlotMenuOptions.visible = false;
-	// 	}
-	// });
-
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
 		// if input then return
@@ -260,7 +251,7 @@
 				overflow-y: scroll;
 				width: 300%;
 				height: 300vh;
-				margin-top: 183px;
+				margin-top: 175px;
 			}
 			.plot_grid[data-marginRight='true'] {
 				/* This is for when the balanceSheet is being shown. */
