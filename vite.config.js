@@ -5,7 +5,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 export default defineConfig({
 	plugins: [svelte()],
 	build: {
-		outDir: './dist', // relative to index.html
+		outDir: './docs', // relative to index.html
 		// emptyOutDir: true, // true if outDir is inside root. if outDir is not inside root, uncomment this.
 	},
 });
