@@ -65,13 +65,14 @@
 			{ x: plot.x, y: plot.y - 1 },
 			{ x: plot.x, y: plot.y + 1 },
 		];
+
 		return adjacentPlots.some((adjacentPlot) => {
-			// check if adjacent plot is outside of the 25x25 grid
+			console.log($DB.plots.length);
 			if (
 				adjacentPlot.x < 0 ||
-				adjacentPlot.x > $DB.plots.length ||
+				adjacentPlot.x > $DB.plots.length - 1 ||
 				adjacentPlot.y < 0 ||
-				adjacentPlot.y > $DB.plots.length
+				adjacentPlot.y > $DB.plots.length - 1
 			) {
 				return false;
 			}
@@ -184,12 +185,13 @@
 
 			// Check if any of the possible squares have entirely active==false plots that are within the bounds of the map.
 			possibleSquares = possibleSquares.filter((square) => {
+				console.log(z.plots.length);
 				return square.every((plot) => {
 					return (
 						plot[0] >= 0 &&
-						plot[0] <= z.plots.length &&
+						plot[0] <= z.plots.length - 1 &&
 						plot[1] >= 0 &&
-						plot[1] <= z.plots.length &&
+						plot[1] <= z.plots.length - 1 &&
 						!z.plots[plot[0]][plot[1]].active &&
 						checkIfPlotCanBeUpgraded(plot[0], plot[1]) == true
 					);

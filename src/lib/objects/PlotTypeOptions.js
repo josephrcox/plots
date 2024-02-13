@@ -1,6 +1,3 @@
-// -3: unusable, school background
-// -2: unusable, park background
-
 export const options = [
 	{
 		id: 'res_small',
@@ -25,7 +22,7 @@ export const options = [
 			health: 0,
 			population: 16,
 		},
-		styling: 'background-color: #e15f00',
+		styling: 'background-color: #e15f00', // residential
 	},
 	{
 		id: 'res_medium',
@@ -50,7 +47,7 @@ export const options = [
 			health: 0,
 			population: 64,
 		},
-		styling: 'background-color: #e15f00',
+		styling: 'background-color: #e15f00', // residential
 	},
 	{
 		id: 'res_large',
@@ -75,7 +72,7 @@ export const options = [
 			health: 0,
 			population: 256,
 		},
-		styling: 'background-color: #e15f00',
+		styling: 'background-color: #e15f00', // residential
 	},
 	{
 		id: 'cafe',
@@ -100,7 +97,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#d24646;',
+		styling: 'background-color: #d24646;', // food
 	},
 	{
 		id: 'carrot_farm',
@@ -125,7 +122,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #d24646;',
+		styling: 'background-color: #008000;', // farm
 	},
 	{
 		id: 'apple_orchard', // 'apple_orchard
@@ -151,7 +148,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#d24646;',
+		styling: 'background-color: #008000;', // farm
 	},
 	{
 		id: 'bakery',
@@ -176,7 +173,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #d24646;',
+		styling: 'background-color: #008000;', // farm
 	},
 	{
 		id: 'grocery',
@@ -201,7 +198,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#d24646;',
+		styling: 'background-color: #d24646;', // food
 	},
 	{
 		id: 'fishery',
@@ -227,7 +224,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color:#d24646;',
+		styling: 'background-color: #d24646;', // food
 	},
 	{
 		id: 'library',
@@ -253,6 +250,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
+		styling: 'background-color: #4169e1;', // recreation
 	},
 	{
 		id: 'pub',
@@ -278,6 +276,7 @@ export const options = [
 			health: -25,
 			population: 0,
 		},
+		styling: 'background-color: #4169e1;', // recreation
 	},
 	{
 		id: 'church',
@@ -302,7 +301,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgb(255, 255, 255)',
+		styling: 'background-color: #4169e1;', // recreation
 	},
 	{
 		id: 'stables',
@@ -328,7 +327,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgb(255, 255, 255)',
+		styling: 'background-color: #4169e1;', // recreation
 	},
 	{
 		id: 'blacksmith',
@@ -354,7 +353,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgb(255, 255, 255)',
+		styling: 'background-color: #ff00ff;', // shop
 	},
 	{
 		id: 'inn',
@@ -381,7 +380,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgb(255, 255, 255)',
+		styling: 'background-color: #ff00ff;', // tourism
 	},
 	{
 		id: 'park_small',
@@ -406,7 +405,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgba(152, 255, 95, 0.69)',
+		styling: 'background-color: #ffff00;', // recreation
 	},
 	{
 		id: 'park_medium',
@@ -431,7 +430,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgba(152, 255, 95, 0.69)',
+		styling: 'background-color: #ffff00;', // recreation
 	},
 	{
 		id: 'park_large',
@@ -458,7 +457,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background: rgba(152, 255, 95, 0.69)',
+		styling: 'background-color: #ffff00;', // recreation
 	},
 	{
 		id: 'school_small',
@@ -486,7 +485,7 @@ export const options = [
 			health: 3,
 			population: 0,
 		},
-		styling: null,
+		styling: 'background-color: #4caf50;', // education
 	},
 	{
 		id: 'school_large',
@@ -513,7 +512,7 @@ export const options = [
 			health: 3,
 			population: 0,
 		},
-		styling: null,
+		styling: 'background-color: #4caf50;', // education
 	},
 	{
 		id: 'university',
@@ -540,7 +539,7 @@ export const options = [
 			health: 25,
 			population: 0,
 		},
-		styling: null,
+		styling: 'background-color: #4caf50;', // education
 	},
 	{
 		id: 'small_hospital',
@@ -567,7 +566,7 @@ export const options = [
 			health: 50,
 			population: 0,
 		},
-		styling: null,
+		styling: 'background-color: #ff0000;', // medical
 	},
 	{
 		id: 'large_hospital',
@@ -594,7 +593,7 @@ export const options = [
 			health: 75,
 			population: 0,
 		},
-		styling: null,
+		styling: 'background-color: #ff0000;', // medical
 	},
 	{
 		id: 'bank',
@@ -621,7 +620,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: null,
+		styling: 'background-color: #7b68ee;', // bank
 	},
 	{
 		id: 'city-hall',
@@ -648,8 +647,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: null,
-		canDelete: false,
-		maxPerMap: 1,
+		styling: 'background-color: #7b68ee;', // federal
 	},
 ];

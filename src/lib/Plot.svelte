@@ -124,7 +124,6 @@
 		width: 100px;
 		height: 100px;
 		background-color: rgb(126, 158, 255);
-		border: 1px solid rgba(0, 0, 0, 0.7);
 		text-align: center;
 		word-wrap: normal;
 		min-width: 100px;
@@ -155,7 +154,12 @@
 		border: none;
 	}
 	.plot_container[data-type='-2'] {
-		background-color: rgba(152, 255, 95, 0.69);
+		background-color: #ffff00;
+		border: none;
+	}
+
+	.plot_container[data-size='2'] {
+		/* border top and left */
 		border: none;
 	}
 
