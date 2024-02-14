@@ -432,8 +432,7 @@
 							on:click={choosePlotOption}
 						>
 							<div>
-								<span class="heading_m">{option.title} {option.affordable}</span
-								>
+								<span class="heading_m">{option.title}</span>
 								<br />
 								<span class="subheading_m">{option.subtitle}</span>
 								<br />
