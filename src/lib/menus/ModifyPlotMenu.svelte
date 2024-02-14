@@ -9,7 +9,7 @@
 	let searchQuery = '';
 	let PlotTypeOptions = options;
 	export let tooltip = '';
-	let filteredOptions = PlotTypeOptions;
+	// let filteredOptions = PlotTypeOptions;
 
 	let searchInput;
 	let totalAffordableOptionsCount;
@@ -21,12 +21,21 @@
 		}
 	});
 
-	$: filteredOptions = searchQuery
-		? PlotTypeOptions.filter((option) =>
+	let reactiveOptions = [];
+
+	$: if ($DB) {
+		reactiveOptions = PlotTypeOptions.map((option) => ({
+			...option,
+			affordable: checkIfAffordable(option),
+		}));
+	}
+
+	$: reactiveOptions = searchQuery
+		? reactiveOptions.filter((option) =>
 				option.title.toLowerCase().includes(searchQuery.toLowerCase()),
 			)
-		: PlotTypeOptions;
-	$: totalAffordableOptionsCount = filteredOptions.filter((option) =>
+		: reactiveOptions;
+	$: totalAffordableOptionsCount = reactiveOptions.filter((option) =>
 		checkIfAffordable(option),
 	).length;
 
@@ -403,25 +412,28 @@
 					<span class="text_s">({totalAffordableOptionsCount})</span>
 				{/if}
 				<!-- show plot options that are affordable -->
-				{#if filteredOptions.length == 0}
+				{#if reactiveOptions.length == 0}
 					<span class="text_s">(0)</span>
 				{/if}
 			</label>
 			<br />
 			<br />
 			<div class="plotOptions">
-				{#each filteredOptions as option (option)}
+				{#each reactiveOptions as option (option)}
 					<!-- Sort the options to show affordable ones first -->
 					{#if true}
 						<div
-							class="plotOption background-lightgray"
+							class="plotOption background-lightgray {option.affordable
+								? ''
+								: 'unaffordable'}"
 							data-active={option.selected}
-							data-affordable={checkIfAffordable(option)}
+							data-affordable={option.affordable}
 							data-plotOptionID={option.id}
 							on:click={choosePlotOption}
 						>
 							<div>
-								<span class="heading_m">{option.title}</span>
+								<span class="heading_m">{option.title} {option.affordable}</span
+								>
 								<br />
 								<span class="subheading_m">{option.subtitle}</span>
 								<br />
@@ -693,7 +705,7 @@
 	[data-positive='true'] {
 		color: rgb(114, 255, 114);
 	}
-	[data-affordable='false'] {
+	.unaffordable {
 		opacity: 0.3;
 	}
 	[data-positive='false'] {

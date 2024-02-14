@@ -41,10 +41,14 @@ export function startGame(difficulty, endGoal) {
 	location.reload();
 }
 
-export function clearDB() {
+export function clearDB(overridenFile) {
 	console.log('RELOADING');
 	localStorage.removeItem(DATABASE_NAME);
 	DB.set(null); // Update the store to null
+	if (overridenFile) {
+		localStorage.setItem(DATABASE_NAME, JSON.stringify(overridenFile));
+		DB.set(overridenFile);
+	}
 	location.reload();
 }
 

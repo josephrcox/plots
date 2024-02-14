@@ -46,8 +46,8 @@
 				}
 				break;
 			case 'escape':
-				// check if also holding shift
 				if (e.shiftKey) {
+					$paused = true;
 					localStorage.setItem('reset', 'true');
 					location.reload();
 					clearDB();

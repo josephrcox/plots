@@ -1,9 +1,57 @@
-<script>
+<script lang="ts">
+	import { DB, clearDB } from '../store.js';
+
+	function saveGame() {
+		const data = JSON.stringify($DB);
+		const blob = new Blob([data], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${new Date().toISOString()}.json`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
+
+	function loadGame() {
+		const uploader = document.getElementById('upload') as HTMLInputElement;
+		const file = uploader.files[0];
+		const reader = new FileReader();
+		reader.onload = function (e) {
+			const contents = e.target.result;
+			if (typeof contents === 'string') {
+				if (!isValidFile(contents)) {
+					alert('Invalid game file');
+					return;
+				}
+				clearDB(JSON.parse(contents));
+			} else {
+				alert('Invalid game file: is not String.');
+			}
+		};
+		reader.readAsText(file);
+	}
+
+	function isValidFile(s: string) {
+		const json = JSON.parse(s);
+		console.log(json);
+		console.log(json.townInfo != null);
+		console.log(json.difficulty != null);
+		if (json.townInfo != null && json.difficulty != null) return true;
+		return false;
+	}
 </script>
 
 <div class="dialog">
 	<div class="dialog-content">
-		The game is paused.
+		The game is paused!
+		<br />
+		Load file:
+		<input type="file" id="upload" on:change={loadGame} />
+		<br />
+		Backup save:
+		<button id="save" on:click={saveGame}>Save</button>
 		<br />
 		Unpause the game by pressing P
 		<br />
