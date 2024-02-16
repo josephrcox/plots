@@ -1,6 +1,6 @@
-<script lang="ts">
+<script lang="js">
 	import { onMount, tick } from 'svelte';
-	import { DATABASE_NAME, DB, modifyPlotMenuOptions } from '../store.js';
+	import { ACTIVE_GAME_DB_NAME, DB, modifyPlotMenuOptions } from '../store.ts';
 	import { options } from '../objects/PlotTypeOptions.js';
 	import gameClock from '../gameClock.svelte';
 
@@ -258,14 +258,14 @@
 			z.plotCounts[typeIndex]++;
 			z.lastChangeDay = z.environment.day;
 
-			z.economy_and_laws.balanceSheetHistory = [
+			z.economyAndLaws.balance_sheet_history = [
 				{
 					day: z.environment.day,
 					plot: `${x},${y}`,
 					profits: plotChosen.requirements.gold * -1,
 					balance: roundTo(z.townInfo.gold, 2),
 				},
-				...z.economy_and_laws.balanceSheetHistory,
+				...z.economyAndLaws.balance_sheet_history,
 			];
 
 			switch (plotChosen.id) {
@@ -280,7 +280,7 @@
 			}
 
 			DB.set(z);
-			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 			// close modal
 			$modifyPlotMenuOptions.visible = false;
 		} else {
@@ -331,7 +331,7 @@
 
 		z.lastChangeDay = z.environment.day;
 		DB.set(z);
-		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 	}
 
 	function roundTo(n, digits) {
@@ -455,7 +455,7 @@
 												>{option.revenue_per_week}</span
 											>
 											{roundTo(
-												$DB.economy_and_laws.tax_rate * option.revenue_per_week,
+												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
 												2,
 											)} gold (with tax rate)</span
 										>
@@ -467,7 +467,7 @@
 												>{option.tourism_revenue_per_week}</span
 											>
 											{roundTo(
-												$DB.economy_and_laws.tax_rate *
+												$DB.economyAndLaws.tax_rate *
 													option.tourism_revenue_per_week *
 													$DB.townInfo.population_count,
 												2,

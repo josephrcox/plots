@@ -1,5 +1,5 @@
-<script lang="ts">
-	import { DB, clearDB } from '../store.js';
+<script lang="js">
+	import { DB, clearDB } from '../store.ts';
 
 	function saveGame() {
 		const data = JSON.stringify($DB);
@@ -15,7 +15,7 @@
 	}
 
 	function loadGame() {
-		const uploader = document.getElementById('upload') as HTMLInputElement;
+		const uploader = document.getElementById('upload');
 		const file = uploader.files[0];
 		const reader = new FileReader();
 		reader.onload = function (e) {
@@ -33,7 +33,7 @@
 		reader.readAsText(file);
 	}
 
-	function isValidFile(s: string) {
+	function isValidFile(s) {
 		const json = JSON.parse(s);
 		if (json.townInfo != null && json.difficulty != null) return true;
 		return false;

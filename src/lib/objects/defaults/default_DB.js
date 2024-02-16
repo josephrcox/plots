@@ -19,11 +19,11 @@ export const default_db = {
 		happiness: 1,
 		health: 1,
 	},
-	economy_and_laws: {
+	economyAndLaws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
-		balanceSheetHistory: [],
-		lastMonthProfit: 0,
+		balance_sheet_history: [],
+		last_month_profit: 0,
 	},
 	plotCounts: [],
 	environment: {

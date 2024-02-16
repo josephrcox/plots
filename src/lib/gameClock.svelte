@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, DATABASE_NAME, paused, speed, clearDB } from './store.js';
+	import { DB, ACTIVE_GAME_DB_NAME, paused, speed, clearDB } from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
 	import { options } from './objects/PlotTypeOptions.js';
 	import Plot from './Plot.svelte';
@@ -70,7 +70,7 @@
 
 	DB.subscribe((currentDB) => {
 		if (currentDB) {
-			localStorage.setItem(DATABASE_NAME, JSON.stringify(currentDB));
+			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(currentDB));
 		}
 	});
 
@@ -239,16 +239,16 @@
 
 	function _taxRateEffects(z) {
 		const randomness = Math.random();
-		if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate) {
+		if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate) {
 			const lenientChance = // higher == more lenient
 				z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
 			if (randomness < lenientChance) {
-				if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate * 2) {
+				if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate * 2) {
 					z.modifiers.happiness -= 0.03;
 					z = addToTownLog(
 						messages.very_high_tax_rate +
 							'  (' +
-							z.economy_and_laws.tax_rate +
+							z.economyAndLaws.tax_rate +
 							'%)',
 						z,
 					);
@@ -257,7 +257,7 @@
 					z = addToTownLog(
 						messages.high_tax_rate +
 							'  (' +
-							z.economy_and_laws.tax_rate * 100 +
+							z.economyAndLaws.tax_rate * 100 +
 							'%)',
 						z,
 					);
@@ -268,7 +268,7 @@
 				z = addToTownLog(
 					messages.high_tax_rate +
 						'  (' +
-						z.economy_and_laws.tax_rate * 100 +
+						z.economyAndLaws.tax_rate * 100 +
 						'%)',
 					z,
 				);
@@ -300,8 +300,8 @@
 		if (z.townInfo.population_max == 0) {
 			z = addToTownLog(messages.nobody_home, z);
 		}
-		z.economy_and_laws.lastMonthProfit = roundTo(
-			z.economy_and_laws.lastMonthProfit,
+		z.economyAndLaws.last_month_profit = roundTo(
+			z.economyAndLaws.last_month_profit,
 			2,
 		);
 
@@ -372,7 +372,7 @@
 	}
 
 	function _calculateProfits(z) {
-		z.economy_and_laws.lastMonthProfit = 0;
+		z.economyAndLaws.last_month_profit = 0;
 		// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
@@ -381,30 +381,30 @@
 					let plotOptionForPlot = options[z.plots[i][j].type];
 					let profit = getProfit(plotOptionForPlot.revenue_per_week, z);
 					z.townInfo.gold += profit;
-					z.economy_and_laws.lastMonthProfit += profit;
+					z.economyAndLaws.last_month_profit += profit;
 
 					// push object to the start of the balance sheet history array instead of the end
 					if (profit > 0) {
-						z.economy_and_laws.balanceSheetHistory = [
+						z.economyAndLaws.balance_sheet_history = [
 							{
 								day: z.environment.day,
 								plot: `${i},${j}`,
 								profits: profit,
-								taxRate: z.economy_and_laws.tax_rate,
+								taxRate: z.economyAndLaws.tax_rate,
 							},
-							...z.economy_and_laws.balanceSheetHistory,
+							...z.economyAndLaws.balance_sheet_history,
 						];
-						// If balanceSheetHistory has over 250 items, set to only latest 250 entries
-						if (z.economy_and_laws.balanceSheetHistory.length > 250) {
-							z.economy_and_laws.balanceSheetHistory =
-								z.economy_and_laws.balanceSheetHistory.slice(0, 250);
+						// If balance_sheet_history has over 250 items, set to only latest 250 entries
+						if (z.economyAndLaws.balance_sheet_history.length > 250) {
+							z.economyAndLaws.balance_sheet_history =
+								z.economyAndLaws.balance_sheet_history.slice(0, 250);
 						}
 					}
 
 					if (plotOptionForPlot.enables_tourism == true) {
 						z.townInfo.gold_from_tourism +=
 							plotOptionForPlot.tourism_revenue_per_week *
-							z.economy_and_laws.tax_rate *
+							z.economyAndLaws.tax_rate *
 							z.townInfo.population_count;
 					}
 				}
@@ -453,7 +453,7 @@
 
 		let profit =
 			revenue *
-			z.economy_and_laws.tax_rate *
+			z.economyAndLaws.tax_rate *
 			(z.townInfo.population_count / z.townInfo.population_max) *
 			profitModifiers;
 		return roundTo(profit, 2);

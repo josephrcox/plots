@@ -1,6 +1,6 @@
-<script lang="ts">
+<script lang="js">
 	import { writable } from 'svelte/store';
-	import { DB } from '../store.js';
+	import { DB } from '../store.ts';
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
 

@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, DATABASE_NAME, speed, showBalanceSheet } from './store.js';
+	import { DB, ACTIVE_GAME_DB_NAME, speed, showBalanceSheet } from './store.ts';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import HowToPlayMenu from './menus/HowToPlayMenu.svelte';
 
@@ -21,7 +21,7 @@
 			let z = $DB;
 			z.townInfo.name = newName;
 			DB.set(z);
-			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 		}
 	}
 	export let speedMultiplier = 1;
@@ -49,9 +49,9 @@
 
 	function setTaxRate(e) {
 		let z = $DB;
-		z.economy_and_laws.tax_rate = roundTo(e.target.value, 2);
+		z.economyAndLaws.tax_rate = roundTo(e.target.value, 2);
 		DB.set(z);
-		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 	}
 
 	function roundTo(n, digits) {
@@ -72,7 +72,7 @@
 			z.townInfo.gold += z.townInfo.gold_from_tourism;
 			z.townInfo.gold_from_tourism = 0;
 			DB.set(z);
-			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 		} else {
 			alert('You need a bank to transfer funds from tourism activities.');
 		}
@@ -156,13 +156,13 @@
 			<div class="text_m">
 				{$DB.townInfo.gold}
 				<br />
-				{#if $DB.economy_and_laws.lastMonthProfit >= 0}
+				{#if $DB.economyAndLaws.last_month_profit >= 0}
 					<span class="text_s green"
-						>(+{$DB.economy_and_laws.lastMonthProfit})</span
+						>(+{$DB.economyAndLaws.last_month_profit})</span
 					>
-				{:else if $DB.economy_and_laws.lastMonthProfit < 0}
+				{:else if $DB.economyAndLaws.last_month_profit < 0}
 					<span class="text_s red"
-						>({$DB.economy_and_laws.lastMonthProfit})</span
+						>({$DB.economyAndLaws.last_month_profit})</span
 					>
 				{/if}
 			</div>
@@ -232,7 +232,7 @@
 				min="0"
 				max="1"
 				step="0.01"
-				bind:value={$DB.economy_and_laws.tax_rate}
+				bind:value={$DB.economyAndLaws.tax_rate}
 				on:change={setTaxRate}
 			/>
 			<div class="incrementalButtons">
@@ -240,12 +240,12 @@
 					on:mousedown={() => {
 						intervalId = setInterval(() => {
 							let z = $DB;
-							z.economy_and_laws.tax_rate = roundTo(
-								z.economy_and_laws.tax_rate - 0.01,
+							z.economyAndLaws.tax_rate = roundTo(
+								z.economyAndLaws.tax_rate - 0.01,
 								2,
 							);
 							DB.set(z);
-							localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+							localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 						}, 100);
 					}}
 					on:mouseup={() => {
@@ -254,8 +254,8 @@
 					on:click={() => {
 						// go down by 0.01
 						let z = $DB;
-						z.economy_and_laws.tax_rate = roundTo(
-							z.economy_and_laws.tax_rate - 0.01,
+						z.economyAndLaws.tax_rate = roundTo(
+							z.economyAndLaws.tax_rate - 0.01,
 							2,
 						);
 					}}
@@ -269,25 +269,25 @@
 						let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
 						if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
 							let z = $DB;
-							z.economy_and_laws.tax_rate = roundTo(newTaxRate, 2);
+							z.economyAndLaws.tax_rate = roundTo(newTaxRate, 2);
 							DB.set(z);
-							localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+							localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 						}
 					}}
 				>
-					{($DB.economy_and_laws.tax_rate * 100).toFixed(0)}%
+					{($DB.economyAndLaws.tax_rate * 100).toFixed(0)}%
 				</div>
 
 				<button
 					on:mousedown={() => {
 						intervalId = setInterval(() => {
 							let z = $DB;
-							z.economy_and_laws.tax_rate = roundTo(
-								z.economy_and_laws.tax_rate + 0.01,
+							z.economyAndLaws.tax_rate = roundTo(
+								z.economyAndLaws.tax_rate + 0.01,
 								2,
 							);
 							DB.set(z);
-							localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+							localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 						}, 100);
 					}}
 					on:mouseup={() => {
@@ -295,12 +295,12 @@
 					}}
 					on:click={() => {
 						let z = $DB;
-						z.economy_and_laws.tax_rate = roundTo(
-							z.economy_and_laws.tax_rate + 0.01,
+						z.economyAndLaws.tax_rate = roundTo(
+							z.economyAndLaws.tax_rate + 0.01,
 							2,
 						);
 						DB.set(z);
-						localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+						localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 					}}
 				>
 					+
