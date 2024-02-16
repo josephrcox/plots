@@ -49,3 +49,32 @@ export type Game = {
     }
 
 }
+
+export type PlotOption = {
+    id: string;
+    title: string;
+    subtitle: string;
+    type: string;
+    description: string;
+    revenue_per_week: number;
+    tourism_revenue_per_week : number;
+    requirements: {
+        gold: number;
+        plots: any[];
+        employees: number;
+        climate: number | null;
+        knowledge: number;
+    },
+    effect_modifiers: {
+        happiness: number;
+        health: number;
+    },
+    immediate_variable_changes: {
+        happiness: number;
+        health: number;
+        population: number;
+    },
+    styling: string;
+    affordable: boolean | null;
+    selected: boolean | null;
+}
