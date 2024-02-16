@@ -39,13 +39,15 @@
 	$: reactiveOptions = reactiveOptions.filter((option) =>
 		option.title.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
+
 	$: totalAffordableOptionsCount = reactiveOptions.filter(
 		(option: any) => option.affordable,
 	).length;
 
 	function handleInput(event: any) {
+		console.log(event.target.value);
 		searchQuery = (event.target.value as string) || '';
-		event.stopPropagation(); // This will stop the event from propagating further
+		// event.stopPropagation(); // This will stop the event from propagating further
 	}
 
 	onMount(() => {
@@ -666,8 +668,7 @@
 		margin-right: 10px;
 		display: flex;
 		z-index: 10;
-		max-width: 70%;
-		width: 70%;
+		max-width: 80%;
 	}
 
 	.dialog-content {
@@ -676,8 +677,7 @@
 		border-top-right-radius: 0.5em;
 		box-shadow: 0 0 100px rgba(45, 35, 35, 1);
 		height: 70vh;
-		min-width: 95%;
-		width: 95%;
+		min-width: 98%;
 	}
 
 	.scrollable-y {

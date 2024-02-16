@@ -47,6 +47,7 @@ export type Game = {
         msg: string;
         win: boolean;
     }
+    tick: number;
 
 }
 

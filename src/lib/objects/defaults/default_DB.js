@@ -35,4 +35,5 @@ export const default_db = {
 	difficulty: 0, // 0 = easy, 1 = medium, 2 = hard
 	endGoal: 'land',
 	endGameDetails: null,
+	tick: 0,
 };

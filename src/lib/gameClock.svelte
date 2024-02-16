@@ -7,6 +7,7 @@
 	import { winScenarios } from './objects/WinScenarios.js';
 
 	let z = $DB;
+	const GAME_TICK_SPEED = 30;
 
 	function performWeeklyTasks(db) {
 		db = _unemployment(db);
@@ -41,6 +42,10 @@
 
 	export function mainGameThreadLoop() {
 		DB.update((currentDB) => {
+			currentDB.tick++;
+			if (currentDB.tick % GAME_TICK_SPEED !== 0) {
+				return currentDB;
+			}
 			if ($paused || !currentDB || currentDB.endGameDetails) {
 				return currentDB;
 			}
@@ -478,7 +483,7 @@
 			}
 			// call mainGameThreadLoop ever $speed ms
 			mainGameThreadLoop();
-			await new Promise((r) => setTimeout(r, $speed));
+			await new Promise((r) => setTimeout(r, $speed / GAME_TICK_SPEED));
 		}
 	});
 </script>
