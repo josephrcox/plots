@@ -1,4 +1,4 @@
-<script lang="js">
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
@@ -7,7 +7,7 @@
 		checkForAvailablePlots();
 	}
 
-	export function checkIfPlotCanBeUpgraded(x, y) {
+	export function checkIfPlotCanBeUpgraded(x: number, y: number) {
 		let plot = {
 			x: x,
 			y: y,
