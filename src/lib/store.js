@@ -42,7 +42,6 @@ export function startGame(difficulty, endGoal) {
 }
 
 export function clearDB(overridenFile) {
-	console.log('RELOADING');
 	localStorage.removeItem(DATABASE_NAME);
 	DB.set(null); // Update the store to null
 	if (overridenFile) {

@@ -398,7 +398,7 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.01,
-			health: 1.05,
+			health: 1.07,
 		},
 		immediate_variable_changes: {
 			happiness: 5,
@@ -412,7 +412,7 @@ export const options = [
 		title: '🛝 Medium park',
 		subtitle: 'for bringing your dog, or eating a sandwich',
 		type: 'recreation',
-		description: 'Benches, grass, and a couple of swingsets.',
+		description: 'Benches, grass, and a couple of swing-sets.',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 150,
@@ -423,10 +423,10 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.02,
-			health: 1.08,
+			health: 1.15,
 		},
 		immediate_variable_changes: {
-			happiness: 5,
+			happiness: 10,
 			health: 0,
 			population: 0,
 		},
@@ -450,10 +450,10 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.09,
-			health: 1.1,
+			health: 1.25,
 		},
 		immediate_variable_changes: {
-			happiness: 15,
+			happiness: 30,
 			health: 0,
 			population: 0,
 		},

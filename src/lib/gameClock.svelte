@@ -8,41 +8,73 @@
 
 	let z = $DB;
 
-	export function mainGameThreadLoop() {
-		if ($paused == false && z.endGameDetails == null && DB != null) {
-			z.environment.day += 1;
-
-			// Every 7 days
-			if (z.environment.day % 7 == 0) {
-				_unemployment();
-				_taxRateEffects();
-				_calculateProfits();
-				_applyModifiers();
-				_healthEffects();
-				_bringModifiersBackToNormal();
-			}
-			// Every 30 days
-			if (z.environment.day % 30 === 0) {
-				_calculateKnowledge();
-				_movePeopleInMovePeopleOut();
-				_banksEffect();
-				_federalGovEffect();
-			}
-			// Every 90 days
-			if (z.environment.day % 90 == 0) {
-				_boredom();
-				_bringStatsBackToNormal();
-			}
-			_fixVariables();
-			_checkGameLost();
-			_checkGameWin();
-
-			DB.set(z);
-			localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
-		}
+	function performWeeklyTasks(db) {
+		db = _unemployment(db);
+		db = _taxRateEffects(db);
+		db = _calculateProfits(db);
+		db = _applyModifiers(db);
+		db = _healthEffects(db);
+		db = _bringModifiersBackToNormal(db);
+		return db;
 	}
 
-	function _checkGameWin() {
+	function performMonthlyTasks(db) {
+		db = _calculateKnowledge(db);
+		db = _movePeopleInMovePeopleOut(db);
+		db = _banksEffect(db);
+		db = _federalGovEffect(db);
+		return db;
+	}
+
+	function performQuarterlyTasks(db) {
+		db = _boredom(db);
+		db = _bringStatsBackToNormal(db);
+		return db;
+	}
+
+	function checkGameStatus(db) {
+		db = _fixVariables(db);
+		db = _checkGameLost(db);
+		db = _checkGameWin(db);
+		return db;
+	}
+
+	export function mainGameThreadLoop() {
+		DB.update((currentDB) => {
+			if ($paused || !currentDB || currentDB.endGameDetails) {
+				return currentDB;
+			}
+
+			try {
+				currentDB.environment.day += 1;
+
+				// Weekly, Monthly, Quarterly tasks
+				if (currentDB.environment.day % 7 === 0) {
+					currentDB = performWeeklyTasks(currentDB);
+				}
+				if (currentDB.environment.day % 30 === 0) {
+					currentDB = performMonthlyTasks(currentDB);
+				}
+				if (currentDB.environment.day % 90 === 0) {
+					currentDB = performQuarterlyTasks(currentDB);
+				}
+
+				currentDB = checkGameStatus(currentDB);
+				return currentDB;
+			} catch (error) {
+				console.error('Error in game loop:', error);
+				return currentDB; // Returning the current state in case of an error
+			}
+		});
+	}
+
+	DB.subscribe((currentDB) => {
+		if (currentDB) {
+			localStorage.setItem(DATABASE_NAME, JSON.stringify(currentDB));
+		}
+	});
+
+	function _checkGameWin(z) {
 		const gameWinScenario = z.endGoal;
 
 		if (gameWinScenario == 'land') {
@@ -54,7 +86,9 @@
 				z.townInfo.health >=
 					winScenarios.land.requirements[z.difficulty].health &&
 				z.townInfo.employees / z.townInfo.population_count >=
-					winScenarios.land.requirements[z.difficulty].employment
+					winScenarios.land.requirements[z.difficulty].employment &&
+				z.townInfo.population_count >
+					winScenarios.land.requirements[z.difficulty].population
 			) {
 				// iterate over the plots and see if every single one is filled.
 				let allPlotsFilled = true;
@@ -74,9 +108,10 @@
 				}
 			}
 		}
+		return z;
 	}
 
-	function _checkGameLost() {
+	function _checkGameLost(z) {
 		// GAME LOSS SCENARIOS
 		if (z.townInfo.happiness <= 0) {
 			z.townInfo.happiness = 0;
@@ -99,47 +134,47 @@
 				win: false,
 			};
 		}
+		return z;
 	}
 
-	function _unemployment() {
+	function _unemployment(z) {
 		let unemployed = z.townInfo.population_count - z.townInfo.employees;
 		if (unemployed > 0) {
 			z.modifiers.happiness -= unemployed * 0.0009;
-			addToTownLog(unemployed + messages.unemployment_num);
+			z = addToTownLog(unemployed + messages.unemployment_num, z);
 		}
+		return z;
 	}
 
-	function _banksEffect() {
-		let z = $DB;
-
+	function _banksEffect(z) {
 		// Check if there are any banks and store the count of banks
 		if (z.hasBank === true) {
 			// TODO
 		}
+		return z;
 	}
 
-	function _federalGovEffect() {
-		let z = $DB;
-
+	function _federalGovEffect(z) {
 		if (z.hasCityHall === true) {
 			// TODO
 		}
+		return z;
 	}
 
-	function _healthEffects() {
+	function _healthEffects(z) {
 		let health = z.townInfo.health;
 		let peopleLeaving = 0;
 
-		if (health > 50) return;
+		if (health > 50) return z;
 
 		if (health < Math.random() * 50) {
 			if (health < 25) {
-				addToTownLog(messages.sickAndDying);
+				z = addToTownLog(messages.sickAndDying, z);
 				z.townInfo.happiness -= 10;
 				// 10% of population
 				peopleLeaving = Math.round(z.townInfo.population_count * 0.1);
 			} else {
-				addToTownLog(messages.sickAndLeaving);
+				z = addToTownLog(messages.sickAndLeaving, z);
 				z.townInfo.happiness -= 5;
 				// 5%
 				peopleLeaving = Math.round(z.townInfo.population_count * 0.05);
@@ -147,9 +182,10 @@
 			z.townInfo.population_count -= peopleLeaving;
 			z.townInfo.employees -= peopleLeaving;
 		}
+		return z;
 	}
 
-	function _boredom() {
+	function _boredom(z) {
 		if (z.lastChangeDay + (Math.random() * 160 + 50) < z.environment.day) {
 			if (z.townInfo.population_count > 0) {
 				z.townInfo.population_count -= 1;
@@ -157,11 +193,12 @@
 				z.modifiers.happiness -= 0.01;
 			}
 
-			addToTownLog(messages.bored);
+			z = addToTownLog(messages.bored, z);
 		}
+		return z;
 	}
 
-	function _movePeopleInMovePeopleOut() {
+	function _movePeopleInMovePeopleOut(z) {
 		if (z.townInfo.population_count < z.townInfo.population_max) {
 			if (z.townInfo.happiness > 50) {
 				let availableSpots =
@@ -179,7 +216,7 @@
 				if (z.townInfo.employees > z.townInfo.population_count) {
 					z.townInfo.employees = z.townInfo.population_count;
 				}
-				addToTownLog(newPeople + messages.new_people_num);
+				z = addToTownLog(newPeople + messages.new_people_num, z);
 			}
 		}
 		if (z.townInfo.happiness < 50 && z.townInfo.population_count > 0) {
@@ -191,15 +228,16 @@
 				z.townInfo.employees -= unhappyPeople;
 			}
 
-			addToTownLog(unhappyPeople + messages.leave_town_num);
+			z = addToTownLog(unhappyPeople + messages.leave_town_num, z);
 		} else {
 			if (z.townInfo.population_count == z.townInfo.population_max) {
-				addToTownLog(messages.people_want_to_move_in);
+				z = addToTownLog(messages.people_want_to_move_in, z);
 			}
 		}
+		return z;
 	}
 
-	function _taxRateEffects() {
+	function _taxRateEffects(z) {
 		const randomness = Math.random();
 		if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate) {
 			const lenientChance = // higher == more lenient
@@ -207,35 +245,39 @@
 			if (randomness < lenientChance) {
 				if (z.economy_and_laws.tax_rate > z.economy_and_laws.max_tax_rate * 2) {
 					z.modifiers.happiness -= 0.03;
-					addToTownLog(
+					z = addToTownLog(
 						messages.very_high_tax_rate +
 							'  (' +
 							z.economy_and_laws.tax_rate +
 							'%)',
+						z,
 					);
 				} else {
 					z.modifiers.happiness -= 0.01;
-					addToTownLog(
+					z = addToTownLog(
 						messages.high_tax_rate +
 							'  (' +
 							z.economy_and_laws.tax_rate * 100 +
 							'%)',
+						z,
 					);
 				}
 			} else {
 				// No leniency applied
 				z.modifiers.happiness -= 0.01;
-				addToTownLog(
+				z = addToTownLog(
 					messages.high_tax_rate +
 						'  (' +
 						z.economy_and_laws.tax_rate * 100 +
 						'%)',
+					z,
 				);
 			}
 		}
+		return z;
 	}
 
-	export function _fixVariables() {
+	export function _fixVariables(z) {
 		if (z.townInfo.happiness < 0) {
 			z.townInfo.happiness = 0;
 		}
@@ -256,7 +298,7 @@
 		}
 		// Recommend building more buildings
 		if (z.townInfo.population_max == 0) {
-			addToTownLog(messages.nobody_home);
+			z = addToTownLog(messages.nobody_home, z);
 		}
 		z.economy_and_laws.lastMonthProfit = roundTo(
 			z.economy_and_laws.lastMonthProfit,
@@ -285,9 +327,10 @@
 		if (z.modifiers.health < 0.5) {
 			z.modifiers.health = 0.5;
 		}
+		return z;
 	}
 
-	export function _bringModifiersBackToNormal() {
+	export function _bringModifiersBackToNormal(z) {
 		if (z.modifiers.happiness > 1.0) {
 			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
 			let percentAboveOne = z.modifiers.happiness - 1.0;
@@ -304,9 +347,10 @@
 				z.modifiers.health = 1.0;
 			}
 		}
+		return z;
 	}
 
-	export function _bringStatsBackToNormal() {
+	export function _bringStatsBackToNormal(z) {
 		const midpoint = 150;
 		if (z.townInfo.happiness > midpoint) {
 			// check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
@@ -324,9 +368,10 @@
 				z.townInfo.health = midpoint;
 			}
 		}
+		return z;
 	}
 
-	function _calculateProfits() {
+	function _calculateProfits(z) {
 		z.economy_and_laws.lastMonthProfit = 0;
 		// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
 		for (let i = 0; i < z.plots.length; i++) {
@@ -334,7 +379,7 @@
 				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
 					// Iterate through all plots and do actions based on their conditions
 					let plotOptionForPlot = options[z.plots[i][j].type];
-					let profit = getProfit(plotOptionForPlot.revenue_per_week);
+					let profit = getProfit(plotOptionForPlot.revenue_per_week, z);
 					z.townInfo.gold += profit;
 					z.economy_and_laws.lastMonthProfit += profit;
 
@@ -365,14 +410,16 @@
 				}
 			}
 		}
+		return z;
 	}
 
-	function _applyModifiers() {
+	function _applyModifiers(z) {
 		z.townInfo.happiness *= z.modifiers.happiness;
 		z.townInfo.health *= z.modifiers.health;
+		return z;
 	}
 
-	function _calculateKnowledge() {
+	function _calculateKnowledge(z) {
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
 				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
@@ -384,21 +431,19 @@
 				}
 			}
 		}
+		return z;
 	}
 
-	function addToTownLog(message) {
-		let z = $DB;
+	function addToTownLog(message, z) {
 		z.townLog =
 			'Day ' + $DB.environment.day + ' - ' + message + '\n' + z.townLog;
 
-		DB.set(z);
-		localStorage.setItem(DATABASE_NAME, JSON.stringify(z));
+		return z;
 	}
 
-	function getProfit(revenue) {
+	function getProfit(revenue, z) {
 		// This takes in revenue, and returns the gold profit.
 		// Profit is revenue * tax rate * percentage of population out of the max population
-		let z = $DB;
 		let profitModifiers = z.townInfo.happiness / 100;
 		if (profitModifiers > 1.25) {
 			profitModifiers = 1.25;

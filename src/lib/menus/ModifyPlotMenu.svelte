@@ -26,7 +26,7 @@
 	$: if ($DB) {
 		reactiveOptions = PlotTypeOptions.map((option) => ({
 			...option,
-			affordable: checkIfAffordable(option),
+			affordable: checkIfAffordable(option, $DB),
 		}));
 	}
 
@@ -35,8 +35,8 @@
 				option.title.toLowerCase().includes(searchQuery.toLowerCase()),
 			)
 		: reactiveOptions;
-	$: totalAffordableOptionsCount = reactiveOptions.filter((option) =>
-		checkIfAffordable(option),
+	$: totalAffordableOptionsCount = reactiveOptions.filter(
+		(option) => option.affordable == true,
 	).length;
 
 	function handleInput(event) {
@@ -76,7 +76,6 @@
 		];
 
 		return adjacentPlots.some((adjacentPlot) => {
-			console.log($DB.plots.length);
 			if (
 				adjacentPlot.x < 0 ||
 				adjacentPlot.x > $DB.plots.length - 1 ||
@@ -102,16 +101,18 @@
 		reverseClear(x, y);
 	}
 
-	function choosePlotOption(e) {
-		if (e.currentTarget.classList.contains('plotOption')) {
-			const plotOptions = document.querySelectorAll('.plotOption');
-			plotOptions.forEach((plotOption) => {
-				plotOption.classList.remove('active');
-			});
-			e.currentTarget.classList.add('active');
-			const plotOptionID = e.currentTarget.dataset.plotoptionid;
-			purchasePlot(x, y, plotOptionID);
-		}
+	function choosePlotOption(id) {
+		// make all other options remove class active
+		// add active class
+		// use purchasePlot
+		const plotOptions = document.querySelectorAll('.plotOption');
+		plotOptions.forEach((plotOption) => {
+			plotOption.classList.remove('active');
+		});
+
+		const plotOption = document.querySelector(`[data-plotoptionid="${id}"]`);
+		plotOption.classList.add('active');
+		purchasePlot(x, y, id);
 	}
 
 	export function canBulldoze(x, y) {
@@ -136,7 +137,6 @@
 				neighbors++;
 			}
 		}
-		console.log(neighbors);
 		if (neighbors <= 4) {
 			return true;
 		} else {
@@ -194,7 +194,6 @@
 
 			// Check if any of the possible squares have entirely active==false plots that are within the bounds of the map.
 			possibleSquares = possibleSquares.filter((square) => {
-				console.log(z.plots.length);
 				return square.every((plot) => {
 					return (
 						plot[0] >= 0 &&
@@ -351,8 +350,7 @@
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
 
-	function checkIfAffordable(plotChosen) {
-		let z = $DB;
+	function checkIfAffordable(plotChosen, z) {
 		let requirementsMet = true;
 
 		if (plotChosen.requirements.gold > z.townInfo.gold) {
@@ -377,6 +375,15 @@
 
 	function hasABank() {
 		// returns if there is a bank
+		return $DB.hasBank;
+	}
+
+	function handlePlotOptionClick(event) {
+		const plotOption = event.target.closest('.plotOption');
+		if (plotOption) {
+			const plotOptionID = plotOption.dataset.plotoptionid;
+			choosePlotOption(plotOptionID);
+		}
 	}
 </script>
 
@@ -418,164 +425,158 @@
 			</label>
 			<br />
 			<br />
-			<div class="plotOptions">
-				{#each reactiveOptions as option (option)}
+			<div class="plotOptions" on:click={handlePlotOptionClick}>
+				{#each reactiveOptions as option (option.id)}
 					<!-- Sort the options to show affordable ones first -->
-					{#if true}
-						<div
-							class="plotOption background-lightgray {option.affordable
-								? ''
-								: 'unaffordable'}"
-							data-active={option.selected}
-							data-affordable={option.affordable}
-							data-plotOptionID={option.id}
-							on:click={choosePlotOption}
-						>
-							<div>
-								<span class="heading_m">{option.title}</span>
-								<br />
-								<span class="subheading_m">{option.subtitle}</span>
-								<br />
-								<span class="text_s">{option.description}</span>
-							</div>
-
-							<div class="bottom">
-								{#if option.revenue_per_week > 0 || option.tourism_revenue_per_week > 0}
-									<div class="profits">
-										<span class="subheading_m">Profits</span>
-										<br />
-										{#if option.revenue_per_week > 0}
-											<span class="text_s gold"
-												><span class="strikethrough"
-													>{option.revenue_per_week}</span
-												>
-												{roundTo(
-													$DB.economy_and_laws.tax_rate *
-														option.revenue_per_week,
-													2,
-												)} gold (with tax rate)</span
-											>
-											<br />
-										{/if}
-										{#if option.tourism_revenue_per_week > 0}
-											<span class="text_s gold"
-												><span class="strikethrough"
-													>{option.tourism_revenue_per_week}</span
-												>
-												{roundTo(
-													$DB.economy_and_laws.tax_rate *
-														option.tourism_revenue_per_week *
-														$DB.townInfo.population_count,
-													2,
-												)} tourism gold (
-												{#if $DB.hasABank !== true}
-													get a bank to cash out
-												{/if}
-
-												)</span
-											>
-										{/if}
-									</div>
-								{/if}
-								<div class="reqs_and_mods">
-									<div>
-										<span class="subheading_m">Requirements</span>
-										<br />
-										{#if option.requirements.gold !== 0}
-											{#if $DB.townInfo.gold < option.requirements.gold}
-												<span class="red text_s cost_label"
-													>{option.requirements.gold} gold</span
-												>
-											{:else}
-												<span class="text_s cost_label"
-													>{option.requirements.gold} gold</span
-												>
-											{/if}
-											<br />
-										{/if}
-
-										{#if option.requirements.employees !== 0}
-											{#if $DB.townInfo.population_count - $DB.townInfo.employees < option.requirements.employees}
-												<span class="text_s cost_label red"
-													>{option.requirements.employees} employees
-												</span>
-											{:else}
-												<span class="text_s cost_label"
-													>{option.requirements.employees} employees
-												</span>
-											{/if}
-											<br />
-										{/if}
-
-										{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
-											{#if $DB.townInfo.knowledge_points < option.requirements.knowledge}
-												<span class="text_s cost_label red"
-													>{option.requirements.knowledge} knowledge
-												</span>
-											{:else}
-												<span class="text_s cost_label"
-													>{option.requirements.knowledge} knowledge
-												</span>
-											{/if}
-											<br />
-										{/if}
-									</div>
-									<div>
-										<span class="subheading_m">Multiplier</span>
-										<br />
-										<!-- {JSON.stringify(option.effect_modifiers)} -->
-										{#if option.effect_modifiers.happiness == 1.0}
-											<span class="text_s" data-positive="true"
-												>😁 No effect</span
-											>
-										{:else}
-											<span
-												class="text_s"
-												data-positive={option.effect_modifiers.happiness >= 1}
-												>😁 {formatNumber(
-													option.effect_modifiers.happiness,
-												)}</span
-											>
-										{/if}
-										<br />
-										{#if option.effect_modifiers.health == 1.0}
-											<span class="text_s" data-positive="true"
-												>🏥 No effect</span
-											>
-										{:else}
-											<span
-												class="text_s"
-												data-positive={option.effect_modifiers.health >= 1}
-												>🏥 {formatNumber(option.effect_modifiers.health)}</span
-											>
-										{/if}
-									</div>
-								</div>
-								{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
-									<div class="immediate_changes">
-										<span class="subheading_m"
-											>Instant changes:
-											{#if option.immediate_variable_changes.happiness !== 0}
-												😁
-												<span class="green"
-													>{option.immediate_variable_changes.happiness}</span
-												>
-											{/if}
-											{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
-												,
-											{/if}
-											{#if option.immediate_variable_changes.health !== 0}
-												🏥
-												<span class="green"
-													>{option.immediate_variable_changes.health}</span
-												>
-											{/if}
-										</span>
-									</div>
-								{/if}
-							</div>
+					<div
+						class="plotOption background-lightgray {option.affordable
+							? ''
+							: 'unaffordable'}"
+						data-active={option.selected}
+						data-affordable={option.affordable}
+						data-plotOptionID={option.id}
+					>
+						<div>
+							<span class="heading_m">{option.title}</span>
+							<br />
+							<span class="subheading_m">{option.subtitle}</span>
+							<br />
+							<span class="text_s">{option.description}</span>
 						</div>
-					{/if}
+
+						<div class="bottom">
+							{#if option.revenue_per_week > 0 || option.tourism_revenue_per_week > 0}
+								<div class="profits">
+									<span class="subheading_m">Profits</span>
+									<br />
+									{#if option.revenue_per_week > 0}
+										<span class="text_s gold"
+											><span class="strikethrough"
+												>{option.revenue_per_week}</span
+											>
+											{roundTo(
+												$DB.economy_and_laws.tax_rate * option.revenue_per_week,
+												2,
+											)} gold (with tax rate)</span
+										>
+										<br />
+									{/if}
+									{#if option.tourism_revenue_per_week > 0}
+										<span class="text_s gold"
+											><span class="strikethrough"
+												>{option.tourism_revenue_per_week}</span
+											>
+											{roundTo(
+												$DB.economy_and_laws.tax_rate *
+													option.tourism_revenue_per_week *
+													$DB.townInfo.population_count,
+												2,
+											)} tourism gold (
+											{#if $DB.hasABank !== true}
+												get a bank to cash out
+											{/if}
+
+											)</span
+										>
+									{/if}
+								</div>
+							{/if}
+							<div class="reqs_and_mods">
+								<div>
+									<span class="subheading_m">Requirements</span>
+									<br />
+									{#if option.requirements.gold !== 0}
+										{#if $DB.townInfo.gold < option.requirements.gold}
+											<span class="red text_s cost_label"
+												>{option.requirements.gold} gold</span
+											>
+										{:else}
+											<span class="text_s cost_label"
+												>{option.requirements.gold} gold</span
+											>
+										{/if}
+										<br />
+									{/if}
+
+									{#if option.requirements.employees !== 0}
+										{#if $DB.townInfo.population_count - $DB.townInfo.employees < option.requirements.employees}
+											<span class="text_s cost_label red"
+												>{option.requirements.employees} employees
+											</span>
+										{:else}
+											<span class="text_s cost_label"
+												>{option.requirements.employees} employees
+											</span>
+										{/if}
+										<br />
+									{/if}
+
+									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
+										{#if $DB.townInfo.knowledge_points < option.requirements.knowledge}
+											<span class="text_s cost_label red"
+												>{option.requirements.knowledge} knowledge
+											</span>
+										{:else}
+											<span class="text_s cost_label"
+												>{option.requirements.knowledge} knowledge
+											</span>
+										{/if}
+										<br />
+									{/if}
+								</div>
+								<div>
+									<span class="subheading_m">Multiplier</span>
+									<br />
+									<!-- {JSON.stringify(option.effect_modifiers)} -->
+									{#if option.effect_modifiers.happiness == 1.0}
+										<span class="text_s" data-positive="true">😁 No effect</span
+										>
+									{:else}
+										<span
+											class="text_s"
+											data-positive={option.effect_modifiers.happiness >= 1}
+											>😁 {formatNumber(
+												option.effect_modifiers.happiness,
+											)}</span
+										>
+									{/if}
+									<br />
+									{#if option.effect_modifiers.health == 1.0}
+										<span class="text_s" data-positive="true">🏥 No effect</span
+										>
+									{:else}
+										<span
+											class="text_s"
+											data-positive={option.effect_modifiers.health >= 1}
+											>🏥 {formatNumber(option.effect_modifiers.health)}</span
+										>
+									{/if}
+								</div>
+							</div>
+							{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
+								<div class="immediate_changes">
+									<span class="subheading_m"
+										>Instant changes:
+										{#if option.immediate_variable_changes.happiness !== 0}
+											😁
+											<span class="green"
+												>{option.immediate_variable_changes.happiness}</span
+											>
+										{/if}
+										{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
+											,
+										{/if}
+										{#if option.immediate_variable_changes.health !== 0}
+											🏥
+											<span class="green"
+												>{option.immediate_variable_changes.health}</span
+											>
+										{/if}
+									</span>
+								</div>
+							{/if}
+						</div>
+					</div>
 				{/each}
 			</div>
 		</div>

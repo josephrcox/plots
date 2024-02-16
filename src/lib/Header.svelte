@@ -65,14 +65,6 @@
 		return +test.toFixed(digits);
 	}
 
-	function checkForCityHall() {
-		let z = $DB;
-
-		if (z.hasCityHall === true) {
-			showCityHallControls = true;
-		}
-	}
-
 	function transferFundsFromBank() {
 		let z = $DB;
 		// Checks gold_from_tourism and as long as you have a bank, it should transfer
@@ -102,12 +94,7 @@
 		}
 	});
 
-	document.addEventListener('click', () => {
-		checkForCityHall();
-	});
-
 	let intervalId;
-	checkForCityHall();
 
 	let showHowToPlay = false;
 </script>

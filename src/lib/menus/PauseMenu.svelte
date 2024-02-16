@@ -35,9 +35,6 @@
 
 	function isValidFile(s: string) {
 		const json = JSON.parse(s);
-		console.log(json);
-		console.log(json.townInfo != null);
-		console.log(json.difficulty != null);
 		if (json.townInfo != null && json.difficulty != null) return true;
 		return false;
 	}
