@@ -1,5 +1,5 @@
 <script>
-	import { DB } from '../store.js';
+	import { DB } from '../store.ts';
 </script>
 
 {#if $DB.endGameDetails != null}

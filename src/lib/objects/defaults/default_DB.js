@@ -19,11 +19,11 @@ export const default_db = {
 		happiness: 1,
 		health: 1,
 	},
-	economy_and_laws: {
+	economyAndLaws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
-		balanceSheetHistory: [],
-		lastMonthProfit: 0,
+		balance_sheet_history: [],
+		last_month_profit: 0,
 	},
 	plotCounts: [],
 	environment: {
@@ -35,4 +35,5 @@ export const default_db = {
 	difficulty: 0, // 0 = easy, 1 = medium, 2 = hard
 	endGoal: 'land',
 	endGameDetails: null,
+	tick: 0,
 };

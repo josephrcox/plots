@@ -1,18 +1,26 @@
 import { writable } from 'svelte/store';
-import { default_db } from './objects/defaults/default_DB.js';
+// @ts-ignore
+import { default_db, difficulties } from './objects/defaults/default_db';
+// @ts-ignore
+import { Difficulty, EndGoal } from './lib/objects/types';
 
-export const DATABASE_NAME = 'plots_db_v2';
+// The active game DB is for the current game, challenge, or play-through.
+//// This can get corrupted, so it is important to keep this separate from the user DB.
+export const ACTIVE_GAME_DB_NAME = 'plots_active_game_db';
+// The user DB keeps track of progress, achievements,
+//// challenge history, and such.
+export const USER_DB_NAME = 'plots_user_db';
 
 // Define your DB store at the top
 export let DB = writable(
-	JSON.parse(localStorage.getItem(DATABASE_NAME)) || null,
+	JSON.parse(localStorage.getItem(ACTIVE_GAME_DB_NAME) || 'null'),
 );
 
-export function startGame(difficulty, endGoal) {
+export function startGame(difficulty : Difficulty, endGoal : EndGoal ) {
 	let json = { ...default_db }; // Use a copy of default_db
-	json.economy_and_laws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
+	json.economyAndLaws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
-	let default_plots = [];
+	let default_plots = [] as any[][]; 
 	const randomSize =
 		difficulty == '0'
 			? 6
@@ -36,16 +44,16 @@ export function startGame(difficulty, endGoal) {
 
 	json.plots = default_plots;
 	localStorage.reset = false;
-	localStorage.setItem(DATABASE_NAME, JSON.stringify(json));
+	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
 	DB.set(json); // Update the store with the new value
 	location.reload();
 }
 
-export function clearDB(overridenFile) {
-	localStorage.removeItem(DATABASE_NAME);
+export function clearDB(overridenFile : File | null = null) {
+	localStorage.removeItem(ACTIVE_GAME_DB_NAME);
 	DB.set(null); // Update the store to null
 	if (overridenFile) {
-		localStorage.setItem(DATABASE_NAME, JSON.stringify(overridenFile));
+		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(overridenFile));
 		DB.set(overridenFile);
 	}
 	location.reload();

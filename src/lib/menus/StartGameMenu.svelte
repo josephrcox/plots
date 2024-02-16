@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { startGame } from '../store.js';
+	import { startGame } from '../store';
 
 	function captureAndStart() {
 		const difficulty = (

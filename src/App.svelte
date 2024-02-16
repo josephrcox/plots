@@ -3,15 +3,17 @@
 	import GameClock from './lib/gameClock.svelte';
 	import Header from './lib/Header.svelte';
 	import PauseMenu from './lib/menus/PauseMenu.svelte';
+
 	import {
-		DATABASE_NAME,
+		ACTIVE_GAME_DB_NAME,
 		paused,
 		showBalanceSheet,
 		unique,
 		DB,
 		clearDB,
 		modifyPlotMenuOptions,
-	} from './lib/store.js';
+		// @ts-ignore
+	} from './lib/store.ts';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 	import GameLostMenu from './lib/menus/GameLostMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
@@ -30,8 +32,10 @@
 	document.addEventListener('keydown', (e) => {
 		// if input then return
 		if (
-			(document.activeElement.nodeName === 'INPUT' ||
-				document.activeElement.nodeName == 'TEXTAREA') &&
+			((document.activeElement != null &&
+				document.activeElement.nodeName === 'INPUT') ||
+				(document.activeElement != null &&
+					document.activeElement.nodeName == 'TEXTAREA')) &&
 			e.key !== 'Escape'
 		)
 			return;
@@ -82,7 +86,11 @@
 		}
 	});
 
-	function changeSelectedPlot(changeX, changeY, direction) {
+	function changeSelectedPlot(
+		changeX: number,
+		changeY: number,
+		direction: string,
+	) {
 		if (
 			$modifyPlotMenuOptions.visible === false &&
 			$modifyPlotMenuOptions.x === 0 &&
@@ -110,7 +118,7 @@
 		}
 	}
 
-	export function openPlotMenu(x, y, direction) {
+	export function openPlotMenu(x: number, y: number, direction: string) {
 		if (isOnReferencePlot == true) {
 			switch (direction) {
 				case 'up':
@@ -140,9 +148,9 @@
 		let plots = document.querySelectorAll(
 			'.plot_container',
 		) as NodeListOf<HTMLDivElement>;
-		let plot;
+		let plot: any;
 		plots.forEach((p) => {
-			if (p.dataset.x == x && p.dataset.y == y) {
+			if (p.dataset.x == `$x` && p.dataset.y == `$y`) {
 				plot = p;
 			}
 		});
@@ -192,17 +200,19 @@
 
 				// add the selected class to the plots that are one to the right, one below, and one to the right and below.
 				plots.forEach((p) => {
-					if (p.dataset.x == x + 1 && p.dataset.y == y) {
+					const datasetX = parseInt(`${p.dataset.x}`);
+					const datasetY = parseInt(`${p.dataset.y}`);
+					if (datasetX == x + 1 && datasetY == y) {
 						// left bottom
 						p.style.borderLeft = borderStyling;
 						p.style.borderBottom = borderStyling;
 					}
-					if (p.dataset.x == x && p.dataset.y == y + 1) {
+					if (datasetX == x && datasetY == y + 1) {
 						// top right
 						p.style.borderTop = borderStyling;
 						p.style.borderRight = borderStyling;
 					}
-					if (p.dataset.x == x + 1 && p.dataset.y == y + 1) {
+					if (datasetX == x + 1 && datasetY == y + 1) {
 						// bottom right
 						p.style.borderBottom = borderStyling;
 						p.style.borderRight = borderStyling;

@@ -1,5 +1,5 @@
 <script>
-	import { DB, modifyPlotMenuOptions, showBalanceSheet } from '../store';
+	import { DB, modifyPlotMenuOptions, showBalanceSheet } from '../store.ts';
 
 	function openMenu(coords) {
 		let x = parseInt(coords.split(',')[0]);
@@ -15,7 +15,7 @@
 		<!-- Create an HTML table with columns for day, profits, balance -->
 		<div class="heading_m">Balance Sheet</div>
 		<br />
-		{#if $DB.economy_and_laws.balanceSheetHistory.length == 0}
+		{#if $DB.economyAndLaws.balance_sheet_history.length == 0}
 			<div class="text-center padding-sides">
 				No data to display yet. Build some buildings and make sure that the tax
 				rate is above 0%.
@@ -32,7 +32,7 @@
 				</thead>
 				<tbody>
 					<!-- Loop through the balance sheet data -->
-					{#each $DB.economy_and_laws.balanceSheetHistory as row}
+					{#each $DB.economyAndLaws.balance_sheet_history as row}
 						<tr>
 							<td>{row.day}</td>
 							<th

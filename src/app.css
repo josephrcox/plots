@@ -80,15 +80,15 @@ body {
 .message {
 	color: white;
 	background-color: #37496c;
-	padding: 2px;
+	padding: 3px;
 	width: fit-content;
-	margin-bottom: 5px;
+	margin-bottom: 0px;
 	margin-top: 5px;
 	white-space: pre-wrap;
-	max-height: 60px;
+	max-height: 50px;
 	overflow-y: scroll;
 	text-overflow: ellipsis;
-	line-height: 30px;
+	line-height: 24px;
 	transition: all 1s;
 	-ms-overflow-style: none;
 	scrollbar-width: none;
@@ -103,10 +103,6 @@ body {
 	max-height: 78px;
 	margin-top: 5px;
 	margin-bottom: 5px;
-}
-
-.message::before {
-	content: '💡';
 }
 
 .text-center {

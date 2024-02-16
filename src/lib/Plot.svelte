@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { options } from './objects/PlotTypeOptions.js';
-	import { DB, modifyPlotMenuOptions, unique, paused } from './store';
+	import { DB, modifyPlotMenuOptions, unique, paused } from './store.ts';
 
 	export let data = {
 		id: 0,

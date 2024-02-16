@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import { DB } from '../store.js';
+	// @ts-ignore
+	import { DB } from '../store.ts';
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
 
 	let showDialog = true;
+	const scenarios: any = winScenarios;
+	const endGoal = scenarios[$DB.endGoal];
+	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
 
 	function closeDialog() {
 		showDialog = false;
@@ -21,39 +25,36 @@
 {#if dbInitialized && $DB != null && showDialog}
 	<div class="dialog">
 		<div class="dialog-content">
-			HOW TO PLAY ({winScenarios[$DB.endGoal].short_title})
+			HOW TO PLAY ({endGoal.short_title})
 			<br />
 			<hr />
 			{#if $DB.endGoal == 'land'}
-				{winScenarios[$DB.endGoal].description_title}
+				{endGoal.description_title}
 				<br />
 				<br />
-				With your difficulty ({difficulty_options[$DB.difficulty]}), you must
-				also have:
+				With your difficulty ({difficulty}), you must also have:
 				<br />
 				<br />
 				<li>
 					Population: {JSON.stringify(
-						winScenarios.land.requirements[$DB.difficulty].population_count,
+						endGoal.requirements[$DB.difficulty].population_count,
 					)}
 				</li>
 				<br />
 				<li>
 					Happiness: {JSON.stringify(
-						winScenarios.land.requirements[$DB.difficulty].happiness,
+						endGoal.requirements[$DB.difficulty].happiness,
 					)}
 				</li>
 				<br />
 				<li>
-					Health: {JSON.stringify(
-						winScenarios.land.requirements[$DB.difficulty].health,
-					)}
+					Health: {JSON.stringify(endGoal.requirements[$DB.difficulty].health)}
 				</li>
 				<br />
 				<!-- convert from 1 to 100% -->
 				<li>
 					Employment at {JSON.stringify(
-						winScenarios.land.requirements[$DB.difficulty].employment * 100,
+						endGoal.requirements[$DB.difficulty].employment * 100,
 					)}%
 				</li>
 			{/if}
