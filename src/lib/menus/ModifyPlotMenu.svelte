@@ -11,7 +11,6 @@
 	let searchQuery = '';
 	let PlotTypeOptions = options;
 	export let tooltip = '';
-	// let filteredOptions = PlotTypeOptions;
 
 	let searchInput: HTMLInputElement;
 	let totalAffordableOptionsCount: number;
@@ -37,19 +36,15 @@
 		}));
 	}
 
-	$: reactiveOptions = searchQuery
-		? reactiveOptions.filter((option) =>
-				option.title.toLowerCase().includes(searchQuery.toLowerCase()),
-			)
-		: reactiveOptions;
+	$: reactiveOptions = reactiveOptions.filter((option) =>
+		option.title.toLowerCase().includes(searchQuery.toLowerCase()),
+	);
 	$: totalAffordableOptionsCount = reactiveOptions.filter(
 		(option: any) => option.affordable,
 	).length;
 
 	function handleInput(event: any) {
-		console.log(typeof event);
-		console.log(typeof event.target);
-		//searchQuery = (event.target.value as string) || '';
+		searchQuery = (event.target.value as string) || '';
 		event.stopPropagation(); // This will stop the event from propagating further
 	}
 
