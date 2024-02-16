@@ -1,4 +1,5 @@
-<script lang="js">
+<script lang="ts">
+	// @ts-ignore
 	import { DB, clearDB } from '../store.ts';
 
 	function saveGame() {
@@ -15,10 +16,13 @@
 	}
 
 	function loadGame() {
-		const uploader = document.getElementById('upload');
-		const file = uploader.files[0];
+		const uploader = document.getElementById('upload') as HTMLInputElement;
+		const files = uploader.files;
+		if (files == null) return;
+		const file = files[0];
 		const reader = new FileReader();
 		reader.onload = function (e) {
+			if (e.target == null) return;
 			const contents = e.target.result;
 			if (typeof contents === 'string') {
 				if (!isValidFile(contents)) {
@@ -33,7 +37,7 @@
 		reader.readAsText(file);
 	}
 
-	function isValidFile(s) {
+	function isValidFile(s: string) {
 		const json = JSON.parse(s);
 		if (json.townInfo != null && json.difficulty != null) return true;
 		return false;
