@@ -1,8 +1,10 @@
-<script lang="js">
+<script lang="ts">
 	import { onMount, tick } from 'svelte';
+	// @ts-ignore
 	import { ACTIVE_GAME_DB_NAME, DB, modifyPlotMenuOptions } from '../store.ts';
 	import { options } from '../objects/PlotTypeOptions.js';
 	import gameClock from '../gameClock.svelte';
+	import { Game, PlotOption } from '../objects/defaults/types.js';
 
 	export let x = 0;
 	export let y = 0;
@@ -11,8 +13,8 @@
 	export let tooltip = '';
 	// let filteredOptions = PlotTypeOptions;
 
-	let searchInput;
-	let totalAffordableOptionsCount;
+	let searchInput: HTMLInputElement;
+	let totalAffordableOptionsCount: number;
 
 	onMount(async () => {
 		await tick(); // Ensures that DOM has been updated
@@ -21,10 +23,15 @@
 		}
 	});
 
-	let reactiveOptions = [];
+	let reactiveOptions: PlotOption[] = PlotTypeOptions.map(
+		(option: PlotOption | any) => ({
+			...option,
+			affordable: checkIfAffordable(option, $DB),
+		}),
+	);
 
 	$: if ($DB) {
-		reactiveOptions = PlotTypeOptions.map((option) => ({
+		reactiveOptions = PlotTypeOptions.map((option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
 		}));
@@ -36,11 +43,13 @@
 			)
 		: reactiveOptions;
 	$: totalAffordableOptionsCount = reactiveOptions.filter(
-		(option) => option.affordable == true,
+		(option: any) => option.affordable,
 	).length;
 
-	function handleInput(event) {
-		searchQuery = event.target.value;
+	function handleInput(event: any) {
+		console.log(typeof event);
+		console.log(typeof event.target);
+		//searchQuery = (event.target.value as string) || '';
 		event.stopPropagation(); // This will stop the event from propagating further
 	}
 
@@ -56,7 +65,7 @@
 		}
 	});
 
-	export function checkIfPlotCanBeUpgraded(x, y) {
+	export function checkIfPlotCanBeUpgraded(x: number, y: number) {
 		let plot = {
 			x: x,
 			y: y,
@@ -101,7 +110,7 @@
 		reverseClear(x, y);
 	}
 
-	function choosePlotOption(id) {
+	function choosePlotOption(id: string) {
 		// make all other options remove class active
 		// add active class
 		// use purchasePlot
@@ -111,11 +120,13 @@
 		});
 
 		const plotOption = document.querySelector(`[data-plotoptionid="${id}"]`);
-		plotOption.classList.add('active');
-		purchasePlot(x, y, id);
+		if (plotOption) {
+			plotOption.classList.add('active');
+			purchasePlot(x, y, id);
+		}
 	}
 
-	export function canBulldoze(x, y) {
+	export function canBulldoze(x: number, y: number) {
 		let neighbors = 0;
 		if (x > 0) {
 			if ($DB.plots[x - 1][y].type !== -1) {
@@ -144,7 +155,7 @@
 		}
 	}
 
-	export function purchasePlot(x, y, typeID) {
+	export function purchasePlot(x: number, y: number, typeID: string) {
 		let z = $DB;
 		// get the index from the typeID
 		const typeIndex = options.findIndex((option) => option.id === typeID);
@@ -292,7 +303,7 @@
 		}
 	}
 
-	export function reverseClear(x, y) {
+	export function reverseClear(x: number, y: number) {
 		let z = $DB;
 		let oldPlotType = z.plots[x][y].type;
 		z.plots[x][y].type = -1;
@@ -334,7 +345,7 @@
 		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 	}
 
-	function roundTo(n, digits) {
+	function roundTo(n: number, digits: number) {
 		if (digits === undefined) {
 			digits = 0;
 		}
@@ -346,11 +357,11 @@
 	}
 
 	// Function to change 1.2 to 1.20
-	function formatNumber(n) {
+	function formatNumber(n: number) {
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
 
-	function checkIfAffordable(plotChosen, z) {
+	function checkIfAffordable(plotChosen: PlotOption, z: Game) {
 		let requirementsMet = true;
 
 		if (plotChosen.requirements.gold > z.townInfo.gold) {
@@ -378,7 +389,7 @@
 		return $DB.hasBank;
 	}
 
-	function handlePlotOptionClick(event) {
+	function handlePlotOptionClick(event: any) {
 		const plotOption = event.target.closest('.plotOption');
 		if (plotOption) {
 			const plotOptionID = plotOption.dataset.plotoptionid;
