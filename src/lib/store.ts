@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
 // @ts-ignore
-import { default_db, difficulties } from './objects/defaults/default_db';
+import { default_db, difficulties } from './objects/defaults/default_DB.js'
 // @ts-ignore
-import { Difficulty, EndGoal } from './lib/objects/types';
+import { Difficulty, EndGoal } from './types';
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -10,6 +10,17 @@ export const ACTIVE_GAME_DB_NAME = 'plots_active_game_db';
 // The user DB keeps track of progress, achievements,
 //// challenge history, and such.
 export const USER_DB_NAME = 'plots_user_db';
+
+function generateRandomTownName(): string {
+    const firstPart = ["Green", "River", "Mountain", "North", "South", "East", "West", "Lake", "Forest", "Spring", "Golden", "Silver", "Crystal", "Sun", "Moon", "Star", "Valley", "Pine", "Maple", "Oak", "Wild", "Misty", "Rainbow", "Snow", "Summer", "Autumn", "Winter", "Thunder", "Storm", "Crystal", "Diamond"];
+    const secondPart = ["wood", "ville", "town", "field", "ford", "brook", "hill", "dale", "bury", "port", "view", "crest", "meadow", "side", "grove", "haven", "crossing", "junction", "landing", "ridge", "summit", "slope", "strand", "creek", "isle", "glen", "bay", "harbor", "glade", "peak", "plateau"];
+
+    const randomFirstPart = firstPart[Math.floor(Math.random() * firstPart.length)];
+    const randomSecondPart = secondPart[Math.floor(Math.random() * secondPart.length)];
+
+    return `${randomFirstPart}${randomSecondPart}`;
+}
+
 
 // Define your DB store at the top
 export let DB = writable(
@@ -21,6 +32,7 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal ) {
 	json.economyAndLaws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
 	let default_plots = [] as any[][]; 
+	json.townInfo.name = generateRandomTownName();
 	const randomSize =
 		difficulty == '0'
 			? 6

@@ -1,7 +1,11 @@
 module.exports = {
 	preprocess: require('svelte-preprocess')({
 		typescript: {
-			rootDir: './src',
+			rootDir: '$lib',
 		},
 	}),
+	onwarn: (warning, handler) => {
+		if (warning.code.startsWith('a11y-')) return;
+		handler(warning);
+	},
 };

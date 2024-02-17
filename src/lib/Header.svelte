@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { DB, ACTIVE_GAME_DB_NAME, speed, showBalanceSheet } from './store.ts';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
-	import HowToPlayMenu from './menus/HowToPlayMenu.svelte';
+	import { Separator } from '$lib/components/ui/separator';
+	import { Badge } from '$lib/components/ui/badge';
 
 	let balanceSheetComponent;
 	let showCityHallControls = false;
@@ -14,6 +15,59 @@
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
 	}
+
+	const stats = [
+		{
+			label: 'Population',
+			value: `${$DB.townInfo.population_count}/${$DB.townInfo.population_max}`,
+			tap: () => {
+				// TODO
+			},
+		},
+		{
+			label: 'Employees',
+			value: `${$DB.townInfo.employees}/${$DB.townInfo.population_count}`,
+			tap: () => {
+				// TODO
+			},
+		},
+		{
+			label: 'Knowledge',
+			value: $DB.townInfo.knowledge_points,
+			tap: () => {
+				// TODO
+			},
+		},
+		{
+			label: 'Gold',
+			value: $DB.townInfo.gold,
+			tap: () => {
+				// toggle balance sheet
+				showBalanceSheet = !showBalanceSheet;
+			},
+		},
+		{
+			label: 'Tourism Gold',
+			value: $DB.townInfo.gold_from_tourism,
+			tap: () => {
+				transferFundsFromBank();
+			},
+		},
+		{
+			label: 'Happiness',
+			value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
+			tap: () => {
+				// TODO
+			},
+		},
+		{
+			label: 'Health',
+			value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
+			tap: () => {
+				// TODO
+			},
+		},
+	];
 
 	function changeName() {
 		let newName = prompt('Enter a new name for your town (under 200 chars)');
@@ -95,300 +149,97 @@
 	});
 
 	let intervalId;
-
-	let showHowToPlay = false;
 </script>
 
-<div class="header noselect">
-	<div class="header__left">
-		<div class="heading_l" on:dblclick={changeName}>{$DB.townInfo.name}</div>
-		<div class="subheading_m">double click to change name</div>
+<div
+	class="noselect flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 pl-5 pr-5"
+>
+	<div class="noselect flex justify-evenly items-center px-2 pt-3 pb-3">
 		<div>
-			<span on:click={slowDown}>⏪ </span> <span on:click={speedUp}> ⏩</span>
-
-			{speedMultiplier}x - year {year} day {day}
-		</div>
-		{#if $DB.townLog.length > 0}
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
-				class="townLog message"
-				on:click={() => {
-					$DB.townLog = '';
-				}}
+				class="text-2xl font-bold cursor-pointer mb-3
+				 text-emerald-400"
+				id="townName"
+				on:click={changeName}
 			>
-				{$DB.townLog}
+				{$DB.townInfo.name}
 			</div>
-		{/if}
-	</div>
-
-	<div class="header__right">
-		<div>
-			<div class="subheading_m">👪 Population</div>
-			<div class="text_m">
-				{$DB.townInfo.population_count}/{$DB.townInfo.population_max}
-			</div>
-		</div>
-		<div>
-			<div class="subheading_m">🧑‍🌾 Employees</div>
-			<div class="text_m">
-				{$DB.townInfo.employees}/{$DB.townInfo.population_count}
-				<br />
-				{#if $DB.townInfo.population_count - $DB.townInfo.employees > 0}
-					<span class="text_ss gray"
-						>({$DB.townInfo.population_count - $DB.townInfo.employees} unemployed)</span
-					>
-				{/if}
+			<div class="text-sm">
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<span on:click={slowDown}>⏪ </span>
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<span on:click={speedUp}> ⏩</span>
+				{speedMultiplier}x - year {year} day {day}
 			</div>
 		</div>
-		<div>
-			<div class="subheading_m">🧠 Knowledge</div>
-			<div class="text_m">
-				{$DB.townInfo.knowledge_points}
-			</div>
-		</div>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
+			class="
+			flex flex-col items-center gap-1 mt-2 drop-shadow-md p-2 rounded-lg max-h-20 overflow-y-scroll scroll-smooth no-scrollbar"
 			on:click={() => {
-				let show = $showBalanceSheet;
-				show = !show;
-				showBalanceSheet.set(show);
+				$DB.townLog = '';
 			}}
 		>
-			<div class="subheading_m">💰 Gold</div>
-			<div class="text_m">
-				{$DB.townInfo.gold}
-				<br />
-				{#if $DB.economyAndLaws.last_month_profit >= 0}
-					<span class="text_s green"
-						>(+{$DB.economyAndLaws.last_month_profit})</span
-					>
-				{:else if $DB.economyAndLaws.last_month_profit < 0}
-					<span class="text_s red"
-						>({$DB.economyAndLaws.last_month_profit})</span
-					>
-				{/if}
-			</div>
-		</div>
-		<div
-			on:click={() => {
-				transferFundsFromBank();
-			}}
-		>
-			<div class="subheading_m">💰 Tourism Gold</div>
-			<div class="text_m">
-				${$DB.townInfo.gold_from_tourism}
-			</div>
-		</div>
-		<div>
-			<div class="subheading_m">😁 Happiness</div>
-			<div class="text_m">
-				{#if $DB.townInfo.happiness >= 50}
-					<span class="green">{$DB.townInfo.happiness}</span>
-				{:else}
-					<span class="red">{$DB.townInfo.happiness}</span>
-				{/if}
-				<span class="text_ss gray">({roundTo($DB.modifiers.happiness, 2)})</span
-				>
-				{#if $DB.townInfo.happiness >= 300}
-					<span class="yellow max_label">MAX</span>
-				{:else if $DB.townInfo.happiness >= 150}
-					<span>👍</span>
-				{:else if $DB.townInfo.happiness < 150}
-					<span>👎</span>
-				{/if}
-			</div>
-		</div>
-		<div>
-			<div class="subheading_m">🏥 Health</div>
-			<div class="text_m">
-				{#if $DB.townInfo.health >= 50}
-					<span class="green">{$DB.townInfo.health}</span>
-				{:else}
-					<span class="red">{$DB.townInfo.health}</span>
-				{/if}
-
-				<span class="text_ss gray">({roundTo($DB.modifiers.health, 2)})</span>
-				{#if $DB.townInfo.health >= 300}
-					<span class="yellow max_label">MAX</span>
-				{/if}
-			</div>
-		</div>
-	</div>
-
-	<div>
-		<div
-			class="text_m pointer"
-			on:click={() => (showHowToPlay = !showHowToPlay)}
-		>
-			🏆 {#if showHowToPlay}
-				Close
+			<div class="text-xl cursor-pointer">🚨 Alerts</div>
+			{#if $DB.townLog.length > 0}
+				<div class="townLog text-xs text-start">
+					{$DB.townLog.split('\n')[0]}
+				</div>
+				{#each $DB.townLog.split('\n').slice(1, 300) as line}
+					<div class="townLog text-xs text-start text-slate-500">
+						{line}
+					</div>
+				{/each}
 			{:else}
-				How to play
+				<div class="townLog mt-2">🗑️ No town log messages</div>
 			{/if}
 		</div>
-		<br />
-		<div class="taxInfo">
-			<div class="subheading_m">Tax rate (more tax = less happiness)</div>
-			<input
-				type="range"
-				min="0"
-				max="1"
-				step="0.01"
-				bind:value={$DB.economyAndLaws.tax_rate}
-				on:change={setTaxRate}
-			/>
-			<div class="incrementalButtons">
-				<button
-					on:mousedown={() => {
-						intervalId = setInterval(() => {
-							let z = $DB;
-							z.economyAndLaws.tax_rate = roundTo(
-								z.economyAndLaws.tax_rate - 0.01,
-								2,
-							);
-							DB.set(z);
-							localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-						}, 100);
-					}}
-					on:mouseup={() => {
-						clearInterval(intervalId);
-					}}
-					on:click={() => {
-						// go down by 0.01
-						let z = $DB;
-						z.economyAndLaws.tax_rate = roundTo(
-							z.economyAndLaws.tax_rate - 0.01,
-							2,
-						);
-					}}
-				>
-					-
-				</button>
-
-				<div
-					class="text_m"
-					on:dblclick={() => {
-						let newTaxRate = parseFloat(prompt('Set a new tax rate (0-1)'));
-						if (newTaxRate && newTaxRate >= 0 && newTaxRate <= 1) {
-							let z = $DB;
-							z.economyAndLaws.tax_rate = roundTo(newTaxRate, 2);
-							DB.set(z);
-							localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-						}
-					}}
-				>
-					{($DB.economyAndLaws.tax_rate * 100).toFixed(0)}%
-				</div>
-
-				<button
-					on:mousedown={() => {
-						intervalId = setInterval(() => {
-							let z = $DB;
-							z.economyAndLaws.tax_rate = roundTo(
-								z.economyAndLaws.tax_rate + 0.01,
-								2,
-							);
-							DB.set(z);
-							localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-						}, 100);
-					}}
-					on:mouseup={() => {
-						clearInterval(intervalId);
-					}}
-					on:click={() => {
-						let z = $DB;
-						z.economyAndLaws.tax_rate = roundTo(
-							z.economyAndLaws.tax_rate + 0.01,
-							2,
-						);
-						DB.set(z);
-						localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-					}}
-				>
-					+
-				</button>
+		<div>
+			<!-- minimal range for tax rate with a number above representing the tax -->
+			<div class=" p-2 rounded-lg m-3 text-center">
+				<div class="text-lg cursor-pointer">Tax Rate</div>
+				<input
+					type="range"
+					min="0"
+					max="100"
+					step="0.1"
+					value={$DB.economyAndLaws.tax_rate}
+					on:input={setTaxRate}
+					class="cursor-pointer w-100"
+				/>
+				<div class="text-sm">{$DB.economyAndLaws.tax_rate}%</div>
 			</div>
 		</div>
 	</div>
+	<Separator
+		class="mb-3 mt-0 bg-slate-700
+	"
+	/>
+	<div class="flex flex-row justify-between pr-5 pl-5">
+		{#each stats as stat}
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<div
+				class="flex flex-col items-center cursor-pointer justify-center text-center flex-1 gap-2"
+				on:click={stat.tap}
+			>
+				<!-- <span class="text-sm cursor-pointer">{stat.label}</span> -->
+				<Badge class="text-xs bg-slate-900 text-slate-300">{stat.label}</Badge>
+				<span class="text-xs">{stat.value}</span>
+			</div>
+		{/each}
+	</div>
 </div>
-
-{#if showHowToPlay}
-	<HowToPlayMenu />
-{/if}
 
 {#if $showBalanceSheet}
 	<BalanceSheetMenu />
 {/if}
 
 <style>
-	.header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px;
-		background-color: rgb(11, 16, 24);
-		border-bottom: 1px solid black;
-		color: rgb(232, 230, 227);
-		position: fixed;
-		top: 0;
-		z-index: 1;
-		overflow-x: scroll;
-		height: min-content;
-		gap: 21px;
-		width: 97.5%;
-		-ms-overflow-style: none;
-		scrollbar-width: none;
-		overflow-x: clip;
-		max-height: 141px;
-	}
-
-	.header__left {
-		display: flex;
-		flex-direction: column;
-		width: 30%;
-		max-height: 171px;
-	}
-
-	.header__right {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		grid-gap: 16px;
-		min-width: fit-content;
-		padding-inline: 10px;
-		max-height: 171px;
-	}
-
-	.header__right div {
-		min-width: 30px;
-	}
-
-	.header__right > div > .subheading_m {
-		text-align: center;
-	}
-
-	.subheading_m {
-		color: white;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.228);
-	}
-
-	.taxInfo {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		background-color: #37496c;
-		padding: 9px;
-		border-radius: 3px;
-	}
-
-	.max_label {
-		font-size: 12px;
-		font-style: italic;
-	}
-
-	.incrementalButtons {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-		width: 100%;
-		margin-bottom: 5px;
-		margin-top: 5px;
-	}
+	/* no styles */
 </style>

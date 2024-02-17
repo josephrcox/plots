@@ -250,13 +250,10 @@
 		<div class="plot_grid" data-marginRight={$showBalanceSheet}>
 			<PlotController />
 			<br />
-			outside of city
 		</div>
 
 		<style>
 			.plot_grid {
-				max-width: 300%;
-				max-height: 300%;
 				overflow-x: scroll;
 				overflow-y: scroll;
 				width: 300%;
