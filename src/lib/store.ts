@@ -32,7 +32,9 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	json.economyAndLaws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
 	let default_plots = [] as any[][]; 
-	json.townInfo.name = townName ?? generateRandomTownName();
+	// remove leading and trailing spaces, remove symbols other than nunbers and letters
+	townName = townName.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+	json.townInfo.name = townName != '' ? townName : generateRandomTownName();
 	const randomSize =
 		difficulty == '0'
 			? 6

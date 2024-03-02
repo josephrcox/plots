@@ -20,17 +20,11 @@
 	let searchInput: any;
 	let totalAffordableOptionsCount: number;
 
-	// onMount(async () => {
-	// 	await tick(); // Ensures that DOM has been updated
-	// 	if (typeof searchInput ) {
-	// 		searchInput.focus();
-	// 	}
-	// });
-
 	let reactiveOptions: PlotOption[] = PlotTypeOptions.map(
 		(option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
+			selected: PlotTypeOptions[$DB.plots[x][y].type].id === option.id,
 		}),
 	);
 
@@ -38,6 +32,7 @@
 		reactiveOptions = PlotTypeOptions.map((option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
+			selected: PlotTypeOptions[$DB.plots[x][y].type].id === option.id,
 		}));
 	}
 
@@ -50,16 +45,13 @@
 	).length;
 
 	function handleInput(event: any) {
-		console.log(event.target.value);
 		searchQuery = (event.target.value as string) || '';
-		// event.stopPropagation(); // This will stop the event from propagating further
 	}
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
 		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type > -1) {
 			plotOptions[$DB.plots[x][y].type].classList.add('active');
-			// scroll to the active plot option
 			plotOptions[$DB.plots[x][y].type].scrollIntoView({
 				behavior: 'smooth',
 				block: 'center',
@@ -386,17 +378,10 @@
 		return requirementsMet;
 	}
 
-	function hasABank() {
-		// returns if there is a bank
-		return $DB.hasBank;
-	}
-
 	function handlePlotOptionClick(event: any) {
 		const plotOption = event.target.closest('.plotOption');
-		console.log(plotOption);
 		if (plotOption) {
 			const plotOptionID = plotOption.dataset.plotoptionid;
-			console.log(plotOption.dataset);
 			choosePlotOption(plotOptionID);
 		}
 	}
@@ -450,11 +435,10 @@
 				{#each reactiveOptions as option (option.id)}
 					<div
 						class="plotOption
-						
 						{!option.affordable ? 'unaffordable' : ''}
-
-					
-					border rounded-md p-4 mb-4"
+					border rounded-md p-4 mb-4
+						{option.selected ? 'bg-teal-900' : ''}
+					"
 						data-plotoptionid={option.id}
 					>
 						<div>
