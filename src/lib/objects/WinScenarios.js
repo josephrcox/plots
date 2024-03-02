@@ -25,4 +25,29 @@ export const winScenarios = {
 			},
 		},
 	},
+	political: {
+		short_title: 'PLACEHOLDER',
+		description_title: 'PLACEHOLDER',
+		win: 'PLACEHOLDER',
+		requirements: {
+			0: {
+				population_count: 200,
+				happiness: 100,
+				health: 100,
+				employment: 1,
+			},
+			1: {
+				population_count: 500,
+				happiness: 100,
+				health: 100,
+				employment: 1,
+			},
+			2: {
+				population_count: 1000,
+				happiness: 100,
+				health: 100,
+				employment: 1,
+			},
+		},
+	},
 };

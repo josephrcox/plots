@@ -27,12 +27,12 @@ export let DB = writable(
 	JSON.parse(localStorage.getItem(ACTIVE_GAME_DB_NAME) || 'null'),
 );
 
-export function startGame(difficulty : Difficulty, endGoal : EndGoal ) {
+export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string) {
 	let json = { ...default_db }; // Use a copy of default_db
 	json.economyAndLaws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
 	let default_plots = [] as any[][]; 
-	json.townInfo.name = generateRandomTownName();
+	json.townInfo.name = townName ?? generateRandomTownName();
 	const randomSize =
 		difficulty == '0'
 			? 6
@@ -75,6 +75,10 @@ export let modifyPlotMenuOptions = writable({
 	visible: false,
 	x: 0,
 	y: 0,
+});
+
+export let startGameMenu = writable({
+	visible: false,
 });
 
 export let unique = writable({});

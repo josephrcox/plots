@@ -12,6 +12,7 @@
 		DB,
 		clearDB,
 		modifyPlotMenuOptions,
+		startGameMenu,
 		// @ts-ignore
 	} from './lib/store.ts';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
@@ -21,8 +22,10 @@
 	let dbInitialized = false;
 
 	$: if ($DB) {
+		$startGameMenu.visible = false;
 		dbInitialized = true;
 	} else {
+		$startGameMenu.visible = true;
 		dbInitialized = false;
 	}
 
@@ -258,7 +261,7 @@
 				overflow-y: scroll;
 				width: 300%;
 				height: 300vh;
-				margin-top: 175px;
+				margin-top: 185px;
 			}
 			.plot_grid[data-marginRight='true'] {
 				/* This is for when the balanceSheet is being shown. */

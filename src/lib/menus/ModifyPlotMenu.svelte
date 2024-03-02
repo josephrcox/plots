@@ -393,8 +393,10 @@
 
 	function handlePlotOptionClick(event: any) {
 		const plotOption = event.target.closest('.plotOption');
+		console.log(plotOption);
 		if (plotOption) {
 			const plotOptionID = plotOption.dataset.plotoptionid;
+			console.log(plotOption.dataset);
 			choosePlotOption(plotOptionID);
 		}
 	}
@@ -448,9 +450,12 @@
 				{#each reactiveOptions as option (option.id)}
 					<div
 						class="plotOption
+						
 						{!option.affordable ? 'unaffordable' : ''}
+
 					
 					border rounded-md p-4 mb-4"
+						data-plotoptionid={option.id}
 					>
 						<div>
 							<h2 class="text-md font-semibold">{option.title}</h2>

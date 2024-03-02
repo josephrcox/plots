@@ -154,7 +154,7 @@
 <div
 	class="noselect flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 pl-5 pr-5"
 >
-	<div class="noselect flex justify-evenly items-center px-2 pt-3 pb-3">
+	<div class="noselect flex justify-evenly items-center px-2 pb-0">
 		<div>
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -191,12 +191,14 @@
 					{$DB.townLog.split('\n')[0]}
 				</div>
 				{#each $DB.townLog.split('\n').slice(1, 300) as line}
-					<div class="townLog text-xs text-start text-slate-500">
+					<span
+						class="townLog text-xs text-start text-slate-500 cursor-pointer"
+					>
 						{line}
-					</div>
+					</span>
 				{/each}
 			{:else}
-				<div class="townLog mt-2">🗑️ No town log messages</div>
+				<span class="townLog text-xs text-start text-slate-500">No Alerts</span>
 			{/if}
 		</div>
 		<div>
