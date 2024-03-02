@@ -24,7 +24,7 @@
 		(option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
-			selected: PlotTypeOptions[$DB.plots[x][y].type].id === option.id,
+			selected: isSelected(option),
 		}),
 	);
 
@@ -32,7 +32,7 @@
 		reactiveOptions = PlotTypeOptions.map((option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
-			selected: PlotTypeOptions[$DB.plots[x][y].type].id === option.id,
+			selected: isSelected(option),
 		}));
 	}
 
@@ -46,6 +46,12 @@
 
 	function handleInput(event: any) {
 		searchQuery = (event.target.value as string) || '';
+	}
+
+	function isSelected(option: PlotOption) {
+		return $DB.plots[x][y].type > -1
+			? PlotTypeOptions[$DB.plots[x][y].type].id === option.id
+			: false;
 	}
 
 	onMount(() => {

@@ -56,6 +56,7 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 		}
 	}
 
+	paused.set(false);
 	json.plots = default_plots;
 	localStorage.reset = false;
 	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));

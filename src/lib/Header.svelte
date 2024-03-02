@@ -11,63 +11,63 @@
 	let year = Math.floor($DB.environment.day / 365) + 1;
 	let day = $DB.environment.day % 365;
 	// change day and year whenever $DB.environment.day changes
+	let stats = [];
 	$: {
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
+		stats = [
+			{
+				label: 'Population',
+				value: `${$DB.townInfo.population_count}/${$DB.townInfo.population_max}`,
+				tap: () => {
+					// TODO
+				},
+			},
+			{
+				label: 'Employees',
+				value: `${$DB.townInfo.employees}/${$DB.townInfo.population_count}`,
+				tap: () => {
+					// TODO
+				},
+			},
+			{
+				label: 'Knowledge',
+				value: $DB.townInfo.knowledge_points,
+				tap: () => {
+					// TODO
+				},
+			},
+			{
+				label: 'Gold',
+				value: $DB.townInfo.gold,
+				tap: () => {
+					// toggle balance sheet
+					showBalanceSheet = !showBalanceSheet;
+				},
+			},
+			{
+				label: 'Tourism 💰',
+				value: $DB.townInfo.gold_from_tourism,
+				tap: () => {
+					transferFundsFromBank();
+				},
+			},
+			{
+				label: 'Happiness',
+				value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
+				tap: () => {
+					// TODO
+				},
+			},
+			{
+				label: 'Health',
+				value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
+				tap: () => {
+					// TODO
+				},
+			},
+		];
 	}
-
-	const stats = [
-		{
-			label: 'Population',
-			value: `${$DB.townInfo.population_count}/${$DB.townInfo.population_max}`,
-			tap: () => {
-				// TODO
-			},
-		},
-		{
-			label: 'Employees',
-			value: `${$DB.townInfo.employees}/${$DB.townInfo.population_count}`,
-			tap: () => {
-				// TODO
-			},
-		},
-		{
-			label: 'Knowledge',
-			value: $DB.townInfo.knowledge_points,
-			tap: () => {
-				// TODO
-			},
-		},
-		{
-			label: 'Gold',
-			value: $DB.townInfo.gold,
-			tap: () => {
-				// toggle balance sheet
-				showBalanceSheet = !showBalanceSheet;
-			},
-		},
-		{
-			label: 'Tourism Gold',
-			value: $DB.townInfo.gold_from_tourism,
-			tap: () => {
-				transferFundsFromBank();
-			},
-		},
-		{
-			label: 'Happiness',
-			value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
-			tap: () => {
-				// TODO
-			},
-		},
-		{
-			label: 'Health',
-			value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
-			tap: () => {
-				// TODO
-			},
-		},
-	];
 
 	function changeName() {
 		let newName = prompt('Enter a new name for your town (under 200 chars)');
@@ -152,9 +152,9 @@
 </script>
 
 <div
-	class="noselect flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 pl-5 pr-5"
+	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 pl-5 pr-5"
 >
-	<div class="noselect flex justify-evenly items-center px-2 pb-0">
+	<div class="select-none flex justify-evenly items-center px-2 pb-0">
 		<div>
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -166,7 +166,7 @@
 			>
 				{$DB.townInfo.name}
 			</div>
-			<div class="text-sm">
+			<div class="text-xs">
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<span on:click={slowDown}>⏪ </span>
@@ -180,12 +180,12 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			class="
-			flex flex-col items-center gap-1 mt-2 drop-shadow-md p-2 rounded-lg max-h-20 overflow-y-scroll scroll-smooth no-scrollbar"
+			flex flex-col items-center gap-1 mt-2 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar"
 			on:click={() => {
 				$DB.townLog = '';
 			}}
 		>
-			<div class="text-xl cursor-pointer">🚨 Alerts</div>
+			<div class="text-md cursor-pointer">🚨 Alerts</div>
 			{#if $DB.townLog.length > 0}
 				<div class="townLog text-xs text-start">
 					{$DB.townLog.split('\n')[0]}
@@ -204,17 +204,18 @@
 		<div>
 			<!-- minimal range for tax rate with a number above representing the tax -->
 			<div class=" p-2 rounded-lg m-3 text-center">
-				<div class="text-lg cursor-pointer">Tax Rate</div>
+				<div class="text-sm cursor-pointer">
+					Tax Rate ({$DB.economyAndLaws.tax_rate * 100}%)
+				</div>
 				<input
 					type="range"
 					min="0"
-					max="100"
-					step="0.1"
+					max="1.0"
+					step="0.05"
 					value={$DB.economyAndLaws.tax_rate}
 					on:input={setTaxRate}
 					class="cursor-pointer w-100"
 				/>
-				<div class="text-sm">{$DB.economyAndLaws.tax_rate}%</div>
 			</div>
 		</div>
 	</div>
@@ -227,12 +228,15 @@
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
-				class="flex flex-col items-center cursor-pointer justify-center text-center flex-1 gap-2"
+				class="flex flex-col items-center cursor-pointer text-center flex-1"
 				on:click={stat.tap}
 			>
 				<!-- <span class="text-sm cursor-pointer">{stat.label}</span> -->
-				<Badge class="text-xs bg-slate-900 text-slate-300">{stat.label}</Badge>
-				<span class="text-xs">{stat.value}</span>
+				<span class="text-xs pl-4 pr-4 rounded-lg">
+					{stat.label}
+				</span>
+
+				<span class="text-xs text-slate-500">{stat.value}</span>
 			</div>
 		{/each}
 	</div>
