@@ -74,6 +74,8 @@
 {#if $DB != null}
 	<div class="grid">
 		{#each $DB.plots as plotRow}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div class="row" on:click={restartModifyPlotMenu}>
 				{#each plotRow as plot}
 					<Plot

@@ -259,8 +259,6 @@
 			.plot_grid {
 				overflow-x: scroll;
 				overflow-y: scroll;
-				width: 300%;
-				height: 300vh;
 				margin-top: 185px;
 			}
 			.plot_grid[data-marginRight='true'] {

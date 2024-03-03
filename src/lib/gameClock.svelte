@@ -312,6 +312,9 @@
 			z.economyAndLaws.last_month_profit,
 			2,
 		);
+		if (z.townInfo.employees > z.townInfo.population_count) {
+			z.townInfo.employees = z.townInfo.population_count;
+		}
 
 		z.townInfo.gold = roundTo(z.townInfo.gold, 2);
 		z.townInfo.population_count = roundTo(z.townInfo.population_count, 0);

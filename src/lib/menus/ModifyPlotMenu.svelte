@@ -7,6 +7,7 @@
 	import { Game, PlotOption } from '../types.js';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import { Separator } from '$lib/components/ui/separator';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -27,6 +28,16 @@
 			selected: isSelected(option),
 		}),
 	);
+
+	let reactiveOptionIcons: string[] = reactiveOptions.map((option) =>
+		option.affordable ? firstEmoji(option.title) || '' : '',
+	);
+
+	function firstEmoji(s: string): string | null {
+		const regex = /\p{Emoji}/u;
+		const match = regex.exec(s);
+		return match ? match[0] : null;
+	}
 
 	$: if ($DB) {
 		reactiveOptions = PlotTypeOptions.map((option: PlotOption | any) => ({
@@ -394,28 +405,65 @@
 </script>
 
 <Sheet.Root bind:open={$modifyPlotMenuOptions.visible}>
-	<Sheet.Content class="sm:max-w-[425px] overflow-scroll">
+	<!-- fill screen -->
+	<Sheet.Content
+		class="overflow-scroll
+		h-full
+		absolute
+		top-0
+		right-0
+		
+	"
+		side="right"
+	>
 		<Sheet.Header>
-			<Sheet.Title class="text-lg font-semibold"
-				>Modify Plot: {y + 1}-{x + 1}</Sheet.Title
+			<Sheet.Title class="text-2xl font-bold">
+				<span class="text-2xl font-bold"></span>Set Plot: {y + 1}-{x + 1}
+				<span class="text-sm"> (press esc to close)</span></Sheet.Title
 			>
 			{#if tooltip !== ''}
 				<Sheet.Description class="text-sm">{tooltip}</Sheet.Description>
 			{/if}
 		</Sheet.Header>
-		<div class="grid gap-4 py-4">
-			<div class="grid grid-cols-4 items-center gap-4">
-				<Label class="text-right col-span-1">Search</Label>
-				<Input
-					type="text"
-					id="search-bar"
-					placeholder="Search Plot Options..."
-					value={searchQuery}
-					on:input={handleInput}
-					bind:this={searchInput}
-					class="col-span-3 border rounded px-2 py-1"
-				/>
-			</div>
+		<div class="flex mt-4">
+			<Input
+				type="text"
+				id="search-bar"
+				placeholder="Search Plot Options..."
+				value={searchQuery}
+				on:input={handleInput}
+				bind:this={searchInput}
+				class="border rounded w-auto"
+			/>
+			<label for="plotType" class="text-xs ml-4 gap-2">
+				<span class="mb-10">Quick scroll</span>
+				<div>
+					{#if reactiveOptions.length > 0}
+						{#each reactiveOptions as option}
+							{#if option.affordable}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<!-- svelte-ignore a11y-no-static-element-interactions -->
+								<span
+									class="text-xl cursor-pointer hover:bg-slate-300 rounded-lg p-1"
+									on:click={() => {
+										const op = document.querySelector(
+											`[data-plotoptionid="${option.id}"]`,
+										);
+										if (op) {
+											op.scrollIntoView({
+												behavior: 'smooth',
+												block: 'center',
+											});
+										}
+									}}>{firstEmoji(option.title)}</span
+								>
+							{/if}
+						{/each}
+					{:else}
+						No options
+					{/if}
+				</div>
+			</label>
 			<div class="flex justify-end">
 				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
 					<button
@@ -427,30 +475,36 @@
 				{/if}
 			</div>
 		</div>
+		<Separator class="my-4" />
 		<div class="scrollable-y">
-			<label for="plotType">Options</label>
-			{#if totalAffordableOptionsCount > 0}
-				<span class="text-sm">({totalAffordableOptionsCount})</span>
-			{/if}
-			{#if reactiveOptions.length == 0}
-				<span class="text-sm">(0)</span>
-			{/if}
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class="plotOptions" on:click={handlePlotOptionClick}>
+			<div
+				class="plotOptions grid grid-flow-row grid-cols-2
+					<!-- on big width, use 3 columns -->
+					lg:grid-cols-3
+				flex-auto flex-grid gap-6 mt-4
+				"
+				on:click={handlePlotOptionClick}
+			>
 				{#each reactiveOptions as option (option.id)}
 					<div
-						class="plotOption
-						{!option.affordable ? 'unaffordable' : ''}
+						class="plotOption min-w-min overflow-x-auto
+						{!option.affordable ? 'unaffordable cursor-not-allowed' : 'cursor-pointer'}
 					border rounded-md p-4 mb-4
 						{option.selected ? 'bg-teal-900' : ''}
 					"
 						data-plotoptionid={option.id}
 					>
 						<div>
-							<h2 class="text-md font-semibold">{option.title}</h2>
-							<h3 class="text-xs font-medium">{option.subtitle}</h3>
-							<p class="text-xs">{option.description}</p>
+							<h2 class="text-md font-semibold">
+								{option.title}
+								<span class="text-xs font-light italic opacity-50"
+									>{option.subtitle}</span
+								>
+							</h2>
+
+							<p class="text-xs opacity-75">{option.description}</p>
 						</div>
 						<div class="mt-4">
 							{#if option.revenue_per_week > 0 || option.tourism_revenue_per_week > 0}
@@ -460,7 +514,7 @@
 										<p class="text-sm">
 											Profit with Tax Rate:
 											<!-- strikethrough -->
-											<span class="line-through">
+											<span class="line-through text-xs">
 												{roundTo(option.revenue_per_week * 1, 2)}
 											</span>
 											({roundTo(
@@ -470,10 +524,10 @@
 										</p>
 									{/if}
 									{#if option.tourism_revenue_per_week > 0}
-										<p class="text-sm">
+										<p class="text-xs">
 											Tourism Revenue: {option.tourism_revenue_per_week}
 										</p>
-										<p class="text-sm">
+										<p class="text-xs">
 											Taxed Tourism Revenue: {roundTo(
 												$DB.economyAndLaws.tax_rate *
 													option.tourism_revenue_per_week *
@@ -490,7 +544,7 @@
 								<div>
 									<span class="text-sm font-semibold">Requirements</span>
 									{#if option.requirements.gold !== 0}
-										<p class="text-sm">
+										<p class="text-xs">
 											{option.requirements.gold} gold
 											<span class="text-xs"
 												>({roundTo($DB.townInfo.gold, 0)})</span
@@ -510,19 +564,19 @@
 										</p>
 									{/if}
 									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
-										<p class="text-sm">
+										<p class="text-xs">
 											{option.requirements.knowledge} knowledge
 										</p>
 									{/if}
 								</div>
 								<div>
 									<span class="text-sm font-semibold">Multiplier</span>
-									<p class="text-sm">
+									<p class="text-xs">
 										Happiness: {option.effect_modifiers.happiness == 1.0
 											? 'No effect'
 											: formatNumber(option.effect_modifiers.happiness)}
 									</p>
-									<p class="text-sm">
+									<p class="text-xs">
 										Health: {option.effect_modifiers.health == 1.0
 											? 'No effect'
 											: formatNumber(option.effect_modifiers.health)}
@@ -530,15 +584,15 @@
 								</div>
 							</div>
 							{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
-								<div class="immediate_changes mt-0">
+								<div class="immediate_changes mt-4">
 									<span class="text-sm font-semibold">Instant changes</span>
 									{#if option.immediate_variable_changes.happiness !== 0}
-										<p class="text-sm">
+										<p class="text-xs">
 											Happiness: {option.immediate_variable_changes.happiness}
 										</p>
 									{/if}
 									{#if option.immediate_variable_changes.health !== 0}
-										<p class="text-sm">
+										<p class="text-xs">
 											Health: {option.immediate_variable_changes.health}
 										</p>
 									{/if}

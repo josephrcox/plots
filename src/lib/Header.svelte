@@ -21,7 +21,7 @@
 				value: `${$DB.townInfo.population_count}/${$DB.townInfo.population_max}`,
 				subtitle: `<span
 					class='
-						rounded-full px-1 py-1 text-xs text-white
+						rounded-full px-1 py-1 text-xs
 						${
 							$DB.townInfo.population_count < $DB.townInfo.population_max
 								? 'text-red-500'
@@ -39,7 +39,7 @@
 				value: `${$DB.townInfo.employees}/${$DB.townInfo.population_count}`,
 				subtitle: `<span
 					class='
-						rounded-full px-1 py-1 text-xs text-white
+						rounded-full px-1 py-1 text-xs
 						${
 							$DB.townInfo.employees < $DB.townInfo.population_count
 								? 'text-red-500'
@@ -61,18 +61,17 @@
 			},
 			{
 				label: 'Gold',
-				value: $DB.townInfo.gold,
+				value: roundTo($DB.townInfo.gold, 0),
 				// $DB.economy_and_laws.last_month_profit
 				subtitle: `<span
 					class='
-						rounded-full px-1 py-1 text-xs text-white
+						rounded-full px-1 py-1 text-xs
 						${$DB.economyAndLaws.last_month_profit < 0 ? 'text-red-500' : 'text-green-500'}
 					'>
 					${$DB.economyAndLaws.last_month_profit}
 				</span>`,
 				tap: () => {
-					// toggle balance sheet
-					showBalanceSheet = !showBalanceSheet;
+					$showBalanceSheet = !$showBalanceSheet;
 				},
 			},
 			{

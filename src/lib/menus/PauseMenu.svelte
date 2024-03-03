@@ -78,6 +78,8 @@
 					<li>
 						{#if $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].population_count}
 							✅
+						{:else}
+							❌
 						{/if}
 						Population: {JSON.stringify(
 							endGoal.requirements[$DB.difficulty].population_count,
@@ -86,6 +88,8 @@
 					<li>
 						{#if $DB.townInfo.happiness >= endGoal.requirements[$DB.difficulty].happiness}
 							✅
+						{:else}
+							❌
 						{/if}
 						Happiness: {JSON.stringify(
 							endGoal.requirements[$DB.difficulty].happiness,
@@ -94,6 +98,8 @@
 					<li>
 						{#if $DB.townInfo.health >= endGoal.requirements[$DB.difficulty].health}
 							✅
+						{:else}
+							❌
 						{/if}
 						Health: {JSON.stringify(
 							endGoal.requirements[$DB.difficulty].health,
@@ -102,8 +108,10 @@
 					<li>
 						{#if $DB.townInfo.employees / $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].employment}
 							✅
+						{:else}
+							❌
 						{/if}
-						Employment at {JSON.stringify(
+						Employment: {JSON.stringify(
 							endGoal.requirements[$DB.difficulty].employment * 100,
 						)}% - Currently at {JSON.stringify(
 							($DB.townInfo.employees / $DB.townInfo.population_count || 0) *
