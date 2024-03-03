@@ -11,7 +11,7 @@
 	let year = Math.floor($DB.environment.day / 365) + 1;
 	let day = $DB.environment.day % 365;
 	// change day and year whenever $DB.environment.day changes
-	let stats = [];
+	export let stats = [];
 	$: {
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
@@ -90,7 +90,7 @@
 						rounded-full px-1 py-1 text-xs text-white
 						${$DB.townInfo.happiness < 50 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.townInfo.happiness < 50 ? '👎' : '👍'}
+					${$DB.modifiers.happiness < 1 ? '🔴' : '🟢'}
 				</span>`,
 				tap: () => {
 					// TODO
@@ -104,7 +104,7 @@
 						rounded-full px-1 py-1 text-xs text-white
 						${$DB.townInfo.health < 50 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.townInfo.health < 50 ? '👎' : '👍'}
+					${$DB.modifiers.health < 1 ? '🔴' : '🟢'}
 				</span>`,
 				tap: () => {
 					// TODO
@@ -152,7 +152,7 @@
 		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 	}
 
-	function roundTo(n, digits) {
+	export function roundTo(n, digits) {
 		if (digits === undefined) {
 			digits = 0;
 		}
@@ -163,7 +163,7 @@
 		return +test.toFixed(digits);
 	}
 
-	function transferFundsFromBank() {
+	export function transferFundsFromBank() {
 		let z = $DB;
 		// Checks gold_from_tourism and as long as you have a bank, it should transfer
 		if (z.hasABank === true) {

@@ -457,12 +457,16 @@
 								<div class="profits">
 									<span class="text-sm font-semibold">Profits</span>
 									{#if option.revenue_per_week > 0}
-										<p class="text-sm">Revenue: {option.revenue_per_week}</p>
 										<p class="text-sm">
-											Taxed Revenue: {roundTo(
+											Profit with Tax Rate:
+											<!-- strikethrough -->
+											<span class="line-through">
+												{roundTo(option.revenue_per_week * 1, 2)}
+											</span>
+											({roundTo(
 												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
 												2,
-											)} gold
+											)} gold)
 										</p>
 									{/if}
 									{#if option.tourism_revenue_per_week > 0}
@@ -486,11 +490,23 @@
 								<div>
 									<span class="text-sm font-semibold">Requirements</span>
 									{#if option.requirements.gold !== 0}
-										<p class="text-sm">{option.requirements.gold} gold</p>
+										<p class="text-sm">
+											{option.requirements.gold} gold
+											<span class="text-xs"
+												>({roundTo($DB.townInfo.gold, 0)})</span
+											>
+										</p>
 									{/if}
 									{#if option.requirements.employees !== 0}
 										<p class="text-sm">
 											{option.requirements.employees} employees
+											<span class="text-xs"
+												>({roundTo(
+													$DB.townInfo.population_count -
+														$DB.townInfo.employees,
+													0,
+												)})</span
+											>
 										</p>
 									{/if}
 									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}

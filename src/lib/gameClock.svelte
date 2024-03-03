@@ -63,6 +63,9 @@
 				if (currentDB.environment.day % 90 === 0) {
 					currentDB = performQuarterlyTasks(currentDB);
 				}
+				if (window.location.search.includes('debug=true')) {
+					console.log(currentDB);
+				}
 
 				currentDB = checkGameStatus(currentDB);
 				return currentDB;
