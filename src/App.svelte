@@ -13,6 +13,7 @@
 		clearDB,
 		modifyPlotMenuOptions,
 		startGameMenu,
+		headerHeight,
 		// @ts-ignore
 	} from './lib/store.ts';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
@@ -250,18 +251,17 @@
 		<Header />
 		<GameClock />
 		<GameLostMenu />
-		<div class="plot_grid" data-marginRight={$showBalanceSheet}>
+		<div id="plot_grid" data-marginRight={$showBalanceSheet}>
 			<PlotController />
 			<br />
 		</div>
 
 		<style>
-			.plot_grid {
+			#plot_grid {
 				overflow-x: scroll;
 				overflow-y: scroll;
-				margin-top: 185px;
 			}
-			.plot_grid[data-marginRight='true'] {
+			#plot_grid[data-marginRight='true'] {
 				/* This is for when the balanceSheet is being shown. */
 				margin-right: 224px;
 			}

@@ -1,6 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, ACTIVE_GAME_DB_NAME, speed, showBalanceSheet } from './store.ts';
+	import {
+		DB,
+		ACTIVE_GAME_DB_NAME,
+		speed,
+		showBalanceSheet,
+		headerHeight,
+	} from './store.ts';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
@@ -13,6 +19,10 @@
 	// change day and year whenever $DB.environment.day changes
 	export let stats = [];
 	$: {
+		const header = document.getElementById('headerObject');
+		if (header) {
+			$headerHeight = header.offsetHeight;
+		}
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
 		stats = [
@@ -196,6 +206,7 @@
 
 <div
 	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 pl-5 pr-5"
+	id="headerObject"
 >
 	<div class="select-none flex justify-evenly items-center px-2 pb-0">
 		<div>

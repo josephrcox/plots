@@ -29,10 +29,6 @@
 		}),
 	);
 
-	let reactiveOptionIcons: string[] = reactiveOptions.map((option) =>
-		option.affordable ? firstEmoji(option.title) || '' : '',
-	);
-
 	function firstEmoji(s: string): string | null {
 		const regex = /\p{Emoji}/u;
 		const match = regex.exec(s);
@@ -517,10 +513,12 @@
 											<span class="line-through text-xs">
 												{roundTo(option.revenue_per_week * 1, 2)}
 											</span>
-											({roundTo(
-												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
-												2,
-											)} gold)
+											<span class=" text-xs">
+												({roundTo(
+													$DB.economyAndLaws.tax_rate * option.revenue_per_week,
+													2,
+												)} gold)
+											</span>
 										</p>
 									{/if}
 									{#if option.tourism_revenue_per_week > 0}
