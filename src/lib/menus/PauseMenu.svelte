@@ -5,7 +5,6 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	let defaultModal = $paused;
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
 
@@ -67,24 +66,15 @@
 		<Dialog.Header>
 			<Dialog.Title>Pause Menu</Dialog.Title>
 			<Dialog.Description>
-				{#if $DB.endGoal == 'land'}
-					{endGoal.description_title}
-				{/if}
+				{endGoal.description_title}
 			</Dialog.Description>
 		</Dialog.Header>
-		<div class="grid gap-4 py-0">
+		<div class="gap-0 py-0 text-gray-400">
 			{#if $DB.endGoal == 'land'}
-				<div class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-					{endGoal.description_title}
-				</div>
-				<div
-					class="text-base leading-relaxed text-gray-500 dark:text-gray-400 mt-4"
-				>
+				<div class="text-base leading-relaxed">
 					With your difficulty ({difficulty}), you must also have:
 				</div>
-				<ul
-					class="list-inside list-disc text-base leading-relaxed text-gray-500 dark:text-gray-400 mt-0"
-				>
+				<ul class="list-inside list-disc text-base leading-relaxedmt-0">
 					<li>
 						{#if $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].population_count}
 							✅
@@ -125,92 +115,31 @@
 		</div>
 		<Dialog.Footer>
 			<div class="flex flex-col gap-3">
-				<Label class="pb-2">Save or load game</Label>
 				<div class="flex gap-10">
-					<Button on:click={() => saveGame()}>Save</Button>
-					<Input type="file" on:change={loadGame} id="upload" />
+					<Label
+						for="saveButton"
+						class="cursor-pointer bg-blue-600 rounded-md text-center p-2.5 hover:bg-blue-700 justify-center flex 
+					">Save game</Label
+					>
+					<Button
+						class="
+					bg-blue-600 hover:bg-blue-700 hidden
+					"
+						id="saveButton"
+						on:click={() => saveGame()}>Save</Button
+					>
+
+					<Label
+						for="upload"
+						class="cursor-pointer bg-blue-600 rounded-md text-center p-2.5 hover:bg-blue-700 justify-center flex 
+					">Upload game</Label
+					>
+					<Input class="hidden" type="file" on:change={loadGame} id="upload" />
 				</div>
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
-
-<!-- 
-<Modal
-	title="Pause Menu"
-	bind:open={defaultModal}
-	autoclose
-	outsideclose
-	on:close={() => {
-		$paused = false;
-	}}
->
-	{#if $DB.endGoal == 'land'}
-		<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-			{endGoal.description_title}
-		</p>
-
-		<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400 mt-4">
-			With your difficulty ({difficulty}), you must also have:
-		</p>
-
-		<ul
-			class="list-inside list-disc text-base leading-relaxed text-gray-500 dark:text-gray-400 mt-4"
-		>
-			<li>
-				{#if $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].population_count}
-					✅
-				{/if}
-				Population: {JSON.stringify(
-					endGoal.requirements[$DB.difficulty].population_count,
-				)} - Currently at {JSON.stringify($DB.townInfo.population_count)}
-			</li>
-			<li>
-				{#if $DB.townInfo.happiness >= endGoal.requirements[$DB.difficulty].happiness}
-					✅
-				{/if}
-				Happiness: {JSON.stringify(
-					endGoal.requirements[$DB.difficulty].happiness,
-				)} - Currently at {JSON.stringify($DB.townInfo.happiness)}
-			</li>
-			<li>
-				{#if $DB.townInfo.health >= endGoal.requirements[$DB.difficulty].health}
-					✅
-				{/if}Health: {JSON.stringify(
-					endGoal.requirements[$DB.difficulty].health,
-				)} - Currently at {JSON.stringify($DB.townInfo.health)}
-			</li>
-			<li>
-				{#if $DB.townInfo.employees / $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].employment}
-					✅
-				{/if}
-				Employment at {JSON.stringify(
-					endGoal.requirements[$DB.difficulty].employment * 100,
-				)}% - Currently at {JSON.stringify(
-					($DB.townInfo.employees / $DB.townInfo.population_count || 0) * 100,
-				)}%
-			</li>
-		</ul>
-	{/if}
-
-	<svelte:fragment slot="footer">
-		<br />
-		<div></div>
-		<div class="flex flex-col gap-3">
-			<Label class="pb-2">Save or load game</Label>
-			<div class="flex gap-10">
-				<Button
-					id="save"
-					on:click={() => {
-						saveGame();
-					}}>Save</Button
-				>
-
-				<Fileupload on:change={loadGame} id="upload" />
-			</div>
-		</div>
-	</svelte:fragment>
-</Modal> -->
 
 <style>
 	.dialog {

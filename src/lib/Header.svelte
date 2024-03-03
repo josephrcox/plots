@@ -19,6 +19,17 @@
 			{
 				label: 'Population',
 				value: `${$DB.townInfo.population_count}/${$DB.townInfo.population_max}`,
+				subtitle: `<span
+					class='
+						rounded-full px-1 py-1 text-xs text-white
+						${
+							$DB.townInfo.population_count < $DB.townInfo.population_max
+								? 'text-red-500'
+								: 'text-green-500'
+						}
+					'>
+					${$DB.townInfo.population_max - $DB.townInfo.population_count}
+				</span>`,
 				tap: () => {
 					// TODO
 				},
@@ -26,6 +37,17 @@
 			{
 				label: 'Employees',
 				value: `${$DB.townInfo.employees}/${$DB.townInfo.population_count}`,
+				subtitle: `<span
+					class='
+						rounded-full px-1 py-1 text-xs text-white
+						${
+							$DB.townInfo.employees < $DB.townInfo.population_count
+								? 'text-red-500'
+								: 'text-green-500'
+						}
+					'>
+					${$DB.townInfo.population_count - $DB.townInfo.employees}
+				</span>`,
 				tap: () => {
 					// TODO
 				},
@@ -40,6 +62,14 @@
 			{
 				label: 'Gold',
 				value: $DB.townInfo.gold,
+				// $DB.economy_and_laws.last_month_profit
+				subtitle: `<span
+					class='
+						rounded-full px-1 py-1 text-xs text-white
+						${$DB.economyAndLaws.last_month_profit < 0 ? 'text-red-500' : 'text-green-500'}
+					'>
+					${$DB.economyAndLaws.last_month_profit}
+				</span>`,
 				tap: () => {
 					// toggle balance sheet
 					showBalanceSheet = !showBalanceSheet;
@@ -55,6 +85,13 @@
 			{
 				label: 'Happiness',
 				value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
+				subtitle: `<span
+					class='
+						rounded-full px-1 py-1 text-xs text-white
+						${$DB.townInfo.happiness < 50 ? 'text-red-500' : 'text-green-500'}
+					'>
+					${$DB.townInfo.happiness < 50 ? '👎' : '👍'}
+				</span>`,
 				tap: () => {
 					// TODO
 				},
@@ -62,6 +99,13 @@
 			{
 				label: 'Health',
 				value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
+				subtitle: `<span
+					class='
+						rounded-full px-1 py-1 text-xs text-white
+						${$DB.townInfo.health < 50 ? 'text-red-500' : 'text-green-500'}
+					'>
+					${$DB.townInfo.health < 50 ? '👎' : '👍'}
+				</span>`,
 				tap: () => {
 					// TODO
 				},
@@ -231,12 +275,17 @@
 				class="flex flex-col items-center cursor-pointer text-center flex-1"
 				on:click={stat.tap}
 			>
-				<!-- <span class="text-sm cursor-pointer">{stat.label}</span> -->
 				<span class="text-xs pl-4 pr-4 rounded-lg">
 					{stat.label}
 				</span>
 
-				<span class="text-xs text-slate-500">{stat.value}</span>
+				<span class="text-xs text-slate-500"
+					>{stat.value}
+					{#if stat.subtitle != null}
+						<!-- stat.subtitle as html -->
+						{@html stat.subtitle}
+					{/if}</span
+				>
 			</div>
 		{/each}
 	</div>
