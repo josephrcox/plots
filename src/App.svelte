@@ -251,7 +251,11 @@
 		<Header />
 		<GameClock />
 		<GameLostMenu />
-		<div id="plot_grid" data-marginRight={$showBalanceSheet}>
+		<div
+			id="plot_grid"
+			data-marginRight={$showBalanceSheet}
+			style="margin-top: {$headerHeight}px"
+		>
 			<PlotController />
 			<br />
 		</div>

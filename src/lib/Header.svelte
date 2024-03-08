@@ -10,6 +10,7 @@
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Badge } from '$lib/components/ui/badge';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 
 	let balanceSheetComponent;
 	let showCityHallControls = false;
@@ -22,6 +23,7 @@
 		const header = document.getElementById('headerObject');
 		if (header) {
 			$headerHeight = header.offsetHeight;
+			console.log($headerHeight);
 		}
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
@@ -131,27 +133,17 @@
 			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 		}
 	}
-	export let speedMultiplier = 1;
 
-	function slowDown() {
-		let cspeed = $speed;
-		cspeed = cspeed * 2;
-		if (cspeed >= 8000) {
-			cspeed = 8000;
+	let speedMultiplier = 'Normal';
+
+	function toggleSpeed() {
+		if ($speed == 500) {
+			$speed = 250;
+			speedMultiplier = 'Fast';
+		} else {
+			$speed = 500;
+			speedMultiplier = 'Normal';
 		}
-		$speed = cspeed;
-		speedMultiplier = 2000 / $speed;
-	}
-
-	function speedUp() {
-		let cspeed = $speed;
-		cspeed = cspeed / 2;
-
-		if (cspeed <= 250) {
-			cspeed = 250;
-		}
-		$speed = cspeed;
-		speedMultiplier = 2000 / $speed;
 	}
 
 	function setTaxRate(e) {
@@ -166,9 +158,8 @@
 			digits = 0;
 		}
 
-		var multiplicator = Math.pow(10, digits);
-		n = parseFloat((n * multiplicator).toFixed(11));
-		var test = Math.round(n) / multiplicator;
+		n = parseFloat((n * Math.pow(10, digits)).toFixed(11));
+		var test = Math.round(n) / Math.pow(10, digits);
 		return +test.toFixed(digits);
 	}
 
@@ -190,11 +181,11 @@
 		switch (key) {
 			case '1':
 				e.preventDefault();
-				slowDown();
+				toggleSpeed();
 				break;
 			case '2':
 				e.preventDefault();
-				speedUp();
+				toggleSpeed();
 				break;
 			default:
 				break;
@@ -205,36 +196,45 @@
 </script>
 
 <div
-	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 pl-5 pr-5"
+	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 px-3"
 	id="headerObject"
 >
-	<div class="select-none flex justify-evenly items-center px-2 pb-0">
+	<div class="select-none flex justify-evenly items-center">
 		<div>
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
-				class="text-2xl font-bold cursor-pointer mb-3
+				class="text-2xl font-bold cursor-pointer
 				 text-emerald-400"
 				id="townName"
 				on:click={changeName}
 			>
 				{$DB.townInfo.name}
 			</div>
-			<div class="text-xs">
+			<div class="text-xs flex flex-row gap-2 align-middle">
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<span on:click={slowDown}>⏪ </span>
-				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<span on:click={speedUp}> ⏩</span>
-				{speedMultiplier}x - year {year} day {day}
+				<div>
+					<Button
+						class="bg-slate-900 pt-0 px-2 pb-0 hover:bg-slate-400 w-min
+					"
+						on:click={toggleSpeed}>⌛️</Button
+					>
+				</div>
+
+				<div class="align-center">
+					{speedMultiplier} speed
+					<br />
+					Day {day} Year {year}
+				</div>
 			</div>
 		</div>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			class="
-			flex flex-col items-center gap-1 mt-2 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar"
+			flex flex-col items-center gap-1 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar
+			"
 			on:click={() => {
 				$DB.townLog = '';
 			}}

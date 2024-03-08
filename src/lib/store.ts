@@ -88,7 +88,7 @@ export let unique = writable({});
 export let paused = writable(false);
 export let showBalanceSheet = writable(false);
 export let headerHeight = writable(250);
-export let speed = writable(400);
+export let speed = writable(500);
 export let showUnaffordablePlotOptions = writable(
 	localStorage.getItem('showUnaffordablePlotOptions') === 'true' ? true : false,
 );

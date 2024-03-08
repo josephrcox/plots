@@ -64,8 +64,9 @@
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
 		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type > -1) {
-			plotOptions[$DB.plots[x][y].type].classList.add('active');
-			plotOptions[$DB.plots[x][y].type].scrollIntoView({
+			console.log(plotOptions[$DB.plots[x][y]]);
+			plotOptions[$DB.plots[x][y]].classList.add('active');
+			plotOptions[$DB.plots[x][y]].scrollIntoView({
 				behavior: 'smooth',
 				block: 'center',
 			});
@@ -155,6 +156,7 @@
 				neighbors++;
 			}
 		}
+		$modifyPlotMenuOptions.visible = false;
 		if (neighbors <= 4) {
 			return true;
 		} else {
@@ -431,6 +433,16 @@
 				bind:this={searchInput}
 				class="border rounded w-auto"
 			/>
+			<div class="flex justify-end ml-6">
+				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
+					<button
+						on:click={clearPlot}
+						id="bulldoze"
+						class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
+						>🔥 Bulldoze</button
+					>
+				{/if}
+			</div>
 			<label for="plotType" class="text-xs ml-4 gap-2">
 				<span class="mb-10">Quick scroll</span>
 				<div>
@@ -460,16 +472,6 @@
 					{/if}
 				</div>
 			</label>
-			<div class="flex justify-end">
-				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
-					<button
-						on:click={clearPlot}
-						id="bulldoze"
-						class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
-						>🔥 Bulldoze</button
-					>
-				{/if}
-			</div>
 		</div>
 		<Separator class="my-4" />
 		<div class="scrollable-y">
