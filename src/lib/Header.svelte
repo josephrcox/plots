@@ -23,7 +23,6 @@
 		const header = document.getElementById('headerObject');
 		if (header) {
 			$headerHeight = header.offsetHeight;
-			console.log($headerHeight);
 		}
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
@@ -196,7 +195,7 @@
 </script>
 
 <div
-	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-200 pb-3 px-3"
+	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-400 pb-3 px-3"
 	id="headerObject"
 >
 	<div class="select-none flex justify-evenly items-center">
@@ -211,19 +210,16 @@
 			>
 				{$DB.townInfo.name}
 			</div>
-			<div class="text-xs flex flex-row gap-2 align-middle">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<div
+				class="text-xs flex flex-row gap-2 align-middle cursor-pointer hover:text-white"
+				on:click={toggleSpeed}
+			>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<div>
-					<Button
-						class="bg-slate-900 pt-0 px-2 pb-0 hover:bg-slate-400 w-min
-					"
-						on:click={toggleSpeed}>⌛️</Button
-					>
-				</div>
-
 				<div class="align-center">
-					{speedMultiplier} speed
+					<span class=" ">{speedMultiplier} speed</span>
 					<br />
 					Day {day} Year {year}
 				</div>
@@ -233,7 +229,7 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			class="
-			flex flex-col items-center gap-1 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar
+			flex flex-col items-center gap-1 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer hover:text-white
 			"
 			on:click={() => {
 				$DB.townLog = '';

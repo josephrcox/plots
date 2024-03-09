@@ -59,12 +59,12 @@
 		return $DB.plots[x][y].type > -1
 			? PlotTypeOptions[$DB.plots[x][y].type].id === option.id
 			: false;
+		return false;
 	}
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
 		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type > -1) {
-			console.log(plotOptions[$DB.plots[x][y]]);
 			plotOptions[$DB.plots[x][y]].classList.add('active');
 			plotOptions[$DB.plots[x][y]].scrollIntoView({
 				behavior: 'smooth',
@@ -156,7 +156,6 @@
 				neighbors++;
 			}
 		}
-		$modifyPlotMenuOptions.visible = false;
 		if (neighbors <= 4) {
 			return true;
 		} else {
@@ -434,7 +433,7 @@
 				class="border rounded w-auto"
 			/>
 			<div class="flex justify-end ml-6">
-				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
+				{#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
 					<button
 						on:click={clearPlot}
 						id="bulldoze"

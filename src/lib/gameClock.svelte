@@ -86,7 +86,6 @@
 		const gameWinScenario = z.endGoal;
 
 		if (gameWinScenario == 'land') {
-			// Goal for the user is to fill up every plot, and to have happiness >= 100, health >= 100, and to have a full population.
 			if (
 				z.townInfo.population_max == z.townInfo.population_count &&
 				z.townInfo.happiness >=
@@ -96,9 +95,8 @@
 				z.townInfo.employees / z.townInfo.population_count >=
 					winScenarios.land.requirements[z.difficulty].employment &&
 				z.townInfo.population_count >
-					winScenarios.land.requirements[z.difficulty].population
+					winScenarios.land.requirements[z.difficulty].population_count
 			) {
-				// iterate over the plots and see if every single one is filled.
 				let allPlotsFilled = true;
 				for (let i = 0; i < z.plots.length; i++) {
 					for (let j = 0; j < z.plots[i].length; j++) {
@@ -456,8 +454,8 @@
 		// This takes in revenue, and returns the gold profit.
 		// Profit is revenue * tax rate * percentage of population out of the max population
 		let profitModifiers = z.townInfo.happiness / 100;
-		if (profitModifiers > 1.25) {
-			profitModifiers = 1.25;
+		if (profitModifiers > 2.25) {
+			profitModifiers = 2.25;
 		} else if (profitModifiers < 0.75) {
 			profitModifiers = 0.75;
 		}

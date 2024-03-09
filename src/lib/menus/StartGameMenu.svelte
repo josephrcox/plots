@@ -2,6 +2,7 @@
 	import { startGame, DB, startGameMenu } from '../store';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import { flyAndScale } from '$lib/utils';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Difficulty, EndGoal, WinScenario } from '$lib/types';
@@ -28,7 +29,7 @@
 </script>
 
 <Dialog.Root bind:open={$startGameMenu.visible}>
-	<Dialog.Content>
+	<Dialog.Content transition={flyAndScale}>
 		<Dialog.Header>
 			<Dialog.Title class="mb-4">Welcome to Plots!</Dialog.Title>
 			<Dialog.Description>
