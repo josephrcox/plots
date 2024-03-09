@@ -62,17 +62,6 @@
 		return false;
 	}
 
-	onMount(() => {
-		const plotOptions = document.querySelectorAll('.plotOption');
-		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type > -1) {
-			plotOptions[$DB.plots[x][y]].classList.add('active');
-			plotOptions[$DB.plots[x][y]].scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-			});
-		}
-	});
-
 	export function checkIfPlotCanBeUpgraded(x: number, y: number) {
 		let plot = {
 			x: x,
