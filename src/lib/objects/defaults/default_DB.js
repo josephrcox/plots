@@ -36,4 +36,5 @@ export const default_db = {
 	endGoal: 'land',
 	endGameDetails: null,
 	tick: 0,
+	overtime: false,
 };

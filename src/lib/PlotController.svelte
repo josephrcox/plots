@@ -97,6 +97,7 @@
 			<ModifyPlotMenu
 				x={$modifyPlotMenuOptions.x}
 				y={$modifyPlotMenuOptions.y}
+				open={$modifyPlotMenuOptions.visible}
 			/>
 		{/if}
 	{/key}

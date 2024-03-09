@@ -14,11 +14,13 @@
 		modifyPlotMenuOptions,
 		startGameMenu,
 		headerHeight,
+		showScoreboard,
 		// @ts-ignore
 	} from './lib/store.ts';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
-	import GameLostMenu from './lib/menus/GameLostMenu.svelte';
+	import GameEndMenu from './lib/menus/GameEndMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
+	import Scoreboard from '$lib/menus/Scoreboard.svelte';
 
 	let dbInitialized = false;
 
@@ -258,7 +260,8 @@
 
 		<Header />
 		<GameClock />
-		<GameLostMenu />
+		<GameEndMenu />
+		<Scoreboard />
 		<div
 			class="justify-center text-center
 		
@@ -273,9 +276,7 @@
 				data-marginRight={$showBalanceSheet}
 				style="margin-top: {$headerHeight}px"
 				class="scroll-smooth no-scrollbar
-					<!-- no hor scrollbar -->
 					overflow-x
-
 				"
 			>
 				<PlotController />
@@ -297,6 +298,15 @@
 			#plot_grid[data-marginRight='true'] {
 				/* This is for when the balanceSheet is being shown. */
 				margin-right: 224px;
+			}
+
+			html {
+				overflow: scroll;
+			}
+
+			::-webkit-scrollbar {
+				width: 0px;
+				background: transparent; /* make scrollbar transparent */
 			}
 		</style>
 	{/if}

@@ -11,9 +11,12 @@
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { fly, slide } from 'svelte/transition';
+	import { flyAndScale } from '$lib/utils.js';
 
 	export let x = 0;
 	export let y = 0;
+	export let open = false;
 	let searchQuery = '';
 	let PlotTypeOptions = options;
 	export let tooltip = '';
@@ -390,17 +393,12 @@
 	}
 </script>
 
-<Sheet.Root bind:open={$modifyPlotMenuOptions.visible}>
-	<!-- fill screen -->
+<Sheet.Root bind:open>
+	<Sheet.Trigger />
 	<Sheet.Content
-		class="overflow-scroll
-		h-full
-		absolute
-		top-0
-		right-0
-		
-	"
-		side="right"
+		class="overflow-scroll h-4/6 w-10/12 border-gray-500 border-r-2 fixed
+		"
+		side="bottom"
 	>
 		<Sheet.Header>
 			<Sheet.Title class="text-2xl font-bold">

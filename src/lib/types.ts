@@ -48,7 +48,7 @@ export type Game = {
         win: boolean;
     }
     tick: number;
-
+    overtime: boolean;
 }
 
 export type PlotOption = {

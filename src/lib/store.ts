@@ -89,6 +89,7 @@ export let startGameMenu = writable({
 
 export let unique = writable({});
 export let paused = writable(false);
+export let showScoreboard = writable(false);
 export let showBalanceSheet = writable(false);
 export let headerHeight = writable(250);
 export let speed = writable(500);

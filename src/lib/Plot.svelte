@@ -115,28 +115,29 @@
 	{#if data.type > -1}
 		<div>
 			<span data-size={options[data.type].requirements.size}
-				>{options[data.type].title}</span
+				>{options[data.type].title.substring(0, 2)}<br />{options[
+					data.type
+				].title.substring(2)}</span
 			>
-			<!-- <br />
-				<span>{data.x},{data.y}</span> -->
 		</div>
 	{/if}
 </div>
 
 <style>
 	.plot_container {
-		width: 100px;
-		height: 100px;
+		width: 120px;
+		height: 120px;
 		background-color: rgb(126, 158, 255);
-		text-align: center;
 		word-wrap: normal;
-		min-width: 100px;
+		min-width: 120px;
 		display: flex;
+		align-items: start;
 		justify-content: center;
 		align-items: center;
-
-		font-size: 0.8em;
-		padding: 6px;
+		font-size: 0.9em;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
 
 		/* no select */
 		-webkit-touch-callout: none; /* iOS Safari */
@@ -146,9 +147,6 @@
 		-ms-user-select: none; /* Internet Explorer/Edge */
 		user-select: none; /* Non-prefixed version, currently
                               supported by Chrome, Opera and Firefox */
-		box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		-webkit-box-sizing: border-box;
 	}
 	.plot_container[data-active='true'] {
 		background-color: rgb(89 89 239);
@@ -162,7 +160,6 @@
 	}
 
 	.plot_container[data-size='2'] {
-		/* border top and left */
 		border: none;
 	}
 

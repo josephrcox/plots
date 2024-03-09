@@ -35,18 +35,27 @@
 
 	function checkGameStatus(db) {
 		db = _fixVariables(db);
-		db = _checkGameLost(db);
-		db = _checkGameWin(db);
+		if (db.overtime == false) {
+			db = _checkGameLost(db);
+			db = _checkGameWin(db);
+		}
 		return db;
 	}
 
 	export function mainGameThreadLoop() {
 		DB.update((currentDB) => {
+			// currentDB.endGameDetails = null;
+			// currentDB.overtime = false;
+			// return currentDB;
 			currentDB.tick++;
 			if (currentDB.tick % GAME_TICK_SPEED !== 0) {
 				return currentDB;
 			}
-			if ($paused || !currentDB || currentDB.endGameDetails) {
+			if (
+				$paused ||
+				!currentDB ||
+				(currentDB.endGameDetails != null && currentDB.overtime == false)
+			) {
 				return currentDB;
 			}
 
@@ -110,6 +119,7 @@
 					z.endGameDetails = {
 						msg: winScenarios.land.win,
 						win: true,
+						still_playing: false,
 					};
 				}
 			}
@@ -124,6 +134,7 @@
 			z.endGameDetails = {
 				msg: messages.happiness_zero,
 				win: false,
+				still_playing: false,
 			};
 		}
 		if (z.townInfo.health <= 0) {
@@ -131,6 +142,7 @@
 			z.endGameDetails = {
 				msg: messages.health_zero,
 				win: false,
+				still_playing: false,
 			};
 		}
 		if (z.townInfo.population_count <= 0 && z.townInfo.population_max > 0) {
@@ -138,6 +150,7 @@
 			z.endGameDetails = {
 				msg: messages.population_zero,
 				win: false,
+				still_playing: false,
 			};
 		}
 		return z;
