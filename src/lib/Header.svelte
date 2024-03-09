@@ -12,8 +12,8 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 
-	let year = Math.floor($DB.environment.day / 365) + 1;
-	let day = $DB.environment.day % 365;
+	let year;
+	let day;
 	// change day and year whenever $DB.environment.day changes
 	export let stats = [];
 	$: {
@@ -22,7 +22,7 @@
 			$headerHeight = header.offsetHeight + 32;
 		}
 		year = Math.floor($DB.environment.day / 365) + 1;
-		day = $DB.environment.day % 365;
+		day = $DB.environment.day;
 		stats = [
 			{
 				label: 'Population',
@@ -205,10 +205,10 @@
 "
 >
 	<div
-		class="select-none flex flex-col bg-slate-300 border-b-2 border-black text-black p-3 border-r-20 rounded-lg w-10/12"
+		class="select-none flex flex-col justify-start align-left text-left bg-slate-300 border-b-2 border-black text-black p-3 border-r-20 rounded-lg w-10/12"
 		id="headerObject"
 	>
-		<div class="select-none flex justify-evenly items-center">
+		<div class="select-none flex justify-evenly">
 			<div>
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -223,14 +223,14 @@
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
-					class="text-xs flex flex-row gap-2 align-middle cursor-pointer hover:text-blue-600"
+					class="text-xs gap-2 cursor-pointer hover:text-blue-600"
 					on:click={toggleSpeed}
 				>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div>
+					<div class="flex flex-col">
 						<span>{speedMultiplier} speed</span>
-						<br />Day {day} Year {year}
+						<span>Day {day} ({year}y)</span>
 					</div>
 				</div>
 			</div>
@@ -238,19 +238,19 @@
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="
-			flex flex-col gap-1 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/3
+			flex flex-col gap-1 drop-shadow-md text-center pb-6 rounded-lg max-h-20 hover:max-h-48 transition-all ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/2
 			"
 				on:click={() => {
 					$DB.townLog = '';
 				}}
 			>
-				<div class="text-md cursor-pointer">🚨 Alerts</div>
+				<div class="text-md cursor-pointer">🚨 Alerts (scroll)</div>
 				{#if $DB.townLog.length > 0}
-					<div class="townLog text-xs text-start">
+					<div class="townLog text-xs text-center">
 						{$DB.townLog.split('\n')[0]}
 					</div>
 					{#each $DB.townLog.split('\n').slice(1, 300) as line}
-						<span class="townLog text-xs text-start cursor-pointer">
+						<span class="townLog text-xs text-center cursor-pointer">
 							{line}
 						</span>
 					{/each}
@@ -262,9 +262,13 @@
 			</div>
 			<div class="">
 				<!-- minimal range for tax rate with a number above representing the tax -->
-				<div class=" p-2 rounded-lg m-3 text-center">
+				<div class=" pb-2 rounded-lg text-center">
 					<div class="text-sm">
-						Tax Rate ({roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%)
+						<span class="text-slate-500">Tax Rate</span>
+
+						<span class="text-sm text-gray-700"
+							>({roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%)</span
+						>
 					</div>
 					<input
 						type="range"
