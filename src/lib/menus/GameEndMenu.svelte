@@ -10,7 +10,7 @@
 			show = true;
 			console.log($DB.endGameDetails, $DB.overtime);
 		} else {
-			show = true;
+			show = false;
 		}
 	}
 
