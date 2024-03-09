@@ -396,7 +396,7 @@
 <Sheet.Root bind:open>
 	<Sheet.Trigger />
 	<Sheet.Content
-		class="overflow-scroll h-4/6 w-10/12 border-gray-500 border-r-2 fixed
+		class="overflow-scroll h-4/6 w-12/12 border-gray-500 border-r-2 fixed
 		"
 		side="bottom"
 	>
@@ -538,7 +538,7 @@
 										</p>
 									{/if}
 									{#if option.requirements.employees !== 0}
-										<p class="text-sm">
+										<p class="text-xs">
 											{option.requirements.employees} employees
 											<span class="text-xs"
 												>({roundTo(

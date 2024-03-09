@@ -71,7 +71,7 @@
 							value={selectedGameMode}
 							on:change={setSelectedGameMode}
 						>
-							<option value="land">Fill up the grid</option>
+							<option value="land">{winScenarios.land.short_title}</option>
 							<option value="political">Rule the world through politics</option>
 						</select>
 					</div>

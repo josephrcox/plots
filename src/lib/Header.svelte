@@ -83,7 +83,7 @@
 			},
 			{
 				label: 'Tourism 💰',
-				value: $DB.townInfo.gold_from_tourism,
+				value: roundTo($DB.townInfo.gold_from_tourism, 0),
 				tap: () => {
 					transferFundsFromBank();
 				},

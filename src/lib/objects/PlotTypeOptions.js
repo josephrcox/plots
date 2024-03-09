@@ -363,7 +363,7 @@ export const options = [
 		description: 'Generates tourism gold that can be used if you have a bank.',
 		revenue_per_week: 0,
 		enables_tourism: true,
-		tourism_revenue_per_week: 15, // this is per citizen!
+		tourism_revenue_per_week: 1, // this is per citizen!
 		requirements: {
 			gold: 1500,
 			plots: [],
