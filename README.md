@@ -1,7 +1,5 @@
-# plots
- 
-## TLDR
-Plots is a zoning management game where you scale an area to house more people with varied businesses and city services. Inspired by incremental games and board games like Monopoly.  
+#### TLDR
+Plots is a zoning management game with an emphasis on a basic plot grid system. You can build homes, businesses, and special plots to grow your city toward different objectives.
 
 # How to play
 ## Fundamentals
