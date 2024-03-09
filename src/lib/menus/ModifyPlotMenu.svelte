@@ -4,7 +4,13 @@
 	import { ACTIVE_GAME_DB_NAME, DB, modifyPlotMenuOptions } from '../store.ts';
 	import { options } from '../objects/PlotTypeOptions.js';
 	import gameClock from '../gameClock.svelte';
-	import { Game, PlotOption } from '../objects/defaults/types.js';
+	import { Game, PlotOption } from '../types.js';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Separator } from '$lib/components/ui/separator';
+	import * as Sheet from '$lib/components/ui/sheet';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 
 	export let x = 0;
 	export let y = 0;
@@ -12,27 +18,28 @@
 	let PlotTypeOptions = options;
 	export let tooltip = '';
 
-	let searchInput: HTMLInputElement;
+	let searchInput: any;
 	let totalAffordableOptionsCount: number;
-
-	onMount(async () => {
-		await tick(); // Ensures that DOM has been updated
-		if (searchInput) {
-			searchInput.focus();
-		}
-	});
 
 	let reactiveOptions: PlotOption[] = PlotTypeOptions.map(
 		(option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
+			selected: isSelected(option),
 		}),
 	);
+
+	function firstEmoji(s: string): string | null {
+		const regex = /\p{Emoji}/u;
+		const match = regex.exec(s);
+		return match ? match[0] : null;
+	}
 
 	$: if ($DB) {
 		reactiveOptions = PlotTypeOptions.map((option: PlotOption | any) => ({
 			...option,
 			affordable: checkIfAffordable(option, $DB),
+			selected: isSelected(option),
 		}));
 	}
 
@@ -45,17 +52,21 @@
 	).length;
 
 	function handleInput(event: any) {
-		console.log(event.target.value);
 		searchQuery = (event.target.value as string) || '';
-		// event.stopPropagation(); // This will stop the event from propagating further
+	}
+
+	function isSelected(option: PlotOption) {
+		return $DB.plots[x][y].type > -1
+			? PlotTypeOptions[$DB.plots[x][y].type].id === option.id
+			: false;
+		return false;
 	}
 
 	onMount(() => {
 		const plotOptions = document.querySelectorAll('.plotOption');
 		if ($DB.plots[x][y].type !== -1 && $DB.plots[x][y].type > -1) {
-			plotOptions[$DB.plots[x][y].type].classList.add('active');
-			// scroll to the active plot option
-			plotOptions[$DB.plots[x][y].type].scrollIntoView({
+			plotOptions[$DB.plots[x][y]].classList.add('active');
+			plotOptions[$DB.plots[x][y]].scrollIntoView({
 				behavior: 'smooth',
 				block: 'center',
 			});
@@ -381,11 +392,6 @@
 		return requirementsMet;
 	}
 
-	function hasABank() {
-		// returns if there is a bank
-		return $DB.hasBank;
-	}
-
 	function handlePlotOptionClick(event: any) {
 		const plotOption = event.target.closest('.plotOption');
 		if (plotOption) {
@@ -395,192 +401,200 @@
 	}
 </script>
 
-<div class="dialog">
-	<div class="dialog-content">
-		<div class="header">
-			<div>
-				<span class="heading_l">Modify Plot: {y + 1}-{x + 1}</span>
-				{#if tooltip !== ''}
-					<div class="message">{tooltip}</div>
-				{/if}
-			</div>
-			<input
+<Sheet.Root bind:open={$modifyPlotMenuOptions.visible}>
+	<!-- fill screen -->
+	<Sheet.Content
+		class="overflow-scroll
+		h-full
+		absolute
+		top-0
+		right-0
+		
+	"
+		side="right"
+	>
+		<Sheet.Header>
+			<Sheet.Title class="text-2xl font-bold">
+				<span class="text-2xl font-bold"></span>Set Plot: {y + 1}-{x + 1}
+				<span class="text-sm"> (press esc to close)</span></Sheet.Title
+			>
+			{#if tooltip !== ''}
+				<Sheet.Description class="text-sm">{tooltip}</Sheet.Description>
+			{/if}
+		</Sheet.Header>
+		<div class="flex mt-4">
+			<Input
 				type="text"
 				id="search-bar"
 				placeholder="Search Plot Options..."
 				value={searchQuery}
 				on:input={handleInput}
 				bind:this={searchInput}
+				class="border rounded w-auto"
 			/>
-
-			<div>
-				{#if $DB.plots[x][y].type !== -1 && canBulldoze(y, x)}
-					<button on:click={clearPlot} id="bulldoze">🔥</button>
+			<div class="flex justify-end ml-6">
+				{#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
+					<button
+						on:click={clearPlot}
+						id="bulldoze"
+						class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
+						>🔥 Bulldoze</button
+					>
 				{/if}
-				<button on:click={close} id="close">Close</button>
 			</div>
-		</div>
-		<div class="scrollable-y">
-			<label for="plotType"
-				>options
-				{#if totalAffordableOptionsCount > 0}
-					<span class="text_s">({totalAffordableOptionsCount})</span>
-				{/if}
-				<!-- show plot options that are affordable -->
-				{#if reactiveOptions.length == 0}
-					<span class="text_s">(0)</span>
-				{/if}
+			<label for="plotType" class="text-xs ml-4 gap-2">
+				<span class="mb-10">Quick scroll</span>
+				<div>
+					{#if reactiveOptions.length > 0}
+						{#each reactiveOptions as option}
+							{#if option.affordable}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<!-- svelte-ignore a11y-no-static-element-interactions -->
+								<span
+									class="text-xl cursor-pointer hover:bg-slate-300 rounded-lg p-1"
+									on:click={() => {
+										const op = document.querySelector(
+											`[data-plotoptionid="${option.id}"]`,
+										);
+										if (op) {
+											op.scrollIntoView({
+												behavior: 'smooth',
+												block: 'center',
+											});
+										}
+									}}>{firstEmoji(option.title)}</span
+								>
+							{/if}
+						{/each}
+					{:else}
+						No options
+					{/if}
+				</div>
 			</label>
-			<br />
-			<br />
-			<div class="plotOptions" on:click={handlePlotOptionClick}>
+		</div>
+		<Separator class="my-4" />
+		<div class="scrollable-y">
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<div
+				class="plotOptions grid grid-flow-row grid-cols-2
+					<!-- on big width, use 3 columns -->
+					lg:grid-cols-3
+				flex-auto flex-grid gap-6 mt-4
+				"
+				on:click={handlePlotOptionClick}
+			>
 				{#each reactiveOptions as option (option.id)}
-					<!-- Sort the options to show affordable ones first -->
 					<div
-						class="plotOption background-lightgray {option.affordable
-							? ''
-							: 'unaffordable'}"
-						data-active={option.selected}
-						data-affordable={option.affordable}
-						data-plotOptionID={option.id}
+						class="plotOption min-w-min overflow-x-auto
+						{!option.affordable ? 'unaffordable cursor-not-allowed' : 'cursor-pointer'}
+					border rounded-md p-4 mb-4
+						{option.selected ? 'bg-teal-900' : ''}
+					"
+						data-plotoptionid={option.id}
 					>
 						<div>
-							<span class="heading_m">{option.title}</span>
-							<br />
-							<span class="subheading_m">{option.subtitle}</span>
-							<br />
-							<span class="text_s">{option.description}</span>
-						</div>
+							<h2 class="text-md font-semibold">
+								{option.title}
+								<span class="text-xs font-light italic opacity-50"
+									>{option.subtitle}</span
+								>
+							</h2>
 
-						<div class="bottom">
+							<p class="text-xs opacity-75">{option.description}</p>
+						</div>
+						<div class="mt-4">
 							{#if option.revenue_per_week > 0 || option.tourism_revenue_per_week > 0}
 								<div class="profits">
-									<span class="subheading_m">Profits</span>
-									<br />
+									<span class="text-sm font-semibold">Profits</span>
 									{#if option.revenue_per_week > 0}
-										<span class="text_s gold"
-											><span class="strikethrough"
-												>{option.revenue_per_week}</span
-											>
-											{roundTo(
-												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
-												2,
-											)} gold (with tax rate)</span
-										>
-										<br />
+										<p class="text-sm">
+											Profit with Tax Rate:
+											<!-- strikethrough -->
+											<span class="line-through text-xs">
+												{roundTo(option.revenue_per_week * 1, 2)}
+											</span>
+											<span class=" text-xs">
+												({roundTo(
+													$DB.economyAndLaws.tax_rate * option.revenue_per_week,
+													2,
+												)} gold)
+											</span>
+										</p>
 									{/if}
 									{#if option.tourism_revenue_per_week > 0}
-										<span class="text_s gold"
-											><span class="strikethrough"
-												>{option.tourism_revenue_per_week}</span
-											>
-											{roundTo(
+										<p class="text-xs">
+											Tourism Revenue: {option.tourism_revenue_per_week}
+										</p>
+										<p class="text-xs">
+											Taxed Tourism Revenue: {roundTo(
 												$DB.economyAndLaws.tax_rate *
 													option.tourism_revenue_per_week *
 													$DB.townInfo.population_count,
 												2,
-											)} tourism gold (
-											{#if $DB.hasABank !== true}
-												get a bank to cash out
-											{/if}
-
-											)</span
-										>
+											)} gold
+										</p>
 									{/if}
 								</div>
 							{/if}
-							<div class="reqs_and_mods">
+							<div
+								class="reqs_and_mods mt-4 flex flex-row justify-between gap-2"
+							>
 								<div>
-									<span class="subheading_m">Requirements</span>
-									<br />
+									<span class="text-sm font-semibold">Requirements</span>
 									{#if option.requirements.gold !== 0}
-										{#if $DB.townInfo.gold < option.requirements.gold}
-											<span class="red text_s cost_label"
-												>{option.requirements.gold} gold</span
+										<p class="text-xs">
+											{option.requirements.gold} gold
+											<span class="text-xs"
+												>({roundTo($DB.townInfo.gold, 0)})</span
 											>
-										{:else}
-											<span class="text_s cost_label"
-												>{option.requirements.gold} gold</span
-											>
-										{/if}
-										<br />
+										</p>
 									{/if}
-
 									{#if option.requirements.employees !== 0}
-										{#if $DB.townInfo.population_count - $DB.townInfo.employees < option.requirements.employees}
-											<span class="text_s cost_label red"
-												>{option.requirements.employees} employees
-											</span>
-										{:else}
-											<span class="text_s cost_label"
-												>{option.requirements.employees} employees
-											</span>
-										{/if}
-										<br />
+										<p class="text-sm">
+											{option.requirements.employees} employees
+											<span class="text-xs"
+												>({roundTo(
+													$DB.townInfo.population_count -
+														$DB.townInfo.employees,
+													0,
+												)})</span
+											>
+										</p>
 									{/if}
-
 									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
-										{#if $DB.townInfo.knowledge_points < option.requirements.knowledge}
-											<span class="text_s cost_label red"
-												>{option.requirements.knowledge} knowledge
-											</span>
-										{:else}
-											<span class="text_s cost_label"
-												>{option.requirements.knowledge} knowledge
-											</span>
-										{/if}
-										<br />
+										<p class="text-xs">
+											{option.requirements.knowledge} knowledge
+										</p>
 									{/if}
 								</div>
 								<div>
-									<span class="subheading_m">Multiplier</span>
-									<br />
-									<!-- {JSON.stringify(option.effect_modifiers)} -->
-									{#if option.effect_modifiers.happiness == 1.0}
-										<span class="text_s" data-positive="true">😁 No effect</span
-										>
-									{:else}
-										<span
-											class="text_s"
-											data-positive={option.effect_modifiers.happiness >= 1}
-											>😁 {formatNumber(
-												option.effect_modifiers.happiness,
-											)}</span
-										>
-									{/if}
-									<br />
-									{#if option.effect_modifiers.health == 1.0}
-										<span class="text_s" data-positive="true">🏥 No effect</span
-										>
-									{:else}
-										<span
-											class="text_s"
-											data-positive={option.effect_modifiers.health >= 1}
-											>🏥 {formatNumber(option.effect_modifiers.health)}</span
-										>
-									{/if}
+									<span class="text-sm font-semibold">Multiplier</span>
+									<p class="text-xs">
+										Happiness: {option.effect_modifiers.happiness == 1.0
+											? 'No effect'
+											: formatNumber(option.effect_modifiers.happiness)}
+									</p>
+									<p class="text-xs">
+										Health: {option.effect_modifiers.health == 1.0
+											? 'No effect'
+											: formatNumber(option.effect_modifiers.health)}
+									</p>
 								</div>
 							</div>
 							{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
-								<div class="immediate_changes">
-									<span class="subheading_m"
-										>Instant changes:
-										{#if option.immediate_variable_changes.happiness !== 0}
-											😁
-											<span class="green"
-												>{option.immediate_variable_changes.happiness}</span
-											>
-										{/if}
-										{#if option.immediate_variable_changes.happiness !== 0 && option.immediate_variable_changes.health !== 0}
-											,
-										{/if}
-										{#if option.immediate_variable_changes.health !== 0}
-											🏥
-											<span class="green"
-												>{option.immediate_variable_changes.health}</span
-											>
-										{/if}
-									</span>
+								<div class="immediate_changes mt-4">
+									<span class="text-sm font-semibold">Instant changes</span>
+									{#if option.immediate_variable_changes.happiness !== 0}
+										<p class="text-xs">
+											Happiness: {option.immediate_variable_changes.happiness}
+										</p>
+									{/if}
+									{#if option.immediate_variable_changes.health !== 0}
+										<p class="text-xs">
+											Health: {option.immediate_variable_changes.health}
+										</p>
+									{/if}
 								</div>
 							{/if}
 						</div>
@@ -588,133 +602,11 @@
 				{/each}
 			</div>
 		</div>
-	</div>
-</div>
+	</Sheet.Content>
+</Sheet.Root>
 
 <style>
-	#search-bar {
-		width: 100%;
-		padding: 0.5em;
-		margin-bottom: 1em;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-	}
-	.plotOptions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		justify-content: center;
-		padding-bottom: 100px;
-	}
-
-	.plotOption {
-		border: 1px solid rgb(123, 114, 101);
-		width: 12em;
-		height: 15em;
-		min-width: 12em;
-		padding: 5px;
-		background-color: rgb(0, 0, 0);
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-	}
-
-	.header {
-		display: flex;
-		flex-direction: row;
-		padding-bottom: 10px;
-		border-bottom: 1px solid #393939;
-		margin-bottom: 10px;
-		justify-content: space-between;
-		flex: 0 0 25em;
-	}
-
-	.header > div {
-		display: flex;
-		flex-direction: column;
-		flex: 30% 0 0;
-		text-align: center;
-	}
-
-	/* last child on header */
-	.header > div:last-child {
-		text-align: end;
-		display: block;
-	}
-
-	#close,
-	#bulldoze {
-		width: fit-content;
-	}
-
-	.immediate_changes,
-	.reqs_and_mods,
-	.profits {
-		border-top: 1px solid rgb(118, 109, 97);
-		padding-top: 2px;
-		padding-bottom: 2px;
-		padding-left: 3px;
-		padding-right: 3px;
-	}
-
-	.bottom {
-		background-color: rgb(43, 47, 49);
-	}
-
-	.dialog {
-		position: fixed;
-		bottom: 0;
-		right: 0;
-		margin-right: 10px;
-		display: flex;
-		z-index: 10;
-		max-width: 80%;
-	}
-
-	.dialog-content {
-		background: rgb(56 72 108);
-		padding: 1em;
-		border-top-right-radius: 0.5em;
-		box-shadow: 0 0 100px rgba(45, 35, 35, 1);
-		height: 70vh;
-		min-width: 98%;
-	}
-
-	.scrollable-y {
-		overflow-y: scroll;
-		height: 95%;
-		/* no scrollbar */
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-	}
-
-	.cost_label {
-		color: rgb(114, 255, 114);
-		font-size: 12px;
-	}
-	.reqs_and_mods {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 7px;
-	}
-	.reqs_and_mods > div:first-child {
-		border-right: 1px solid rgb(118, 109, 97);
-		padding-right: 5px;
-	}
-	.reqs_and_mods > div:nth-child(2) {
-		padding-left: 5px;
-	}
-	.reqs_and_mods > div {
-		width: 50%;
-	}
-	/* data-positive */
-	[data-positive='true'] {
-		color: rgb(114, 255, 114);
-	}
 	.unaffordable {
 		opacity: 0.3;
-	}
-	[data-positive='false'] {
-		color: #ff5050;
 	}
 </style>

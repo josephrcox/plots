@@ -79,3 +79,17 @@ export type PlotOption = {
     affordable: boolean | null;
     selected: boolean | null;
 }
+
+export type WinScenario = {
+    short_title: string;
+    description_title: string;
+    win: string;
+    requirements: {
+        [key: string]: {
+            population_count: number;
+            happiness: number;
+            health: number;
+            employment: number;
+        }
+    }
+}

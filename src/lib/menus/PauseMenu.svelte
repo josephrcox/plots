@@ -1,6 +1,23 @@
 <script lang="ts">
 	// @ts-ignore
-	import { DB, clearDB } from '../store.ts';
+	import { DB, clearDB, paused } from '../store.ts';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { winScenarios } from '../objects/WinScenarios.js';
+	import { difficulty_options } from '../objects/difficulty.js';
+
+	const scenarios: any = winScenarios;
+	const endGoal = scenarios[$DB.endGoal];
+	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
+
+	let dbInitialized = false;
+	$: if ($DB) {
+		dbInitialized = true;
+	} else {
+		dbInitialized = false;
+	}
 
 	function saveGame() {
 		const data = JSON.stringify($DB);
@@ -44,22 +61,93 @@
 	}
 </script>
 
-<div class="dialog">
-	<div class="dialog-content">
-		The game is paused!
-		<br />
-		Load file:
-		<input type="file" id="upload" on:change={loadGame} />
-		<br />
-		Backup save:
-		<button id="save" on:click={saveGame}>Save</button>
-		<br />
-		Unpause the game by pressing P
-		<br />
-		<br />
-		Reset the game by pressing SHIFT+ESC
-	</div>
-</div>
+<Dialog.Root bind:open={$paused}>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Pause Menu</Dialog.Title>
+			<Dialog.Description>
+				{endGoal.description_title}
+			</Dialog.Description>
+		</Dialog.Header>
+		<div class="gap-0 py-0 text-gray-400">
+			{#if $DB.endGoal == 'land'}
+				<div class="text-base leading-relaxed">
+					With your difficulty ({difficulty}), you must also have:
+				</div>
+				<ul class="list-inside list-disc text-base leading-relaxedmt-0">
+					<li>
+						{#if $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].population_count}
+							✅
+						{:else}
+							❌
+						{/if}
+						Population: {JSON.stringify(
+							endGoal.requirements[$DB.difficulty].population_count,
+						)} - Currently at {JSON.stringify($DB.townInfo.population_count)}
+					</li>
+					<li>
+						{#if $DB.townInfo.happiness >= endGoal.requirements[$DB.difficulty].happiness}
+							✅
+						{:else}
+							❌
+						{/if}
+						Happiness: {JSON.stringify(
+							endGoal.requirements[$DB.difficulty].happiness,
+						)} - Currently at {JSON.stringify($DB.townInfo.happiness)}
+					</li>
+					<li>
+						{#if $DB.townInfo.health >= endGoal.requirements[$DB.difficulty].health}
+							✅
+						{:else}
+							❌
+						{/if}
+						Health: {JSON.stringify(
+							endGoal.requirements[$DB.difficulty].health,
+						)} - Currently at {JSON.stringify($DB.townInfo.health)}
+					</li>
+					<li>
+						{#if $DB.townInfo.employees / $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].employment}
+							✅
+						{:else}
+							❌
+						{/if}
+						Employment: {JSON.stringify(
+							endGoal.requirements[$DB.difficulty].employment * 100,
+						)}% - Currently at {JSON.stringify(
+							($DB.townInfo.employees / $DB.townInfo.population_count || 0) *
+								100,
+						)}%
+					</li>
+				</ul>
+			{/if}
+		</div>
+		<Dialog.Footer>
+			<div class="flex flex-col gap-3">
+				<div class="flex gap-10">
+					<Label
+						for="saveButton"
+						class="cursor-pointer bg-blue-600 rounded-md text-center p-2.5 hover:bg-blue-700 justify-center flex 
+					">Save game</Label
+					>
+					<Button
+						class="
+					bg-blue-600 hover:bg-blue-700 hidden
+					"
+						id="saveButton"
+						on:click={() => saveGame()}>Save</Button
+					>
+
+					<Label
+						for="upload"
+						class="cursor-pointer bg-blue-600 rounded-md text-center p-2.5 hover:bg-blue-700 justify-center flex 
+					">Upload game</Label
+					>
+					<Input class="hidden" type="file" on:change={loadGame} id="upload" />
+				</div>
+			</div>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
 
 <style>
 	.dialog {

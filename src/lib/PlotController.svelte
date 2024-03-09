@@ -2,7 +2,13 @@
 	import { onMount } from 'svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
-	import { DB, modifyPlotMenuOptions, unique, paused } from './store';
+	import {
+		DB,
+		modifyPlotMenuOptions,
+		unique,
+		paused,
+		headerHeight,
+	} from './store';
 	$: if ($DB) {
 		checkForAvailablePlots();
 	}
@@ -72,8 +78,10 @@
 </script>
 
 {#if $DB != null}
-	<div class="grid">
+	<div class="grid overflow-x-scroll">
 		{#each $DB.plots as plotRow}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div class="row" on:click={restartModifyPlotMenu}>
 				{#each plotRow as plot}
 					<Plot

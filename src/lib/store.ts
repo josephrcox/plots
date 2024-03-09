@@ -1,8 +1,10 @@
 import { writable } from 'svelte/store';
 // @ts-ignore
-import { default_db, difficulties } from './objects/defaults/default_db';
+import { default_db, difficulties } from './objects/defaults/default_DB.js'
 // @ts-ignore
-import { Difficulty, EndGoal } from './lib/objects/types';
+import { Difficulty, EndGoal } from './types';
+// @ts-ignore
+import { max_tax_rates_based_on_difficulty } from './objects/difficulty.js';
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -11,16 +13,31 @@ export const ACTIVE_GAME_DB_NAME = 'plots_active_game_db';
 //// challenge history, and such.
 export const USER_DB_NAME = 'plots_user_db';
 
+function generateRandomTownName(): string {
+    const firstPart = ["Green", "River", "Mountain", "North", "South", "East", "West", "Lake", "Forest", "Spring", "Golden", "Silver", "Crystal", "Sun", "Moon", "Star", "Valley", "Pine", "Maple", "Oak", "Wild", "Misty", "Rainbow", "Snow", "Summer", "Autumn", "Winter", "Thunder", "Storm", "Crystal", "Diamond"];
+    const secondPart = ["wood", "ville", "town", "field", "ford", "brook", "hill", "dale", "bury", "port", "view", "crest", "meadow", "side", "grove", "haven", "crossing", "junction", "landing", "ridge", "summit", "slope", "strand", "creek", "isle", "glen", "bay", "harbor", "glade", "peak", "plateau"];
+
+    const randomFirstPart = firstPart[Math.floor(Math.random() * firstPart.length)];
+    const randomSecondPart = secondPart[Math.floor(Math.random() * secondPart.length)];
+
+    return `${randomFirstPart}${randomSecondPart}`;
+}
+
+
 // Define your DB store at the top
 export let DB = writable(
 	JSON.parse(localStorage.getItem(ACTIVE_GAME_DB_NAME) || 'null'),
 );
 
-export function startGame(difficulty : Difficulty, endGoal : EndGoal ) {
+export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string) {
 	let json = { ...default_db }; // Use a copy of default_db
-	json.economyAndLaws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
+	json.economyAndLaws.max_tax_rate = max_tax_rates_based_on_difficulty[difficulty];
+	console.log(json.economyAndLaws.max_tax_rate);
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
 	let default_plots = [] as any[][]; 
+	// remove leading and trailing spaces, remove symbols other than nunbers and letters
+	townName = townName.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+	json.townInfo.name = townName != '' ? townName : generateRandomTownName();
 	const randomSize =
 		difficulty == '0'
 			? 6
@@ -42,6 +59,7 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal ) {
 		}
 	}
 
+	paused.set(false);
 	json.plots = default_plots;
 	localStorage.reset = false;
 	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
@@ -65,10 +83,15 @@ export let modifyPlotMenuOptions = writable({
 	y: 0,
 });
 
+export let startGameMenu = writable({
+	visible: false,
+});
+
 export let unique = writable({});
 export let paused = writable(false);
 export let showBalanceSheet = writable(false);
-export let speed = writable(2000);
+export let headerHeight = writable(250);
+export let speed = writable(500);
 export let showUnaffordablePlotOptions = writable(
 	localStorage.getItem('showUnaffordablePlotOptions') === 'true' ? true : false,
 );

@@ -12,6 +12,8 @@
 		DB,
 		clearDB,
 		modifyPlotMenuOptions,
+		startGameMenu,
+		headerHeight,
 		// @ts-ignore
 	} from './lib/store.ts';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
@@ -21,8 +23,10 @@
 	let dbInitialized = false;
 
 	$: if ($DB) {
+		$startGameMenu.visible = false;
 		dbInitialized = true;
 	} else {
+		$startGameMenu.visible = true;
 		dbInitialized = false;
 	}
 
@@ -184,7 +188,6 @@
 
 			plots.forEach((plot) => {
 				plot.classList.remove('selected');
-				plot.style.border = 'none';
 				plot.style.fontWeight = '';
 			});
 			// Highlight a plot when it's clicked on
@@ -247,23 +250,31 @@
 		<Header />
 		<GameClock />
 		<GameLostMenu />
-		<div class="plot_grid" data-marginRight={$showBalanceSheet}>
-			<PlotController />
-			<br />
-			outside of city
+		<div
+			class="justify-center text-center
+		
+			align-middle
+			<!-- center horiz -->
+			flex
+			
+		"
+		>
+			<div
+				id="plot_grid"
+				data-marginRight={$showBalanceSheet}
+				style="margin-top: {$headerHeight}px "
+			>
+				<PlotController />
+				<br />
+			</div>
 		</div>
 
 		<style>
-			.plot_grid {
-				max-width: 300%;
-				max-height: 300%;
+			#plot_grid {
 				overflow-x: scroll;
 				overflow-y: scroll;
-				width: 300%;
-				height: 300vh;
-				margin-top: 175px;
 			}
-			.plot_grid[data-marginRight='true'] {
+			#plot_grid[data-marginRight='true'] {
 				/* This is for when the balanceSheet is being shown. */
 				margin-right: 224px;
 			}
