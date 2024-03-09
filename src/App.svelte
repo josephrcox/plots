@@ -271,7 +271,12 @@
 			<div
 				id="plot_grid"
 				data-marginRight={$showBalanceSheet}
-				style="margin-top: {$headerHeight}px "
+				style="margin-top: {$headerHeight}px"
+				class="scroll-smooth no-scrollbar
+					<!-- no hor scrollbar -->
+					overflow-x
+
+				"
 			>
 				<PlotController />
 				<br />
@@ -282,7 +287,13 @@
 			#plot_grid {
 				overflow-x: scroll;
 				overflow-y: scroll;
+				scroll-behavior: smooth;
 			}
+			/* no visible scrollbars */
+			#plot_grid::-webkit-scrollbar {
+				display: none;
+			}
+
 			#plot_grid[data-marginRight='true'] {
 				/* This is for when the balanceSheet is being shown. */
 				margin-right: 224px;

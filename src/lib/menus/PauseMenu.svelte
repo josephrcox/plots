@@ -19,6 +19,27 @@
 		dbInitialized = false;
 	}
 
+	async function callWebhook() {
+		const url =
+			'https://hooks.zapier.com/hooks/catch/9593735/30t8u16/?test=true&name=joe';
+		const data = {
+			...$DB,
+			difficulty: difficulty,
+			endGoal: endGoal,
+		};
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		});
+		const json = await response.json();
+		console.log(json);
+	}
+
+	callWebhook();
+
 	function saveGame() {
 		const data = JSON.stringify($DB);
 		const blob = new Blob([data], { type: 'text/plain' });
