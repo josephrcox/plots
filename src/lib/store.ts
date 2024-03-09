@@ -3,6 +3,8 @@ import { writable } from 'svelte/store';
 import { default_db, difficulties } from './objects/defaults/default_DB.js'
 // @ts-ignore
 import { Difficulty, EndGoal } from './types';
+// @ts-ignore
+import { max_tax_rates_based_on_difficulty } from './objects/difficulty.js';
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -29,7 +31,8 @@ export let DB = writable(
 
 export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string) {
 	let json = { ...default_db }; // Use a copy of default_db
-	json.economyAndLaws.max_tax_rate = Math.random() * (0.5 - 0.2) + 0.2;
+	json.economyAndLaws.max_tax_rate = max_tax_rates_based_on_difficulty[difficulty];
+	console.log(json.economyAndLaws.max_tax_rate);
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
 	let default_plots = [] as any[][]; 
 	// remove leading and trailing spaces, remove symbols other than nunbers and letters

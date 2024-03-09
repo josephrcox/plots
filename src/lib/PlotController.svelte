@@ -78,7 +78,7 @@
 </script>
 
 {#if $DB != null}
-	<div class="grid">
+	<div class="grid overflow-x-scroll">
 		{#each $DB.plots as plotRow}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->

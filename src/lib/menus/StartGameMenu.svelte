@@ -31,17 +31,24 @@
 <Dialog.Root bind:open={$startGameMenu.visible}>
 	<Dialog.Content transition={flyAndScale}>
 		<Dialog.Header>
-			<Dialog.Title class="mb-4">Welcome to Plots!</Dialog.Title>
+			<Dialog.Title>Welcome to Plots!</Dialog.Title>
 			<Dialog.Description>
-				<div class="flex flex-col justify-center gap-5">
+				<a
+					href="https://github.com/josephrcox/plots"
+					class="text-blue-500 text-sm mb-4 hover:underline"
+				>
+					GitHub</a
+				>
+
+				<div class="flex flex-col justify-center gap-5 mt-4">
 					<div>
 						<Label for="difficulty" class="mt-2">Select a difficulty</Label>
 						<select
 							id="difficulty"
 							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 						>
-							<option value="0">Easy (quick game)</option>
-							<option value="1" selected>Normal (longer game)</option>
+							<option value="0" selected>Easy (quick game)</option>
+							<option value="1">Normal (longer game)</option>
 							<option value="2">Hard (longest game)</option>
 						</select>
 					</div>

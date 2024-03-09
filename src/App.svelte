@@ -188,7 +188,6 @@
 
 			plots.forEach((plot) => {
 				plot.classList.remove('selected');
-				plot.style.border = 'none';
 				plot.style.fontWeight = '';
 			});
 			// Highlight a plot when it's clicked on
@@ -252,12 +251,22 @@
 		<GameClock />
 		<GameLostMenu />
 		<div
-			id="plot_grid"
-			data-marginRight={$showBalanceSheet}
-			style="margin-top: {$headerHeight}px"
+			class="justify-center text-center
+		
+			align-middle
+			<!-- center horiz -->
+			flex
+			
+		"
 		>
-			<PlotController />
-			<br />
+			<div
+				id="plot_grid"
+				data-marginRight={$showBalanceSheet}
+				style="margin-top: {$headerHeight}px "
+			>
+				<PlotController />
+				<br />
+			</div>
 		</div>
 
 		<style>

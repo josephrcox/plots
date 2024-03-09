@@ -89,8 +89,12 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="plot_container"
+	class="plot_container {data.type == -1 && canBeUpgraded == false
+		? 'border-slate-500 border-dashed border'
+		: ''}"
 	data-active={data.active}
 	data-id={data.id}
 	data-x={data.x}
@@ -150,8 +154,7 @@
 		background-color: rgb(89 89 239);
 	}
 	.plot_container[data-canBeUpgraded='false'] {
-		background-color: rgb(64, 64, 64);
-		border: none;
+		background-color: rgb(21 28 41);
 	}
 	.plot_container[data-type='-2'] {
 		background-color: #ffff00;

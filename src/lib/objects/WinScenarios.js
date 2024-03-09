@@ -3,7 +3,7 @@ export const winScenarios = {
 		short_title: 'Fill the grid',
 		description_title:
 			'You win by filling up all possible plots in the grid, and by meeting some requirements.',
-		win: 'You have filled the grid with buildings. You win!',
+		win: 'You have filled the grid with buildings and met the requirements. Your citizens are happy, fulfilled, hard-working, and healthy. ',
 		requirements: {
 			0: {
 				population_count: 110,

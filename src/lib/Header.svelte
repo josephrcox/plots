@@ -12,9 +12,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 
-	let balanceSheetComponent;
-	let showCityHallControls = false;
-
 	let year = Math.floor($DB.environment.day / 365) + 1;
 	let day = $DB.environment.day % 365;
 	// change day and year whenever $DB.environment.day changes
@@ -22,7 +19,7 @@
 	$: {
 		const header = document.getElementById('headerObject');
 		if (header) {
-			$headerHeight = header.offsetHeight;
+			$headerHeight = header.offsetHeight + 32;
 		}
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = $DB.environment.day % 365;
@@ -73,7 +70,6 @@
 			{
 				label: 'Gold',
 				value: roundTo($DB.townInfo.gold, 0),
-				// $DB.economy_and_laws.last_month_profit
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs
@@ -156,9 +152,13 @@
 		if (digits === undefined) {
 			digits = 0;
 		}
+		if (n == null || n == undefined) {
+			return 0;
+		}
 
 		n = parseFloat((n * Math.pow(10, digits)).toFixed(11));
 		var test = Math.round(n) / Math.pow(10, digits);
+
 		return +test.toFixed(digits);
 	}
 
@@ -190,110 +190,119 @@
 				break;
 		}
 	});
-
-	let intervalId;
 </script>
 
 <div
-	class="select-none flex flex-col bg-slate-800 fixed top-0 left-0 w-screen text-slate-400 pb-3 px-3"
-	id="headerObject"
+	class="
+	<!-- center horizontally -->
+	flex justify-center
+	text-center
+	p-3
+	fixed
+	top-0
+	left-0
+	right-0
+"
 >
-	<div class="select-none flex justify-evenly items-center">
-		<div>
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div
-				class="text-2xl font-bold cursor-pointer
-				 text-emerald-400"
-				id="townName"
-				on:click={changeName}
-			>
-				{$DB.townInfo.name}
-			</div>
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div
-				class="text-xs flex flex-row gap-2 align-middle cursor-pointer hover:text-white"
-				on:click={toggleSpeed}
-			>
+	<div
+		class="select-none flex flex-col bg-slate-300 border-b-2 border-black text-black p-3 border-r-20 rounded-lg w-10/12"
+		id="headerObject"
+	>
+		<div class="select-none flex justify-evenly items-center">
+			<div>
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div
+					class="text-2xl font-bold cursor-pointer
+				 text-emerald-700"
+					id="townName"
+					on:click={changeName}
+				>
+					{$DB.townInfo.name}
+				</div>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<div class="align-center">
-					<span class=" ">{speedMultiplier} speed</span>
-					<br />
-					Day {day} Year {year}
-				</div>
-			</div>
-		</div>
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<div
-			class="
-			flex flex-col items-center gap-1 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer hover:text-white
-			"
-			on:click={() => {
-				$DB.townLog = '';
-			}}
-		>
-			<div class="text-md cursor-pointer">🚨 Alerts</div>
-			{#if $DB.townLog.length > 0}
-				<div class="townLog text-xs text-start">
-					{$DB.townLog.split('\n')[0]}
-				</div>
-				{#each $DB.townLog.split('\n').slice(1, 300) as line}
-					<span
-						class="townLog text-xs text-start text-slate-500 cursor-pointer"
-					>
-						{line}
-					</span>
-				{/each}
-			{:else}
-				<span class="townLog text-xs text-start text-slate-500">No Alerts</span>
-			{/if}
-		</div>
-		<div>
-			<!-- minimal range for tax rate with a number above representing the tax -->
-			<div class=" p-2 rounded-lg m-3 text-center">
-				<div class="text-sm cursor-pointer">
-					Tax Rate ({$DB.economyAndLaws.tax_rate * 100}%)
-				</div>
-				<input
-					type="range"
-					min="0"
-					max="1.0"
-					step="0.05"
-					value={$DB.economyAndLaws.tax_rate}
-					on:input={setTaxRate}
-					class="cursor-pointer w-100"
-				/>
-			</div>
-		</div>
-	</div>
-	<Separator
-		class="mb-3 mt-0 bg-slate-700
-	"
-	/>
-	<div class="flex flex-row justify-between pr-5 pl-5">
-		{#each stats as stat}
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div
-				class="flex flex-col items-center cursor-pointer text-center flex-1"
-				on:click={stat.tap}
-			>
-				<span class="text-xs pl-4 pr-4 rounded-lg">
-					{stat.label}
-				</span>
-
-				<span class="text-xs text-slate-500"
-					>{stat.value}
-					{#if stat.subtitle != null}
-						<!-- stat.subtitle as html -->
-						{@html stat.subtitle}
-					{/if}</span
+				<div
+					class="text-xs flex flex-row gap-2 align-middle cursor-pointer hover:text-blue-600"
+					on:click={toggleSpeed}
 				>
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div>
+						<span>{speedMultiplier} speed</span>
+						<br />Day {day} Year {year}
+					</div>
+				</div>
 			</div>
-		{/each}
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<div
+				class="
+			flex flex-col gap-1 drop-shadow-md p-2 rounded-lg max-h-20 ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/3
+			"
+				on:click={() => {
+					$DB.townLog = '';
+				}}
+			>
+				<div class="text-md cursor-pointer">🚨 Alerts</div>
+				{#if $DB.townLog.length > 0}
+					<div class="townLog text-xs text-start">
+						{$DB.townLog.split('\n')[0]}
+					</div>
+					{#each $DB.townLog.split('\n').slice(1, 300) as line}
+						<span class="townLog text-xs text-start cursor-pointer">
+							{line}
+						</span>
+					{/each}
+				{:else}
+					<span class="townLog text-xs text-start text-slate-500"
+						>No Alerts</span
+					>
+				{/if}
+			</div>
+			<div class="">
+				<!-- minimal range for tax rate with a number above representing the tax -->
+				<div class=" p-2 rounded-lg m-3 text-center">
+					<div class="text-sm">
+						Tax Rate ({roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%)
+					</div>
+					<input
+						type="range"
+						min="0"
+						max="1.0"
+						step="0.05"
+						value={$DB.economyAndLaws.tax_rate}
+						on:input={setTaxRate}
+						class="cursor-pointer w-100"
+					/>
+				</div>
+			</div>
+		</div>
+		<Separator
+			class="mb-3 mt-0 bg-slate-700
+	"
+		/>
+		<div class="flex flex-row justify-between pr-5 pl-5">
+			{#each stats as stat}
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div
+					class="flex flex-col items-center cursor-pointer text-center flex-1"
+					on:click={stat.tap}
+				>
+					<span class="text-xs pl-4 pr-4 rounded-lg">
+						{stat.label}
+					</span>
+
+					<span class="text-xs text-slate-500"
+						>{stat.value}
+						{#if stat.subtitle != null}
+							{@html stat.subtitle}
+						{/if}</span
+					>
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>
 
@@ -302,5 +311,54 @@
 {/if}
 
 <style>
-	/* no styles */
+	input[type='range'] {
+		-webkit-appearance: none;
+		appearance: none;
+		background: transparent;
+		cursor: pointer;
+		width: 100px;
+	}
+
+	input[type='range']:focus {
+		outline: none;
+	}
+
+	input[type='range']::-webkit-slider-runnable-track {
+		background-color: rgb(3, 71, 117);
+		border-radius: 0.5rem;
+		height: 0.5rem;
+	}
+
+	input[type='range']::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		margin-top: -4px;
+		background-color: rgb(255, 255, 255);
+		height: 1rem;
+		width: 1rem;
+	}
+
+	input[type='range']:focus::-webkit-slider-thumb {
+		border: none;
+	}
+
+	input[type='range']::-moz-range-track {
+		background-color: rgb(3, 71, 117);
+		border-radius: 0.5rem;
+		height: 0.5rem;
+	}
+
+	input[type='range']::-moz-range-thumb {
+		border: none;
+		border-radius: 0;
+		background-color: rgb(255, 255, 255);
+		height: 1rem;
+		width: 1rem;
+	}
+
+	input[type='range']:focus::-moz-range-thumb {
+		border: none;
+		outline: 3px solid #053a5f;
+		outline-offset: 0.125rem;
+	}
 </style>
