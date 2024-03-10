@@ -289,7 +289,7 @@
 			];
 
 			switch (plotChosen.id) {
-				case 'city-hall':
+				case 'city_hall':
 					z.hasCityHall = true;
 					break;
 				case 'bank':

@@ -104,7 +104,7 @@
 					if (z.plots[i][j].id == 'bank') {
 						hasBank = true;
 					}
-					if (z.plots[i][j].id == 'city-hall') {
+					if (z.plots[i][j].id == 'city_hall') {
 						hasCityHall = true;
 					}
 					if (
@@ -122,10 +122,24 @@
 		return z;
 	}
 
+	function _isAllPlotsFilled(z) {
+		let result = true;
+		for (let i = 0; i < z.plots.length; i++) {
+			for (let j = 0; j < z.plots[i].length; j++) {
+				if (z.plots[i][j].active == false) {
+					result = false;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
 	function _checkGameWin(z) {
 		const gameWinScenario = z.endGoal;
 
 		if (gameWinScenario == 'land') {
+			let allPlotsFilled = true;
 			if (
 				z.townInfo.population_max == z.townInfo.population_count &&
 				z.townInfo.happiness >=
@@ -135,18 +149,39 @@
 				z.townInfo.employees / z.townInfo.population_count >=
 					winScenarios.land.requirements[z.difficulty].employment &&
 				z.townInfo.population_count >
-					winScenarios.land.requirements[z.difficulty].population_count
+					winScenarios.land.requirements[z.difficulty].population_count &&
+				z.townInfo.knowledge_points >=
+					winScenarios.land.requirements[z.difficulty].knowledge
 			) {
-				let allPlotsFilled = true;
-				for (let i = 0; i < z.plots.length; i++) {
-					for (let j = 0; j < z.plots[i].length; j++) {
-						if (z.plots[i][j].active == false) {
-							allPlotsFilled = false;
-							break;
+				let hasRequiredPlots = true;
+				// iterate over winScenarios.land.requirements[z.difficulty].required_plots which has each plot id. then check if any aren't placed
+				for (
+					let i = 0;
+					i <
+					winScenarios.land.requirements[z.difficulty].required_plots.length;
+					i++
+				) {
+					let plotId =
+						winScenarios.land.requirements[z.difficulty].required_plots[i];
+					//console.log(plotId);
+					let found = false;
+					for (let j = 0; j < z.plots.length; j++) {
+						for (let k = 0; k < z.plots[j].length; k++) {
+							console.log(options[z.plots[j][k].type].id);
+							if (options[z.plots[j][k].type].id == plotId) {
+								found = true;
+								break;
+							}
 						}
 					}
+					if (found == false) {
+						hasRequiredPlots = false;
+						break;
+					}
 				}
-				if (allPlotsFilled) {
+				const allPlotsFilled = _isAllPlotsFilled(z);
+
+				if (allPlotsFilled && hasRequiredPlots) {
 					z.endGameDetails = {
 						msg: winScenarios.land.win,
 						win: true,
@@ -155,6 +190,7 @@
 				}
 			}
 		}
+
 		return z;
 	}
 

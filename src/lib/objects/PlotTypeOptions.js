@@ -122,7 +122,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #1ac61a;', // farm
+		styling: 'background-color: #519c1f;', // farm
 	},
 	{
 		id: 'apple_orchard', // 'apple_orchard
@@ -148,7 +148,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #1ac61a;', // farm
+		styling: 'background-color: #519c1f;', // farm
 	},
 	{
 		id: 'bakery',
@@ -173,7 +173,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #1ac61a;', // farm
+		styling: 'background-color: #519c1f;', // farm
 	},
 	{
 		id: 'grocery',
@@ -460,7 +460,7 @@ export const options = [
 		styling: 'background-color: #858507;', // recreation
 	},
 	{
-		id: 'school_small',
+		id: 'small_school',
 		title: '📚 Small school',
 		subtitle: 'for learning',
 		type: 'education',
@@ -623,7 +623,7 @@ export const options = [
 		styling: 'background-color: #7b68ee;', // bank
 	},
 	{
-		id: 'city-hall',
+		id: 'city_hall',
 		title: '🗳️ City Hall',
 		subtitle: 'for bureaucracy',
 		type: 'federal',

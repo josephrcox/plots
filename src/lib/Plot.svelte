@@ -104,6 +104,7 @@
 	data-canBeUpgraded={canBeUpgraded}
 	style={specialStylingString}
 	data-type={data.type}
+	data-type-id={data.typeId}
 	data-referencePlotX={data.referencePlot !== undefined
 		? data.referencePlot[0]
 		: null}

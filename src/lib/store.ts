@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 // @ts-ignore
 import { default_db, difficulties } from './objects/defaults/default_DB.js'
 // @ts-ignore
-import { Difficulty, EndGoal } from './types';
+import { Difficulty, EndGoal, Game } from './types';
 // @ts-ignore
 import { max_tax_rates_based_on_difficulty } from './objects/difficulty.js';
 
@@ -30,7 +30,7 @@ export let DB = writable(
 );
 
 export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string, cheats: boolean) {
-	let json = { ...default_db }; // Use a copy of default_db
+	let json : Game = { ...default_db }; // Use a copy of default_db 
 	json.economyAndLaws.max_tax_rate = max_tax_rates_based_on_difficulty[difficulty];
 	console.log(json.economyAndLaws.max_tax_rate);
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
@@ -38,6 +38,8 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	// remove leading and trailing spaces, remove symbols other than nunbers and letters
 	townName = townName.replace(/[^a-zA-Z0-9 ]/g, '').trim();
 	json.townInfo.name = townName != '' ? townName : generateRandomTownName();
+	json.difficulty = parseInt(difficulty);
+	
 	if (cheats) {
 		json.townInfo.gold = 1000000;
 		json.townInfo.employees = 10000;

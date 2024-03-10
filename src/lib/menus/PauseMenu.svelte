@@ -96,16 +96,6 @@
 						)} - Currently at {JSON.stringify($DB.townInfo.happiness)}
 					</li>
 					<li>
-						{#if $DB.townInfo.health >= endGoal.requirements[$DB.difficulty].health}
-							✅
-						{:else}
-							❌
-						{/if}
-						Health: {JSON.stringify(
-							endGoal.requirements[$DB.difficulty].health,
-						)} - Currently at {JSON.stringify($DB.townInfo.health)}
-					</li>
-					<li>
 						{#if $DB.townInfo.employees / $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].employment}
 							✅
 						{:else}
@@ -118,7 +108,37 @@
 								100,
 						)}%
 					</li>
+					<li>
+						{#if $DB.townInfo.health >= endGoal.requirements[$DB.difficulty].health}
+							✅
+						{:else}
+							❌
+						{/if}
+						Health: {JSON.stringify(
+							endGoal.requirements[$DB.difficulty].health,
+						)} - Currently at {JSON.stringify($DB.townInfo.health)}
+					</li>
+
+					<li>
+						{#if $DB.townInfo.knowledge_points >= endGoal.requirements[$DB.difficulty].knowledge}
+							✅
+						{:else}
+							❌
+						{/if}
+						Knowledge: {JSON.stringify(
+							endGoal.requirements[$DB.difficulty].knowledge,
+						)} - Currently at {JSON.stringify($DB.townInfo.knowledge_points)}
+					</li>
 				</ul>
+				{#if endGoal.requirements[$DB.difficulty].required_plots != null && endGoal.requirements[$DB.difficulty].required_plots.length > 0}
+					<br />
+					You also need to have these plots:
+					{#each endGoal.requirements[$DB.difficulty].required_plots as plot}
+						<div class="text-base leading-relaxed">
+							<li>{plot}</li>
+						</div>
+					{/each}
+				{/if}
 			{/if}
 		</div>
 		<Dialog.Footer>
