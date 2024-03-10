@@ -50,12 +50,12 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	}
 	const randomSize =
 		difficulty == '0'
-			? 6 // 36 total
-			: difficulty == '1' // from 9 - 12
-			? Math.floor(Math.random() * 3) + 9
-			: difficulty == '2' // from 13 - 16
-			? Math.floor(Math.random() * 4) + 13
-			: 35; // undefined difficulty
+			? 8
+			: difficulty == '1' 
+			? 12
+			: difficulty == '2' 
+			? 16
+			: 1; // never should happen. 
 	for (let i = 0; i < randomSize; i++) {
 		default_plots.push([]);
 		for (let j = 0; j < randomSize; j++) {
@@ -73,9 +73,8 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	json.plots = default_plots;
 	localStorage.reset = false;
 	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
+	paused.set(true);
 	DB.set(json); // Update the store with the new value
-		paused.set(true);
-	location.reload();
 }
 
 export function clearDB(overridenFile : File | null = null) {

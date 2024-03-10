@@ -22,7 +22,11 @@
 	export function hasPlotOfType(type: string) {
 		for (let x = 0; x < $DB.plots.length; x++) {
 			for (let y = 0; y < $DB.plots[x].length; y++) {
-				if ($DB.plots[x][y] == null || $DB.plots[x][y].type == null) {
+				if (
+					$DB.plots[x][y].active == false ||
+					$DB.plots[x][y] == null ||
+					$DB.plots[x][y].type == null
+				) {
 					continue;
 				}
 				if (options[$DB.plots[x][y].type].id === type) {
@@ -148,12 +152,14 @@
 					You also need to have these plots:
 					{#each endGoal.requirements[$DB.difficulty].required_plots as plot}
 						<div class="text-base leading-relaxed">
-							{#if hasPlotOfType(plot)}
-								✅
-							{:else}
-								❌
-							{/if}
-							{plot}
+							<li>
+								{#if hasPlotOfType(plot)}
+									✅
+								{:else}
+									❌
+								{/if}
+								{plot}
+							</li>
 						</div>
 					{/each}
 				{/if}
