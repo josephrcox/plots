@@ -98,6 +98,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #d24646;', // food
+		check_for_variety: true,
 	},
 	{
 		id: 'carrot_farm',
@@ -123,6 +124,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
 	},
 	{
 		id: 'apple_orchard', // 'apple_orchard
@@ -149,6 +151,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
 	},
 	{
 		id: 'bakery',
@@ -174,6 +177,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
 	},
 	{
 		id: 'grocery',
@@ -225,6 +229,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #d24646;', // food
+		check_for_variety: true,
 	},
 	{
 		id: 'library',
@@ -277,6 +282,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #4070ff;', // recreation
+		check_for_variety: true,
 	},
 	{
 		id: 'church',
@@ -302,6 +308,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #4070ff;', // recreation
+		check_for_variety: true,
 	},
 	{
 		id: 'stables',
@@ -328,6 +335,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #4070ff;', // recreation
+		check_for_variety: true,
 	},
 	{
 		id: 'blacksmith',
@@ -354,6 +362,7 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #ff00ff;', // shop
+		check_for_variety: true,
 	},
 	{
 		id: 'inn',

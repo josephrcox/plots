@@ -18,6 +18,7 @@
 		db = _healthEffects(db);
 		db = _bringModifiersBackToNormal(db);
 		db = _checkSpecialPlots(db);
+		db = _checkPlotCountForEffect(db);
 		return db;
 	}
 
@@ -32,7 +33,7 @@
 	function performQuarterlyTasks(db) {
 		db = _boredom(db);
 		db = _bringStatsBackToNormal(db);
-		db = _checkPlotCountForEffect(db);
+
 		db = _movePeopleInMovePeopleOut(db);
 		return db;
 	}
@@ -245,13 +246,12 @@
 		let totalPlotsPlaced = z.plotCounts.reduce((a, b) => a + b, 0);
 		let negativeEffect = false;
 
-		// This starts at 3 to ignore residential properties
-		for (let i = 3; i < z.plotCounts.length; i++) {
-			if (z.plotCounts[i] == null) {
+		for (let i = 0; i < z.plotCounts.length; i++) {
+			console.log(options[i].title);
+			if (z.plotCounts[i] == null || options[i].check_for_variety != true) {
 				continue;
 			}
-			console.log(`Total placed: ${totalPlotsPlaced}, ${z.plotCounts[i]}, ${z.plotCounts[i] / totalPlotsPlaced},
-				${plotCountMaximums[z.difficulty]}`);
+
 			if (
 				z.plotCounts[i] / totalPlotsPlaced >=
 				plotCountMaximums[z.difficulty]
