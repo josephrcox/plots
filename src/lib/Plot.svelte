@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { options } from './objects/PlotTypeOptions.js';
+	import { options, getColor } from './objects/PlotTypeOptions.js';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.ts';
 	import Tooltip from './Tooltip.svelte';
 
@@ -14,28 +14,6 @@
 		referencePlot: [],
 	};
 	export let canBeUpgraded = false;
-
-	$: onChange(data);
-
-	function onChange(...args) {
-		refreshStyling();
-	}
-	let specialStylingString = data.styling;
-
-	onMount(async () => {
-		if (data.type >= 0 && options[data.type].styling) {
-			specialStylingString = options[data.type].styling;
-		}
-	});
-
-	function refreshStyling() {
-		if (data.type >= 0 && options[data.type].styling) {
-			specialStylingString = options[data.type].styling;
-		}
-		if (data.type < 0) {
-			specialStylingString = '';
-		}
-	}
 
 	function openMenu(e, a, b) {
 		let plots = document.querySelectorAll('.plot_container');
@@ -97,6 +75,7 @@
 	canBeUpgraded == false
 		? 'border-slate-500 border-dashed border'
 		: ''}"
+	style="background-color:{getColor(data.type, canBeUpgraded)}"
 	data-active={data.active}
 	data-id={data.id}
 	data-x={data.x}
@@ -104,7 +83,6 @@
 	data-optionIndex={data.optionIndex}
 	on:click={openMenu}
 	data-canBeUpgraded={canBeUpgraded}
-	style={specialStylingString}
 	data-type={data.type}
 	data-type-id={data.typeId}
 	data-refPlotX={data.referencePlot !== undefined
@@ -120,8 +98,13 @@
 			<span data-size={options[data.type].requirements.size}
 				>{options[data.type].title.substring(0, 2)}<br />{options[
 					data.type
-				].title.substring(2)}</span
-			>
+				].title.substring(2)}
+				{options[data.type].requirements.size > 1
+					? `(${options[data.type].requirements.size}x${
+							options[data.type].requirements.size
+						})`
+					: ''}
+			</span>
 		</div>
 	{:else if data.type == -1 && data.x == 0 && data.y == 0}
 		<Tooltip text="Build your first home" happy="true" />
@@ -170,12 +153,8 @@
 	}
 
 	.plot_container[data-type='-3'] {
-		background-color: rgba(62, 62, 242, 0.7);
+		background-color: rgba(42, 62, 250, 0.9);
 		border: none;
-	}
-
-	span[data-size='2'] {
-		/* transform: translateX(50px) translateY(40px); */
 	}
 
 	.plot_container > div {

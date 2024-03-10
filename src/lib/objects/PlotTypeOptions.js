@@ -22,7 +22,6 @@ export const options = [
 			health: 0,
 			population: 16,
 		},
-		styling: 'background-color: #e15f00', // residential
 	},
 	{
 		id: 'res_medium',
@@ -47,7 +46,6 @@ export const options = [
 			health: 0,
 			population: 64,
 		},
-		styling: 'background-color: #e15f00', // residential
 	},
 	{
 		id: 'res_large',
@@ -72,7 +70,6 @@ export const options = [
 			health: 0,
 			population: 256,
 		},
-		styling: 'background-color: #e15f00', // residential
 	},
 	{
 		id: 'carrot_farm',
@@ -97,7 +94,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #519c1f;', // farm
 		check_for_variety: true,
 	},
 	{
@@ -124,7 +120,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #519c1f;', // farm
 		check_for_variety: true,
 	},
 	{
@@ -150,7 +145,6 @@ export const options = [
 			health: 5,
 			population: 0,
 		},
-		styling: 'background-color: #519c1f;', // farm
 		check_for_variety: true,
 	},
 	{
@@ -159,7 +153,7 @@ export const options = [
 		subtitle: 'for farming',
 		type: 'farm',
 		description: 'A few cows that produce milk, cheese, and butter.',
-		revenue_per_week: 12,
+		revenue_per_week: 16,
 		requirements: {
 			gold: 300,
 			plots: [],
@@ -176,7 +170,6 @@ export const options = [
 			health: 5,
 			population: 0,
 		},
-		styling: 'background-color: #519c1f;', // farm
 		check_for_variety: true,
 	},
 	{
@@ -202,7 +195,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #d24646;', // food
 		check_for_variety: true,
 	},
 	{
@@ -228,7 +220,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #519c1f;', // farm
 		check_for_variety: true,
 	},
 	{
@@ -254,7 +245,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #d24646;', // food
 	},
 	{
 		id: 'fishery',
@@ -280,7 +270,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #d24646;', // food
 		check_for_variety: true,
 	},
 	{
@@ -307,7 +296,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #4070ff;', // recreation
 	},
 	{
 		id: 'pub',
@@ -333,7 +321,6 @@ export const options = [
 			health: -25,
 			population: 0,
 		},
-		styling: 'background-color: #4070ff;', // recreation
 		check_for_variety: true,
 	},
 	{
@@ -359,8 +346,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #4070ff;', // recreation
-		check_for_variety: true,
 	},
 	{
 		id: 'stables',
@@ -386,8 +371,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #4070ff;', // recreation
-		check_for_variety: true,
 	},
 	{
 		id: 'blacksmith',
@@ -413,8 +396,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #ff00ff;', // shop
-		check_for_variety: true,
 	},
 	{
 		id: 'vineyard',
@@ -440,8 +421,6 @@ export const options = [
 			health: -10,
 			population: 0,
 		},
-		styling: 'background-color: #519c1f;', // farm
-		check_for_variety: true,
 	},
 	{
 		id: 'inn',
@@ -468,7 +447,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #ff00ff;', // tourism
 	},
 	{
 		id: 'park_small',
@@ -493,7 +471,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'park_medium',
@@ -518,7 +495,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'park_large',
@@ -545,7 +521,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'community_center',
@@ -572,7 +547,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'small_school',
@@ -600,7 +574,6 @@ export const options = [
 			health: 3,
 			population: 0,
 		},
-		styling: 'background-color: #4caf50;', // education
 	},
 	{
 		id: 'large_school',
@@ -627,7 +600,6 @@ export const options = [
 			health: 3,
 			population: 0,
 		},
-		styling: 'background-color: #4caf50;', // education
 	},
 	{
 		id: 'university',
@@ -654,7 +626,6 @@ export const options = [
 			health: 25,
 			population: 0,
 		},
-		styling: 'background-color: #4caf50;', // education
 	},
 	{
 		id: 'small_hospital',
@@ -681,7 +652,6 @@ export const options = [
 			health: 75,
 			population: 0,
 		},
-		styling: 'background-color: #ff0000;', // medical
 	},
 	{
 		id: 'large_hospital',
@@ -708,7 +678,6 @@ export const options = [
 			health: 75,
 			population: 0,
 		},
-		styling: 'background-color: #ff0000;', // medical
 	},
 	{
 		id: 'bank',
@@ -735,7 +704,6 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #7b68ee;', // bank
 	},
 	{
 		id: 'city_hall',
@@ -762,6 +730,39 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #7b68ee;', // federal
 	},
 ];
+
+export const typeColors = {
+	// dark blue
+	empty_unusable: 'rgb(21 28 41);',
+	empty_buildable: 'rgb(126, 158, 255)',
+	residential: '#e15f00',
+	farm: '#519c1f',
+	food: '#d24646',
+	recreation: '#4070ff',
+	shop: '#ff00ff',
+	tourism: '#ff00ff',
+	education: 'rgba(42, 62, 250, 0.9)',
+	medical: '#ff0000',
+	bank: '#7b68ee',
+	federal: '#7b68ee',
+};
+
+export function getColor(typeIndex, canBeUpgraded = false) {
+	if (typeIndex < 0) {
+		if (typeIndex == -1) {
+			if (canBeUpgraded) {
+				return typeColors['empty_buildable'];
+			}
+			return typeColors['empty'];
+		} else if (typeIndex == -2) {
+			return typeColors['education'];
+		} else {
+			console.log(typeIndex);
+			return typeColors['empty'];
+		}
+	}
+	const plotOption = options[typeIndex];
+	return typeColors[plotOption.type];
+}

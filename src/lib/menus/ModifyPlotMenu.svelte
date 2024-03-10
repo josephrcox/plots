@@ -8,7 +8,7 @@
 		showOnlyAffordable,
 		toggleShowOnlyAffordable,
 	} from '../store.js';
-	import { options } from '../objects/PlotTypeOptions.js';
+	import { getColor, options } from '../objects/PlotTypeOptions.js';
 	import { Game, PlotOption } from '../types.js';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$lib/components/ui/separator';
@@ -32,6 +32,10 @@
 			selected: isSelected(option),
 		}),
 	);
+
+	function getOptionIndex(id: string) {
+		return options.findIndex((option) => option.id === id);
+	}
 
 	function firstEmoji(s: string): string | null {
 		const regex = /\p{Emoji}/u;
@@ -527,14 +531,15 @@
 					<tr class="text-xs text-left">
 						<th class="px-2 py-2">Title</th>
 						<th class="px-2 pr-36 py-2">Desc</th>
-						<th class="px-2 py-2">Profit (wk)</th>
+						<th class="px-2 py-2">Revenue</th>
+						<th class="px-2 py-2">Profit</th>
 						<th class="px-2 py-2">Employees</th>
-						<th class="px-2 py-2">Required Gold</th>
-						<th class="px-2 py-2">Required Knowledge</th>
-						<th class="px-2 py-2">Happiness multiplier</th>
-						<th class="px-2 py-2">Health multiplier</th>
-						<th class="px-2 py-2">Instant Happiness change</th>
-						<th class="px-2 py-2">Instant Health change</th>
+						<th class="px-2 py-2">Cost</th>
+						<th class="px-2 py-2">Req. Knowledge</th>
+						<th class="px-2 py-2">Happiness (x)</th>
+						<th class="px-2 py-2">Health (x)</th>
+						<th class="px-2 py-2">Instant Happiness</th>
+						<th class="px-2 py-2">Instant Health</th>
 					</tr>
 				</thead>
 				<tbody class="overflow-hidden text-xs">
@@ -549,7 +554,13 @@
 								
 								"
 							data-plotoptionid={option.id}
-							style={option.styling}
+							style="background-color: 
+									{// pass in option index
+							getColor(
+								getOptionIndex(option.id),
+								checkIfPlotCanBeUpgraded(x, y),
+							)}
+							"
 						>
 							<td class="px-2 py-2">
 								{option.selected ? '➡️' : ''}
@@ -560,10 +571,15 @@
 							<td class="px-2 py-2">
 								{#if option.revenue_per_week > 0}
 									<div>
-										<span class="line-through"
-											>${roundTo(option.revenue_per_week, 2)}</span
-										>
-
+										<span>${roundTo(option.revenue_per_week, 2)}</span>
+									</div>
+								{:else}
+									<!-- whole lotta nothin' -->
+								{/if}
+							</td>
+							<td class="px-2 py-2">
+								{#if option.revenue_per_week > 0}
+									<div>
 										<span
 											>${roundTo(
 												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
