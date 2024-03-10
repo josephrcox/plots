@@ -1,13 +1,12 @@
 <script lang="ts">
 	// @ts-ignore
-	import { DB, clearDB, paused } from '../store.ts';
+	import { DB, clearDB, paused, hasPlotOfType } from '../store.ts';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
-	import { options } from '../objects/PlotTypeOptions.js';
 	const scenarios: any = winScenarios;
 	const endGoal = scenarios[$DB.endGoal];
 	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -17,25 +16,6 @@
 		dbInitialized = true;
 	} else {
 		dbInitialized = false;
-	}
-
-	export function hasPlotOfType(type: string) {
-		for (let x = 0; x < $DB.plots.length; x++) {
-			for (let y = 0; y < $DB.plots[x].length; y++) {
-				if (
-					$DB.plots[x][y].active == false ||
-					$DB.plots[x][y] == null ||
-					$DB.plots[x][y].type == null ||
-					$DB.plots[x][y].type < 1
-				) {
-					continue;
-				}
-				if (options[$DB.plots[x][y].type].id === type) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	function saveGame() {
@@ -154,7 +134,7 @@
 					{#each endGoal.requirements[$DB.difficulty].required_plots as plot}
 						<div class="text-base leading-relaxed">
 							<li>
-								{#if hasPlotOfType(plot)}
+								{#if hasPlotOfType(plot, $DB)}
 									✅
 								{:else}
 									❌

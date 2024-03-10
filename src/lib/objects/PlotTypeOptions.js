@@ -75,32 +75,6 @@ export const options = [
 		styling: 'background-color: #e15f00', // residential
 	},
 	{
-		id: 'cafe',
-		title: '☕️ Small café',
-		subtitle: 'for recreation & food',
-		type: 'food',
-		description: 'Great for eating & relaxing, not great for long-term health.',
-		revenue_per_week: 12,
-		requirements: {
-			gold: 100,
-			plots: [],
-			employees: 16,
-			climate: null,
-			knowledge: 0,
-		},
-		effect_modifiers: {
-			happiness: 1.05,
-			health: 0.95,
-		},
-		immediate_variable_changes: {
-			happiness: 5,
-			health: 0,
-			population: 0,
-		},
-		styling: 'background-color: #d24646;', // food
-		check_for_variety: true,
-	},
-	{
 		id: 'carrot_farm',
 		title: '🥕 Carrot farm',
 		subtitle: 'for farming',
@@ -108,7 +82,7 @@ export const options = [
 		description: 'Farm for making carrots, makes money by selling them.',
 		revenue_per_week: 6,
 		requirements: {
-			gold: 25,
+			gold: 50,
 			plots: [],
 			employees: 2,
 			climate: null,
@@ -135,7 +109,7 @@ export const options = [
 			'A bunch of trees that make apples, makes money by selling them and by selling apple-related products.',
 		revenue_per_week: 8,
 		requirements: {
-			gold: 50,
+			gold: 75,
 			plots: [],
 			employees: 4,
 			climate: null,
@@ -151,6 +125,84 @@ export const options = [
 			population: 0,
 		},
 		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
+	},
+	{
+		id: 'potato_farm',
+		title: '🥔 Potato farm',
+		subtitle: 'for farming',
+		type: 'farm',
+		description: 'Easy to farm, sells to local grocery stores and restaurants.',
+		revenue_per_week: 9,
+		requirements: {
+			gold: 75,
+			plots: [],
+			employees: 2,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.1,
+			health: 1.1,
+		},
+		immediate_variable_changes: {
+			happiness: 5,
+			health: 5,
+			population: 0,
+		},
+		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
+	},
+	{
+		id: 'dairy_farm',
+		title: '🐮 Dairy farm',
+		subtitle: 'for farming',
+		type: 'farm',
+		description: 'A few cows that produce milk, cheese, and butter.',
+		revenue_per_week: 12,
+		requirements: {
+			gold: 300,
+			plots: [],
+			employees: 4,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.2,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 5,
+			health: 5,
+			population: 0,
+		},
+		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
+	},
+	{
+		id: 'cafe',
+		title: '☕️ Small café',
+		subtitle: 'for recreation & food',
+		type: 'food',
+		description: 'Great for eating & relaxing, not great for long-term health.',
+		revenue_per_week: 12,
+		requirements: {
+			gold: 100,
+			plots: [],
+			employees: 16,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.05,
+			health: 0.95,
+		},
+		immediate_variable_changes: {
+			happiness: 5,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background-color: #d24646;', // food
 		check_for_variety: true,
 	},
 	{
@@ -365,6 +417,33 @@ export const options = [
 		check_for_variety: true,
 	},
 	{
+		id: 'vineyard',
+		title: '🍇 Vineyard',
+		subtitle: '',
+		type: 'farm',
+		description:
+			'Grapes are grown and made into wine. Makes money by selling wine.',
+		revenue_per_week: 50,
+		requirements: {
+			gold: 800,
+			plots: [],
+			employees: 6,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.5,
+			health: 1,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: -10,
+			population: 0,
+		},
+		styling: 'background-color: #519c1f;', // farm
+		check_for_variety: true,
+	},
+	{
 		id: 'inn',
 		title: '🛌 Village Inn',
 		subtitle: 'for a night out',
@@ -469,6 +548,33 @@ export const options = [
 		styling: 'background-color: #858507;', // recreation
 	},
 	{
+		id: 'community_center',
+		title: '🫶 Community Center',
+		subtitle: 'for community',
+		type: 'recreation',
+		description:
+			'A place for meeting people, growing community, and hosting events. Required for City Hall.',
+		revenue_per_week: 0,
+		requirements: {
+			gold: 5000,
+			plots: [],
+			employees: 8,
+			climate: null,
+			size: 1,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.09,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 30,
+			health: 0,
+			population: 0,
+		},
+		styling: 'background-color: #858507;', // recreation
+	},
+	{
 		id: 'small_school',
 		title: '📚 Small school',
 		subtitle: 'for learning',
@@ -476,9 +582,9 @@ export const options = [
 		description:
 			'A place where children can learn and grow, and where adults can learn new skills. Produces knowledge.',
 		revenue_per_week: 0,
-		knowledge_points_per_month: 5,
+		knowledge_points_per_month: 8,
 		requirements: {
-			gold: 850,
+			gold: 1000,
 			plots: [],
 			employees: 20,
 			climate: null,
@@ -503,9 +609,9 @@ export const options = [
 		type: 'education',
 		description: 'A larger school. Produces knowledge',
 		revenue_per_week: 0,
-		knowledge_points_per_month: 15,
+		knowledge_points_per_month: 18,
 		requirements: {
-			gold: 1300,
+			gold: 2500,
 			plots: [],
 			employees: 40,
 			climate: null,
@@ -532,7 +638,7 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 75,
 		requirements: {
-			gold: 3500,
+			gold: 10000,
 			plots: [],
 			employees: 64,
 			climate: null,
@@ -541,7 +647,7 @@ export const options = [
 		},
 		effect_modifiers: {
 			happiness: 1.25,
-			health: 1.0,
+			health: 0.9,
 		},
 		immediate_variable_changes: {
 			happiness: 25,
@@ -559,12 +665,12 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 1500,
+			gold: 5000,
 			plots: [],
 			employees: 18,
 			climate: null,
 			size: 1,
-			knowledge: 50,
+			knowledge: 100,
 		},
 		effect_modifiers: {
 			happiness: 1.25,
@@ -586,12 +692,12 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 4000,
+			gold: 10000,
 			plots: [],
-			employees: 64,
+			employees: 50,
 			climate: null,
 			size: 1,
-			knowledge: 200,
+			knowledge: 250,
 		},
 		effect_modifiers: {
 			happiness: 1.25,
@@ -613,7 +719,7 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 30000,
+			gold: 20000,
 			plots: [],
 			employees: 64,
 			climate: null,
@@ -640,8 +746,8 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 30000,
-			plots: [],
+			gold: 50000,
+			plots: ['community_center'],
 			employees: 24,
 			climate: null,
 			size: 1,

@@ -1,24 +1,19 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
 	// @ts-ignore
 	import {
 		ACTIVE_GAME_DB_NAME,
 		DB,
+		hasPlotOfType,
 		modifyPlotMenuOptions,
 		showOnlyAffordable,
 		toggleShowOnlyAffordable,
 	} from '../store.js';
 	import { options } from '../objects/PlotTypeOptions.js';
-	import gameClock from '../gameClock.svelte';
 	import { Game, PlotOption } from '../types.js';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$lib/components/ui/separator';
-	import * as Sheet from '$lib/components/ui/sheet';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { fly, slide } from 'svelte/transition';
-	import { flyAndScale } from '$lib/utils.js';
+	import { numberWithCommas } from '../utils.js';
 
 	export let x = 0;
 	export let y = 0;
@@ -120,9 +115,6 @@
 	}
 
 	function choosePlotOption(id: string) {
-		// make all other options remove class active
-		// add active class
-		// use purchasePlot
 		const plotOptions = document.querySelectorAll('.plotOption');
 		plotOptions.forEach((plotOption) => {
 			plotOption.classList.remove('active');
@@ -170,6 +162,11 @@
 		const typeIndex = options.findIndex((option) => option.id === typeID);
 
 		let plotChosen = options[typeIndex];
+
+		if (checkIfAffordable(plotChosen, $DB) == false) {
+			console.log(plotChosen.requirements);
+			return alert(`${JSON.stringify(plotChosen.requirements)}`);
+		}
 
 		// go over requirements
 		let requirementsMet = true;
@@ -385,7 +382,7 @@
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
 
-	function checkIfAffordable(plotChosen: PlotOption, z: Game) {
+	function checkIfAffordable(plotChosen: any, z: Game) {
 		let requirementsMet = true;
 
 		if (plotChosen.requirements.gold > z.townInfo.gold) {
@@ -405,11 +402,24 @@
 				requirementsMet = false;
 			}
 		}
+		// some plots have requirements.plots which is an array of IDs, check if we have those by using hasPlotOfType
+		if (
+			plotChosen.requirements.plots !== undefined &&
+			plotChosen.requirements.plots.length > 0
+		) {
+			plotChosen.requirements.plots.forEach((plot: any) => {
+				if (!hasPlotOfType(plot, z)) {
+					requirementsMet = false;
+				}
+			});
+		}
+
 		return requirementsMet;
 	}
 
 	function handlePlotOptionClick(event: any) {
 		const plotOption = event.target.closest('.plotOption');
+
 		if (plotOption) {
 			const plotOptionID = plotOption.dataset.plotoptionid;
 			choosePlotOption(plotOptionID);
@@ -568,7 +578,9 @@
 							<td class="px-2 py-2">{option.requirements.employees || ''}</td>
 							<td class="px-2 py-2"
 								>${option.requirements.gold}
-								<span class="text-xs opacity-50">(${$DB.townInfo.gold})</span>
+								<span class="text-xs opacity-50"
+									>(${numberWithCommas($DB.townInfo.gold)})</span
+								>
 							</td>
 							<td class="px-2 py-2">{option.requirements.knowledge || ''}</td>
 							<td class="px-2 py-2"

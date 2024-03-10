@@ -5,6 +5,8 @@ import { default_db, difficulties } from './objects/defaults/default_DB.js'
 import { Difficulty, EndGoal, Game } from './types';
 // @ts-ignore
 import { max_tax_rates_based_on_difficulty } from './objects/difficulty.js';
+// @ts-ignore
+	import { options } from './objects/PlotTypeOptions.js';
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -40,11 +42,10 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	json.difficulty = parseInt(difficulty);
 	
 	if (cheats) {
-		json.townInfo.gold = 1000000;
-		json.townInfo.employees = 10000;
-		json.townInfo.happiness = 10000;
-		json.townInfo.health = 10000;
-		json.townInfo.knowledge_points = 1000;
+		json.townInfo.gold = 100000000;
+		json.townInfo.happiness = 10000000;
+		json.townInfo.health = 1000000;
+		json.townInfo.knowledge_points = 100000;
 		json.modifiers.happiness = 10000;
 		json.modifiers.health = 10000;
 	}
@@ -76,6 +77,25 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	DB.set(json); // Update the store with the new value
 	location.reload();
 }
+
+export function  hasPlotOfType(type: string, z: Game) {
+		for (let x = 0; x < z.plots.length; x++) {
+			for (let y = 0; y < z.plots[x].length; y++) {
+				if (
+					z.plots[x][y].active == false ||
+				z.plots[x][y] == null ||
+					z.plots[x][y].type == null ||
+					z.plots[x][y].type < 1
+				) {
+					continue;
+				}
+				if (options[z.plots[x][y].type].id === type) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 export function clearDB(overridenFile : File | null = null) {
 	localStorage.removeItem(ACTIVE_GAME_DB_NAME);

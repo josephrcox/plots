@@ -55,7 +55,6 @@ export type Game = {
 export type PlotOption = {
     id: string;
     title: string;
-    subtitle: string;
     type: string;
     description: string;
     revenue_per_week: number;

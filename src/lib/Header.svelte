@@ -9,9 +9,8 @@
 	} from './store.ts';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import { Separator } from '$lib/components/ui/separator';
-	import { Badge } from '$lib/components/ui/badge';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import Tooltip from './Tooltip.svelte';
+	import { numberWithCommas } from './utils.ts';
 
 	let year;
 	let day;
@@ -23,11 +22,11 @@
 			$headerHeight = header.offsetHeight + 32;
 		}
 		year = Math.floor($DB.environment.day / 365) + 1;
-		day = $DB.environment.day;
+		day = numberWithCommas($DB.environment.day);
 		stats = [
 			{
 				label: 'Population',
-				value: `${$DB.townInfo.population_count}/${$DB.townInfo.population_max}`,
+				value: `${numberWithCommas($DB.townInfo.population_count)}/${numberWithCommas($DB.townInfo.population_max)}`,
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs
@@ -37,7 +36,7 @@
 								: 'text-green-500'
 						}
 					'>
-					${$DB.townInfo.population_max - $DB.townInfo.population_count}
+					${numberWithCommas($DB.townInfo.population_max - $DB.townInfo.population_count)}
 				</span>`,
 				tap: () => {
 					// TODO
@@ -45,7 +44,7 @@
 			},
 			{
 				label: 'Employees',
-				value: `${$DB.townInfo.employees}/${$DB.townInfo.population_count}`,
+				value: `${numberWithCommas($DB.townInfo.employees)}/${numberWithCommas($DB.townInfo.population_count)}`,
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs
@@ -55,7 +54,7 @@
 								: 'text-green-500'
 						}
 					'>
-					${$DB.townInfo.population_count - $DB.townInfo.employees}
+					${numberWithCommas($DB.townInfo.population_count - $DB.townInfo.employees)}
 				</span>`,
 				tap: () => {
 					// TODO
@@ -63,20 +62,20 @@
 			},
 			{
 				label: 'Knowledge',
-				value: $DB.townInfo.knowledge_points,
+				value: numberWithCommas($DB.townInfo.knowledge_points),
 				tap: () => {
 					// TODO
 				},
 			},
 			{
 				label: 'Gold',
-				value: roundTo($DB.townInfo.gold, 0),
+				value: '$' + numberWithCommas(roundTo($DB.townInfo.gold, 0)),
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs
 						${$DB.economyAndLaws.last_month_profit < 0 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${roundTo($DB.economyAndLaws.last_month_profit, 0)}
+					${numberWithCommas(roundTo($DB.economyAndLaws.last_month_profit, 0))}
 				</span>`,
 				tap: () => {
 					$showBalanceSheet = !$showBalanceSheet;
@@ -84,7 +83,7 @@
 			},
 			{
 				label: 'Tourism 💰',
-				value: roundTo($DB.townInfo.gold_from_tourism, 0),
+				value: numberWithCommas(roundTo($DB.townInfo.gold_from_tourism, 0)),
 				tap: () => {
 					transferFundsFromBank();
 				},
