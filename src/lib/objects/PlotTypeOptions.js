@@ -559,9 +559,9 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 800,
+			gold: 1500,
 			plots: [],
-			employees: 8,
+			employees: 18,
 			climate: null,
 			size: 1,
 			knowledge: 50,
@@ -572,7 +572,7 @@ export const options = [
 		},
 		immediate_variable_changes: {
 			happiness: 5,
-			health: 50,
+			health: 75,
 			population: 0,
 		},
 		styling: 'background-color: #ff0000;', // medical
