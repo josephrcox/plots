@@ -3,7 +3,7 @@ export const messages = {
 	bored: 'People are bored. Try making some new buildings.',
 	vairety:
 		"People don't like going to the same places over and over again. Try making some new buildings.",
-	nobody_home: 'Nobody can live here. Build some residential buildings.',
+	nobody_home: 'Build some homes!',
 	leave_town_num: ' people left town because they were unhappy.',
 	new_people_num: ' new people moved to town.',
 	people_want_to_move_in: 'People want to move in. Build more homes.',

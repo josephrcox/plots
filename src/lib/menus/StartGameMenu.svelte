@@ -36,10 +36,11 @@
 			<Dialog.Title>Welcome to Plots!</Dialog.Title>
 			<Dialog.Description>
 				<a
-					href="https://github.com/josephrcox/plots"
+					href="https://github.com/josephrcox/plots#how-to-play"
 					class="text-blue-500 text-sm mb-4 hover:underline"
+					target="_blank"
 				>
-					GitHub</a
+					GitHub / Learn how to play</a
 				>
 
 				<div class="flex flex-col justify-center gap-5 mt-4">

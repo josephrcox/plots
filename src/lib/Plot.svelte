@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { options } from './objects/PlotTypeOptions.js';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.ts';
+	import Tooltip from './Tooltip.svelte';
 
 	export let data = {
 		id: 0,
@@ -92,7 +93,8 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="plot_container {data.type == -1 && canBeUpgraded == false
+	class="plot_container overflow-visible {data.type == -1 &&
+	canBeUpgraded == false
 		? 'border-slate-500 border-dashed border'
 		: ''}"
 	data-active={data.active}
@@ -121,6 +123,8 @@
 				].title.substring(2)}</span
 			>
 		</div>
+	{:else if data.type == -1 && data.x == 0 && data.y == 0}
+		<Tooltip text="Build your first home" happy="true" />
 	{/if}
 </div>
 
@@ -139,6 +143,7 @@
 		box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;
+		overflow: visible;
 
 		/* no select */
 		-webkit-touch-callout: none; /* iOS Safari */
