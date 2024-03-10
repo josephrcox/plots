@@ -65,10 +65,9 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Pause Menu</Dialog.Title>
-			<Dialog.Description>
-				{endGoal.description_title}
-			</Dialog.Description>
+			<Dialog.Description>Unpause any time by pressing 'P'</Dialog.Description>
 		</Dialog.Header>
+		<span class="italic">{endGoal.description_title}</span>
 		<div class="gap-0 py-0 text-gray-400">
 			{#if $DB.endGoal == 'land'}
 				<div class="text-base leading-relaxed">

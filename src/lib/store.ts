@@ -103,7 +103,7 @@ export let startGameMenu = writable({
 });
 
 export let unique = writable({});
-export let paused = writable(false);
+export let paused = writable(true);
 export let showScoreboard = writable(false);
 export let showBalanceSheet = writable(false);
 export let showOnlyAffordable = localStorage.getItem('showOnlyAffordable') === 'true' ? writable(true) : writable(false);
