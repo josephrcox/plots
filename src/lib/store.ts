@@ -29,7 +29,7 @@ export let DB = writable(
 	JSON.parse(localStorage.getItem(ACTIVE_GAME_DB_NAME) || 'null'),
 );
 
-export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string) {
+export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string, cheats: boolean) {
 	let json = { ...default_db }; // Use a copy of default_db
 	json.economyAndLaws.max_tax_rate = max_tax_rates_based_on_difficulty[difficulty];
 	console.log(json.economyAndLaws.max_tax_rate);
@@ -38,6 +38,15 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	// remove leading and trailing spaces, remove symbols other than nunbers and letters
 	townName = townName.replace(/[^a-zA-Z0-9 ]/g, '').trim();
 	json.townInfo.name = townName != '' ? townName : generateRandomTownName();
+	if (cheats) {
+		json.townInfo.gold = 1000000;
+		json.townInfo.employees = 10000;
+		json.townInfo.happiness = 10000;
+		json.townInfo.health = 10000;
+		json.townInfo.knowledge_points = 1000;
+		json.modifiers.happiness = 10000;
+		json.modifiers.health = 10000;
+	}
 	const randomSize =
 		difficulty == '0'
 			? 6

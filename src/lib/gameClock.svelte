@@ -16,6 +16,7 @@
 		db = _applyModifiers(db);
 		db = _healthEffects(db);
 		db = _bringModifiersBackToNormal(db);
+		db = _checkSpecialPlots(db);
 		return db;
 	}
 
@@ -90,6 +91,36 @@
 			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(currentDB));
 		}
 	});
+
+	function _checkSpecialPlots(z) {
+		// this function checks and updates if the city has a bank, hospital, and city hall
+		let hasBank = false;
+		let hasHospital = false;
+		let hasCityHall = false;
+
+		for (let i = 0; i < z.plots.length; i++) {
+			for (let j = 0; j < z.plots[i].length; j++) {
+				if (z.plots[i][j].active == true) {
+					if (z.plots[i][j].id == 'bank') {
+						hasBank = true;
+					}
+					if (z.plots[i][j].id == 'city-hall') {
+						hasCityHall = true;
+					}
+					if (
+						z.plots[i][j].id == 'small_hospital' ||
+						z.plots[i][j].id == 'large_hospital'
+					) {
+						hasHospital = true;
+					}
+				}
+			}
+		}
+		z.hasBank = hasBank;
+		z.hasHospital = hasHospital;
+		z.hasCityHall = hasCityHall;
+		return z;
+	}
 
 	function _checkGameWin(z) {
 		const gameWinScenario = z.endGoal;
@@ -362,6 +393,11 @@
 			}
 		}
 		if (z.modifiers.health > 1.0) {
+			if (z.hasHospital) {
+				addToTownLog(messages.hospital_advantage, z);
+				return z;
+			}
+
 			// check % above 1.0 that z.modifiers.health is, and get it 8% closer to 1.0
 			let percentAboveOne = z.modifiers.health - 1.0;
 			z.modifiers.health -= percentAboveOne * 0.08;

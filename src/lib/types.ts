@@ -25,6 +25,7 @@ export type Game = {
     },
     hasCityHall: boolean;
     hasBank: boolean;
+    hasHospital: boolean;
     modifiers: {
         happiness: number;
         health: number;

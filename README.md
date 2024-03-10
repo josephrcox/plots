@@ -16,7 +16,14 @@ At the top of the screen, you will see metrics or stats. These help you understa
 - Happiness. How happy your town is overall. Happiness is impacted by:
   - Plots. Certain plots make your town trend happier or sadder. 
   - Health. If your town is unhealthy, it will be unhappy.
-  - Unemployement. If your town has too many people and not enough jobs, it will be unhappy.
+  - Unemployment. If your town has too many people and not enough jobs, it will be unhappy.
   - Tax rate. If your tax rate is too high, your town will be unhappy.
   - Boredom. If the town rarely has changes such as new businesses then people will become exponentially more unhappy. 
 - Tax rate. This is set by you and can be changed at any time using the slider. Depending on the difficulty of your game, you can set this higher or lower, though every game has a random 'ok' range that people are ok with before getting upset. This changes the percentage of revenue you get from businesses. 
+
+## Building
+There are a few types of plots that you want to have a good mix of:
+- Residential. You need these to increase your population.
+- Commercial. These are plots that require employees, and generate revenue. Some of these are far better value as they improve the happiness or health, but some also hurt these stats. 
+- Parks & Recreation. These plots don't make money but they make your town happier or healthier. 
+- City Services. Schools, Hospitals, Banks. These are advanced plots designed for late game to improve your wealth and unlock other capabilities in game. 

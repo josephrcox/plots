@@ -17,4 +17,6 @@ export const messages = {
 	win: {
 		land: 'You have filled the grid with buildings. You win!',
 	},
+	hospital_advantage:
+		'Because you have a hospital, the town is staying healthier for longer!',
 };

@@ -467,7 +467,7 @@ export const options = [
 		description:
 			'A place where children can learn and grow, and where adults can learn new skills. Produces knowledge.',
 		revenue_per_week: 0,
-		knowledge_points_per_month: 2,
+		knowledge_points_per_month: 5,
 		requirements: {
 			gold: 850,
 			plots: [],
@@ -494,7 +494,7 @@ export const options = [
 		type: 'education',
 		description: 'A larger school. Produces knowledge',
 		revenue_per_week: 0,
-		knowledge_points_per_month: 8,
+		knowledge_points_per_month: 15,
 		requirements: {
 			gold: 1300,
 			plots: [],
@@ -521,7 +521,7 @@ export const options = [
 		type: 'education',
 		description: 'The supreme learning institution. Produces knowledge.',
 		revenue_per_week: 0,
-		knowledge_points_per_month: 25,
+		knowledge_points_per_month: 75,
 		requirements: {
 			gold: 3500,
 			plots: [],

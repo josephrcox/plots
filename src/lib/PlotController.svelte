@@ -63,18 +63,6 @@
 	export function restartModifyPlotMenu() {
 		$unique = {};
 	}
-
-	// check if ?dev=true is in the url
-	if (window.location.search.includes('dev=true')) {
-		$DB.townInfo.name = 'DevTown';
-		$DB.townInfo.gold = 100000000;
-		$DB.townInfo.population = 0;
-		$DB.townInfo.happiness = 100000;
-		$DB.townInfo.health = 100000;
-		$DB.modifiers.happiness = 100000;
-		$DB.modifiers.health = 100000;
-		$DB.townInfo.knowledge_points = 10000;
-	}
 </script>
 
 {#if $DB != null}

@@ -125,16 +125,16 @@
 
 <style>
 	.plot_container {
-		width: 120px;
-		height: 120px;
+		width: 100px;
+		height: 100px;
 		background-color: rgb(126, 158, 255);
 		word-wrap: normal;
-		min-width: 120px;
+		min-width: 100px;
 		display: flex;
 		align-items: start;
 		justify-content: center;
 		align-items: center;
-		font-size: 0.9em;
+		font-size: 0.8em;
 		box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;

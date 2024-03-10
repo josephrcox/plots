@@ -16,9 +16,11 @@
 			.value;
 		const townName = (document.getElementById('townName') as HTMLInputElement)
 			.value;
+		const cheats =
+			(document.getElementById('cheats') as HTMLSelectElement).value == 'true';
 		const dif = difficulty as Difficulty;
 		const eg = endGoal as EndGoal;
-		startGame(dif, eg, townName);
+		startGame(dif, eg, townName, cheats);
 	}
 
 	let selectedGameMode = 'land';
@@ -54,7 +56,7 @@
 					</div>
 
 					<div>
-						<Label for="endGoal" class="mt-2">Select a gamemode</Label>
+						<Label for="endGoal" class="mt-2">Select a game mode</Label>
 						{#if selectedGameMode === 'land'}
 							<p class="text-gray-500 text-sm">
 								{winScenarios.land.description_title}
@@ -83,6 +85,16 @@
 							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 							placeholder="Will be randomized if you leave blank"
 						/>
+					</div>
+					<div>
+						<Label for="cheats" class="mt-2">Cheats</Label>
+						<select
+							id="cheats"
+							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						>
+							<option value="false" selected>No cheats</option>
+							<option value="true">Dev mode</option>
+						</select>
 					</div>
 				</div>
 			</Dialog.Description>

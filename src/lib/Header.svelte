@@ -96,7 +96,7 @@
 						rounded-full px-1 py-1 text-xs text-white
 						${$DB.townInfo.happiness < 50 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.modifiers.happiness < 1 ? '🔴' : '🟢'}
+					${$DB.modifiers.happiness < 1 ? '🔴' : '🟢'}(${roundTo($DB.modifiers.happiness, 2)}x)
 				</span>`,
 				tap: () => {
 					// TODO
@@ -110,7 +110,7 @@
 						rounded-full px-1 py-1 text-xs text-white
 						${$DB.townInfo.health < 50 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.modifiers.health < 1 ? '🔴' : '🟢'}
+					${$DB.modifiers.health < 1 ? '🔴' : '🟢'}(${roundTo($DB.modifiers.health, 2)}x)
 				</span>`,
 				tap: () => {
 					// TODO
