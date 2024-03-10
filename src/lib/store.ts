@@ -32,7 +32,6 @@ export let DB = writable(
 export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: string, cheats: boolean) {
 	let json : Game = { ...default_db }; // Use a copy of default_db 
 	json.economyAndLaws.max_tax_rate = max_tax_rates_based_on_difficulty[difficulty];
-	console.log(json.economyAndLaws.max_tax_rate);
 	json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
 	let default_plots = [] as any[][]; 
 	// remove leading and trailing spaces, remove symbols other than nunbers and letters
@@ -51,11 +50,11 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	}
 	const randomSize =
 		difficulty == '0'
-			? 6
-			: difficulty == '1' // from 7-11
-			? Math.floor(Math.random() * 4) + 7
-			: difficulty == '2' // from 12 - 20
-			? Math.floor(Math.random() * 9) + 12
+			? 6 // 36 total
+			: difficulty == '1' // from 9 - 12
+			? Math.floor(Math.random() * 3) + 9
+			: difficulty == '2' // from 13 - 16
+			? Math.floor(Math.random() * 4) + 13
 			: 35; // undefined difficulty
 	for (let i = 0; i < randomSize; i++) {
 		default_plots.push([]);
@@ -90,7 +89,6 @@ export function clearDB(overridenFile : File | null = null) {
 
 export function toggleShowOnlyAffordable() {
 	showOnlyAffordable.update((value) => !value);
-	console.log(showOnlyAffordable);
 	localStorage.setItem('showOnlyAffordable', localStorage.getItem('showOnlyAffordable') === 'true' ? 'false' : 'true');
 }
 

@@ -19,4 +19,6 @@ export const messages = {
 	},
 	hospital_advantage:
 		'Because you have a hospital, the town is staying healthier for longer!',
+	notEnoughVariety:
+		'People are sick of going to the same places over and over, add some variety!',
 };

@@ -5,6 +5,7 @@
 	import { options } from './objects/PlotTypeOptions.js';
 	import Plot from './Plot.svelte';
 	import { winScenarios } from './objects/WinScenarios.js';
+	import { plotCountMaximums } from './objects/difficulty.js';
 
 	let z = $DB;
 	const GAME_TICK_SPEED = 30;
@@ -22,7 +23,7 @@
 
 	function performMonthlyTasks(db) {
 		db = _calculateKnowledge(db);
-		db = _movePeopleInMovePeopleOut(db);
+
 		db = _banksEffect(db);
 		db = _federalGovEffect(db);
 		return db;
@@ -31,6 +32,8 @@
 	function performQuarterlyTasks(db) {
 		db = _boredom(db);
 		db = _bringStatsBackToNormal(db);
+		db = _checkPlotCountForEffect(db);
+		db = _movePeopleInMovePeopleOut(db);
 		return db;
 	}
 
@@ -163,11 +166,9 @@
 				) {
 					let plotId =
 						winScenarios.land.requirements[z.difficulty].required_plots[i];
-					//console.log(plotId);
 					let found = false;
 					for (let j = 0; j < z.plots.length; j++) {
 						for (let k = 0; k < z.plots[j].length; k++) {
-							console.log(options[z.plots[j][k].type].id);
 							if (options[z.plots[j][k].type].id == plotId) {
 								found = true;
 								break;
@@ -237,6 +238,32 @@
 		if (z.hasBank === true) {
 			// TODO
 		}
+		return z;
+	}
+
+	function _checkPlotCountForEffect(z) {
+		let totalPlotsPlaced = z.plotCounts.reduce((a, b) => a + b, 0);
+		let negativeEffect = false;
+
+		// This starts at 3 to ignore residential properties
+		for (let i = 3; i < z.plotCounts.length; i++) {
+			if (z.plotCounts[i] == null) {
+				continue;
+			}
+			console.log(`Total placed: ${totalPlotsPlaced}, ${z.plotCounts[i]}, ${z.plotCounts[i] / totalPlotsPlaced},
+				${plotCountMaximums[z.difficulty]}`);
+			if (
+				z.plotCounts[i] / totalPlotsPlaced >=
+				plotCountMaximums[z.difficulty]
+			) {
+				negativeEffect = true;
+			}
+		}
+		if (negativeEffect) {
+			z.modifiers.happiness -= 0.05;
+			z = addToTownLog(messages.notEnoughVariety, z);
+		}
+
 		return z;
 	}
 

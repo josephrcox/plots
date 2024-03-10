@@ -8,7 +8,6 @@
 	$: {
 		if ($DB.endGameDetails != null && $DB.overtime == false) {
 			show = true;
-			console.log($DB.endGameDetails, $DB.overtime);
 		} else {
 			show = false;
 		}

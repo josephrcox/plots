@@ -11,3 +11,9 @@ export const max_tax_rates_based_on_difficulty = {
 	1: Math.random() * (0.4 - 0.2) + 0.2,
 	2: Math.random() * (0.3 - 0.1) + 0.1,
 };
+
+export const plotCountMaximums = {
+	0: 0.25,
+	1: 0.3,
+	2: 0.35,
+};

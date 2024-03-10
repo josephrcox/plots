@@ -238,7 +238,7 @@
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="
-			flex flex-col gap-1 drop-shadow-md text-center pb-6 rounded-lg max-h-20 hover:max-h-48 transition-all ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/2
+			flex flex-col gap-1 drop-shadow-md text-center pb-6 rounded-lg max-h-20 h-20 hover:max-h-48 hover:h-48 transition-all ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/2
 			"
 				on:click={() => {
 					$DB.townLog = '';
@@ -255,7 +255,7 @@
 						</span>
 					{/each}
 				{:else}
-					<span class="townLog text-xs text-start text-slate-500"
+					<span class="townLog text-xs text-slate-500 text-center"
 						>No Alerts</span
 					>
 				{/if}
