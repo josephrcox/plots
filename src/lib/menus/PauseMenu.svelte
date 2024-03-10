@@ -25,7 +25,8 @@
 				if (
 					$DB.plots[x][y].active == false ||
 					$DB.plots[x][y] == null ||
-					$DB.plots[x][y].type == null
+					$DB.plots[x][y].type == null ||
+					$DB.plots[x][y].type < 1
 				) {
 					continue;
 				}

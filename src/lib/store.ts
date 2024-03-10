@@ -73,8 +73,8 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	json.plots = default_plots;
 	localStorage.reset = false;
 	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
-	paused.set(true);
 	DB.set(json); // Update the store with the new value
+	location.reload();
 }
 
 export function clearDB(overridenFile : File | null = null) {

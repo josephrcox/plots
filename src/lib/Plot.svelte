@@ -107,11 +107,11 @@
 	style={specialStylingString}
 	data-type={data.type}
 	data-type-id={data.typeId}
-	data-referencePlotX={data.referencePlot !== undefined
-		? data.referencePlot[0]
-		: null}
-	data-referencePlotY={data.referencePlot !== undefined
+	data-refPlotX={data.referencePlot !== undefined
 		? data.referencePlot[1]
+		: null}
+	data-refPlotY={data.referencePlot !== undefined
+		? data.referencePlot[0]
 		: null}
 	data-size={data.type > -1 ? options[data.type].requirements.size : null}
 >

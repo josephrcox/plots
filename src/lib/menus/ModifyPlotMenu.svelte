@@ -304,7 +304,8 @@
 			// close modal
 			$modifyPlotMenuOptions.visible = false;
 		} else {
-			tooltip = 'You do not have enough resources to purchase this plot.';
+			tooltip =
+				"You do not have enough resources to purchase this plot. If it's a 'Large' plot, make sure you have a 2x2 area available. ";
 			const plotOptions = document.querySelectorAll('.plotOption');
 			plotOptions.forEach((plotOption) => {
 				plotOption.classList.remove('active');
@@ -347,6 +348,20 @@
 				z.plotCounts[oldPlotType] = 0;
 			}
 			z.plotCounts[oldPlotType]--;
+			let size = options[oldPlotType].requirements.size ?? 1;
+			if (size > 1) {
+				for (let a = 0; a < z.plots.length; a++) {
+					for (let b = 0; b < z.plots[x].length; b++) {
+						if (
+							z.plots[a][b].referencePlot != undefined &&
+							z.plots[a][b].referencePlot[0] === x &&
+							z.plots[a][b].referencePlot[1] === y
+						) {
+							reverseClear(a, b);
+						}
+					}
+				}
+			}
 		}
 
 		z.lastChangeDay = z.environment.day;

@@ -525,7 +525,7 @@ export const options = [
 	},
 	{
 		id: 'university',
-		title: '🏫 University',
+		title: '🏫 Large University',
 		subtitle: 'for learning',
 		type: 'education',
 		description: 'The supreme learning institution. Produces knowledge.',
