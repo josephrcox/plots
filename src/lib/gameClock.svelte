@@ -18,13 +18,11 @@
 		db = _healthEffects(db);
 		db = _bringModifiersBackToNormal(db);
 		db = _checkSpecialPlots(db);
-		db = _checkPlotCountForEffect(db);
 		return db;
 	}
 
 	function performMonthlyTasks(db) {
 		db = _calculateKnowledge(db);
-
 		db = _banksEffect(db);
 		db = _federalGovEffect(db);
 		return db;
@@ -33,7 +31,7 @@
 	function performQuarterlyTasks(db) {
 		db = _boredom(db);
 		db = _bringStatsBackToNormal(db);
-
+		db = _checkPlotCountForEffect(db);
 		db = _movePeopleInMovePeopleOut(db);
 		return db;
 	}
@@ -52,6 +50,9 @@
 			// currentDB.endGameDetails = null;
 			// currentDB.overtime = false;
 			// return currentDB;
+			if (currentDB == null) {
+				return currentDB;
+			}
 			currentDB.tick++;
 			if (currentDB.tick % GAME_TICK_SPEED !== 0) {
 				return currentDB;
@@ -245,6 +246,7 @@
 	function _checkPlotCountForEffect(z) {
 		let totalPlotsPlaced = z.plotCounts.reduce((a, b) => a + b, 0);
 		let negativeEffect = false;
+		let plotCausingNegativeEffect = '';
 
 		for (let i = 0; i < z.plotCounts.length; i++) {
 			if (z.plotCounts[i] == null || options[i].check_for_variety != true) {
@@ -255,12 +257,14 @@
 				z.plotCounts[i] / totalPlotsPlaced >=
 				plotCountMaximums[z.difficulty]
 			) {
+				plotCausingNegativeEffect = options[i].title;
+
 				negativeEffect = true;
 			}
 		}
 		if (negativeEffect) {
-			z.modifiers.happiness -= 0.05;
 			z = addToTownLog(messages.notEnoughVariety, z);
+			z.modifiers.happiness * 0.95;
 		}
 
 		return z;
