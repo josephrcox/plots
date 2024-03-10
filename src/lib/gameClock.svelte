@@ -247,7 +247,6 @@
 		let negativeEffect = false;
 
 		for (let i = 0; i < z.plotCounts.length; i++) {
-			console.log(options[i].title);
 			if (z.plotCounts[i] == null || options[i].check_for_variety != true) {
 				continue;
 			}
