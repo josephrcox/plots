@@ -310,7 +310,7 @@ export const options = [
 		type: 'recreation',
 		description:
 			'People love horses. This makes them happy, and can generate some money through lessons.',
-		revenue_per_week: 10,
+		revenue_per_week: 25,
 		requirements: {
 			gold: 220,
 			plots: [],
@@ -319,8 +319,8 @@ export const options = [
 			knowledge: 0,
 		},
 		effect_modifiers: {
-			happiness: 1.1,
-			health: 1.0,
+			happiness: 1.05,
+			health: 1.02,
 		},
 		immediate_variable_changes: {
 			happiness: 5,

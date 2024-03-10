@@ -155,7 +155,7 @@
 		background-color: rgb(21 28 41);
 	}
 	.plot_container[data-type='-2'] {
-		background-color: #ffff00;
+		background-color: #858507;
 		border: none;
 	}
 
@@ -169,7 +169,7 @@
 	}
 
 	span[data-size='2'] {
-		transform: translateX(50px) translateY(40px);
+		/* transform: translateX(50px) translateY(40px); */
 	}
 
 	.plot_container > div {
