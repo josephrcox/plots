@@ -4,7 +4,7 @@ export const options = [
 		title: '🏠 Residential (small)',
 		subtitle: 'for living',
 		type: 'residential',
-		description: 'A few basic homes that can hold 16 people.',
+		description: 'A few basic homes (+16 people)',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 150,
@@ -29,7 +29,7 @@ export const options = [
 		title: '🏘️ Residential (medium)',
 		subtitle: 'for living',
 		type: 'residential',
-		description: 'A few high-density buildings that can hold 64 people.',
+		description: 'Some apartments (+64 people)',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 500,
@@ -54,7 +54,7 @@ export const options = [
 		title: '🏢 Residential (large)',
 		subtitle: 'for living',
 		type: 'residential',
-		description: 'Many high-density buildings that can hold 256 people.',
+		description: 'Many apartments (+256 people)',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 1500,
@@ -405,7 +405,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #ffff00;', // recreation
+		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'park_medium',
@@ -430,7 +430,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #ffff00;', // recreation
+		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'park_large',
@@ -457,7 +457,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		styling: 'background-color: #ffff00;', // recreation
+		styling: 'background-color: #858507;', // recreation
 	},
 	{
 		id: 'school_small',
