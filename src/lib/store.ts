@@ -86,6 +86,12 @@ export function clearDB(overridenFile : File | null = null) {
 	location.reload();
 }
 
+export function toggleShowOnlyAffordable() {
+	showOnlyAffordable.update((value) => !value);
+	console.log(showOnlyAffordable);
+	localStorage.setItem('showOnlyAffordable', localStorage.getItem('showOnlyAffordable') === 'true' ? 'false' : 'true');
+}
+
 export let modifyPlotMenuOptions = writable({
 	visible: false,
 	x: 0,
@@ -100,8 +106,6 @@ export let unique = writable({});
 export let paused = writable(false);
 export let showScoreboard = writable(false);
 export let showBalanceSheet = writable(false);
+export let showOnlyAffordable = localStorage.getItem('showOnlyAffordable') === 'true' ? writable(true) : writable(false);
 export let headerHeight = writable(250);
 export let speed = writable(500);
-export let showUnaffordablePlotOptions = writable(
-	localStorage.getItem('showUnaffordablePlotOptions') === 'true' ? true : false,
-);

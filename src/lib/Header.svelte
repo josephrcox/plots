@@ -93,10 +93,10 @@
 				value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
 				subtitle: `<span
 					class='
-						rounded-full px-1 py-1 text-xs text-white
+						rounded-full px-1 py-1 text-xs text-slate-600
 						${$DB.townInfo.happiness < 50 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.modifiers.happiness < 1 ? '🔴' : '🟢'}(${roundTo($DB.modifiers.happiness, 2)}x)
+					${$DB.modifiers.happiness < 1 ? '🔴' : '🟢'} (${roundTo($DB.modifiers.happiness, 2)}x)
 				</span>`,
 				tap: () => {
 					// TODO
@@ -107,10 +107,10 @@
 				value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
 				subtitle: `<span
 					class='
-						rounded-full px-1 py-1 text-xs text-white
+						rounded-full px-1 py-1 text-xs text-slate-600
 						${$DB.townInfo.health < 50 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.modifiers.health < 1 ? '🔴' : '🟢'}(${roundTo($DB.modifiers.health, 2)}x)
+					${$DB.modifiers.health < 1 ? '🔴' : '🟢'} (${roundTo($DB.modifiers.health, 2)}x)
 				</span>`,
 				tap: () => {
 					// TODO

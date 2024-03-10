@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	// @ts-ignore
-	import { ACTIVE_GAME_DB_NAME, DB, modifyPlotMenuOptions } from '../store.ts';
+	import {
+		ACTIVE_GAME_DB_NAME,
+		DB,
+		modifyPlotMenuOptions,
+		showOnlyAffordable,
+		toggleShowOnlyAffordable,
+	} from '../store.js';
 	import { options } from '../objects/PlotTypeOptions.js';
 	import gameClock from '../gameClock.svelte';
 	import { Game, PlotOption } from '../types.js';
@@ -44,6 +50,9 @@
 			affordable: checkIfAffordable(option, $DB),
 			selected: isSelected(option),
 		}));
+		if ($showOnlyAffordable) {
+			reactiveOptions = reactiveOptions.filter((option) => option.affordable);
+		}
 	}
 
 	$: reactiveOptions = reactiveOptions.filter((option) =>
@@ -393,23 +402,21 @@
 	}
 </script>
 
-<Sheet.Root bind:open>
-	<Sheet.Trigger />
-	<Sheet.Content
-		class="overflow-scroll h-4/6 w-12/12 border-gray-500 border-r-2 fixed
+<Dialog.Root bind:open>
+	<Dialog.Content
+		class="border-gray-500 border-r-2 overflow-y-scroll max-w-[90vw] max-h-[90vh]
 		"
-		side="bottom"
 	>
-		<Sheet.Header>
-			<Sheet.Title class="text-2xl font-bold">
+		<Dialog.Header>
+			<Dialog.Title class="text-2xl font-bold">
 				<span class="text-2xl font-bold"></span>Set Plot: {y + 1}-{x + 1}
-				<span class="text-sm"> (press esc to close)</span></Sheet.Title
+				<span class="text-sm"> (press esc to close)</span></Dialog.Title
 			>
 			{#if tooltip !== ''}
-				<Sheet.Description class="text-sm">{tooltip}</Sheet.Description>
+				<Dialog.Description class="text-sm">{tooltip}</Dialog.Description>
 			{/if}
-		</Sheet.Header>
-		<div class="flex mt-4">
+		</Dialog.Header>
+		<div class="flex">
 			<Input
 				type="text"
 				id="search-bar"
@@ -419,12 +426,32 @@
 				bind:this={searchInput}
 				class="border rounded w-auto"
 			/>
+			<!-- toggle to only show affordable ones -->
+			<div class="flex items-center ml-6">
+				<input
+					type="checkbox"
+					id="toggle-affordable"
+					class="rounded"
+					on:change={() => {
+						toggleShowOnlyAffordable();
+					}}
+					checked={totalAffordableOptionsCount === reactiveOptions.length}
+				/>
+				<!-- no select -->
+				<label
+					for="toggle-affordable"
+					class="ml-2
+					no-select cursor-pointer
+				
+				">Show only affordable</label
+				>
+			</div>
 			<div class="flex justify-end ml-6">
 				{#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
 					<button
 						on:click={clearPlot}
 						id="bulldoze"
-						class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
+						class="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
 						>🔥 Bulldoze</button
 					>
 				{/if}
@@ -459,138 +486,119 @@
 				</div>
 			</label>
 		</div>
-		<Separator class="my-4" />
+		<Separator class="" />
 		<div class="scrollable-y">
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div
-				class="plotOptions grid grid-flow-row grid-cols-2
-					<!-- on big width, use 3 columns -->
-					lg:grid-cols-3
-				flex-auto flex-grid gap-6 mt-4
-				"
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+			<table
+				class="text-left table-auto text-xs w-full border-collapse border-gray-500 rounded-lgshadow-lg"
 				on:click={handlePlotOptionClick}
 			>
-				{#each reactiveOptions as option (option.id)}
-					<div
-						class="plotOption min-w-min overflow-x-auto
-						{!option.affordable ? 'unaffordable cursor-not-allowed' : 'cursor-pointer'}
-					border rounded-md p-4 mb-4
-						{option.selected ? 'bg-teal-900' : ''}
-					"
-						data-plotoptionid={option.id}
-					>
-						<div>
-							<h2 class="text-md font-semibold">
-								{option.title}
-								<span class="text-xs font-light italic opacity-50"
-									>{option.subtitle}</span
-								>
-							</h2>
+				<thead
+					class="
+					sticky top-0 z-10 bg-slate-900 position-sticky text-white text-left
+				"
+				>
+					<tr class="text-xs text-left">
+						<th class="px-2 py-2">Title</th>
+						<th class="px-2 pr-36 py-2">Desc</th>
+						<th class="px-2 py-2">Profit (wk)</th>
+						<th class="px-2 py-2">Employees</th>
+						<th class="px-2 py-2">Required Gold</th>
+						<th class="px-2 py-2">Required Knowledge</th>
+						<th class="px-2 py-2">Happiness multiplier</th>
+						<th class="px-2 py-2">Health multiplier</th>
+						<th class="px-2 py-2">Instant Happiness change</th>
+						<th class="px-2 py-2">Instant Health change</th>
+					</tr>
+				</thead>
+				<tbody class="overflow-hidden text-xs">
+					{#each reactiveOptions as option (option.id)}
+						<tr
+							class="plotOption border-b border-black {option.affordable
+								? 'cursor-pointer'
+								: 'unaffordable cursor-not-allowed bg-gray-200'}
+								{option.selected
+								? 'italic font-semibold border-green-500 border-4 border-b-4 cursor-not-allowed border-dashed'
+								: ''}
+								
+								"
+							data-plotoptionid={option.id}
+							style={option.styling}
+						>
+							<td class="px-2 py-2">
+								{option.selected ? '➡️' : ''}
 
-							<p class="text-xs opacity-75">{option.description}</p>
-						</div>
-						<div class="mt-4">
-							{#if option.revenue_per_week > 0 || option.tourism_revenue_per_week > 0}
-								<div class="profits">
-									<span class="text-sm font-semibold">Profits</span>
-									{#if option.revenue_per_week > 0}
-										<p class="text-sm">
-											Profit with Tax Rate:
-											<!-- strikethrough -->
-											<span class="line-through text-xs">
-												{roundTo(option.revenue_per_week * 1, 2)}
-											</span>
-											<span class=" text-xs">
-												({roundTo(
-													$DB.economyAndLaws.tax_rate * option.revenue_per_week,
-													2,
-												)} gold)
-											</span>
-										</p>
-									{/if}
-									{#if option.tourism_revenue_per_week > 0}
-										<p class="text-xs">
-											Tourism Revenue: {option.tourism_revenue_per_week}
-										</p>
-										<p class="text-xs">
-											Taxed Tourism Revenue: {roundTo(
-												$DB.economyAndLaws.tax_rate *
-													option.tourism_revenue_per_week *
-													$DB.townInfo.population_count,
-												2,
-											)} gold
-										</p>
-									{/if}
-								</div>
-							{/if}
-							<div
-								class="reqs_and_mods mt-4 flex flex-row justify-between gap-2"
+								{option.title}</td
 							>
-								<div>
-									<span class="text-sm font-semibold">Requirements</span>
-									{#if option.requirements.gold !== 0}
-										<p class="text-xs">
-											{option.requirements.gold} gold
-											<span class="text-xs"
-												>({roundTo($DB.townInfo.gold, 0)})</span
-											>
-										</p>
-									{/if}
-									{#if option.requirements.employees !== 0}
-										<p class="text-xs">
-											{option.requirements.employees} employees
-											<span class="text-xs"
-												>({roundTo(
-													$DB.townInfo.population_count -
-														$DB.townInfo.employees,
-													0,
-												)})</span
-											>
-										</p>
-									{/if}
-									{#if option.requirements.knowledge != null && option.requirements.knowledge !== 0}
-										<p class="text-xs">
-											{option.requirements.knowledge} knowledge
-										</p>
-									{/if}
-								</div>
-								<div>
-									<span class="text-sm font-semibold">Multiplier</span>
-									<p class="text-xs">
-										Happiness: {option.effect_modifiers.happiness == 1.0
-											? 'No effect'
-											: formatNumber(option.effect_modifiers.happiness)}
-									</p>
-									<p class="text-xs">
-										Health: {option.effect_modifiers.health == 1.0
-											? 'No effect'
-											: formatNumber(option.effect_modifiers.health)}
-									</p>
-								</div>
-							</div>
-							{#if option.immediate_variable_changes.happiness !== 0 || option.immediate_variable_changes.health !== 0}
-								<div class="immediate_changes mt-4">
-									<span class="text-sm font-semibold">Instant changes</span>
-									{#if option.immediate_variable_changes.happiness !== 0}
-										<p class="text-xs">
-											Happiness: {option.immediate_variable_changes.happiness}
-										</p>
-									{/if}
-									{#if option.immediate_variable_changes.health !== 0}
-										<p class="text-xs">
-											Health: {option.immediate_variable_changes.health}
-										</p>
-									{/if}
-								</div>
-							{/if}
-						</div>
-					</div>
-				{/each}
-			</div>
+							<td class="px-2 py-2 w-max">{option.description}</td>
+							<td class="px-2 py-2">
+								{#if option.revenue_per_week > 0}
+									<div>
+										<span class="line-through"
+											>${roundTo(option.revenue_per_week, 2)}</span
+										>
+
+										<span
+											>${roundTo(
+												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
+												2,
+											)}</span
+										>
+									</div>
+								{:else}
+									<!-- whole lotta nothin' -->
+								{/if}
+							</td>
+							<td class="px-2 py-2">{option.requirements.employees || ''}</td>
+							<td class="px-2 py-2"
+								>${option.requirements.gold}
+								<span class="text-xs opacity-50">(${$DB.townInfo.gold})</span>
+							</td>
+							<td class="px-2 py-2">{option.requirements.knowledge || ''}</td>
+							<td class="px-2 py-2"
+								>{option.effect_modifiers.happiness == 1.0
+									? ''
+									: formatNumber(option.effect_modifiers.happiness)}
+								{option.effect_modifiers.happiness > 1
+									? '🟢'
+									: option.effect_modifiers.happiness < 1
+										? '🔴'
+										: ''}
+							</td>
+							<td class="px-2 py-2"
+								>{option.effect_modifiers.health == 1.0
+									? ''
+									: formatNumber(option.effect_modifiers.health)}
+								{option.effect_modifiers.health > 1
+									? '🟢'
+									: option.effect_modifiers.health < 1
+										? '🔴'
+										: ''}
+							</td>
+							<td class="px-2 py-2"
+								>{option.immediate_variable_changes.happiness || ''}
+								{option.immediate_variable_changes.happiness > 0
+									? '🟢'
+									: option.immediate_variable_changes.happiness < 0
+										? '🔴'
+										: ''}
+							</td>
+							<td class="px-2 py-2"
+								>{option.immediate_variable_changes.health || ''}
+								{option.immediate_variable_changes.health > 0
+									? '🟢'
+									: option.immediate_variable_changes.health < 0
+										? '🔴'
+										: ''}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 		</div>
-	</Sheet.Content>
-</Sheet.Root>
+	</Dialog.Content>
+</Dialog.Root>
 
 <style>
 	.unaffordable {
