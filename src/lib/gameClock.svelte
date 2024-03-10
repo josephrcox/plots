@@ -105,16 +105,17 @@
 
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
-				if (z.plots[i][j].active == true) {
-					if (z.plots[i][j].id == 'bank') {
+				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+					let plotOptionForPlot = options[z.plots[i][j].type].id;
+					if (plotOptionForPlot == 'bank') {
 						hasBank = true;
 					}
-					if (z.plots[i][j].id == 'city_hall') {
+					if (plotOptionForPlot == 'city_hall') {
 						hasCityHall = true;
 					}
 					if (
-						z.plots[i][j].id == 'small_hospital' ||
-						z.plots[i][j].id == 'large_hospital'
+						plotOptionForPlot == 'small_hospital' ||
+						plotOptionForPlot == 'large_hospital'
 					) {
 						hasHospital = true;
 					}
@@ -460,8 +461,9 @@
 		}
 		if (z.modifiers.health > 1.0) {
 			if (z.hasHospital) {
-				addToTownLog(messages.hospital_advantage, z);
-				return z;
+				if (z.townLog.indexOf(messages.hospital_advantage) == -1) {
+					return (z = addToTownLog(messages.hospital_advantage, z));
+				}
 			}
 
 			// check % above 1.0 that z.modifiers.health is, and get it 8% closer to 1.0

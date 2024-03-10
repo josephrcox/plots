@@ -9,6 +9,7 @@
 		paused,
 		headerHeight,
 	} from './store';
+
 	$: if ($DB) {
 		checkForAvailablePlots();
 	}

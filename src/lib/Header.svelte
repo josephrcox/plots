@@ -76,7 +76,7 @@
 						rounded-full px-1 py-1 text-xs
 						${$DB.economyAndLaws.last_month_profit < 0 ? 'text-red-500' : 'text-green-500'}
 					'>
-					${$DB.economyAndLaws.last_month_profit}
+					${roundTo($DB.economyAndLaws.last_month_profit, 0)}
 				</span>`,
 				tap: () => {
 					$showBalanceSheet = !$showBalanceSheet;

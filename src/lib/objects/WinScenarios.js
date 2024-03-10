@@ -6,7 +6,7 @@ export const winScenarios = {
 		win: 'You have filled the grid with buildings and met the requirements. Your citizens are happy, fulfilled, hard-working, and healthy. ',
 		requirements: {
 			0: {
-				population_count: 110,
+				population_count: 150,
 				happiness: 100,
 				health: 100,
 				employment: 1,
@@ -14,20 +14,20 @@ export const winScenarios = {
 				required_plots: ['small_school', 'pub'],
 			},
 			1: {
-				population_count: 300,
+				population_count: 500,
 				happiness: 120,
 				health: 120,
 				employment: 1,
 				knowledge: 100,
-				required_plots: ['small_hospital'],
+				required_plots: ['small_hospital', 'large_school'],
 			},
 			2: {
-				population_count: 600,
+				population_count: 1000,
 				happiness: 200,
 				health: 200,
 				employment: 1,
 				knowledge: 1000,
-				required_plots: ['city_hall'],
+				required_plots: ['city_hall', 'bank'],
 			},
 		},
 	},

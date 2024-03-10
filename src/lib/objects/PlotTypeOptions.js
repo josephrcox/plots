@@ -497,7 +497,7 @@ export const options = [
 		styling: 'background-color: #4caf50;', // education
 	},
 	{
-		id: 'school_large',
+		id: 'large_school',
 		title: '🚌 Large school',
 		subtitle: 'for learning',
 		type: 'education',

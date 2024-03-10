@@ -13,7 +13,7 @@ export const max_tax_rates_based_on_difficulty = {
 };
 
 export const plotCountMaximums = {
-	0: 0.25,
-	1: 0.3,
-	2: 0.35,
+	0: 0.4,
+	1: 0.4,
+	2: 0.3,
 };

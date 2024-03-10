@@ -69,11 +69,12 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 		}
 	}
 
-	paused.set(false);
+
 	json.plots = default_plots;
 	localStorage.reset = false;
 	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
 	DB.set(json); // Update the store with the new value
+		paused.set(true);
 	location.reload();
 }
 
@@ -103,7 +104,7 @@ export let startGameMenu = writable({
 });
 
 export let unique = writable({});
-export let paused = writable(true);
+export let paused = writable(false);
 export let showScoreboard = writable(false);
 export let showBalanceSheet = writable(false);
 export let showOnlyAffordable = localStorage.getItem('showOnlyAffordable') === 'true' ? writable(true) : writable(false);
