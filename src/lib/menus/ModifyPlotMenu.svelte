@@ -585,7 +585,7 @@
 
 								{option.title}</td
 							>
-							<td class="px-2 py-2 w-24">{option.description}</td>
+							<td class="px-2 py-2 w-24">{@html option.description}</td>
 							<td class="px-2 py-2 w-12">
 								{#if option.revenue_per_week > 0}
 									<div>

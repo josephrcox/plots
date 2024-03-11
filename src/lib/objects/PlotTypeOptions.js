@@ -663,7 +663,7 @@ export const options = [
 		requirements: {
 			gold: 10000,
 			plots: [],
-			employees: 50,
+			employees: 75,
 			climate: null,
 			size: 1,
 			knowledge: 250,
@@ -683,8 +683,11 @@ export const options = [
 		title: '🏦 Bank',
 		subtitle: 'for storing and accessing funds',
 		type: 'bank',
-		description:
-			'Rich get richer. Allows you to transfer tourism gold to regular gold and enables other plots.',
+		description: `Rich get richer. Allows you to transfer tourism gold to regular gold and enables other plots.
+			<ul>
+				<li>Enables converting tourism gold to gold</li>
+				<li>Enables converting knowledge to gold (TODO)</li>
+			</ul>`,
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
