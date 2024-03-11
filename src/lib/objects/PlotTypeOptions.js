@@ -101,8 +101,7 @@ export const options = [
 		title: '🍎 Apple orchard',
 		subtitle: 'for farming',
 		type: 'farm',
-		description:
-			'A bunch of trees that make apples, makes money by selling them and by selling apple-related products.',
+		description: 'A bunch of apple trees. Sells apple products.',
 		revenue_per_week: 8,
 		requirements: {
 			gold: 75,
@@ -378,7 +377,7 @@ export const options = [
 		subtitle: 'for making shiny things',
 		type: 'shop',
 		description:
-			'Sometimes problems can only be dealt with by a hunk of metal. Makes money by selling weapons, tools, & armor.',
+			'Enables exporting of weapons and armor, and makes money by selling them.',
 		revenue_per_week: 50,
 		requirements: {
 			gold: 1300,
@@ -684,7 +683,8 @@ export const options = [
 		title: '🏦 Bank',
 		subtitle: 'for storing and accessing funds',
 		type: 'bank',
-		description: 'Rich get richer.',
+		description:
+			'Rich get richer. Allows you to transfer tourism gold to regular gold and enables other plots.',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
@@ -710,7 +710,34 @@ export const options = [
 		title: '🗳️ City Hall',
 		subtitle: 'for bureaucracy',
 		type: 'federal',
-		description: 'For running the government.',
+		description: 'REQUIRES COMMUNITY CENTER. For running the government. ',
+		revenue_per_week: 0,
+		knowledge_points_per_month: 0,
+		requirements: {
+			gold: 50000,
+			plots: ['community_center'],
+			employees: 24,
+			climate: null,
+			size: 1,
+			knowledge: 500,
+		},
+		effect_modifiers: {
+			happiness: 0.8,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+	},
+	{
+		id: 'lab',
+		title: '🧑‍🔬 Laboratory',
+		subtitle: '',
+		type: 'science',
+		description:
+			'Design things that can help your city grow. Experiments can cause unexpected situations.',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
@@ -747,6 +774,7 @@ export const typeColors = {
 	medical: '#ff0000',
 	bank: '#7b68ee',
 	federal: '#7b68ee',
+	science: 'rgba(42, 62, 250, 0.9)',
 };
 
 export function getColor(typeIndex, canBeUpgraded = false) {
@@ -757,7 +785,7 @@ export function getColor(typeIndex, canBeUpgraded = false) {
 			}
 			return typeColors['empty'];
 		} else if (typeIndex == -2) {
-			return typeColors['education'];
+			return typeColors['recreation'];
 		} else {
 			console.log(typeIndex);
 			return typeColors['empty'];

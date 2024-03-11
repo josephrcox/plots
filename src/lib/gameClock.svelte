@@ -200,7 +200,7 @@
 
 	function _checkGameLost(z) {
 		// GAME LOSS SCENARIOS
-		if (z.townInfo.happiness <= 0) {
+		if (z.townInfo.happiness <= 3) {
 			z.townInfo.happiness = 0;
 			z.endGameDetails = {
 				msg: messages.happiness_zero,
@@ -208,8 +208,8 @@
 				still_playing: false,
 			};
 		}
-		if (z.townInfo.health <= 0) {
-			z.townInfo.health = 0;
+		if (z.townInfo.health <= 3) {
+			z.townInfo.health = 3;
 			z.endGameDetails = {
 				msg: messages.health_zero,
 				win: false,

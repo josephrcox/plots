@@ -122,11 +122,12 @@
 		align-items: start;
 		justify-content: center;
 		align-items: center;
-		font-size: 0.8em;
+		font-size: 0.7em;
 		box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;
 		overflow: visible;
+		padding: 2px;
 
 		/* no select */
 		-webkit-touch-callout: none; /* iOS Safari */

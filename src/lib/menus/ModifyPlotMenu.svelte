@@ -37,6 +37,27 @@
 		return options.findIndex((option) => option.id === id);
 	}
 
+	function formatModifier(modifier: number) {
+		let isNegative = modifier < 1;
+		let response = roundTo((modifier % 1) * 100, 0);
+		if (!isNegative) {
+			return `+${response}% 🟢`;
+		} else {
+			return `-${100 - response}% 🔴`;
+		}
+	}
+
+	function formatInstantChange(change: number) {
+		// We divide by 3 because the number is actually 300 but shown to the user as 100 max
+		change = roundTo(change / 3, 0);
+		let isNegative = change < 0;
+		if (!isNegative) {
+			return `+${change} 🟢`;
+		} else {
+			return `-${change} 🔴`;
+		}
+	}
+
 	function firstEmoji(s: string): string | null {
 		const regex = /\p{Emoji}/u;
 		const match = regex.exec(s);
@@ -530,16 +551,13 @@
 				>
 					<tr class="text-xs text-left">
 						<th class="px-2 py-2">Title</th>
-						<th class="px-2 pr-36 py-2">Desc</th>
+						<th class="px-2 pr-2 py-2">Desc</th>
 						<th class="px-2 py-2">Revenue</th>
 						<th class="px-2 py-2">Profit</th>
 						<th class="px-2 py-2">Employees</th>
 						<th class="px-2 py-2">Cost</th>
-						<th class="px-2 py-2">Req. Knowledge</th>
-						<th class="px-2 py-2">Happiness (x)</th>
-						<th class="px-2 py-2">Health (x)</th>
-						<th class="px-2 py-2">Instant Happiness</th>
-						<th class="px-2 py-2">Instant Health</th>
+						<th class="px-2 py-2">Modifiers</th>
+						<th class="px-2 py-2">Instant effect</th>
 					</tr>
 				</thead>
 				<tbody class="overflow-hidden text-xs">
@@ -562,22 +580,20 @@
 							)}
 							"
 						>
-							<td class="px-2 py-2">
+							<td class="px-2 py-2 w-12">
 								{option.selected ? '➡️' : ''}
 
 								{option.title}</td
 							>
-							<td class="px-2 py-2 w-max">{option.description}</td>
-							<td class="px-2 py-2">
+							<td class="px-2 py-2 w-24">{option.description}</td>
+							<td class="px-2 py-2 w-12">
 								{#if option.revenue_per_week > 0}
 									<div>
 										<span>${roundTo(option.revenue_per_week, 2)}</span>
 									</div>
-								{:else}
-									<!-- whole lotta nothin' -->
 								{/if}
 							</td>
-							<td class="px-2 py-2">
+							<td class="px-2 py-2 w-12 font-bold">
 								{#if option.revenue_per_week > 0}
 									<div>
 										<span
@@ -587,53 +603,45 @@
 											)}</span
 										>
 									</div>
-								{:else}
-									<!-- whole lotta nothin' -->
 								{/if}
 							</td>
-							<td class="px-2 py-2">{option.requirements.employees || ''}</td>
-							<td class="px-2 py-2"
-								>${option.requirements.gold}
+							<td class="px-2 py-2 w-12"
+								>{option.requirements.employees || ''}</td
+							>
+							<td class="px-2 py-2 w-12"
+								>${formatNumber(option.requirements.gold)}
 								<span class="text-xs opacity-50"
 									>(${numberWithCommas($DB.townInfo.gold)})</span
 								>
+								{#if option.requirements.knowledge > 0}
+									<br />
+									{option.requirements.knowledge} KPts
+								{/if}
 							</td>
-							<td class="px-2 py-2">{option.requirements.knowledge || ''}</td>
-							<td class="px-2 py-2"
-								>{option.effect_modifiers.happiness == 1.0
-									? ''
-									: formatNumber(option.effect_modifiers.happiness)}
-								{option.effect_modifiers.happiness > 1
-									? '🟢'
-									: option.effect_modifiers.happiness < 1
-										? '🔴'
-										: ''}
+							<td class="px-2 py-2 w-12">
+								<div>
+									{#if option.effect_modifiers.happiness != 1.0}
+										😍 {formatModifier(option.effect_modifiers.happiness)}
+									{/if}
+								</div>
+								<div class="mt-2">
+									{#if option.effect_modifiers.health != 1.0}
+										🚑 {formatModifier(option.effect_modifiers.health)}
+									{/if}
+								</div>
 							</td>
-							<td class="px-2 py-2"
-								>{option.effect_modifiers.health == 1.0
-									? ''
-									: formatNumber(option.effect_modifiers.health)}
-								{option.effect_modifiers.health > 1
-									? '🟢'
-									: option.effect_modifiers.health < 1
-										? '🔴'
-										: ''}
-							</td>
-							<td class="px-2 py-2"
-								>{option.immediate_variable_changes.happiness || ''}
-								{option.immediate_variable_changes.happiness > 0
-									? '🟢'
-									: option.immediate_variable_changes.happiness < 0
-										? '🔴'
-										: ''}
-							</td>
-							<td class="px-2 py-2"
-								>{option.immediate_variable_changes.health || ''}
-								{option.immediate_variable_changes.health > 0
-									? '🟢'
-									: option.immediate_variable_changes.health < 0
-										? '🔴'
-										: ''}
+							<td class="px-2 py-2 w-12"
+								>{#if option.immediate_variable_changes.happiness != 0}
+									😍 {formatInstantChange(
+										option.immediate_variable_changes.happiness,
+									)}
+								{/if}
+								{#if option.immediate_variable_changes.health != 0}
+									<br />
+									🚑 {formatInstantChange(
+										option.immediate_variable_changes.health,
+									)}
+								{/if}
 							</td>
 						</tr>
 					{/each}
