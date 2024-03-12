@@ -35,6 +35,7 @@ export type Game = {
         max_tax_rate: number;
         balance_sheet_history: any[];
         last_month_profit: number;
+        knowledge_gold_market_rates: number[];
     },
     plotCounts: [][];
     environment: {

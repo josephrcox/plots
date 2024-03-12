@@ -15,9 +15,10 @@
 		db = _taxRateEffects(db);
 		db = _calculateProfits(db);
 		db = _applyModifiers(db);
-		db = _healthEffects(db);
+		db = _healthEffects(db); //////////
 		db = _bringModifiersBackToNormal(db);
 		db = _checkSpecialPlots(db);
+		db = _adjustKnowledgeGoldMarketRates(db);
 		return db;
 	}
 
@@ -312,6 +313,47 @@
 
 			z = addToTownLog(messages.bored, z);
 		}
+		return z;
+	}
+
+	function _adjustKnowledgeGoldMarketRates(z) {
+		let currentRate =
+			z.economyAndLaws.knowledge_gold_market_rates[
+				z.economyAndLaws.knowledge_gold_market_rates.length - 1
+			] || 1;
+		const lowerLimit = -100;
+		const maxJump = 6;
+		const maxChange = 3;
+
+		let randomness = Math.random();
+		let changeAmount = Math.random() * maxChange; /////////
+
+		if (randomness < 0.4) {
+			let jump = Math.random() * maxJump;
+			if (Math.random() < 0.5) {
+				currentRate += jump;
+			} else {
+				currentRate -= jump;
+			}
+		} else {
+			if (Math.random() > 0.5) {
+				currentRate += changeAmount;
+			} else {
+				currentRate -= changeAmount;
+			}
+		}
+
+		if (currentRate < lowerLimit) {
+			currentRate += (Math.random() * changeAmount) / 5;
+		}
+		// round to whole closest whole, either up or down/////
+		currentRate = Math.round(currentRate);
+
+		z.economyAndLaws.knowledge_gold_market_rates = [
+			...z.economyAndLaws.knowledge_gold_market_rates,
+			currentRate,
+		];
+
 		return z;
 	}
 

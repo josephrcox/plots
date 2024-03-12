@@ -25,6 +25,7 @@ export const default_db = {
 		max_tax_rate: 1,
 		balance_sheet_history: [],
 		last_month_profit: 0,
+		knowledge_gold_market_rates: [],
 	},
 	plotCounts: [],
 	environment: {

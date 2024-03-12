@@ -21,6 +21,7 @@
 	import GameEndMenu from './lib/menus/GameEndMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
 	import Scoreboard from '$lib/menus/Scoreboard.svelte';
+	import KnowledgeMenu from '$lib/menus/KnowledgeMenu.svelte';
 
 	let dbInitialized = false;
 
@@ -262,6 +263,7 @@
 		<GameClock />
 		<GameEndMenu />
 		<Scoreboard />
+		<KnowledgeMenu />
 		<div
 			class="justify-center text-center
 		

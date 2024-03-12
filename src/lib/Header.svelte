@@ -6,6 +6,7 @@
 		speed,
 		showBalanceSheet,
 		headerHeight,
+		showKnowledgeMenu,
 	} from './store.ts';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import { Separator } from '$lib/components/ui/separator';
@@ -64,7 +65,7 @@
 				label: 'Knowledge',
 				value: numberWithCommas($DB.townInfo.knowledge_points),
 				tap: () => {
-					// TODO
+					$showKnowledgeMenu = !$showKnowledgeMenu;
 				},
 			},
 			{
@@ -165,7 +166,7 @@
 	export function transferFundsFromBank() {
 		let z = $DB;
 		// Checks gold_from_tourism and as long as you have a bank, it should transfer
-		if (z.hasABank === true) {
+		if (z.hasBank === true) {
 			z.townInfo.gold += z.townInfo.gold_from_tourism;
 			z.townInfo.gold_from_tourism = 0;
 			DB.set(z);
