@@ -15,9 +15,11 @@
 		db = _taxRateEffects(db);
 		db = _calculateProfits(db);
 		db = _applyModifiers(db);
-		db = _healthEffects(db);
+		db = _healthEffects(db); //////////
 		db = _bringModifiersBackToNormal(db);
 		db = _checkSpecialPlots(db);
+		db = _adjustKnowledgeGoldMarketRates(db);
+		db = _warnUser(db);
 		return db;
 	}
 
@@ -139,6 +141,27 @@
 			}
 		}
 		return result;
+	}
+
+	function _warnUser(z) {
+		// if happiness or health is lower than 25, then warn the user via an alert. change z.last_warning_happiness and for health to the day triggered and only show if it hasn't been shown in 90 days
+		if (z.townInfo.happiness < 70) {
+			if (z.last_warning_happiness + 180 < z.environment.day) {
+				alert(
+					'Your citizens are very unhappy. You should do something about it.',
+				);
+				z.last_warning_happiness = z.environment.day;
+			}
+		}
+		if (z.townInfo.health < 70) {
+			if (z.last_warning_health + 180 < z.environment.day) {
+				alert(
+					'Your citizens are very unhealthy. You should do something about it.',
+				);
+				z.last_warning_health = z.environment.day;
+			}
+		}
+		return z;
 	}
 
 	function _checkGameWin(z) {
@@ -303,7 +326,7 @@
 	}
 
 	function _boredom(z) {
-		if (z.lastChangeDay + (Math.random() * 160 + 50) < z.environment.day) {
+		if (z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day) {
 			if (z.townInfo.population_count > 0) {
 				z.townInfo.population_count -= 1;
 				z.townInfo.employees -= 1;
@@ -312,6 +335,47 @@
 
 			z = addToTownLog(messages.bored, z);
 		}
+		return z;
+	}
+
+	function _adjustKnowledgeGoldMarketRates(z) {
+		let currentRate =
+			z.economyAndLaws.knowledge_gold_market_rates[
+				z.economyAndLaws.knowledge_gold_market_rates.length - 1
+			] || 1;
+		const lowerLimit = -100;
+		const maxJump = 8;
+		const maxChange = 3;
+
+		let randomness = Math.random();
+		let changeAmount = Math.random() * maxChange; /////////
+
+		if (randomness < 0.4) {
+			let jump = Math.random() * maxJump;
+			if (Math.random() < 0.5) {
+				currentRate += jump;
+			} else {
+				currentRate -= jump;
+			}
+		} else {
+			if (Math.random() > 0.5) {
+				currentRate += changeAmount;
+			} else {
+				currentRate -= changeAmount;
+			}
+		}
+
+		if (currentRate < lowerLimit) {
+			currentRate += (Math.random() * changeAmount) / 5;
+		}
+		// round to whole closest whole, either up or down/////
+		currentRate = Math.round(currentRate);
+
+		z.economyAndLaws.knowledge_gold_market_rates = [
+			...z.economyAndLaws.knowledge_gold_market_rates,
+			currentRate,
+		];
+
 		return z;
 	}
 
@@ -348,7 +412,7 @@
 			z = addToTownLog(unhappyPeople + messages.leave_town_num, z);
 		} else {
 			if (z.townInfo.population_count == z.townInfo.population_max) {
-				z = addToTownLog(messages.people_want_to_move_in, z);
+				// z = addToTownLog(messages.people_want_to_move_in, z);
 			}
 		}
 		return z;
@@ -415,7 +479,8 @@
 		}
 		// Recommend building more buildings
 		if (z.townInfo.population_max == 0) {
-			z = addToTownLog(messages.nobody_home, z);
+			if (z.townLog.indexOf(messages.nobody_home) == -1)
+				z = addToTownLog(messages.nobody_home, z);
 		}
 		z.economyAndLaws.last_month_profit = roundTo(
 			z.economyAndLaws.last_month_profit,

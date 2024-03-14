@@ -14,6 +14,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
 	import { numberWithCommas } from '../utils.js';
+	import Stats from '../Stats.svelte';
 
 	export let x = 0;
 	export let y = 0;
@@ -41,9 +42,9 @@
 		let isNegative = modifier < 1;
 		let response = roundTo((modifier % 1) * 100, 0);
 		if (!isNegative) {
-			return `+${response}% 🟢`;
+			return `+${response}%`;
 		} else {
-			return `-${100 - response}% 🔴`;
+			return `-${100 - response}%`;
 		}
 	}
 
@@ -52,9 +53,9 @@
 		change = roundTo(change / 3, 0);
 		let isNegative = change < 0;
 		if (!isNegative) {
-			return `+${change} 🟢`;
+			return `+${change}`;
 		} else {
-			return `-${change} 🔴`;
+			return `-${change}`;
 		}
 	}
 
@@ -402,7 +403,6 @@
 		return +test.toFixed(digits);
 	}
 
-	// Function to change 1.2 to 1.20
 	function formatNumber(n: number) {
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
@@ -454,28 +454,39 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="border-gray-500 border-r-2 overflow-y-scroll max-w-[90vw] max-h-[90vh]
+		class="border-gray-500 border-r-2 overflow-clip max-w-[90vw] max-h-[90vh]
 		"
 	>
 		<Dialog.Header>
 			<Dialog.Title class="text-2xl font-bold">
-				<span class="text-2xl font-bold"></span>Set Plot: {y + 1}-{x + 1}
-				<span class="text-sm"> (press esc to close)</span></Dialog.Title
+				<span class="text-2xl font-bold"></span>Set this Plot</Dialog.Title
 			>
 			{#if tooltip !== ''}
 				<Dialog.Description class="text-sm">{tooltip}</Dialog.Description>
 			{/if}
+			<div class="mt-4"></div>
+			<Stats classText="w-full" clickEvents="false" />
+			<div class="mb-4"></div>
 		</Dialog.Header>
-		<div class="flex">
-			<Input
-				type="text"
-				id="search-bar"
-				placeholder="Search Plot Options..."
-				value={searchQuery}
-				on:input={handleInput}
-				bind:this={searchInput}
-				class="border rounded w-auto"
-			/>
+		<div
+			class="flex flex-row w-full px-4 py-2 text-white
+		"
+		>
+			<div
+				class="
+			flex items-center
+			"
+			>
+				<Input
+					type="text"
+					id="search-bar"
+					placeholder="Search Plot Options..."
+					value={searchQuery}
+					on:input={handleInput}
+					bind:this={searchInput}
+					class="border rounded w-auto"
+				/>
+			</div>
 			<!-- toggle to only show affordable ones -->
 			<div class="flex items-center ml-6">
 				<input
@@ -537,7 +548,11 @@
 			</label>
 		</div>
 		<Separator class="" />
-		<div class="scrollable-y">
+		<div
+			class="overflow-y-scroll
+		scroll-smooth no-scrollbar max-h-[80vh]
+		"
+		>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<table
@@ -546,53 +561,45 @@
 			>
 				<thead
 					class="
-					sticky top-0 z-10 bg-slate-900 position-sticky text-white text-left
+					sticky top-0 z-10 bg-slate-900 position-sticky text-white text-left w-full px-5
 				"
 				>
 					<tr class="text-xs text-left">
 						<th class="px-2 py-2">Title</th>
-						<th class="px-2 pr-2 py-2">Desc</th>
-						<th class="px-2 py-2">Revenue</th>
+						<th class="px-2 pr-2 py-2 w-48">Desc</th>
 						<th class="px-2 py-2">Profit</th>
 						<th class="px-2 py-2">Employees</th>
 						<th class="px-2 py-2">Cost</th>
+						<th class="px-2 py-2">Requires</th>
 						<th class="px-2 py-2">Modifiers</th>
 						<th class="px-2 py-2">Instant effect</th>
 					</tr>
 				</thead>
-				<tbody class="overflow-hidden text-xs">
+				<tbody class="overflow-hidden text-xs mx-2">
 					{#each reactiveOptions as option (option.id)}
 						<tr
-							class="plotOption border-b border-black {option.affordable
+							class="plotOption border-b border-gray-900 {option.affordable
 								? 'cursor-pointer'
 								: 'unaffordable cursor-not-allowed bg-gray-200'}
-								{option.selected
-								? 'italic font-semibold border-green-500 border-4 border-b-4 cursor-not-allowed border-dashed'
-								: ''}
+								{option.selected ? 'italic font-light opacity-50 ' : ''}
 								
 								"
 							data-plotoptionid={option.id}
 							style="background-color: 
-									{// pass in option index
-							getColor(
-								getOptionIndex(option.id),
-								checkIfPlotCanBeUpgraded(x, y),
-							)}
+									{!option.selected
+								? getColor(
+										getOptionIndex(option.id),
+										checkIfPlotCanBeUpgraded(x, y),
+									)
+								: 'gray'}
 							"
 						>
 							<td class="px-2 py-2 w-12">
-								{option.selected ? '➡️' : ''}
-
-								{option.title}</td
-							>
-							<td class="px-2 py-2 w-24">{@html option.description}</td>
-							<td class="px-2 py-2 w-12">
-								{#if option.revenue_per_week > 0}
-									<div>
-										<span>${roundTo(option.revenue_per_week, 2)}</span>
-									</div>
-								{/if}
+								{option.selected
+									? `✅ SELECTED ${option.title.substring(2)}`
+									: `${option.title}`}
 							</td>
+							<td class="px-2 py-2 w-24">{@html option.description}</td>
 							<td class="px-2 py-2 w-12 font-bold">
 								{#if option.revenue_per_week > 0}
 									<div>
@@ -605,10 +612,10 @@
 									</div>
 								{/if}
 							</td>
-							<td class="px-2 py-2 w-12"
+							<td class="px-2 py-2 w-8"
 								>{option.requirements.employees || ''}</td
 							>
-							<td class="px-2 py-2 w-12"
+							<td class="px-2 py-2 w-8"
 								>${formatNumber(option.requirements.gold)}
 								<span class="text-xs opacity-50"
 									>(${numberWithCommas($DB.townInfo.gold)})</span
@@ -620,25 +627,39 @@
 							</td>
 							<td class="px-2 py-2 w-12">
 								<div>
+									<!-- list each requirements.plot[]  -->
+									{#each option.requirements.plots as plot}
+										{#if hasPlotOfType(plot, $DB)}
+											<span class="text-green-500">✅</span>
+										{:else}
+											<span class="text-red-500">❌</span>
+										{/if}
+										{plot}
+										<br />
+									{/each}
+								</div>
+							</td>
+							<td class="px-2 py-2 w-12 text-xs">
+								<div class="text-xs">
 									{#if option.effect_modifiers.happiness != 1.0}
-										😍 {formatModifier(option.effect_modifiers.happiness)}
+										😀 {formatModifier(option.effect_modifiers.happiness)}
 									{/if}
 								</div>
 								<div class="mt-2">
 									{#if option.effect_modifiers.health != 1.0}
-										🚑 {formatModifier(option.effect_modifiers.health)}
+										😷 {formatModifier(option.effect_modifiers.health)}
 									{/if}
 								</div>
 							</td>
 							<td class="px-2 py-2 w-12"
 								>{#if option.immediate_variable_changes.happiness != 0}
-									😍 {formatInstantChange(
+									😀 {formatInstantChange(
 										option.immediate_variable_changes.happiness,
 									)}
 								{/if}
 								{#if option.immediate_variable_changes.health != 0}
 									<br />
-									🚑 {formatInstantChange(
+									😷 {formatInstantChange(
 										option.immediate_variable_changes.health,
 									)}
 								{/if}
