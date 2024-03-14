@@ -403,7 +403,6 @@
 		return +test.toFixed(digits);
 	}
 
-	// Function to change 1.2 to 1.20
 	function formatNumber(n: number) {
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}

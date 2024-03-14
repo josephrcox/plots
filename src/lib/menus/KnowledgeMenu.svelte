@@ -41,27 +41,36 @@
 			alert('You need a bank to convert knowledge to gold.');
 		}
 	}
+
+	function formatNumber(n: number) {
+		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+	}
 </script>
 
 <Dialog.Root bind:open={$showKnowledgeMenu}>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>Manage your Knowledge</Dialog.Title>
+			<Dialog.Title
+				>Manage your Knowledge ({$DB.townInfo.knowledge_points} pts)</Dialog.Title
+			>
 			<Dialog.Description>
 				<!--  -->
 			</Dialog.Description>
 		</Dialog.Header>
 		<span class="italic">Knowledge is power, unlock it!</span>
-		<div class="py-0 flex flex-col gap-4 text-gray-400">
+		<div class="py-0 flex flex-col gap-4 text-gray-400 overflow-x-auto">
 			<div>
-				Your Knowledge is worth <span
+				Market Rate: <span
 					class="
 				{marketRate < 0 ? 'text-red-500' : 'text-green-500'}
-			">{marketRate ?? 0}</span
+			">{marketRate ?? 0} gold</span
 				>
-				Gold per unit.
+				per Knowledge Point
 				{#if marketRate > 0}
-					(total {$DB.townInfo.knowledge_points * marketRate})
+					<br />
+					(total value: ${formatNumber(
+						$DB.townInfo.knowledge_points * marketRate,
+					)})
 				{/if}
 			</div>
 			<LineGraph data={graphData} />
