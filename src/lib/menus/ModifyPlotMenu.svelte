@@ -460,24 +460,35 @@
 	>
 		<Dialog.Header>
 			<Dialog.Title class="text-2xl font-bold">
-				<span class="text-2xl font-bold"></span>Set Plot: {y + 1}-{x + 1}
-				<span class="text-sm"> (press esc to close)</span></Dialog.Title
+				<span class="text-2xl font-bold"></span>Set this Plot</Dialog.Title
 			>
 			{#if tooltip !== ''}
 				<Dialog.Description class="text-sm">{tooltip}</Dialog.Description>
 			{/if}
-			<Stats classText="w-full" />
+			<div class="mt-4"></div>
+			<Stats classText="w-full" clickEvents="false" />
+			<div class="mb-4"></div>
 		</Dialog.Header>
-		<div class="flex">
-			<Input
-				type="text"
-				id="search-bar"
-				placeholder="Search Plot Options..."
-				value={searchQuery}
-				on:input={handleInput}
-				bind:this={searchInput}
-				class="border rounded w-auto"
-			/>
+		<!-- center elements vertically -->
+		<div
+			class="flex flex-row w-full px-4 py-2 text-white
+		"
+		>
+			<div
+				class="
+			flex items-center
+			"
+			>
+				<Input
+					type="text"
+					id="search-bar"
+					placeholder="Search Plot Options..."
+					value={searchQuery}
+					on:input={handleInput}
+					bind:this={searchInput}
+					class="border rounded w-auto"
+				/>
+			</div>
 			<!-- toggle to only show affordable ones -->
 			<div class="flex items-center ml-6">
 				<input

@@ -9,6 +9,7 @@
 
 	export let stats = [];
 	export let classText = '';
+	export let clickEvents = 'true';
 
 	$: {
 		stats = [
@@ -50,7 +51,9 @@
 			},
 			{
 				label: 'Knowledge',
-				value: numberWithCommas($DB.townInfo.knowledge_points) + ' (click me)',
+				value:
+					numberWithCommas($DB.townInfo.knowledge_points) +
+					`${clickEvents == 'true' ? '(click me)' : ''}`,
 				tap: () => {
 					$showKnowledgeMenu = !$showKnowledgeMenu;
 				},
@@ -141,8 +144,10 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
-			class="flex flex-col items-center cursor-pointer text-center flex-1"
-			on:click={stat.tap}
+			class="flex flex-col items-center text-center flex-1
+				{clickEvents == 'true' ? 'cursor-pointer' : ''}
+			"
+			on:click={clickEvents == 'true' ? stat.tap : null}
 		>
 			<span class="text-xs pl-4 pr-4 rounded-lg">
 				{stat.label}
