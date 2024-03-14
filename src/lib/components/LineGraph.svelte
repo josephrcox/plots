@@ -9,7 +9,7 @@
 	const margin = { top: 10, right: 30, bottom: 10, left: 20 };
 	const width = 500 - margin.left - margin.right;
 	const height = 400 - margin.top - margin.bottom; // increased height for better visibility
-	const daysSupported = 365; // Use only the last 365 data points
+	const daysSupported = 52; // Use only the last 365 data points
 
 	const lineGenerator = d3
 		.line()

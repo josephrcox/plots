@@ -58,11 +58,15 @@
 				Your Knowledge is worth <span
 					class="
 				{marketRate < 0 ? 'text-red-500' : 'text-green-500'}
-			">{marketRate}</span
+			">{marketRate ?? 0}</span
 				>
 				Gold per unit.
+				{#if marketRate > 0}
+					(total {$DB.townInfo.knowledge_points * marketRate})
+				{/if}
 			</div>
 			<LineGraph data={graphData} />
+
 			{#if marketRate < 0}
 				<div>
 					Wait until the market value is <span class="text-green-500"
@@ -87,5 +91,5 @@
 </Dialog.Root>
 
 <style>
-	/* nuttin' */
+	/* nothin' */
 </style>

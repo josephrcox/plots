@@ -96,9 +96,8 @@
 	{#if data.type > -1}
 		<div>
 			<span data-size={options[data.type].requirements.size}
-				>{options[data.type].title.substring(0, 2)}<br />{options[
-					data.type
-				].title.substring(2)}
+				><span class="text-lg">{options[data.type].title.substring(0, 2)}</span
+				><br />{options[data.type].title.substring(2)}
 				{options[data.type].requirements.size > 1
 					? `(${options[data.type].requirements.size}x${
 							options[data.type].requirements.size

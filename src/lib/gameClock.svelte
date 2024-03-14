@@ -304,7 +304,7 @@
 	}
 
 	function _boredom(z) {
-		if (z.lastChangeDay + (Math.random() * 160 + 50) < z.environment.day) {
+		if (z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day) {
 			if (z.townInfo.population_count > 0) {
 				z.townInfo.population_count -= 1;
 				z.townInfo.employees -= 1;
@@ -322,7 +322,7 @@
 				z.economyAndLaws.knowledge_gold_market_rates.length - 1
 			] || 1;
 		const lowerLimit = -100;
-		const maxJump = 6;
+		const maxJump = 8;
 		const maxChange = 3;
 
 		let randomness = Math.random();
@@ -390,7 +390,7 @@
 			z = addToTownLog(unhappyPeople + messages.leave_town_num, z);
 		} else {
 			if (z.townInfo.population_count == z.townInfo.population_max) {
-				z = addToTownLog(messages.people_want_to_move_in, z);
+				// z = addToTownLog(messages.people_want_to_move_in, z);
 			}
 		}
 		return z;
@@ -457,7 +457,8 @@
 		}
 		// Recommend building more buildings
 		if (z.townInfo.population_max == 0) {
-			z = addToTownLog(messages.nobody_home, z);
+			if (z.townLog.indexOf(messages.nobody_home) == -1)
+				z = addToTownLog(messages.nobody_home, z);
 		}
 		z.economyAndLaws.last_month_profit = roundTo(
 			z.economyAndLaws.last_month_profit,

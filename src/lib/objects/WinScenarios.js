@@ -11,7 +11,7 @@ export const winScenarios = {
 				health: 100,
 				employment: 1,
 				knowledge: 50,
-				required_plots: ['small_school', 'pub'],
+				required_plots: ['pub', 'small_school', 'community_center'],
 			},
 			1: {
 				population_count: 500,
@@ -19,7 +19,7 @@ export const winScenarios = {
 				health: 120,
 				employment: 1,
 				knowledge: 100,
-				required_plots: ['small_hospital', 'large_school'],
+				required_plots: ['bank'],
 			},
 			2: {
 				population_count: 1000,
@@ -27,7 +27,7 @@ export const winScenarios = {
 				health: 200,
 				employment: 1,
 				knowledge: 1000,
-				required_plots: ['city_hall', 'bank'],
+				required_plots: ['bank', 'city_hall'],
 			},
 		},
 	},

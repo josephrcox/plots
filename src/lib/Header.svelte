@@ -12,11 +12,10 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import Tooltip from './Tooltip.svelte';
 	import { numberWithCommas } from './utils.ts';
+	import Stats from './Stats.svelte';
 
 	let year;
 	let day;
-	// change day and year whenever $DB.environment.day changes
-	export let stats = [];
 	$: {
 		const header = document.getElementById('headerObject');
 		if (header) {
@@ -24,100 +23,6 @@
 		}
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = numberWithCommas($DB.environment.day);
-		stats = [
-			{
-				label: 'Population',
-				value: `${numberWithCommas($DB.townInfo.population_count)}/${numberWithCommas($DB.townInfo.population_max)}`,
-				subtitle: `<span
-					class='
-						rounded-full px-1 py-1 text-xs
-						${
-							$DB.townInfo.population_count < $DB.townInfo.population_max
-								? 'text-red-500'
-								: 'text-green-500'
-						}
-					'>
-					${numberWithCommas($DB.townInfo.population_max - $DB.townInfo.population_count)}
-				</span>`,
-				tap: () => {
-					// TODO
-				},
-			},
-			{
-				label: 'Employees',
-				value: `${numberWithCommas($DB.townInfo.employees)}/${numberWithCommas($DB.townInfo.population_count)}`,
-				subtitle: `<span
-					class='
-						rounded-full px-1 py-1 text-xs
-						${
-							$DB.townInfo.employees < $DB.townInfo.population_count
-								? 'text-red-500'
-								: 'text-green-500'
-						}
-					'>
-					${numberWithCommas($DB.townInfo.population_count - $DB.townInfo.employees)}
-				</span>`,
-				tap: () => {
-					// TODO
-				},
-			},
-			{
-				label: 'Knowledge',
-				value: numberWithCommas($DB.townInfo.knowledge_points),
-				tap: () => {
-					$showKnowledgeMenu = !$showKnowledgeMenu;
-				},
-			},
-			{
-				label: 'Gold',
-				value: '$' + numberWithCommas(roundTo($DB.townInfo.gold, 0)),
-				subtitle: `<span
-					class='
-						rounded-full px-1 py-1 text-xs
-						${$DB.economyAndLaws.last_month_profit < 0 ? 'text-red-500' : 'text-green-500'}
-					'>
-					${numberWithCommas(roundTo($DB.economyAndLaws.last_month_profit, 0))}
-				</span>`,
-				tap: () => {
-					$showBalanceSheet = !$showBalanceSheet;
-				},
-			},
-			{
-				label: 'Tourism 💰',
-				value: numberWithCommas(roundTo($DB.townInfo.gold_from_tourism, 0)),
-				tap: () => {
-					transferFundsFromBank();
-				},
-			},
-			{
-				label: 'Happiness',
-				value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
-				subtitle: `<span
-					class='
-						rounded-full px-1 py-1 text-xs text-slate-600
-						${$DB.townInfo.happiness < 50 ? 'text-red-500' : 'text-green-500'}
-					'>
-					${$DB.modifiers.happiness < 1 ? '🔴' : '🟢'} (${roundTo($DB.modifiers.happiness, 2)}x)
-				</span>`,
-				tap: () => {
-					// TODO
-				},
-			},
-			{
-				label: 'Health',
-				value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
-				subtitle: `<span
-					class='
-						rounded-full px-1 py-1 text-xs text-slate-600
-						${$DB.townInfo.health < 50 ? 'text-red-500' : 'text-green-500'}
-					'>
-					${$DB.modifiers.health < 1 ? '🔴' : '🟢'} (${roundTo($DB.modifiers.health, 2)}x)
-				</span>`,
-				tap: () => {
-					// TODO
-				},
-			},
-		];
 	}
 
 	function changeName() {
@@ -234,6 +139,9 @@
 						<span>Day {day} ({year}y)</span>
 					</div>
 				</div>
+				<span class="text-xs text-col"
+					>💡 Press P to Pause or learn how to play</span
+				>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -292,27 +200,7 @@
 			class="mb-3 mt-0 bg-slate-700
 	"
 		/>
-		<div class="flex flex-row justify-between pr-5 pl-5">
-			{#each stats as stat}
-				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div
-					class="flex flex-col items-center cursor-pointer text-center flex-1"
-					on:click={stat.tap}
-				>
-					<span class="text-xs pl-4 pr-4 rounded-lg">
-						{stat.label}
-					</span>
-
-					<span class="text-xs text-slate-500"
-						>{stat.value}
-						{#if stat.subtitle != null}
-							{@html stat.subtitle}
-						{/if}</span
-					>
-				</div>
-			{/each}
-		</div>
+		<Stats />
 	</div>
 </div>
 
