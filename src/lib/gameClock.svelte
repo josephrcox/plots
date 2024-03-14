@@ -19,6 +19,7 @@
 		db = _bringModifiersBackToNormal(db);
 		db = _checkSpecialPlots(db);
 		db = _adjustKnowledgeGoldMarketRates(db);
+		db = _warnUser(db);
 		return db;
 	}
 
@@ -140,6 +141,27 @@
 			}
 		}
 		return result;
+	}
+
+	function _warnUser(z) {
+		// if happiness or health is lower than 25, then warn the user via an alert. change z.last_warning_happiness and for health to the day triggered and only show if it hasn't been shown in 90 days
+		if (z.townInfo.happiness < 70) {
+			if (z.last_warning_happiness + 180 < z.environment.day) {
+				alert(
+					'Your citizens are very unhappy. You should do something about it.',
+				);
+				z.last_warning_happiness = z.environment.day;
+			}
+		}
+		if (z.townInfo.health < 70) {
+			if (z.last_warning_health + 180 < z.environment.day) {
+				alert(
+					'Your citizens are very unhealthy. You should do something about it.',
+				);
+				z.last_warning_health = z.environment.day;
+			}
+		}
+		return z;
 	}
 
 	function _checkGameWin(z) {

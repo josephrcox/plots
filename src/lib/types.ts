@@ -51,6 +51,8 @@ export type Game = {
     }
     tick: number;
     overtime: boolean;
+    last_warning_happiness: number;
+    last_warning_health: number;
 }
 
 export type PlotOption = {

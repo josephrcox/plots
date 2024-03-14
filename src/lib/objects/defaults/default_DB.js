@@ -39,4 +39,6 @@ export const default_db = {
 	endGameDetails: null,
 	tick: 0,
 	overtime: false,
+	last_warning_happiness: 0,
+	last_warning_health: 0,
 };
