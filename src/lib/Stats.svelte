@@ -53,7 +53,7 @@
 				label: 'Knowledge',
 				value:
 					numberWithCommas($DB.townInfo.knowledge_points) +
-					`${clickEvents == 'true' ? '(click me)' : ''}`,
+					`${clickEvents == 'true' ? ' (click me)' : ''}`,
 				tap: () => {
 					$showKnowledgeMenu = !$showKnowledgeMenu;
 				},

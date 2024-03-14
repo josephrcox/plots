@@ -32,10 +32,9 @@
 
 	export function convertKnowledgeToGold() {
 		let z = $DB;
-		// Checks gold_from_tourism and as long as you have a bank, it should transfer
 		if ($DB.hasBank === true) {
-			z.townInfo.gold += z.townInfo.gold_from_tourism;
-			z.townInfo.gold_from_tourism = 0;
+			z.townInfo.gold += Math.round(z.townInfo.knowledge_points * marketRate);
+			z.townInfo.knowledge_points = 0;
 			DB.set(z);
 			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 		} else {

@@ -469,7 +469,6 @@
 			<Stats classText="w-full" clickEvents="false" />
 			<div class="mb-4"></div>
 		</Dialog.Header>
-		<!-- center elements vertically -->
 		<div
 			class="flex flex-row w-full px-4 py-2 text-white
 		"
