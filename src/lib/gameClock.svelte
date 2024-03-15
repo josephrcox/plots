@@ -333,7 +333,10 @@
 	}
 
 	function _boredom(z) {
-		if (z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day) {
+		if (
+			z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day &&
+			z.townInfo.population_count > 0
+		) {
 			if (z.townInfo.population_count > 0) {
 				z.townInfo.population_count -= 1;
 				z.townInfo.employees -= 1;
@@ -427,7 +430,10 @@
 
 	function _taxRateEffects(z) {
 		const randomness = Math.random();
-		if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate) {
+		if (
+			z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate &&
+			population_count > 0
+		) {
 			const lenientChance = // higher == more lenient
 				z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
 			if (randomness < lenientChance) {

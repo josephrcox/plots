@@ -54,6 +54,19 @@ export type Game = {
     overtime: boolean;
     last_warning_happiness: number;
     last_warning_health: number;
+    lab: {
+        active_experiment: Experiment;
+        past_experiments: Experiment[];
+        xp: number;
+    }
+}
+
+export type Experiment = {
+    id: string;
+    title: string;
+    description: string;
+    cost: number;
+    already_researched: boolean;
 }
 
 export type PlotOption = {

@@ -42,4 +42,9 @@ export const default_db = {
 	overtime: false,
 	last_warning_happiness: 0,
 	last_warning_health: 0,
+	lab: {
+		active_experiment: null,
+		past_experiments: [],
+		xp: 0,
+	},
 };
