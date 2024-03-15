@@ -6,13 +6,15 @@
 		speed,
 		showBalanceSheet,
 		headerHeight,
-		showKnowledgeMenu,
+		showLabMenu,
 	} from './store.ts';
 	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import Tooltip from './Tooltip.svelte';
 	import { numberWithCommas } from './utils.ts';
 	import Stats from './Stats.svelte';
+	import Button from './components/ui/button/button.svelte';
+	import LabMenu from './menus/LabMenu.svelte';
 
 	let year;
 	let day;
@@ -96,6 +98,10 @@
 				break;
 		}
 	});
+
+	function showTheLabMenu() {
+		showLabMenu.set(true);
+	}
 </script>
 
 <div
@@ -192,6 +198,10 @@
 
 					{#if $DB.economyAndLaws.tax_rate == 0}
 						<Tooltip text="Set this!!!" />
+					{/if}
+					{#if $DB.hasLab || true}
+						<Button class="text-xs" on:click={showTheLabMenu}>Manage Lab</Button
+						>
 					{/if}
 				</div>
 			</div>

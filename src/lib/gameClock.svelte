@@ -104,6 +104,7 @@
 		let hasBank = false;
 		let hasHospital = false;
 		let hasCityHall = false;
+		let hasLab = false;
 
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
@@ -120,6 +121,9 @@
 						plotOptionForPlot == 'large_hospital'
 					) {
 						hasHospital = true;
+					}
+					if (plotOptionForPlot == 'lab') {
+						hasLab = true;
 					}
 				}
 			}

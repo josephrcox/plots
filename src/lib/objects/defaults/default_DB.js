@@ -16,6 +16,7 @@ export const default_db = {
 	hasCityHall: false,
 	hasBank: false,
 	hasHospital: false,
+	hasLab: false,
 	modifiers: {
 		happiness: 1,
 		health: 1,
