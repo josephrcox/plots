@@ -550,13 +550,13 @@
 		<Separator class="" />
 		<div
 			class="overflow-y-scroll
-		scroll-smooth no-scrollbar max-h-[80vh]
+		scroll-smooth no-scrollbar max-h-[60vh]
 		"
 		>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<table
-				class="text-left table-auto text-xs w-full border-collapse border-gray-500 rounded-lgshadow-lg"
+				class="text-left table-auto text-xs w-full border-collapse rounded-lgshadow-lg"
 				on:click={handlePlotOptionClick}
 			>
 				<thead
@@ -578,7 +578,7 @@
 				<tbody class="overflow-hidden text-xs mx-2">
 					{#each reactiveOptions as option (option.id)}
 						<tr
-							class="plotOption border-b border-gray-900 {option.affordable
+							class="plotOption border-b border-black {option.affordable
 								? 'cursor-pointer'
 								: 'unaffordable cursor-not-allowed bg-gray-200'}
 								{option.selected ? 'italic font-light opacity-50 ' : ''}
@@ -612,14 +612,21 @@
 									</div>
 								{/if}
 							</td>
-							<td class="px-2 py-2 w-8"
-								>{option.requirements.employees || ''}</td
+							<td
+								class="px-2 py-2 w-8
+								{option.requirements.employees >
+								$DB.townInfo.population_count - $DB.townInfo.employees
+									? 'underline bg-red-800 text-white'
+									: ''}
+							">{option.requirements.employees || ''}</td
 							>
-							<td class="px-2 py-2 w-8"
+							<td
+								class="px-2 py-2 w-8
+									{option.requirements.gold > $DB.townInfo.gold
+									? 'underline bg-red-800 text-white border-none'
+									: ''}
+					"
 								>${formatNumber(option.requirements.gold)}
-								<span class="text-xs opacity-50"
-									>(${numberWithCommas($DB.townInfo.gold)})</span
-								>
 								{#if option.requirements.knowledge > 0}
 									<br />
 									{option.requirements.knowledge} KPts

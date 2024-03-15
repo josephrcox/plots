@@ -16,15 +16,117 @@ export const ACTIVE_GAME_DB_NAME = 'plots_active_game_db';
 export const USER_DB_NAME = 'plots_user_db';
 
 function generateRandomTownName(): string {
-    const firstPart = ["Green", "River", "Mountain", "North", "South", "East", "West", "Lake", "Forest", "Spring", "Golden", "Silver", "Crystal", "Sun", "Moon", "Star", "Valley", "Pine", "Maple", "Oak", "Wild", "Misty", "Rainbow", "Snow", "Summer", "Autumn", "Winter", "Thunder", "Storm", "Crystal", "Diamond"];
-    const secondPart = ["wood", "ville", "town", "field", "ford", "brook", "hill", "dale", "bury", "port", "view", "crest", "meadow", "side", "grove", "haven", "crossing", "junction", "landing", "ridge", "summit", "slope", "strand", "creek", "isle", "glen", "bay", "harbor", "glade", "peak", "plateau"];
+    const baseNames = [
+		"York", "London", "Paris", "Madrid", "Rome", 
+		"Berlin", "Vienna", "Prague", "Warsaw", "Oslo", 
+		"Lisbon", "Dublin", "Brussels", "Amsterdam", "Stockholm", 
+		"Copenhagen", "Edinburgh", "Moscow", "Beijing", "Tokyo", 
+		"Seoul", "Bangkok", "Delhi", "Mumbai", "Shanghai", 
+		"Sydney", "Melbourne", "Cairo", "Dubai", "Istanbul", 
+		"Athens", "Budapest", "Reykjavik", "Helsinki", "Tallinn", 
+		"Riga", "Vilnius", "Sofia", "Bucharest", "Belgrade", 
+		"Zagreb", "Sarajevo", "Ljubljana", "Skopje", "Tirana", 
+		"Podgorica", "Thessaloniki", "Barcelona", "Valencia", "Seville", 
+		"Granada", "Malaga", "Lyon", "Marseille", "Toulouse", 
+		"Nice", "Nantes", "Strasbourg", "Bordeaux", "Lille", 
+		"Venice", "Milan", "Florence", "Naples", "Turin", 
+		"Bologna", "Perugia", "Genoa", "Pisa", "Verona", 
+		"Palermo", "Catania", "Bari", "Padua", "Cagliari", 
+		"Krakow", "Gdansk", "Poznan", "Wroclaw", "Lodz", 
+		"Katowice", "Bialystok", "Gdynia", "Sopot", "Bydgoszcz", 
+		"Lublin", "Szczecin", "Gorzow", "Zakopane", "Olsztyn", 
+		"Torun", "Rzeszow", "Kielce", "Radom", "Siedlce", 
+		"Los", "Angeles", "Chicago", "Houston", "Phoenix",
+		"San", "Antonio", "San", "Diego", "Dallas", "San", "Jose", "Austin", 
+		"Jacksonville", "Fort", "Worth", "Columbus", "Charlotte",
+		"Liverpool", "Manchester", "Glasgow", "Birmingham",
+		"Leeds", "Sheffield", "Newcastle", "upon", "Tyne", "Bristol",
+		"Nottingham", "Leicester", "Coventry", "Belfast",
+		"Reading", "Cardiff", "Southampton", "Aberdeen",
+		"Plymouth", "Stoke", "Trent", "Wolverhampton", "Swansea",
+		"Sunderland", "Portsmouth", "Yorkshire", "Hull",
+		"Blackpool", "Bradford", "Derby", "Middlesbrough",
+		"Peterborough", "Stockton", "on", "Tees", "Brighton",
+		"Poole", "Bournemouth", "Huddersfield", "Luton",
+		"Oxford", "Norwich", "Oldham", "Cambridge",
+		"Exeter", "Walsall", "Colchester", "Watford",
+		"Rotherham", "Newport", "Gateshead", "Dundee",
+		"Gloucester", "Solihull", "High", "Wycombe", "Maidstone",
+		"Slough", "Basildon", "Chelmsford", "Salford",
+		"Bedford", "Stevenage", "Woking", "Grimsby",
+		"Birkenhead", "Halifax", "Warrington", "Gillingham",
+		"Wigan", "Worcester", "Wakefield", "Lincoln",
+		"Chester", "Rochdale", "Dagenham", "Widnes",
+		"St", "Albans", "Mansfield", "Sutton", "Coldfield", "Crawley",
+		"Wokingham", "Barnsley", "St", "Helens", "Harrogate",
+		"Redditch", "Scunthorpe", "Nuneaton", "Chesterfield",
+		"Hemel", "Hempstead", "Bury", "Guildford", "Ashford",
+		"Telford", "Newcastle", "under", "Lyme", "Aylesbury", "Halesowen",
+		"Shrewsbury", "Lowestoft", "Loughborough", "Cheltenham",
+		"Kidderminster", "Basingstoke", "Rugby", "Stourbridge",
+		"Southport", "Kettering", "Royal", "Leamington", "Spa", "Beeston",
+		"Farnborough", "Wrexham", "Banbury", "Weymouth",
+		"Wallsend", "Dartford", "Grays", "Tamworth",
+		"Ashford", "Esher", "Folkestone", "Tonbridge",
+		"Taunton", "Runcorn", "Macclesfield", "Keighley",
+		"Bridgend", "Barnstaple", "Letchworth", "Garden", "City", "Worthing",
+		"Gosport", "Eastleigh", "Staines", "upon", "Thames", "Lisburn",
+		"Livingston", "Bognor", "Regis", "Scarborough", "Cannock",
+		"Margate", "Chippenham", "Rhondda", "Maidenhead",
+		"Wellingborough", "Washington", "Camberley", "Bootle",
+		"Lancaster", "Llanelli", "Chatham", "Cheshunt",
+		"Bishop", "Auckland", "Nelson", "Belper",
+		"Pontefract", "Barry", "Braintree", "Crosby",
+		"Bury", "St", "Edmunds", "Bexhill", "Margate", "Aldershot",
+		"Rowley", "Regis", "Hoddesdon", "Sittingbourne", "Rugby",
+		"Newquay", "Falmouth", "Stretford", "Camberley",
+		"Beverley", "Windsor", "Rochester", "Wickford",
+		"Diss", "Farnham", "Andover", "Camberwell",
+		"Bermondsey", "Lewisham", "Wembley", "Hayes",
+		"Harrow", "Ilford", "Enfield", "Twickenham",
+		"Richmond", "Brentwood", "Edgware", "Ealing",
+		"Greenwich", "Bromley", "Hounslow", "Romford",
+		"Hillingdon", "Uxbridge", "Wandsworth", "Sutton",
+		"Kingston", "upon", "Thames", "Bexley", "Havering",
+		"Barking"
+	];
 
-    const randomFirstPart = firstPart[Math.floor(Math.random() * firstPart.length)];
-    const randomSecondPart = secondPart[Math.floor(Math.random() * secondPart.length)];
 
-    return `${randomFirstPart}${randomSecondPart}`;
+    const suffixes = [
+        "ia", "ville", "ton", "land", "field", 
+        "burgh", "ford", "wood", "port",
+        "bay", "beach", "peak", "valley", "ridge", 
+        "hill", "dale", "island", "cape", "spring", 
+        "grove", "polis", "side", "view", "shore", 
+        "haven", "place", "gardens", "plaza", "square"
+    ];
+
+	const prefixes = [
+		"New", "Old", "North", "South", "East", 
+		"West", "Upper", "Lower", "Little", "Great", 
+		"Saint", "Fort", "Mount", "Lake", "River",
+		"The Village of", "The City of", "The Town of",
+		"The Borough of", "The County of", "The State of",
+		"The Kingdom of", "The Empire of", "The Republic of",
+		"The Commonwealth of", "The Union of", "The Federation of",
+		"Rainy", "Sunny", "Windy", "Frosty", "Snowy",
+	]
+
+    function getRandomElement(arr: string[]): string {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+	let prefix = getRandomElement(prefixes);
+    let baseName = getRandomElement(baseNames);
+    let suffix = getRandomElement(suffixes);
+
+	let townName = '';
+	if (Math.random() > 0.5) {
+		townName = prefix + ' ' + baseName + suffix;
+	} else {
+		townName = baseName + suffix;
+	}
+	return townName;
 }
-
 
 // Define your DB store at the top
 export let DB = writable(

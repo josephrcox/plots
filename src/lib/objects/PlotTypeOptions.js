@@ -49,7 +49,7 @@ export const options = [
 	},
 	{
 		id: 'res_large',
-		title: '🏢 Residential (large)',
+		title: '🏢 Residential (big)',
 		subtitle: 'for living',
 		type: 'residential',
 		description: 'Many apartments (+256 people)',
@@ -431,7 +431,7 @@ export const options = [
 		revenue_per_week: 150,
 		requirements: {
 			gold: 2300,
-			plots: [],
+			plots: ['large_school'],
 			employees: 15,
 			climate: null,
 			knowledge: 0,
@@ -547,7 +547,7 @@ export const options = [
 	},
 	{
 		id: 'park_large',
-		title: '🎪 Large park',
+		title: '🎪 Large park (2x2)',
 		subtitle: 'for bringing your dog, or eating a sandwich',
 		type: 'recreation',
 		description:
@@ -626,7 +626,7 @@ export const options = [
 	},
 	{
 		id: 'large_school',
-		title: '🚌 Large school',
+		title: '🚌 Large school (2x2)',
 		subtitle: 'for learning',
 		type: 'education',
 		description: 'A larger school. Produces knowledge',
@@ -652,7 +652,7 @@ export const options = [
 	},
 	{
 		id: 'university',
-		title: '🏫 Large University',
+		title: '🏫 Large University (2x2)',
 		subtitle: 'for learning',
 		type: 'education',
 		description: 'The supreme learning institution. Produces knowledge.',
@@ -704,7 +704,7 @@ export const options = [
 	},
 	{
 		id: 'large_hospital',
-		title: '🏥 Large hospital',
+		title: '🏥 Large hospital (2x2)',
 		subtitle: 'for healing',
 		type: 'medical',
 		description:
@@ -716,7 +716,7 @@ export const options = [
 			plots: [],
 			employees: 90,
 			climate: null,
-			size: 1,
+			size: 2,
 			knowledge: 250,
 		},
 		effect_modifiers: {
@@ -731,7 +731,7 @@ export const options = [
 	},
 	{
 		id: 'bank',
-		title: '🏦 Bank',
+		title: '🏦 Bank (2x2)',
 		subtitle: 'for storing and accessing funds',
 		type: 'bank',
 		description: `Rich get richer.
@@ -742,7 +742,7 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 20000,
+			gold: 50000,
 			plots: ['blacksmith', 'vineyard'],
 			employees: 64,
 			climate: null,
@@ -769,7 +769,7 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 50000,
+			gold: 150000,
 			plots: ['community_center', 'small_school'],
 			employees: 48,
 			climate: null,
@@ -821,12 +821,13 @@ export const typeColors = {
 	empty_buildable: 'rgb(126, 158, 255)',
 	residential: '#e15f00',
 	farm: '#519c1f',
-	food: '#b55959',
+	// violet
+	food: '#8a2be2',
 	recreation: '#4070ff',
 	shop: '#ff00ff',
 	tourism: '#ff00ff',
 	education: 'rgba(42, 62, 250, 0.9)',
-	medical: '#ff0000',
+	medical: 'rgba(42, 62, 250, 0.9)',
 	bank: '#7b68ee',
 	federal: '#7b68ee',
 	science: 'rgba(42, 62, 250, 0.9)',
