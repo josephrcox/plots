@@ -3,7 +3,6 @@
 	import { DB, ACTIVE_GAME_DB_NAME, paused, speed, clearDB } from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
 	import { options } from './objects/PlotTypeOptions.js';
-	import Plot from './Plot.svelte';
 	import { winScenarios } from './objects/WinScenarios.js';
 	import { plotCountMaximums } from './objects/difficulty.js';
 
@@ -40,6 +39,7 @@
 
 	function checkGameStatus(db) {
 		db = _fixVariables(db);
+		db = _checkExperiment(db);
 		if (db.overtime == false) {
 			db = _checkGameLost(db);
 			db = _checkGameWin(db);
@@ -432,7 +432,7 @@
 		const randomness = Math.random();
 		if (
 			z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate &&
-			population_count > 0
+			z.townInfo.population_count > 0
 		) {
 			const lenientChance = // higher == more lenient
 				z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
@@ -467,6 +467,16 @@
 					z,
 				);
 			}
+		}
+		return z;
+	}
+
+	export function _checkExperiment(z) {
+		if (z.lab.active_experiment == null) return z;
+		let active = z.lab.active_experiment;
+		if (active.duration > 0) {
+			z.lab.active_experiment.duration -= 1;
+		} else {
 		}
 		return z;
 	}

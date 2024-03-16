@@ -55,7 +55,7 @@ export type Game = {
     last_warning_happiness: number;
     last_warning_health: number;
     lab: {
-        active_experiment: Experiment;
+        active_experiment: Experiment | null;
         past_experiments: Experiment[];
         xp: number;
     }
@@ -67,6 +67,7 @@ export type Experiment = {
     description: string;
     cost: number;
     already_researched: boolean;
+    duration: number; // days
 }
 
 export type PlotOption = {
