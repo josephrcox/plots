@@ -199,9 +199,25 @@
 					{#if $DB.economyAndLaws.tax_rate == 0}
 						<Tooltip text="Set this!!!" />
 					{/if}
+					<!-- TODO REMOVE TRUE HERE BEFORE MERGE -->
 					{#if $DB.hasLab || true}
-						<Button class="text-xs" on:click={showTheLabMenu}>Manage Lab</Button
-						>
+						<Button
+							class="text-xs flex flex-col h-min mt-2"
+							on:click={showTheLabMenu}
+							><div>Manage Lab</div>
+							{#if $DB.lab.active_experiment !== null}
+								{#if $DB.lab.active_experiment.duration > 0}
+									<span>{$DB.lab.active_experiment.duration}d</span>
+								{:else if $DB.lab.active_experiment.duration === 0}
+									<span
+										class="
+									
+										animate-pulse
+									">✅ DONE!</span
+									>
+								{/if}
+							{/if}
+						</Button>
 					{/if}
 				</div>
 			</div>

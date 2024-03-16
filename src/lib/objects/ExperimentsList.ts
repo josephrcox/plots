@@ -8,8 +8,18 @@ export const experiments : Experiment[] = [
         
         Now, every home is equipped with a pair of sunglasses and a sunhat. Enjoy happier citizens!,
         `,
-        cost: 15000,
-        duration: 10
+        cost: 5000,
+        duration: 180
+    },
+    {
+        id: "antibiotics",
+        title: "We will call them 'Antibiotics'",
+        description: `Scientist Alfred C. has pitched us an idea that he calls Antibiotics.
+        
+         We don't really know what that means, but it seems to make people healthier. 
+        `,
+        cost: 8000,
+        duration: 200
     },
 ]
     

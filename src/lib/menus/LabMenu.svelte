@@ -46,6 +46,7 @@
 				filteredExperiments[
 					Math.floor(Math.random() * filteredExperiments.length)
 				];
+			ex.cost = Math.floor(ex.cost * (Math.random() * 1.5 + 0.8));
 			newExperiments.push(ex);
 		}
 
@@ -76,8 +77,8 @@
 			case 'sunshine':
 				$DB.modifiers.happiness = 50;
 				break;
-			case 2:
-				$DB.townInfo.gold += 500;
+			case 'antibiotics':
+				$DB.modifiers.health = 50;
 				break;
 			default:
 				break;
@@ -88,7 +89,7 @@
 	function finalizeAndNext() {
 		let z = $DB;
 		z.lab.xp += Math.round(
-			z.lab.active_experiment.cost / (Math.random() * 95 + 1),
+			z.lab.active_experiment.cost * (Math.random() * 2 + 0.5),
 		);
 		z.lab.active_experiment = null;
 		showAlert = false;
@@ -97,6 +98,16 @@
 
 	function formatNumber(n: number) {
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+	}
+	function roundTo(n: number, digits: number) {
+		if (digits === undefined) {
+			digits = 0;
+		}
+
+		var m = Math.pow(10, digits);
+		n = parseFloat((n * m).toFixed(11));
+		var test = Math.round(n) / m;
+		return +test.toFixed(digits);
 	}
 </script>
 
@@ -171,9 +182,9 @@
 					text-sm
 					"
 			>
-				It's time to start your next experiment! Choose below based on how much
-				you want to fund the project. Once the experiment is over, you will see
-				the results.
+				It's time to fund your next experiment! Choose a project below based on
+				it's funding requirement. Once the experiment is over, you will see the
+				results.
 			</div>
 			<div
 				class="text-center flex flex-col justify-center
@@ -188,7 +199,7 @@
 						variant="outline"
 						class="min-w-48 w-max
 				{ex.cost > $DB.townInfo.gold ? 'cursor-not-allowed' : ''}
-				">{ex.cost} gold</Button
+				">${formatNumber(ex.cost).split('.')[0]} gold</Button
 					>
 				{/each}
 			</div>
