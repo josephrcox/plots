@@ -8,18 +8,8 @@ export const experiments : Experiment[] = [
         
         Now, every home is equipped with a pair of sunglasses and a sunhat. Enjoy happier citizens!,
         `,
-        cost: 100,
-        already_researched: false,
+        cost: 15000,
         duration: 10
     },
-    {
-        id: "experiment_3",
-        title: "Experiment 3",
-        description: "This is the first experiment",
-        cost: 200,
-        already_researched: false,
-        duration: 20
-    },
-    
 ]
     

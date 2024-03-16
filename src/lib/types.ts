@@ -66,7 +66,6 @@ export type Experiment = {
     title: string;
     description: string;
     cost: number;
-    already_researched: boolean;
     duration: number; // days
 }
 
