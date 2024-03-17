@@ -48,7 +48,7 @@
 </script>
 
 <Dialog.Root bind:open={$showKnowledgeMenu}>
-	<Dialog.Content>
+	<Dialog.Content transitionConfig={{ duration: 0 }}>
 		<Dialog.Header>
 			<Dialog.Title
 				>Manage your Knowledge ({$DB.townInfo.knowledge_points} pts)</Dialog.Title
@@ -79,7 +79,8 @@
 				<div>
 					Wait until the market value is <span class="text-green-500"
 						>positive</span
-					> to sell your Knowledge for Gold.
+					> to sell your Knowledge for Gold. Keep in mind that you need a bank to
+					convert.
 				</div>
 			{/if}
 			{#if $DB.hasBank && marketRate > 0}
@@ -88,8 +89,6 @@
 						Convert Knowledge to Gold
 					</Button>
 				</div>
-			{:else if marketRate > 0}
-				<div class="font-bold">Get a bank to convert 🏦</div>
 			{/if}
 		</div>
 		<Dialog.Footer>

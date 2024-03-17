@@ -153,7 +153,7 @@
 	}
 
 	.plot_container[data-type='-3'] {
-		background-color: rgba(42, 62, 250, 0.9);
+		background-color: rgba(42, 62, 230, 1);
 		border: none;
 	}
 

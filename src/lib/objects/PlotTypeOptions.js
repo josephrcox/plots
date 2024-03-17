@@ -826,7 +826,7 @@ export const options = [
 			employees: 24,
 			climate: null,
 			size: 1,
-			knowledge: 500,
+			knowledge: 1500,
 		},
 		effect_modifiers: {
 			happiness: 0.95,
@@ -841,21 +841,19 @@ export const options = [
 ];
 
 export const typeColors = {
-	// dark blue
 	empty_unusable: 'rgb(21 28 41);',
 	empty_buildable: 'rgb(126, 158, 255)',
 	residential: '#e15f00',
 	farm: '#519c1f',
-	// violet
 	food: '#8a2be2',
 	recreation: '#4070ff',
 	shop: '#ff00ff',
 	tourism: '#ff00ff',
-	education: 'rgba(42, 62, 250, 0.9)',
-	medical: 'rgba(42, 62, 250, 0.9)',
+	education: 'rgba(42, 62, 230, 1.0)',
+	medical: 'rgba(42, 62, 230, 1.0)',
 	bank: '#7b68ee',
 	federal: '#7b68ee',
-	science: 'rgba(42, 62, 250, 0.9)',
+	science: 'rgba(42, 62, 230, 1.0)',
 };
 
 export function getColor(typeIndex, canBeUpgraded = false) {
@@ -868,7 +866,6 @@ export function getColor(typeIndex, canBeUpgraded = false) {
 		} else if (typeIndex == -2) {
 			return typeColors['recreation'];
 		} else {
-			console.log(typeIndex);
 			return typeColors['empty'];
 		}
 	}

@@ -258,7 +258,7 @@
 	function _unemployment(z) {
 		let unemployed = z.townInfo.population_count - z.townInfo.employees;
 		if (unemployed > 0) {
-			z.modifiers.happiness -= unemployed * 0.0009;
+			z.modifiers.happiness -= unemployed * 0.0004;
 			z = addToTownLog(unemployed + messages.unemployment_num, z);
 		}
 		return z;

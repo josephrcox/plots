@@ -64,7 +64,7 @@
 							</p>
 						{:else}
 							<p class="text-gray-500 text-sm">
-								{winScenarios.political.description_title}
+								{winScenarios.free_play.description_title}
 							</p>
 						{/if}
 
@@ -75,7 +75,9 @@
 							on:change={setSelectedGameMode}
 						>
 							<option value="land">{winScenarios.land.short_title}</option>
-							<option value="political">Rule the world through politics</option>
+							<option value="free_play"
+								>{winScenarios.free_play.short_title}</option
+							>
 						</select>
 					</div>
 
