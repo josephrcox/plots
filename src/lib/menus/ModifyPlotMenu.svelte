@@ -270,6 +270,7 @@
 			z.plots[x][y].type = typeIndex;
 			z.plots[x][y].active = true;
 			z.plots[x][y].referencePlot = [];
+			z.plots[x][y].typeId = plotChosen.id;
 			z.townInfo.gold -= plotChosen.requirements.gold;
 			z.townInfo.gold = roundTo(z.townInfo.gold, 2);
 			// Immediate variable changes
@@ -433,7 +434,7 @@
 			plotChosen.requirements.plots.length > 0
 		) {
 			plotChosen.requirements.plots.forEach((plot: any) => {
-				if (!hasPlotOfType(plot, z)) {
+				if (hasPlotOfType(plot, z).length === 0) {
 					requirementsMet = false;
 				}
 			});
@@ -636,7 +637,7 @@
 								<div>
 									<!-- list each requirements.plot[]  -->
 									{#each option.requirements.plots as plot}
-										{#if hasPlotOfType(plot, $DB)}
+										{#if hasPlotOfType(plot, $DB).length > 0}
 											<span class="text-green-500">✅</span>
 										{:else}
 											<span class="text-red-500">❌</span>

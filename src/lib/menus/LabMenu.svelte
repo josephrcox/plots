@@ -1,13 +1,13 @@
 <script lang="ts">
 	// @ts-ignore
-	import { DB, showLabMenu } from '../store.js';
+	import { DB, hasPlotOfType, showLabMenu } from '../store.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
 	import { experiments } from '$lib/objects/ExperimentsList.js';
-	import { Experiment } from '$lib/types.js';
+	import { Experiment, Plot } from '$lib/types.js';
 	import { data } from 'autoprefixer';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	const scenarios: any = winScenarios;
@@ -55,7 +55,6 @@
 		);
 		// remove all entries that are undefined
 		newExperiments = newExperiments.filter((n) => n);
-		console.log(newExperiments);
 		generated = true;
 		return newExperiments;
 	}
@@ -80,10 +79,13 @@
 			case 'antibiotics':
 				$DB.modifiers.health = 50;
 				break;
+			case 'goodbye_carrots':
+
 			default:
 				break;
 		}
-		$DB.lab.active_experiment.duration = -1; // used to mark as already done
+		// used to mark as already done so that the effects don't double
+		$DB.lab.active_experiment.duration = -1;
 	}
 
 	function finalizeAndNext() {
@@ -99,16 +101,11 @@
 	function formatNumber(n: number) {
 		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
 	}
-	function roundTo(n: number, digits: number) {
-		if (digits === undefined) {
-			digits = 0;
-		}
 
-		var m = Math.pow(10, digits);
-		n = parseFloat((n * m).toFixed(11));
-		var test = Math.round(n) / m;
-		return +test.toFixed(digits);
+	function removeAllPlotsOfType(typeId: string) {
+		console.log(hasPlotOfType(typeId, $DB));
 	}
+	removeAllPlotsOfType('res_small');
 </script>
 
 <AlertDialog.Root open={showAlert}>

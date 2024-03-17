@@ -180,23 +180,25 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	location.reload();
 }
 
-export function  hasPlotOfType(type: string, z: Game) {
+export function hasPlotOfType(type: string, z: Game) {
+	let plotsOfType = [];
 		for (let x = 0; x < z.plots.length; x++) {
 			for (let y = 0; y < z.plots[x].length; y++) {
 				if (
 					z.plots[x][y].active == false ||
 				z.plots[x][y] == null ||
-					z.plots[x][y].type == null ||
-					z.plots[x][y].type < 1
+					z.plots[x][y].type === null ||
+					z.plots[x][y].type < 0
 				) {
 					continue;
 				}
-				if (options[z.plots[x][y].type].id === type) {
-					return true;
+				if (options[z.plots[x][y].type].id === type || options[z.plots[x][y].type].typeId === type) {
+					plotsOfType.push(z.plots[x][y]);
 				}
 			}
 		}
-		return false;
+
+		return plotsOfType;
 	}
 
 export function clearDB(overridenFile : File | null = null) {

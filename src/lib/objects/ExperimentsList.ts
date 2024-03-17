@@ -1,5 +1,16 @@
 import { Experiment } from "$lib/types";
 
+/* 
+ideas:
+- every x plot burns to the ground
+- every x plot now generates twice the revenue
+- citizens are happier with a higher tax rate
+- 
+
+
+
+*/
+
 export const experiments : Experiment[] = [
     {
         id: "sunshine",
@@ -21,5 +32,18 @@ export const experiments : Experiment[] = [
         cost: 8000,
         duration: 200
     },
+    {
+        id: "goodbye_carrots",
+        title: "Goodbye Carrots",
+        description: `Scientist Jarrod M. collaborated with local carrot farms to enhance the recipe, aiming to increase consumers' height by 10%.
+
+        Unfortunately, the experiment failed, and all the local carrot farms have gone out of business. 
+        `,
+        cost: 8000,
+        duration: 200
+    },
+
 ]
+
+
     
