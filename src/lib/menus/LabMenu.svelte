@@ -77,6 +77,15 @@
 			case 'goodbye_carrots':
 				removeAllPlotsOfType('carrot_farm');
 				break;
+			case 'missing_treasure':
+				$DB.townInfo.gold += Math.floor(
+					Math.random() * $DB.lab.active_experiment.cost * 2,
+				);
+				break;
+			case 'tax_relief':
+				$DB.economyAndLaws.max_tax_rate =
+					(Math.random() * 0.8 + 1.2) * $DB.economyAndLaws.max_tax_rate;
+				break;
 			default:
 				break;
 		}
