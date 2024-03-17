@@ -68,6 +68,7 @@ export type Experiment = {
     description: string;
     cost: number;
     duration: number; // days
+    effect: boolean; // whether it has an effect or not
 }
 
 export type PlotOption = {

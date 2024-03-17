@@ -5,7 +5,6 @@
 	import PauseMenu from './lib/menus/PauseMenu.svelte';
 
 	import {
-		ACTIVE_GAME_DB_NAME,
 		paused,
 		showBalanceSheet,
 		unique,
@@ -14,9 +13,10 @@
 		modifyPlotMenuOptions,
 		startGameMenu,
 		headerHeight,
-		showScoreboard,
 		// @ts-ignore
 	} from './lib/store.ts';
+	// @ts-ignore
+	import { runTests } from './tests';
 	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 	import GameEndMenu from './lib/menus/GameEndMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
@@ -25,6 +25,7 @@
 	import LabMenu from '$lib/menus/LabMenu.svelte';
 
 	let dbInitialized = false;
+	runTests();
 
 	$: if ($DB) {
 		$startGameMenu.visible = false;

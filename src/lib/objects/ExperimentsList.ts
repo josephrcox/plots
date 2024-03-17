@@ -20,7 +20,8 @@ export const experiments : Experiment[] = [
         Now, every home is equipped with a pair of sunglasses and a sunhat. Enjoy happier citizens!,
         `,
         cost: 5000,
-        duration: 180
+        duration: 180,
+                effect: true,
     },
     {
         id: "antibiotics",
@@ -30,7 +31,8 @@ export const experiments : Experiment[] = [
          We don't really know what that means, but it seems to make people healthier. 
         `,
         cost: 8000,
-        duration: 200
+        duration: 200,
+                effect: true,
     },
     {
         id: "goodbye_carrots",
@@ -40,8 +42,34 @@ export const experiments : Experiment[] = [
         Unfortunately, the experiment failed, and all the local carrot farms have gone out of business. 
         `,
         cost: 8000,
-        duration: 80
+        duration: 80,
+        effect: true,
     },
+    {
+        id: "funny_cows",
+        title: "Cowabunga",
+        description: `Scientist Barry T. thought that showing cows some stand-up comedy would make them produce better milk, but it didn't have the desired effect.
+
+        The cows are now following Mike Birbiglia on Twitter, but the milk production has not increased.
+        `,
+        cost: 3000,
+        duration: 60,
+        effect: false,
+    },
+    {
+        id: "missing_treasure", 
+        title: "Missing Treasure?",
+        description: `Scientist Sarah H. was running an experiment on tree growth and found a stash of gold near the lab. 
+
+        She hopes nobody will miss it.
+        `,
+        cost: 15000,
+        duration: 180,
+        effect: true,
+    }
+    
+
+    
 
 ]
 

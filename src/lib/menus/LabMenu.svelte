@@ -1,18 +1,13 @@
 <script lang="ts">
-	// @ts-ignore
 	import { DB, hasPlotOfType, showLabMenu, reverseClear } from '../store.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { winScenarios } from '../objects/WinScenarios.js';
-	import { difficulty_options } from '../objects/difficulty.js';
 	import { experiments } from '$lib/objects/ExperimentsList.js';
 	import { Experiment, Plot } from '$lib/types.js';
-	import { data } from 'autoprefixer';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	const scenarios: any = winScenarios;
-	const endGoal = scenarios[$DB.endGoal];
-	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
 
 	let experimentOptions: Experiment[] = [];
 	let dbInitialized = false;
@@ -112,7 +107,6 @@
 </script>
 
 <AlertDialog.Root open={showAlert}>
-	<!-- <AlertDialog.Trigger></AlertDialog.Trigger> -->
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title class="text-center"
