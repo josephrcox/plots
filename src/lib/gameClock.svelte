@@ -49,9 +49,6 @@
 
 	export function mainGameThreadLoop() {
 		DB.update((currentDB) => {
-			// currentDB.endGameDetails = null;
-			// currentDB.overtime = false;
-			// return currentDB;
 			if (currentDB == null) {
 				return currentDB;
 			}
@@ -62,7 +59,7 @@
 			if (
 				$paused ||
 				!currentDB ||
-				(currentDB.endGameDetails != null && currentDB.overtime == false)
+				(currentDB.endGameDetails.msg !== '' && currentDB.overtime == false)
 			) {
 				return currentDB;
 			}

@@ -197,10 +197,15 @@
 							ex.cost < $DB.townInfo.gold ? purchaseExperiment(ex) : null;
 						}}
 						variant="outline"
-						class="min-w-48 w-max
+						class="min-w-48 w-max flex-col
 				{ex.cost > $DB.townInfo.gold ? 'cursor-not-allowed' : ''}
-				">${formatNumber(ex.cost).split('.')[0]} gold</Button
-					>
+				"
+						>${formatNumber(ex.cost).split('.')[0]} gold
+
+						{#if $DB.devMode === true}
+							<span class="text-xs text-gray-400"> // dev-{ex.id}</span>
+						{/if}
+					</Button>
 				{/each}
 			</div>
 		{:else if experimentOptions.length === 0}

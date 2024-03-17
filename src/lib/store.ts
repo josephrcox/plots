@@ -144,6 +144,7 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	json.difficulty = parseInt(difficulty);
 	
 	if (cheats) {
+		json.devMode = true;
 		json.townInfo.gold = 100000000;
 		json.townInfo.happiness = 10000000;
 		json.townInfo.health = 1000000;

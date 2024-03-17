@@ -199,8 +199,7 @@
 					{#if $DB.economyAndLaws.tax_rate == 0}
 						<Tooltip text="Set this!!!" />
 					{/if}
-					<!-- TODO REMOVE TRUE HERE BEFORE MERGE -->
-					{#if $DB.hasLab || true}
+					{#if $DB.hasLab || $DB.devMode === true}
 						<Button
 							class="text-xs flex flex-col h-min mt-2"
 							on:click={showTheLabMenu}
