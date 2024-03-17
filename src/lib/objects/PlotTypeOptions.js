@@ -97,6 +97,31 @@ export const options = [
 		check_for_variety: true,
 	},
 	{
+		id: 'tree_farm',
+		title: '🌲 Tree Farm',
+		subtitle: 'for farming',
+		type: 'farm',
+		description: 'Grow trees and sell the resources. Required for most plots.',
+		revenue_per_week: 12,
+		requirements: {
+			gold: 400,
+			plots: [],
+			employees: 10,
+			climate: null,
+			knowledge: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.0,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+		check_for_variety: false,
+	},
+	{
 		id: 'apple_orchard', // 'apple_orchard
 		title: '🍎 Apple orchard',
 		subtitle: 'for farming',
@@ -230,7 +255,7 @@ export const options = [
 		revenue_per_week: 48,
 		requirements: {
 			gold: 300,
-			plots: ['coffee_bean_farm', 'bakery', 'dairy_farm'],
+			plots: ['coffee_bean_farm', 'bakery', 'dairy_farm', 'tree_farm'],
 			employees: 16,
 			climate: null,
 			knowledge: 0,
@@ -280,7 +305,7 @@ export const options = [
 		revenue_per_week: 80,
 		requirements: {
 			gold: 620,
-			plots: ['fishery'],
+			plots: ['fishery', 'tree_farm'],
 			employees: 24,
 			climate: null,
 			knowledge: 0,
@@ -305,7 +330,7 @@ export const options = [
 		revenue_per_week: 40,
 		requirements: {
 			gold: 600,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 9,
 			climate: null,
 			knowledge: 0,
@@ -331,7 +356,7 @@ export const options = [
 		knowledge_points_per_month: 1,
 		requirements: {
 			gold: 500,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 6,
 			climate: null,
 			knowledge: 0,
@@ -356,7 +381,7 @@ export const options = [
 		knowledge_points_per_month: 1,
 		requirements: {
 			gold: 500,
-			plots: ['church'],
+			plots: ['church', 'tree_farm'],
 			employees: 6,
 			climate: null,
 			knowledge: 0,
@@ -381,7 +406,7 @@ export const options = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 500,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 0,
 			climate: null,
 			knowledge: 0,
@@ -406,7 +431,7 @@ export const options = [
 		revenue_per_week: 25,
 		requirements: {
 			gold: 220,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 2,
 			climate: null,
 			knowledge: 0,
@@ -431,7 +456,7 @@ export const options = [
 		revenue_per_week: 150,
 		requirements: {
 			gold: 2300,
-			plots: ['large_school'],
+			plots: ['large_school', 'tree_farm'],
 			employees: 15,
 			climate: null,
 			knowledge: 0,
@@ -482,7 +507,7 @@ export const options = [
 		tourism_revenue_per_week: 1, // this is per citizen!
 		requirements: {
 			gold: 1500,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 14,
 			climate: null,
 			knowledge: 0,
@@ -530,7 +555,7 @@ export const options = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 450,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 2,
 			climate: null,
 			knowledge: 0,
@@ -555,7 +580,7 @@ export const options = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 900,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 4,
 			climate: null,
 			size: 2,
@@ -581,7 +606,7 @@ export const options = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 15000,
-			plots: ['park_medium', 'inn'],
+			plots: ['park_medium', 'inn', 'tree_farm'],
 			employees: 12,
 			climate: null,
 			size: 1,
@@ -608,7 +633,7 @@ export const options = [
 		knowledge_points_per_month: 8,
 		requirements: {
 			gold: 1500,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 20,
 			climate: null,
 			size: 1,
@@ -634,7 +659,7 @@ export const options = [
 		knowledge_points_per_month: 26,
 		requirements: {
 			gold: 15000,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 40,
 			climate: null,
 			size: 2,
@@ -660,7 +685,7 @@ export const options = [
 		knowledge_points_per_month: 300,
 		requirements: {
 			gold: 80000,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 101,
 			climate: null,
 			size: 2,
@@ -686,7 +711,7 @@ export const options = [
 		knowledge_points_per_month: 0,
 		requirements: {
 			gold: 10000,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 18,
 			climate: null,
 			size: 1,
@@ -713,7 +738,7 @@ export const options = [
 		knowledge_points_per_month: 80,
 		requirements: {
 			gold: 45000,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 90,
 			climate: null,
 			size: 2,
@@ -743,7 +768,7 @@ export const options = [
 		knowledge_points_per_month: 0,
 		requirements: {
 			gold: 50000,
-			plots: ['blacksmith', 'vineyard'],
+			plots: ['blacksmith', 'vineyard', 'tree_farm'],
 			employees: 64,
 			climate: null,
 			size: 1,
@@ -770,7 +795,7 @@ export const options = [
 		knowledge_points_per_month: 0,
 		requirements: {
 			gold: 150000,
-			plots: ['community_center', 'small_school'],
+			plots: ['community_center', 'small_school', 'tree_farm'],
 			employees: 48,
 			climate: null,
 			size: 1,
@@ -792,7 +817,7 @@ export const options = [
 		subtitle: '',
 		type: 'science',
 		description:
-			'Design things that can help your city grow. Experiments can cause unexpected situations. Possibly can generate revenue or knowledge.',
+			'Design things that can help your city grow. Experiments can cause unexpected situations. Required to build advanced plot types.',
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {

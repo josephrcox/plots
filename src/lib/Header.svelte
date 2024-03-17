@@ -114,6 +114,7 @@
 	top-0
 	left-0
 	right-0
+	z-20
 "
 >
 	<div
@@ -142,7 +143,7 @@
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div class="flex flex-col">
 						<span>{speedMultiplier} speed</span>
-						<span>Day {day} ({year}y)</span>
+						<span>Day {day} (y.{year})</span>
 					</div>
 				</div>
 				<span class="text-xs text-col"
@@ -153,13 +154,13 @@
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="
-			flex flex-col gap-1 drop-shadow-md text-center pb-6 rounded-lg max-h-24 h-24 hover:max-h-48 hover:h-48 transition-all ml-6 mr-4 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/2
+			flex flex-col gap-2 drop-shadow-md text-center pb-6 rounded-lg max-h-24 h-24 hover:max-h-48 hover:h-48 transition-all ml-2 mr-2 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/4
 			"
 				on:click={() => {
 					$DB.townLog = '';
 				}}
 			>
-				<div class="text-md cursor-pointer">🚨 Alerts (scroll)</div>
+				<div class="text-md cursor-pointer">🚨 Alerts</div>
 				{#if $DB.townLog.length > 0}
 					<div class="townLog text-xs text-center">
 						{$DB.townLog.split('\n')[0]}

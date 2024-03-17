@@ -41,7 +41,7 @@
 				filteredExperiments[
 					Math.floor(Math.random() * filteredExperiments.length)
 				];
-			ex.cost = Math.floor(ex.cost * (Math.random() * 1.5 + 0.8));
+			ex.cost = Math.floor(Math.random() * (ex.cost * 0.35) + ex.cost * 0.8);
 			newExperiments.push(ex);
 		}
 
@@ -85,6 +85,31 @@
 			case 'tax_relief':
 				$DB.economyAndLaws.max_tax_rate =
 					(Math.random() * 0.8 + 1.2) * $DB.economyAndLaws.max_tax_rate;
+				break;
+			case 'coffee_boost_tourism':
+				$DB.townInfo.gold += 5000; // Coffee tourism? Why not!
+				$DB.townInfo.gold_from_tourism += 10000; // Coffee tourism? Why not!
+				break;
+			case 'bee_bonanza':
+				removeAllPlotsOfType('coffee_bean_farm');
+				break;
+			case 'wheat_whirlwind':
+				removeAllPlotsOfType('wheat_farm');
+				$DB.townInfo.happiness *= 1.5;
+				$DB.modifiers.happiness += 3;
+				break;
+			case 'aquatic_overachievers':
+				removeAllPlotsOfType('fishery');
+				$DB.townInfo.gold_from_tourism += 30000;
+				break;
+			case 'educational_eclipse':
+				removeAllPlotsOfType('small_school');
+				removeAllPlotsOfType('large_school');
+				$DB.townInfo.knowledge_points *= 0.8;
+				break;
+			case 'education_grant':
+				$DB.townInfo.knowledge_points *= 1.5;
+				$DB.townInfo.gold += 150000;
 				break;
 			default:
 				break;

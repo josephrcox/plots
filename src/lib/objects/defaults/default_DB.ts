@@ -38,6 +38,10 @@ export const default_db : Game = {
 		climate: -1,
 		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
+	maximums: {
+		health: 300,
+		happiness: 300,
+	},
 	difficulty: 0, // 0 = easy, 1 = medium, 2 = hard
 	endGoal: 'land',
 	endGameDetails: {

@@ -579,16 +579,22 @@
 								{/if}
 							</td>
 							<td class="px-2 py-2 w-12">
-								<div>
-									<!-- list each requirements.plot[]  -->
+								<div
+									class="
+									 flex flex-col align-middle justify-center h-max w-max gap-1"
+								>
 									{#each option.requirements.plots as plot}
 										{#if hasPlotOfType(plot, $DB).length > 0}
-											<span class="text-green-500">✅</span>
+											<span
+												class="text-white bg-opacity-100 bg-green-900 p-1 rounded-sm w-min overflow-ellipsis"
+												>{plot}</span
+											>
 										{:else}
-											<span class="text-red-500">❌</span>
+											<span
+												class="text-red-100 bg-red-900 p-1 rounded-sm w-min overflow-ellipsis px-2"
+												>{plot}</span
+											>
 										{/if}
-										{plot}
-										<br />
 									{/each}
 								</div>
 							</td>

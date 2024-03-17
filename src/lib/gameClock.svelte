@@ -59,7 +59,8 @@
 			if (
 				$paused ||
 				!currentDB ||
-				(currentDB.endGameDetails.msg !== '' && currentDB.overtime == false)
+				(currentDB.endGameDetails.msg !== '' && currentDB.overtime == false) ||
+				currentDB.townInfo.population_count <= 0
 			) {
 				return currentDB;
 			}
@@ -517,13 +518,13 @@
 		z.townInfo.happiness = roundTo(z.townInfo.happiness, 2);
 		z.townInfo.health = roundTo(z.townInfo.health, 2);
 
-		if (z.townInfo.happiness > 300) {
+		if (z.townInfo.happiness > z.maximums.happiness) {
 			// Maxed out happiness
-			z.townInfo.happiness = 300;
+			z.townInfo.happiness = z.maximums.happiness;
 		}
-		if (z.townInfo.health > 300) {
+		if (z.townInfo.health > z.maximums.health) {
 			// Maxed out health
-			z.townInfo.health = 300;
+			z.townInfo.health = z.maximums.health;
 		}
 		// If modifiers are below 0.50, set to 0.50
 		if (z.modifiers.happiness < 0.5) {

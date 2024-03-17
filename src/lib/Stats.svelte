@@ -83,7 +83,7 @@
 			},
 			{
 				label: 'Happiness',
-				value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
+				value: `${roundTo($DB.townInfo.happiness, 0)}/${$DB.maximums.happiness}`,
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs text-slate-600
@@ -97,7 +97,7 @@
 			},
 			{
 				label: 'Health',
-				value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
+				value: `${roundTo($DB.townInfo.health, 0)}/${$DB.maximums.health}`,
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs text-slate-600

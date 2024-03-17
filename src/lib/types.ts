@@ -9,38 +9,42 @@ export type Plot = {
 }
 
 export type Game = {
-    plots: Plot[][];
-    devMode: boolean;
-    lastChangeDay: number;
-    townLog: string,
+    plots: Plot[][]; // 2d array of plot-like objects that mark what is in each plot.
+    devMode: boolean; 
+    lastChangeDay: number; // when the last change in the town was made.
+    townLog: string, 
     townInfo: {
         name: string;
-        gold: number;
-        gold_from_tourism: number;
+        gold: number; // you start with 1000, and generally profits go up slowly.
+        gold_from_tourism: number; // you start with 0, and this goes up with a village inn or with general other tourism plots.
         population_count: number;
         population_max: number;
         employees: number;
-        happiness: number;
-        health: number;
-        knowledge_points: number;
+        happiness: number; // can only go up to maximums.happiness, as it goes down people pay less taxes and leave.
+        health: number; // can only go up to maximums.happiness, as it goes down people die or leave.
+        knowledge_points: number; // goes up with education plots and with some experiments.
     },
     hasCityHall: boolean;
     hasBank: boolean;
     hasHospital: boolean;
     hasLab: boolean;
-    modifiers: {
-        happiness: number;
-        health: number;
+    modifiers: { // May be lower than 1.0 if the town is trending unhappy. 
+        happiness: number; // default here is 1.0 as every week happiness is multiplied by this. Max here should be <20 but always trends back to 1.0.
+        health: number; // default here is 1.0 as every week happiness is multiplied by this. Max here should be <20 but always trends back to 1.0. 
+    },
+    maximums: {
+        health: number; // defaults to 300 but can go up or down with experiments.
+        happiness: number; // defaults to 300 but can go up or down with experiments.
     },
     economyAndLaws: {
-        tax_rate: number;
-        max_tax_rate: number;
+        tax_rate: number; // current tax rate set by user.
+        max_tax_rate: number; // the max the town is willing to pay, random each game between 0.2 and 0.6.
         balance_sheet_history: any[];
         last_month_profit: number;
         knowledge_gold_market_rates: number[];
     },
     plotCounts: [][];
-    environment: {
+    environment: { // TODO: make this do anything meaningful, currently only using day and year.
         day: number;
         year: number;
         climate: number;
