@@ -40,7 +40,7 @@ export const experiments : Experiment[] = [
         Unfortunately, the experiment failed, and all the local carrot farms have gone out of business. 
         `,
         cost: 8000,
-        duration: 200
+        duration: 80
     },
 
 ]

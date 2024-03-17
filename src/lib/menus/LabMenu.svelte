@@ -1,6 +1,6 @@
 <script lang="ts">
 	// @ts-ignore
-	import { DB, hasPlotOfType, showLabMenu } from '../store.js';
+	import { DB, hasPlotOfType, showLabMenu, reverseClear } from '../store.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
@@ -80,7 +80,8 @@
 				$DB.modifiers.health = 50;
 				break;
 			case 'goodbye_carrots':
-
+				removeAllPlotsOfType('carrot_farm');
+				break;
 			default:
 				break;
 		}
@@ -103,9 +104,11 @@
 	}
 
 	function removeAllPlotsOfType(typeId: string) {
-		console.log(hasPlotOfType(typeId, $DB));
+		let plotsOfType: any[] = hasPlotOfType(typeId, $DB);
+		for (let i = 0; i < plotsOfType.length; i++) {
+			reverseClear(plotsOfType[i].x, plotsOfType[i].y, $DB);
+		}
 	}
-	removeAllPlotsOfType('res_small');
 </script>
 
 <AlertDialog.Root open={showAlert}>

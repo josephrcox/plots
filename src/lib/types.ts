@@ -10,6 +10,7 @@ export type Plot = {
 
 export type Game = {
     plots: Plot[][];
+    devMode: boolean;
     lastChangeDay: number;
     townLog: string,
     townInfo: {

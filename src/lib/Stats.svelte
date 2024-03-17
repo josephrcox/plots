@@ -12,6 +12,7 @@
 	export let clickEvents = 'true';
 
 	$: {
+		// TODO: Fix bug where gold is sometimes shown as NaN. Possibly related to hot reload.
 		stats = [
 			{
 				label: 'Population',

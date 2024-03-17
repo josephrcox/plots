@@ -168,6 +168,7 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 				x: i,
 				y: j,
 				type: -1,
+				typeId: '',
 			};
 		}
 	}
@@ -179,6 +180,73 @@ export function startGame(difficulty : Difficulty, endGoal : EndGoal, townName: 
 	DB.set(json); // Update the store with the new value
 	location.reload();
 }
+
+	function roundTo(n : number, digits : number) {
+		if (digits === undefined) {
+			digits = 0;
+		}
+
+		var multiplicator = Math.pow(10, digits);
+		n = parseFloat((n * multiplicator).toFixed(11));
+		var test = Math.round(n) / multiplicator;
+		return +test.toFixed(digits);
+	}
+
+export function reverseClear(x: number, y: number, z : any) {
+		// TODO: Use Game as type for z instead of any.
+		let oldPlotType = z.plots[x][y].type;
+		z.plots[x][y].type = -1;
+		z.plots[x][y].active = false;
+
+		if (oldPlotType > -1) {
+			// Immediate variable changes
+			z.townInfo.population_count -=
+				options[oldPlotType].immediate_variable_changes.population;
+			z.townInfo.population_max -=
+				options[oldPlotType].immediate_variable_changes.population;
+			z.townInfo.happiness -=
+				options[oldPlotType].immediate_variable_changes.happiness;
+			z.townInfo.health -=
+				options[oldPlotType].immediate_variable_changes.health;
+			// Effect modifiers
+			z.modifiers.happiness = roundTo(
+				z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
+				2,
+			);
+			z.modifiers.health = roundTo(
+				z.modifiers.health / options[oldPlotType].effect_modifiers.health,
+				2,
+			);
+			// Employeer modifications
+			z.townInfo.employees -= options[oldPlotType].requirements.employees;
+
+			if (
+				z.plotCounts[oldPlotType] === undefined ||
+				z.plotCounts[oldPlotType] === null
+			) {
+				z.plotCounts[oldPlotType] = 0;
+			}
+			z.plotCounts[oldPlotType]--;
+			let size = options[oldPlotType].requirements.size ?? 1;
+			if (size > 1) {
+				for (let a = 0; a < z.plots.length; a++) {
+					for (let b = 0; b < z.plots[x].length; b++) {
+						if (
+							z.plots[a][b].referencePlot != undefined &&
+							z.plots[a][b].referencePlot[0] === x &&
+							z.plots[a][b].referencePlot[1] === y
+						) {
+							reverseClear(a, b, z);
+						}
+					}
+				}
+			}
+		}
+
+		z.lastChangeDay = z.environment.day;
+		DB.set(z);
+		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
+	}
 
 export function hasPlotOfType(type: string, z: Game) {
 	let plotsOfType = [];

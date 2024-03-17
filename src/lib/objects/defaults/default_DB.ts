@@ -1,5 +1,8 @@
-export const default_db = {
+import { Game } from "$lib/types";
+
+export const default_db : Game = {
 	plots: [],
+	devMode: false,
 	lastChangeDay: 0,
 	townLog: '',
 	townInfo: {
@@ -37,7 +40,10 @@ export const default_db = {
 	},
 	difficulty: 0, // 0 = easy, 1 = medium, 2 = hard
 	endGoal: 'land',
-	endGameDetails: null,
+	endGameDetails: {
+		msg: '',
+		win: false,
+	},
 	tick: 0,
 	overtime: false,
 	last_warning_happiness: 0,
