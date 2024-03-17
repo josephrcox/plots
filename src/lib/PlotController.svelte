@@ -1,14 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
-	import {
-		DB,
-		modifyPlotMenuOptions,
-		unique,
-		paused,
-		headerHeight,
-	} from './store';
+	import { DB, modifyPlotMenuOptions, unique } from './store';
 
 	$: if ($DB) {
 		checkForAvailablePlots();

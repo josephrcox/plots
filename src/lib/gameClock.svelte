@@ -7,7 +7,7 @@
 	import { plotCountMaximums } from './objects/difficulty.js';
 
 	let z = $DB;
-	const GAME_TICK_SPEED = 30;
+	const GAME_TICK_SPEED = 200;
 
 	function performWeeklyTasks(db) {
 		db = _unemployment(db);
@@ -595,24 +595,6 @@
 					z.townInfo.gold += profit;
 					z.economyAndLaws.last_month_profit += profit;
 
-					// push object to the start of the balance sheet history array instead of the end
-					if (profit > 0) {
-						z.economyAndLaws.balance_sheet_history = [
-							{
-								day: z.environment.day,
-								plot: `${i},${j}`,
-								profits: profit,
-								taxRate: z.economyAndLaws.tax_rate,
-							},
-							...z.economyAndLaws.balance_sheet_history,
-						];
-						// If balance_sheet_history has over 250 items, set to only latest 250 entries
-						if (z.economyAndLaws.balance_sheet_history.length > 250) {
-							z.economyAndLaws.balance_sheet_history =
-								z.economyAndLaws.balance_sheet_history.slice(0, 250);
-						}
-					}
-
 					if (plotOptionForPlot.enables_tourism == true) {
 						z.townInfo.gold_from_tourism +=
 							plotOptionForPlot.tourism_revenue_per_week *
@@ -688,7 +670,7 @@
 				clearDB();
 				localStorage.setItem('reset', 'false');
 			}
-			// call mainGameThreadLoop ever $speed ms
+
 			mainGameThreadLoop();
 			await new Promise((r) => setTimeout(r, $speed / GAME_TICK_SPEED));
 		}

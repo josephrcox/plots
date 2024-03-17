@@ -14,7 +14,6 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
-	import { numberWithCommas } from '../utils.js';
 	import Stats from '../Stats.svelte';
 
 	export let x = 0;
@@ -302,16 +301,6 @@
 			}
 			z.plotCounts[typeIndex]++;
 			z.lastChangeDay = z.environment.day;
-
-			z.economyAndLaws.balance_sheet_history = [
-				{
-					day: z.environment.day,
-					plot: `${x},${y}`,
-					profits: plotChosen.requirements.gold * -1,
-					balance: roundTo(z.townInfo.gold, 2),
-				},
-				...z.economyAndLaws.balance_sheet_history,
-			];
 
 			switch (plotChosen.id) {
 				case 'city_hall':

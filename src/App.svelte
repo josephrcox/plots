@@ -6,7 +6,6 @@
 
 	import {
 		paused,
-		showBalanceSheet,
 		unique,
 		DB,
 		clearDB,
@@ -17,7 +16,6 @@
 	} from './lib/store.ts';
 	// @ts-ignore
 	import { runTests } from './tests';
-	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
 	import GameEndMenu from './lib/menus/GameEndMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
 	import Scoreboard from '$lib/menus/Scoreboard.svelte';
@@ -257,10 +255,6 @@
 			<PauseMenu />
 		{/if}
 
-		{#if $showBalanceSheet == true}
-			<BalanceSheetMenu />
-		{/if}
-
 		<Header />
 		<GameClock />
 		<GameEndMenu />
@@ -278,7 +272,6 @@
 		>
 			<div
 				id="plot_grid"
-				data-marginRight={$showBalanceSheet}
 				style="margin-top: {$headerHeight}px"
 				class="scroll-smooth no-scrollbar
 					overflow-x
@@ -298,11 +291,6 @@
 			/* no visible scrollbars */
 			#plot_grid::-webkit-scrollbar {
 				display: none;
-			}
-
-			#plot_grid[data-marginRight='true'] {
-				/* This is for when the balanceSheet is being shown. */
-				margin-right: 224px;
 			}
 
 			html {

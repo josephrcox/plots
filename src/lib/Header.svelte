@@ -4,17 +4,14 @@
 		DB,
 		ACTIVE_GAME_DB_NAME,
 		speed,
-		showBalanceSheet,
 		headerHeight,
 		showLabMenu,
 	} from './store.ts';
-	import BalanceSheetMenu from './menus/BalanceSheetMenu.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import Tooltip from './Tooltip.svelte';
 	import { numberWithCommas } from './utils.ts';
 	import Stats from './Stats.svelte';
 	import Button from './components/ui/button/button.svelte';
-	import LabMenu from './menus/LabMenu.svelte';
 
 	let year;
 	let day;
@@ -26,6 +23,16 @@
 		year = Math.floor($DB.environment.day / 365) + 1;
 		day = numberWithCommas($DB.environment.day);
 	}
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			$DB.timeSpent += 1000;
+		}, 1000);
+
+		return () => {
+			clearInterval(interval); // Clear the interval when the component is destroyed
+		};
+	});
 
 	function changeName() {
 		let newName = prompt('Enter a new name for your town (under 200 chars)');
@@ -102,6 +109,32 @@
 	function showTheLabMenu() {
 		showLabMenu.set(true);
 	}
+
+	// Assuming $DB.timeSpent is reactive and stores time in milliseconds
+	let formattedTime = '00:00:00';
+
+	// Function to format the duration
+	function formatDuration(ms) {
+		let seconds = Math.floor(ms / 1000);
+		let minutes = Math.floor(seconds / 60);
+		seconds = seconds % 60;
+		let hours = Math.floor(minutes / 60);
+		minutes = minutes % 60;
+
+		return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+	}
+
+	// Helper function to ensure two digits
+	function pad(n) {
+		return n < 10 ? '0' + n : n;
+	}
+
+	// Watch for changes in $DB.timeSpent and update formattedTime
+	$: if ($DB.timeSpent > 0) {
+		formattedTime = formatDuration($DB.timeSpent);
+	} else {
+		formattedTime = '00:00:00';
+	}
 </script>
 
 <div
@@ -122,7 +155,7 @@
 		id="headerObject"
 	>
 		<div class="select-none flex justify-evenly">
-			<div>
+			<div class="flex flex-col gap-1">
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div
@@ -135,7 +168,7 @@
 				</div>
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
-				<div
+				<span
 					class="text-xs gap-2 cursor-pointer hover:text-blue-600"
 					on:click={toggleSpeed}
 				>
@@ -143,12 +176,15 @@
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div class="flex flex-row">
 						<span>{speedMultiplier} speed</span>
-						<span> - Day {day} Year {year}</span>
+						<span> / Day {day} Year {year}</span>
 					</div>
-				</div>
+				</span>
 				<span class="text-xs text-col"
-					>💡 Press P to Pause or learn how to play</span
+					>Press P to Pause or learn how to play</span
 				>
+				<span class="text-xs text-gray-400">
+					({formattedTime})
+				</span>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -229,10 +265,6 @@
 		<Stats />
 	</div>
 </div>
-
-{#if $showBalanceSheet}
-	<BalanceSheetMenu />
-{/if}
 
 <style>
 	input[type='range'] {

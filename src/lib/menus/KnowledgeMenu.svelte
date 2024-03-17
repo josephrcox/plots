@@ -1,20 +1,12 @@
 <script lang="ts">
 	// @ts-ignore
-	import {
-		DB,
-		clearDB,
-		paused,
-		showKnowledgeMenu,
-		ACTIVE_GAME_DB_NAME,
-	} from '../store.js';
+	import { DB, showKnowledgeMenu, ACTIVE_GAME_DB_NAME } from '../store.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
 	import LineGraph from '$lib/components/LineGraph.svelte';
 	const scenarios: any = winScenarios;
-	const endGoal = scenarios[$DB.endGoal];
-	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
 	let graphData: number[];
 	let marketRate = 0;
 

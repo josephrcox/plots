@@ -1,7 +1,8 @@
-import { Game } from "$lib/types";
+import { Game } from '$lib/types';
 
-export const default_db : Game = {
+export const default_db: Game = {
 	plots: [],
+	timeSpent: 0,
 	devMode: false,
 	lastChangeDay: 0,
 	townLog: '',
@@ -27,7 +28,6 @@ export const default_db : Game = {
 	economyAndLaws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
-		balance_sheet_history: [],
 		last_month_profit: 0,
 		knowledge_gold_market_rates: [],
 	},

@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from 'svelte';
 	import { options, getColor } from './objects/PlotTypeOptions.js';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.ts';
 	import Tooltip from './Tooltip.svelte';

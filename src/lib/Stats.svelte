@@ -1,10 +1,5 @@
 <script>
-	import {
-		DB,
-		ACTIVE_GAME_DB_NAME,
-		showBalanceSheet,
-		showKnowledgeMenu,
-	} from './store.ts';
+	import { DB, ACTIVE_GAME_DB_NAME, showKnowledgeMenu } from './store.ts';
 	import { numberWithCommas } from './utils.ts';
 
 	export let stats = [];
@@ -70,7 +65,7 @@
 					${numberWithCommas(roundTo($DB.economyAndLaws.last_month_profit, 0))}
 				</span>`,
 				tap: () => {
-					$showBalanceSheet = !$showBalanceSheet;
+					//
 				},
 			},
 			{
