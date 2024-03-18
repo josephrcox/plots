@@ -236,7 +236,7 @@
 					{#if $DB.economyAndLaws.tax_rate == 0}
 						<Tooltip text="Set this!!!" />
 					{/if}
-					{#if $DB.hasLab || $DB.devMode === true}
+					{#if $DB.hasLab}
 						<Button
 							class="text-xs flex flex-col h-min mt-2"
 							on:click={showTheLabMenu}

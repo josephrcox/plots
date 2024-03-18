@@ -148,11 +148,12 @@
 	}
 
 	.plot_container[data-size='2'] {
+		background-color: rgb(42, 62, 230);
 		border: none;
 	}
 
 	.plot_container[data-type='-3'] {
-		background-color: rgba(42, 62, 230, 1);
+		background-color: rgb(42, 62, 230);
 		border: none;
 	}
 

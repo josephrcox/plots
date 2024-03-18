@@ -78,7 +78,7 @@ export const experiments: Experiment[] = [
 	},
 	{
 		id: 'coffee_boost_tourism',
-		title: 'Speedy Brewqs',
+		title: 'Speedy Brews',
 		description: `Scientist Claudia A. has found that a specific blend of coffee can significantly increase productivity among town employees. 
 
         The catch? It only works on Mondays. But hey, starting the week with a turbo-charged workforce might just be the boost we needed. The town gets a bit of extra cash from the productivity, and a bit of tourism revenue from coffee tourism.
@@ -110,7 +110,7 @@ export const experiments: Experiment[] = [
 	{
 		id: 'aquatic_overachievers',
 		title: 'Fishy Business',
-		description: `An attempt to genetically enhance fish intelligence by Scientist Goldy F. in fisheries has gone awry, resulting in fish that are too smart to be caught. The fisheries are now underpopulated and shut down, but the town enjoys an unexpected tourism boom as people flock to see the genius fish who are now hanging out in local parks.
+		description: `An attempt to genetically enhance fish intelligence by Scientist Goldie F. in fisheries has gone awry, resulting in fish that are too smart to be caught. The fisheries are now underpopulated and shut down, but the town enjoys an unexpected tourism boom as people flock to see the genius fish who are now hanging out in local parks.
 
         Who knew fish could be such a draw?`,
 		cost: 6000,

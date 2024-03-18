@@ -136,6 +136,7 @@
 		z.hasBank = hasBank;
 		z.hasHospital = hasHospital;
 		z.hasCityHall = hasCityHall;
+		z.hasLab = hasLab;
 		return z;
 	}
 
