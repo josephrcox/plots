@@ -6,7 +6,7 @@ import { Difficulty, EndGoal, Game } from './types';
 // @ts-ignore
 import { max_tax_rates_based_on_difficulty } from './objects/difficulty.js';
 // @ts-ignore
-import { options } from './objects/PlotTypeOptions.js';
+import { options } from './objects/PlotTypeOptions';
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -567,7 +567,7 @@ export function hasPlotOfType(type: string, z: Game) {
 			}
 			if (
 				options[z.plots[x][y].type].id === type ||
-				options[z.plots[x][y].type].typeId === type
+				options[z.plots[x][y].type].type === type
 			) {
 				plotsOfType.push(z.plots[x][y]);
 			}

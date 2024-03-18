@@ -1,5 +1,5 @@
 <script>
-	import { options, getColor } from './objects/PlotTypeOptions.js';
+	import { options, getColor } from './objects/PlotTypeOptions';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.ts';
 	import Tooltip from './Tooltip.svelte';
 

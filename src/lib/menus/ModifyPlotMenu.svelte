@@ -9,7 +9,7 @@
 		toggleShowOnlyAffordable,
 		reverseClear,
 	} from '../store.js';
-	import { getColor, options } from '../objects/PlotTypeOptions.js';
+	import { getColor, options } from '../objects/PlotTypeOptions';
 	import { Game, PlotOption } from '../types.js';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$lib/components/ui/separator';

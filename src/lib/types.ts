@@ -84,13 +84,16 @@ export type PlotOption = {
 	description: string;
 	revenue_per_week: number;
 	tourism_revenue_per_week: number;
+	enables_tourism: true;
 	requirements: {
 		gold: number;
 		plots: any[];
 		employees: number;
 		climate: number | null;
 		knowledge: number;
+		size: number;
 	};
+	knowledge_points_per_month: number;
 	effect_modifiers: {
 		happiness: number;
 		health: number;
@@ -103,6 +106,7 @@ export type PlotOption = {
 	styling: string;
 	affordable: boolean | null;
 	selected: boolean | null;
+	check_for_variety: boolean;
 };
 
 export type WinScenario = {

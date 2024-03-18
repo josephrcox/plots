@@ -9,7 +9,7 @@
 		hasPlotOfType,
 	} from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
-	import { options } from './objects/PlotTypeOptions.js';
+	import { options } from './objects/PlotTypeOptions';
 	import { winScenarios } from './objects/WinScenarios.js';
 	import { plotCountMaximums } from './objects/difficulty.js';
 
