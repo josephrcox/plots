@@ -304,8 +304,16 @@ export const options = [
 		description: 'People get hungry. This is where they go to get food.',
 		revenue_per_week: 80,
 		requirements: {
-			gold: 620,
-			plots: ['fishery', 'tree_farm'],
+			gold: 820,
+			plots: [
+				'fishery',
+				'tree_farm',
+				'carrot_farm',
+				'dairy_farm',
+				'bakery',
+				'wheat_farm',
+				'coffee_bean_farm',
+			],
 			employees: 24,
 			climate: null,
 			knowledge: 0,
@@ -506,8 +514,8 @@ export const options = [
 		enables_tourism: true,
 		tourism_revenue_per_week: 1, // this is per citizen!
 		requirements: {
-			gold: 1500,
-			plots: ['tree_farm'],
+			gold: 15000,
+			plots: ['tree_farm', 'cafe', 'stables'],
 			employees: 14,
 			climate: null,
 			knowledge: 0,
@@ -756,7 +764,7 @@ export const options = [
 	},
 	{
 		id: 'bank',
-		title: '🏦 Bank (2x2)',
+		title: '🏦 Bank',
 		subtitle: 'for storing and accessing funds',
 		type: 'bank',
 		description: `Rich get richer.
@@ -767,12 +775,12 @@ export const options = [
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
 		requirements: {
-			gold: 50000,
+			gold: 75000,
 			plots: ['blacksmith', 'vineyard', 'tree_farm'],
 			employees: 64,
 			climate: null,
 			size: 1,
-			knowledge: 300,
+			knowledge: 1000,
 		},
 		effect_modifiers: {
 			happiness: 0.8,

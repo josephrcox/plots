@@ -174,9 +174,9 @@
 				>
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div class="flex flex-row">
+					<div class="flex flex-row gap-3">
 						<span>{speedMultiplier} speed</span>
-						<span> / Day {day} Year {year}</span>
+						<span>Day {day} Year {year}</span>
 					</div>
 				</span>
 				<span class="text-xs text-col"

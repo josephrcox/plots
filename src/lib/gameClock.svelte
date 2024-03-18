@@ -1,13 +1,20 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, ACTIVE_GAME_DB_NAME, paused, speed, clearDB } from './store.ts';
+	import {
+		DB,
+		ACTIVE_GAME_DB_NAME,
+		paused,
+		speed,
+		clearDB,
+		hasPlotOfType,
+	} from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
 	import { options } from './objects/PlotTypeOptions.js';
 	import { winScenarios } from './objects/WinScenarios.js';
 	import { plotCountMaximums } from './objects/difficulty.js';
 
 	let z = $DB;
-	const GAME_TICK_SPEED = 200;
+	const GAME_TICK_SPEED = 30;
 
 	function performWeeklyTasks(db) {
 		db = _unemployment(db);
@@ -197,16 +204,7 @@
 				) {
 					let plotId =
 						winScenarios.land.requirements[z.difficulty].required_plots[i];
-					let found = false;
-					for (let j = 0; j < z.plots.length; j++) {
-						for (let k = 0; k < z.plots[j].length; k++) {
-							if (options[z.plots[j][k].type].id == plotId) {
-								found = true;
-								break;
-							}
-						}
-					}
-					if (found == false) {
+					if (hasPlotOfType(plotId, z) == false) {
 						hasRequiredPlots = false;
 						break;
 					}
