@@ -119,7 +119,7 @@ export const options = [
 			health: 0,
 			population: 0,
 		},
-		check_for_variety: false,
+		check_for_variety: true,
 	},
 	{
 		id: 'apple_orchard', // 'apple_orchard
