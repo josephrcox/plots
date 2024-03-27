@@ -6,7 +6,7 @@
 	let show = false;
 
 	$: {
-		if ($DB.endGameDetails != null && $DB.overtime == false) {
+		if ($DB.endGameDetails.msg != '' && $DB.overtime == false) {
 			show = true;
 		} else {
 			show = false;

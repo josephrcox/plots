@@ -134,7 +134,7 @@
 					{#each endGoal.requirements[$DB.difficulty].required_plots as plot}
 						<div class="text-base leading-relaxed">
 							<li>
-								{#if hasPlotOfType(plot, $DB)}
+								{#if hasPlotOfType(plot, $DB).length > 0}
 									✅
 								{:else}
 									❌

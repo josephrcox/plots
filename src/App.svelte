@@ -5,25 +5,25 @@
 	import PauseMenu from './lib/menus/PauseMenu.svelte';
 
 	import {
-		ACTIVE_GAME_DB_NAME,
 		paused,
-		showBalanceSheet,
 		unique,
 		DB,
 		clearDB,
 		modifyPlotMenuOptions,
 		startGameMenu,
 		headerHeight,
-		showScoreboard,
 		// @ts-ignore
 	} from './lib/store.ts';
-	import BalanceSheetMenu from './lib/menus/BalanceSheetMenu.svelte';
+	// @ts-ignore
+	import { runTests } from './tests';
 	import GameEndMenu from './lib/menus/GameEndMenu.svelte';
 	import StartGameMenu from './lib/menus/StartGameMenu.svelte';
 	import Scoreboard from '$lib/menus/Scoreboard.svelte';
 	import KnowledgeMenu from '$lib/menus/KnowledgeMenu.svelte';
+	import LabMenu from '$lib/menus/LabMenu.svelte';
 
 	let dbInitialized = false;
+	runTests();
 
 	$: if ($DB) {
 		$startGameMenu.visible = false;
@@ -255,15 +255,12 @@
 			<PauseMenu />
 		{/if}
 
-		{#if $showBalanceSheet == true}
-			<BalanceSheetMenu />
-		{/if}
-
 		<Header />
 		<GameClock />
 		<GameEndMenu />
 		<Scoreboard />
 		<KnowledgeMenu />
+		<LabMenu />
 		<div
 			class="justify-center text-center
 		
@@ -275,7 +272,6 @@
 		>
 			<div
 				id="plot_grid"
-				data-marginRight={$showBalanceSheet}
 				style="margin-top: {$headerHeight}px"
 				class="scroll-smooth no-scrollbar
 					overflow-x
@@ -295,11 +291,6 @@
 			/* no visible scrollbars */
 			#plot_grid::-webkit-scrollbar {
 				display: none;
-			}
-
-			#plot_grid[data-marginRight='true'] {
-				/* This is for when the balanceSheet is being shown. */
-				margin-right: 224px;
 			}
 
 			html {

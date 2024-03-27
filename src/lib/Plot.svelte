@@ -1,6 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
-	import { options, getColor } from './objects/PlotTypeOptions.js';
+	import { options, getColor } from './objects/PlotTypeOptions';
 	import { DB, modifyPlotMenuOptions, unique, paused } from './store.ts';
 	import Tooltip from './Tooltip.svelte';
 
@@ -149,11 +148,12 @@
 	}
 
 	.plot_container[data-size='2'] {
+		background-color: rgb(42, 62, 230);
 		border: none;
 	}
 
 	.plot_container[data-type='-3'] {
-		background-color: rgba(42, 62, 250, 0.9);
+		background-color: rgb(42, 62, 230);
 		border: none;
 	}
 

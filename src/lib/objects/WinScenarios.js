@@ -6,7 +6,7 @@ export const winScenarios = {
 		win: 'You have filled the grid with buildings and met the requirements. Your citizens are happy, fulfilled, hard-working, and healthy. ',
 		requirements: {
 			0: {
-				population_count: 150,
+				population_count: 200,
 				happiness: 100,
 				health: 100,
 				employment: 1,
@@ -14,7 +14,7 @@ export const winScenarios = {
 				required_plots: ['pub', 'small_school', 'community_center'],
 			},
 			1: {
-				population_count: 500,
+				population_count: 1000,
 				happiness: 120,
 				health: 120,
 				employment: 1,
@@ -31,29 +31,9 @@ export const winScenarios = {
 			},
 		},
 	},
-	political: {
-		short_title: 'PLACEHOLDER',
-		description_title: 'PLACEHOLDER',
-		win: 'PLACEHOLDER',
-		requirements: {
-			0: {
-				population_count: 200,
-				happiness: 100,
-				health: 100,
-				employment: 1,
-			},
-			1: {
-				population_count: 500,
-				happiness: 100,
-				health: 100,
-				employment: 1,
-			},
-			2: {
-				population_count: 1000,
-				happiness: 100,
-				health: 100,
-				employment: 1,
-			},
-		},
+	free_play: {
+		short_title: 'Free Play',
+		description_title:
+			'Play for as long as you can and build the best city you can.',
 	},
 };

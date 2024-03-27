@@ -1,5 +1,9 @@
-export const default_db = {
+import { Game } from '$lib/types';
+
+export const default_db: Game = {
 	plots: [],
+	timeSpent: 0,
+	devMode: false,
 	lastChangeDay: 0,
 	townLog: '',
 	townInfo: {
@@ -16,6 +20,7 @@ export const default_db = {
 	hasCityHall: false,
 	hasBank: false,
 	hasHospital: false,
+	hasLab: false,
 	modifiers: {
 		happiness: 1,
 		health: 1,
@@ -23,7 +28,6 @@ export const default_db = {
 	economyAndLaws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
-		balance_sheet_history: [],
 		last_month_profit: 0,
 		knowledge_gold_market_rates: [],
 	},
@@ -34,11 +38,23 @@ export const default_db = {
 		climate: -1,
 		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
+	maximums: {
+		health: 300,
+		happiness: 300,
+	},
 	difficulty: 0, // 0 = easy, 1 = medium, 2 = hard
 	endGoal: 'land',
-	endGameDetails: null,
+	endGameDetails: {
+		msg: '',
+		win: false,
+	},
 	tick: 0,
 	overtime: false,
 	last_warning_happiness: 0,
 	last_warning_health: 0,
+	lab: {
+		active_experiment: null,
+		past_experiments: [],
+		xp: 0,
+	},
 };

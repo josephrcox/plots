@@ -1,9 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
-	import { DB, ACTIVE_GAME_DB_NAME, paused, speed, clearDB } from './store.ts';
+	import {
+		DB,
+		ACTIVE_GAME_DB_NAME,
+		paused,
+		speed,
+		clearDB,
+		hasPlotOfType,
+	} from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
-	import { options } from './objects/PlotTypeOptions.js';
-	import Plot from './Plot.svelte';
+	import { options } from './objects/PlotTypeOptions';
 	import { winScenarios } from './objects/WinScenarios.js';
 	import { plotCountMaximums } from './objects/difficulty.js';
 
@@ -40,6 +46,7 @@
 
 	function checkGameStatus(db) {
 		db = _fixVariables(db);
+		db = _checkExperiment(db);
 		if (db.overtime == false) {
 			db = _checkGameLost(db);
 			db = _checkGameWin(db);
@@ -49,9 +56,6 @@
 
 	export function mainGameThreadLoop() {
 		DB.update((currentDB) => {
-			// currentDB.endGameDetails = null;
-			// currentDB.overtime = false;
-			// return currentDB;
 			if (currentDB == null) {
 				return currentDB;
 			}
@@ -62,7 +66,8 @@
 			if (
 				$paused ||
 				!currentDB ||
-				(currentDB.endGameDetails != null && currentDB.overtime == false)
+				(currentDB.endGameDetails.msg !== '' && currentDB.overtime == false) ||
+				currentDB.townInfo.population_count <= 0
 			) {
 				return currentDB;
 			}
@@ -104,6 +109,7 @@
 		let hasBank = false;
 		let hasHospital = false;
 		let hasCityHall = false;
+		let hasLab = false;
 
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
@@ -121,12 +127,16 @@
 					) {
 						hasHospital = true;
 					}
+					if (plotOptionForPlot == 'lab') {
+						hasLab = true;
+					}
 				}
 			}
 		}
 		z.hasBank = hasBank;
 		z.hasHospital = hasHospital;
 		z.hasCityHall = hasCityHall;
+		z.hasLab = hasLab;
 		return z;
 	}
 
@@ -195,16 +205,7 @@
 				) {
 					let plotId =
 						winScenarios.land.requirements[z.difficulty].required_plots[i];
-					let found = false;
-					for (let j = 0; j < z.plots.length; j++) {
-						for (let k = 0; k < z.plots[j].length; k++) {
-							if (options[z.plots[j][k].type].id == plotId) {
-								found = true;
-								break;
-							}
-						}
-					}
-					if (found == false) {
+					if (hasPlotOfType(plotId, z) == false) {
 						hasRequiredPlots = false;
 						break;
 					}
@@ -256,7 +257,7 @@
 	function _unemployment(z) {
 		let unemployed = z.townInfo.population_count - z.townInfo.employees;
 		if (unemployed > 0) {
-			z.modifiers.happiness -= unemployed * 0.0009;
+			z.modifiers.happiness -= unemployed * 0.0004;
 			z = addToTownLog(unemployed + messages.unemployment_num, z);
 		}
 		return z;
@@ -329,7 +330,10 @@
 	}
 
 	function _boredom(z) {
-		if (z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day) {
+		if (
+			z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day &&
+			z.townInfo.population_count > 0
+		) {
 			if (z.townInfo.population_count > 0) {
 				z.townInfo.population_count -= 1;
 				z.townInfo.employees -= 1;
@@ -423,7 +427,10 @@
 
 	function _taxRateEffects(z) {
 		const randomness = Math.random();
-		if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate) {
+		if (
+			z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate &&
+			z.townInfo.population_count > 0
+		) {
 			const lenientChance = // higher == more lenient
 				z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
 			if (randomness < lenientChance) {
@@ -457,6 +464,16 @@
 					z,
 				);
 			}
+		}
+		return z;
+	}
+
+	export function _checkExperiment(z) {
+		if (z.lab.active_experiment == null) return z;
+		let active = z.lab.active_experiment;
+		if (active.duration > 0) {
+			z.lab.active_experiment.duration -= 1;
+		} else {
 		}
 		return z;
 	}
@@ -500,13 +517,13 @@
 		z.townInfo.happiness = roundTo(z.townInfo.happiness, 2);
 		z.townInfo.health = roundTo(z.townInfo.health, 2);
 
-		if (z.townInfo.happiness > 300) {
+		if (z.townInfo.happiness > z.maximums.happiness) {
 			// Maxed out happiness
-			z.townInfo.happiness = 300;
+			z.townInfo.happiness = z.maximums.happiness;
 		}
-		if (z.townInfo.health > 300) {
+		if (z.townInfo.health > z.maximums.health) {
 			// Maxed out health
-			z.townInfo.health = 300;
+			z.townInfo.health = z.maximums.health;
 		}
 		// If modifiers are below 0.50, set to 0.50
 		if (z.modifiers.happiness < 0.5) {
@@ -576,24 +593,6 @@
 					let profit = getProfit(plotOptionForPlot.revenue_per_week, z);
 					z.townInfo.gold += profit;
 					z.economyAndLaws.last_month_profit += profit;
-
-					// push object to the start of the balance sheet history array instead of the end
-					if (profit > 0) {
-						z.economyAndLaws.balance_sheet_history = [
-							{
-								day: z.environment.day,
-								plot: `${i},${j}`,
-								profits: profit,
-								taxRate: z.economyAndLaws.tax_rate,
-							},
-							...z.economyAndLaws.balance_sheet_history,
-						];
-						// If balance_sheet_history has over 250 items, set to only latest 250 entries
-						if (z.economyAndLaws.balance_sheet_history.length > 250) {
-							z.economyAndLaws.balance_sheet_history =
-								z.economyAndLaws.balance_sheet_history.slice(0, 250);
-						}
-					}
 
 					if (plotOptionForPlot.enables_tourism == true) {
 						z.townInfo.gold_from_tourism +=
@@ -670,7 +669,7 @@
 				clearDB();
 				localStorage.setItem('reset', 'false');
 			}
-			// call mainGameThreadLoop ever $speed ms
+
 			mainGameThreadLoop();
 			await new Promise((r) => setTimeout(r, $speed / GAME_TICK_SPEED));
 		}

@@ -7,13 +7,17 @@
 		modifyPlotMenuOptions,
 		showOnlyAffordable,
 		toggleShowOnlyAffordable,
+		reverseClear,
 	} from '../store.js';
-	import { getColor, options } from '../objects/PlotTypeOptions.js';
+	import {
+		getColor,
+		options,
+		plotTypeMaximums,
+	} from '../objects/PlotTypeOptions';
 	import { Game, PlotOption } from '../types.js';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
-	import { numberWithCommas } from '../utils.js';
 	import Stats from '../Stats.svelte';
 
 	export let x = 0;
@@ -74,6 +78,16 @@
 		if ($showOnlyAffordable) {
 			reactiveOptions = reactiveOptions.filter((option) => option.affordable);
 		}
+		// iterate over plotTypeMaximums and remove any options that are at their maximum. If 'lab': 1, then make sure that if hasPlotOfType('lab') > 0, then remove that option from the list.
+		Object.keys(plotTypeMaximums).forEach((key) => {
+			let max = plotTypeMaximums[key];
+			if (max > 0) {
+				let count = hasPlotOfType(key, $DB).length;
+				reactiveOptions = reactiveOptions.filter((option) => {
+					return option.id !== key || count < max;
+				});
+			}
+		});
 	}
 
 	$: reactiveOptions = reactiveOptions.filter((option) =>
@@ -128,16 +142,12 @@
 		});
 	}
 
-	function close() {
-		$modifyPlotMenuOptions.visible = false;
-	}
-
 	function clearPlot() {
 		const plotOptions = document.querySelectorAll('.plotOption');
 		plotOptions.forEach((plotOption) => {
 			plotOption.classList.remove('active');
 		});
-		reverseClear(x, y);
+		reverseClear(x, y, $DB);
 	}
 
 	function choosePlotOption(id: string) {
@@ -263,13 +273,14 @@
 		if (requirementsMet === true) {
 			// Check if the plot is already set to a type. If so, reverse the effects of that type.
 			if (z.plots[x][y].type !== -1) {
-				reverseClear(x, y);
+				reverseClear(x, y, z);
 			}
 
 			tooltip = '';
 			z.plots[x][y].type = typeIndex;
 			z.plots[x][y].active = true;
 			z.plots[x][y].referencePlot = [];
+			z.plots[x][y].typeId = plotChosen.id;
 			z.townInfo.gold -= plotChosen.requirements.gold;
 			z.townInfo.gold = roundTo(z.townInfo.gold, 2);
 			// Immediate variable changes
@@ -301,16 +312,6 @@
 			z.plotCounts[typeIndex]++;
 			z.lastChangeDay = z.environment.day;
 
-			z.economyAndLaws.balance_sheet_history = [
-				{
-					day: z.environment.day,
-					plot: `${x},${y}`,
-					profits: plotChosen.requirements.gold * -1,
-					balance: roundTo(z.townInfo.gold, 2),
-				},
-				...z.economyAndLaws.balance_sheet_history,
-			];
-
 			switch (plotChosen.id) {
 				case 'city_hall':
 					z.hasCityHall = true;
@@ -334,62 +335,6 @@
 				plotOption.classList.remove('active');
 			});
 		}
-	}
-
-	export function reverseClear(x: number, y: number) {
-		let z = $DB;
-		let oldPlotType = z.plots[x][y].type;
-		z.plots[x][y].type = -1;
-		z.plots[x][y].active = false;
-
-		if (oldPlotType > -1) {
-			// Immediate variable changes
-			z.townInfo.population_count -=
-				options[oldPlotType].immediate_variable_changes.population;
-			z.townInfo.population_max -=
-				options[oldPlotType].immediate_variable_changes.population;
-			z.townInfo.happiness -=
-				options[oldPlotType].immediate_variable_changes.happiness;
-			z.townInfo.health -=
-				options[oldPlotType].immediate_variable_changes.health;
-			// Effect modifiers
-			z.modifiers.happiness = roundTo(
-				z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
-				2,
-			);
-			z.modifiers.health = roundTo(
-				z.modifiers.health / options[oldPlotType].effect_modifiers.health,
-				2,
-			);
-			// Employeer modifications
-			z.townInfo.employees -= options[oldPlotType].requirements.employees;
-
-			if (
-				z.plotCounts[oldPlotType] === undefined ||
-				z.plotCounts[oldPlotType] === null
-			) {
-				z.plotCounts[oldPlotType] = 0;
-			}
-			z.plotCounts[oldPlotType]--;
-			let size = options[oldPlotType].requirements.size ?? 1;
-			if (size > 1) {
-				for (let a = 0; a < z.plots.length; a++) {
-					for (let b = 0; b < z.plots[x].length; b++) {
-						if (
-							z.plots[a][b].referencePlot != undefined &&
-							z.plots[a][b].referencePlot[0] === x &&
-							z.plots[a][b].referencePlot[1] === y
-						) {
-							reverseClear(a, b);
-						}
-					}
-				}
-			}
-		}
-
-		z.lastChangeDay = z.environment.day;
-		DB.set(z);
-		localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 	}
 
 	function roundTo(n: number, digits: number) {
@@ -433,7 +378,7 @@
 			plotChosen.requirements.plots.length > 0
 		) {
 			plotChosen.requirements.plots.forEach((plot: any) => {
-				if (!hasPlotOfType(plot, z)) {
+				if (hasPlotOfType(plot, z).length === 0) {
 					requirementsMet = false;
 				}
 			});
@@ -604,9 +549,11 @@
 								{#if option.revenue_per_week > 0}
 									<div>
 										<span
-											>${roundTo(
-												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
-												2,
+											>${formatNumber(
+												roundTo(
+													$DB.economyAndLaws.tax_rate * option.revenue_per_week,
+													2,
+												),
 											)}</span
 										>
 									</div>
@@ -633,16 +580,22 @@
 								{/if}
 							</td>
 							<td class="px-2 py-2 w-12">
-								<div>
-									<!-- list each requirements.plot[]  -->
+								<div
+									class="
+									 flex flex-col align-middle justify-center h-max w-max gap-1"
+								>
 									{#each option.requirements.plots as plot}
-										{#if hasPlotOfType(plot, $DB)}
-											<span class="text-green-500">✅</span>
+										{#if hasPlotOfType(plot, $DB).length > 0}
+											<span
+												class="text-white bg-opacity-100 bg-green-900 p-1 rounded-sm w-min overflow-ellipsis"
+												>{plot}</span
+											>
 										{:else}
-											<span class="text-red-500">❌</span>
+											<span
+												class="text-red-100 bg-red-900 p-1 rounded-sm w-min overflow-ellipsis px-2"
+												>{plot}</span
+											>
 										{/if}
-										{plot}
-										<br />
 									{/each}
 								</div>
 							</td>

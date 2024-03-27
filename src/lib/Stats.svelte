@@ -1,10 +1,5 @@
 <script>
-	import {
-		DB,
-		ACTIVE_GAME_DB_NAME,
-		showBalanceSheet,
-		showKnowledgeMenu,
-	} from './store.ts';
+	import { DB, ACTIVE_GAME_DB_NAME, showKnowledgeMenu } from './store.ts';
 	import { numberWithCommas } from './utils.ts';
 
 	export let stats = [];
@@ -12,6 +7,7 @@
 	export let clickEvents = 'true';
 
 	$: {
+		// TODO: Fix bug where gold is sometimes shown as NaN. Possibly related to hot reload.
 		stats = [
 			{
 				label: 'Population',
@@ -69,7 +65,7 @@
 					${numberWithCommas(roundTo($DB.economyAndLaws.last_month_profit, 0))}
 				</span>`,
 				tap: () => {
-					$showBalanceSheet = !$showBalanceSheet;
+					//
 				},
 			},
 			{
@@ -82,7 +78,7 @@
 			},
 			{
 				label: 'Happiness',
-				value: `${roundTo($DB.townInfo.happiness / 3, 0)}/100`,
+				value: `${roundTo($DB.townInfo.happiness, 0)}/${$DB.maximums.happiness}`,
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs text-slate-600
@@ -96,7 +92,7 @@
 			},
 			{
 				label: 'Health',
-				value: `${roundTo($DB.townInfo.health / 3, 0)}/100`,
+				value: `${roundTo($DB.townInfo.health, 0)}/${$DB.maximums.health}`,
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs text-slate-600

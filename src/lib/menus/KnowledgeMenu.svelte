@@ -1,20 +1,12 @@
 <script lang="ts">
 	// @ts-ignore
-	import {
-		DB,
-		clearDB,
-		paused,
-		showKnowledgeMenu,
-		ACTIVE_GAME_DB_NAME,
-	} from '../store.js';
+	import { DB, showKnowledgeMenu, ACTIVE_GAME_DB_NAME } from '../store.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { winScenarios } from '../objects/WinScenarios.js';
 	import { difficulty_options } from '../objects/difficulty.js';
 	import LineGraph from '$lib/components/LineGraph.svelte';
 	const scenarios: any = winScenarios;
-	const endGoal = scenarios[$DB.endGoal];
-	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
 	let graphData: number[];
 	let marketRate = 0;
 
@@ -48,7 +40,7 @@
 </script>
 
 <Dialog.Root bind:open={$showKnowledgeMenu}>
-	<Dialog.Content>
+	<Dialog.Content transitionConfig={{ duration: 0 }}>
 		<Dialog.Header>
 			<Dialog.Title
 				>Manage your Knowledge ({$DB.townInfo.knowledge_points} pts)</Dialog.Title
@@ -79,7 +71,8 @@
 				<div>
 					Wait until the market value is <span class="text-green-500"
 						>positive</span
-					> to sell your Knowledge for Gold.
+					> to sell your Knowledge for Gold. Keep in mind that you need a bank to
+					convert.
 				</div>
 			{/if}
 			{#if $DB.hasBank && marketRate > 0}
@@ -88,8 +81,6 @@
 						Convert Knowledge to Gold
 					</Button>
 				</div>
-			{:else if marketRate > 0}
-				<div class="font-bold">Get a bank to convert 🏦</div>
 			{/if}
 		</div>
 		<Dialog.Footer>
