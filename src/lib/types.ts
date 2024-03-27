@@ -92,6 +92,7 @@ export type PlotOption = {
 		climate: number | null;
 		knowledge: number;
 		size: number;
+		xp: number;
 	};
 	knowledge_points_per_month: number;
 	effect_modifiers: {

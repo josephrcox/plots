@@ -9,7 +9,11 @@
 		toggleShowOnlyAffordable,
 		reverseClear,
 	} from '../store.js';
-	import { getColor, options } from '../objects/PlotTypeOptions';
+	import {
+		getColor,
+		options,
+		plotTypeMaximums,
+	} from '../objects/PlotTypeOptions';
 	import { Game, PlotOption } from '../types.js';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Separator } from '$lib/components/ui/separator';
@@ -74,6 +78,16 @@
 		if ($showOnlyAffordable) {
 			reactiveOptions = reactiveOptions.filter((option) => option.affordable);
 		}
+		// iterate over plotTypeMaximums and remove any options that are at their maximum. If 'lab': 1, then make sure that if hasPlotOfType('lab') > 0, then remove that option from the list.
+		Object.keys(plotTypeMaximums).forEach((key) => {
+			let max = plotTypeMaximums[key];
+			if (max > 0) {
+				let count = hasPlotOfType(key, $DB).length;
+				reactiveOptions = reactiveOptions.filter((option) => {
+					return option.id !== key || count < max;
+				});
+			}
+		});
 	}
 
 	$: reactiveOptions = reactiveOptions.filter((option) =>
@@ -126,10 +140,6 @@
 			const adjacentPlotData = $DB.plots[adjacentPlot.x][adjacentPlot.y];
 			return adjacentPlotData.active;
 		});
-	}
-
-	function close() {
-		$modifyPlotMenuOptions.visible = false;
 	}
 
 	function clearPlot() {
@@ -539,9 +549,11 @@
 								{#if option.revenue_per_week > 0}
 									<div>
 										<span
-											>${roundTo(
-												$DB.economyAndLaws.tax_rate * option.revenue_per_week,
-												2,
+											>${formatNumber(
+												roundTo(
+													$DB.economyAndLaws.tax_rate * option.revenue_per_week,
+													2,
+												),
 											)}</span
 										>
 									</div>

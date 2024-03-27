@@ -14,6 +14,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.0,
@@ -45,6 +46,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.0,
@@ -76,6 +78,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.0,
@@ -107,6 +110,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -138,6 +142,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.0,
@@ -169,6 +174,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -200,6 +206,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.1,
@@ -231,6 +238,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.0,
@@ -262,6 +270,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.2,
@@ -293,6 +302,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.2,
@@ -324,6 +334,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -355,6 +366,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.11,
@@ -394,6 +406,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -426,6 +439,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -458,6 +472,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.2,
@@ -489,6 +504,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.2,
@@ -519,6 +535,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.1,
@@ -551,6 +568,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -570,6 +588,7 @@ export const options: PlotOption[] = [
 		check_for_variety: false,
 	},
 	{
+		// TODO: Make the blacksmith do a bit more. Also maybe require a mine or something like that if it does more.
 		id: 'blacksmith',
 		title: '⚔️ Blacksmith',
 		type: 'shop',
@@ -583,6 +602,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.0,
@@ -615,6 +635,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.5,
@@ -648,6 +669,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 0.9,
@@ -677,6 +699,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.01,
@@ -708,6 +731,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			knowledge: 0,
 			size: 1,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.02,
@@ -740,6 +764,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 2,
 			knowledge: 0,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.1,
@@ -772,6 +797,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 1,
 			knowledge: 0,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.09,
@@ -805,6 +831,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 1,
 			knowledge: 0,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.05,
@@ -836,6 +863,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 2,
 			knowledge: 50,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.2,
@@ -867,6 +895,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 2,
 			knowledge: 100,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.25,
@@ -898,6 +927,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 1,
 			knowledge: 100,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.25,
@@ -930,6 +960,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 2,
 			knowledge: 250,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 1.25,
@@ -965,6 +996,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 1,
 			knowledge: 1000,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 0.8,
@@ -997,6 +1029,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 1,
 			knowledge: 500,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 0.8,
@@ -1029,6 +1062,7 @@ export const options: PlotOption[] = [
 			climate: null,
 			size: 1,
 			knowledge: 1500,
+			xp: 0,
 		},
 		effect_modifiers: {
 			happiness: 0.95,
@@ -1080,3 +1114,9 @@ export function getColor(typeIndex: number, canBeUpgraded = false) {
 	const plotOption = options[typeIndex];
 	return typeColors[plotOption.type];
 }
+
+export const plotTypeMaximums: any = {
+	lab: 1,
+	city_hall: 1,
+	bank: 1,
+};

@@ -111,6 +111,9 @@
 				$DB.townInfo.knowledge_points *= 1.5;
 				$DB.townInfo.gold += 150000;
 				break;
+			case 'mindfulness_meditation_classes':
+				$DB.modifiers.happiness * 1.5;
+				break;
 			default:
 				break;
 		}

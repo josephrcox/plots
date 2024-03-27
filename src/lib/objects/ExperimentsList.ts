@@ -137,4 +137,14 @@ export const experiments: Experiment[] = [
 		duration: 45,
 		effect: true,
 	},
+	{
+		id: 'mindfulness_meditation_classes',
+		title: "'Mindfulness Meditation Classes'",
+		description: `Scientist Zen M. has introduced mindfulness meditation classes to the town after realizing that breathing in certain ways can lower stress. 
+		
+		Now, the town is a bit more relaxed, for now.`,
+		cost: 13000,
+		duration: 540,
+		effect: true,
+	},
 ];
