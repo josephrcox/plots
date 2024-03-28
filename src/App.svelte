@@ -35,14 +35,14 @@
 
 	let isOnReferencePlot = false;
 
-	// if screen width drops below 800, show an alert
-	window.addEventListener('resize', () => {
-		if (window.innerWidth < 800) {
-			alert(
-				'Your screen is too small to play this game. Please use a larger screen.',
-			);
-		}
-	});
+	// TODO: Make this a proper alert.
+	// window.addEventListener('resize', () => {
+	// 	if (window.innerWidth < 800) {
+	// 		alert(
+	// 			'Your screen is too small to play this game. Please use a larger screen.',
+	// 		);
+	// 	}
+	// });
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
