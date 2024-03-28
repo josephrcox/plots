@@ -1119,4 +1119,5 @@ export const plotTypeMaximums: any = {
 	lab: 1,
 	city_hall: 1,
 	bank: 1,
+	community_center: 1,
 };

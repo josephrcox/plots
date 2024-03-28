@@ -7,11 +7,14 @@
 		speed,
 		clearDB,
 		hasPlotOfType,
+		userDB,
+		USER_DB_NAME,
 	} from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
 	import { options } from './objects/PlotTypeOptions';
 	import { winScenarios } from './objects/WinScenarios.js';
 	import { plotCountMaximums } from './objects/difficulty.js';
+	import { achievements } from './objects/AchievementList.ts';
 
 	let z = $DB;
 	const GAME_TICK_SPEED = 30;
@@ -33,14 +36,15 @@
 		db = _calculateKnowledge(db);
 		db = _banksEffect(db);
 		db = _federalGovEffect(db);
+
 		return db;
 	}
 
 	function performQuarterlyTasks(db) {
 		db = _boredom(db);
 		db = _bringStatsBackToNormal(db);
-		db = _checkPlotCountForEffect(db);
 		db = _movePeopleInMovePeopleOut(db);
+		db = _checkPlotCountForEffect(db);
 		return db;
 	}
 
@@ -51,6 +55,7 @@
 			db = _checkGameLost(db);
 			db = _checkGameWin(db);
 		}
+		db = _checkForAchievements(db);
 		return db;
 	}
 
@@ -101,6 +106,11 @@
 	DB.subscribe((currentDB) => {
 		if (currentDB) {
 			localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(currentDB));
+		}
+	});
+	userDB.subscribe((currentDB) => {
+		if (currentDB) {
+			localStorage.setItem(USER_DB_NAME, JSON.stringify(currentDB));
 		}
 	});
 
@@ -196,7 +206,6 @@
 					winScenarios.land.requirements[z.difficulty].knowledge
 			) {
 				let hasRequiredPlots = true;
-				// iterate over winScenarios.land.requirements[z.difficulty].required_plots which has each plot id. then check if any aren't placed
 				for (
 					let i = 0;
 					i <
@@ -222,6 +231,32 @@
 			}
 		}
 
+		return z;
+	}
+
+	function _checkForAchievements(z) {
+		if (z.devMode) {
+			return z;
+		}
+		let user_db = $userDB;
+		for (let i = 0; i < achievements.length; i++) {
+			if (
+				user_db.achievements.find((a) => a[0] == achievements[i].id) == null
+			) {
+				if (achievements[i].check(z)) {
+					user_db.achievements.push([
+						achievements[i].id,
+						z.environment.day,
+						z.townInfo.name,
+					]);
+					addToTownLog('🎉 NEW Achievement: ' + achievements[i].title, z);
+				}
+			}
+		}
+
+		userDB.update(() => {
+			return user_db;
+		});
 		return z;
 	}
 
@@ -545,17 +580,25 @@
 			}
 		}
 		if (z.modifiers.health > 1.0) {
-			if (z.hasHospital) {
+			if (
+				hasPlotOfType('small_hospital', z) ||
+				hasPlotOfType('large_hospital', z)
+			) {
 				if (z.townLog.indexOf(messages.hospital_advantage) == -1) {
 					return (z = addToTownLog(messages.hospital_advantage, z));
 				}
-			}
-
-			// check % above 1.0 that z.modifiers.health is, and get it 8% closer to 1.0
-			let percentAboveOne = z.modifiers.health - 1.0;
-			z.modifiers.health -= percentAboveOne * 0.08;
-			if (z.modifiers.health < 1.05) {
-				z.modifiers.health = 1.0;
+				let percentAboveOne = z.modifiers.health - 1.0;
+				z.modifiers.health -=
+					percentAboveOne * hasPlotOfType('large_hospital', z) ? 0.04 : 0.06;
+				if (z.modifiers.health < 1.03) {
+					z.modifiers.health = 1.0;
+				}
+			} else {
+				let percentAboveOne = z.modifiers.health - 1.0;
+				z.modifiers.health -= percentAboveOne * 0.08;
+				if (z.modifiers.health < 1.05) {
+					z.modifiers.health = 1.0;
+				}
 			}
 		}
 		return z;

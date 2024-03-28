@@ -68,6 +68,26 @@ export type Game = {
 	};
 };
 
+export type UserDatabase = {
+	stats: {
+		games_played: number;
+		wins: number;
+		losses: number;
+	};
+	// id, day, town name, prize collected.
+	achievements: [string, number, string, boolean][];
+};
+
+export type Achievement = {
+	id: string;
+	title: string;
+	description: string;
+	requirements: string;
+	icon: string;
+	prize: number;
+	check: (game: Game) => boolean;
+};
+
 export type Experiment = {
 	id: string;
 	title: string;

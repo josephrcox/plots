@@ -1,4 +1,4 @@
-import { Game } from '$lib/types';
+import { Game, UserDatabase } from '$lib/types';
 
 export const default_db: Game = {
 	plots: [],
@@ -57,4 +57,13 @@ export const default_db: Game = {
 		past_experiments: [],
 		xp: 0,
 	},
+};
+
+export const default_user_db: UserDatabase = {
+	stats: {
+		games_played: 0,
+		wins: 0,
+		losses: 0,
+	},
+	achievements: [],
 };
