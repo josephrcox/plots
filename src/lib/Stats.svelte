@@ -145,7 +145,7 @@
 			"
 			on:click={clickEvents == 'true' ? stat.tap : null}
 		>
-			<span class="text-xs pl-4 pr-4 rounded-lg">
+			<span class="text-xs pl-4 pr-4 rounded-lg whitespace-nowrap">
 				{stat.label}
 			</span>
 

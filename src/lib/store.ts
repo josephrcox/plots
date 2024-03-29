@@ -622,6 +622,7 @@ export let unique = writable({});
 export let paused = writable(false);
 export let showScoreboard = writable(false);
 export let showKnowledgeMenu = writable(false);
+export let showAchievementPopup = writable(false);
 export let showLabMenu = writable(false);
 export let showCompletedAchievements =
 	localStorage.getItem('showCompletedAchievements') === 'true'

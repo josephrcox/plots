@@ -9,6 +9,7 @@
 		hasPlotOfType,
 		userDB,
 		USER_DB_NAME,
+		showAchievementPopup,
 	} from './store.ts';
 	import { messages } from './objects/TownLogMessages.js';
 	import { options } from './objects/PlotTypeOptions';
@@ -249,7 +250,8 @@
 						z.environment.day,
 						z.townInfo.name,
 					]);
-					addToTownLog('🎉 NEW Achievement: ' + achievements[i].title, z);
+					$paused = true;
+					$showAchievementPopup = true;
 				}
 			}
 		}

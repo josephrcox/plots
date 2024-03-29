@@ -8,6 +8,7 @@
 		userDB,
 		showCompletedAchievements,
 		pauseMenuTab,
+		showAchievementPopup,
 	} from '../store';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -18,6 +19,7 @@
 	import { difficulty_options } from '../objects/difficulty.js';
 	import { achievements } from '$lib/objects/AchievementList.js';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	const scenarios: any = winScenarios;
 	const endGoal = scenarios[$DB.endGoal];
 	const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -154,6 +156,13 @@
 	if (localStorage.getItem('pauseMenuTab') == null) {
 		localStorage.setItem('pauseMenuTab', 'game');
 		pauseMenuTab.set('game');
+	}
+
+	function getLatestAchievementObject() {
+		const latestAchievement =
+			$userDB.achievements[$userDB.achievements.length - 1];
+		if (latestAchievement == null) return;
+		return achievements.find((a) => a.id == latestAchievement[0]);
 	}
 </script>
 
@@ -398,6 +407,35 @@
 		</div>
 	</Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog.Root open={$showAchievementPopup}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title class="text-center text-xl font-bold"
+				>{getLatestAchievementObject()?.title}</AlertDialog.Title
+			>
+			<AlertDialog.Description>
+				<div class="flex flex-row align-middle justify-evenly px-6 py-4">
+					<div class="text-center w-[30%] align-middle flex flex-col text-8xl">
+						{getLatestAchievementObject()?.icon}
+					</div>
+					<div
+						class="pl-8 w-[80%] align-middle flex flex-col justify-center text-lg"
+					>
+						{getLatestAchievementObject()?.description}
+					</div>
+				</div>
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel
+				on:click={() => {
+					$showAchievementPopup = false;
+				}}>Close to collect prize</AlertDialog.Cancel
+			>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
 
 <style>
 	/*  */

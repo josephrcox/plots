@@ -159,19 +159,19 @@ export const achievements: Achievement[] = [
 		prize: 100000,
 	},
 	{
-		id: '100k',
-		title: '$100,000',
+		id: '250k',
+		title: '$250,000',
 		description: '',
-		requirements: 'Gold reaches $100,000',
+		requirements: 'Gold reaches $250,000',
 		icon: '💸',
-		check: (z: Game) => z.townInfo.gold >= 100000,
-		prize: 25000,
+		check: (z: Game) => z.townInfo.gold >= 250000,
+		prize: 50000,
 	},
 	{
 		id: 'banker',
 		title: 'Banker',
 		description: '',
-		requirements: 'Build your first bank.',
+		requirements: 'Build your first bank. ',
 		icon: '🏦',
 		check: (z: Game) => {
 			return hasPlotOfType('bank', z).length !== 0;
@@ -179,15 +179,26 @@ export const achievements: Achievement[] = [
 		prize: 5000,
 	},
 	{
+		id: 'community',
+		title: 'Community Center',
+		description: '',
+		requirements: 'Build your first community center. ',
+		icon: '❤️',
+		check: (z: Game) => {
+			return hasPlotOfType('community_center', z).length !== 0;
+		},
+		prize: 10000,
+	},
+	{
 		id: 'tourist_town',
 		title: 'Tourist Town',
-		description: 'Reach $5,000 in tourism gold without converting to gold.',
+		description: 'Reach $50,000 in tourism gold without converting to gold.',
 		requirements: '',
 		icon: '🏝️',
 		check: (z: Game) => {
-			return z.townInfo.gold_from_tourism >= 5000;
+			return z.townInfo.gold_from_tourism >= 50000;
 		},
-		prize: 12000,
+		prize: 50000,
 	},
 	{
 		id: '1m',

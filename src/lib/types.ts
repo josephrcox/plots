@@ -104,7 +104,7 @@ export type PlotOption = {
 	description: string;
 	revenue_per_week: number;
 	tourism_revenue_per_week: number;
-	enables_tourism: true;
+	enables_tourism: boolean;
 	requirements: {
 		gold: number;
 		plots: any[];
