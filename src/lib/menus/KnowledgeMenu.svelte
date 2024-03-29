@@ -82,6 +82,9 @@
 					</Button>
 				</div>
 			{/if}
+			{#if $DB.hasBank === false}
+				<div>You need a bank to convert knowledge to gold.</div>
+			{/if}
 		</div>
 		<Dialog.Footer>
 			<!--  -->

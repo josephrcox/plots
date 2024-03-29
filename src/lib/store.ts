@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
 // @ts-ignore
-import { default_db, difficulties } from './objects/defaults/default_DB.js';
+import { default_db, default_user_db } from './objects/defaults/default_DB.js';
 // @ts-ignore
-import { Difficulty, EndGoal, Game } from './types';
+import { Difficulty, EndGoal, Game, UserDatabase } from './types';
 // @ts-ignore
 import { max_tax_rates_based_on_difficulty } from './objects/difficulty.js';
 // @ts-ignore
@@ -439,6 +439,11 @@ export let DB = writable(
 	JSON.parse(localStorage.getItem(ACTIVE_GAME_DB_NAME) || 'null'),
 );
 
+export let userDB = writable(
+	JSON.parse(localStorage.getItem(USER_DB_NAME) || 'null'),
+);
+setUserDBIfNull();
+
 export function startGame(
 	difficulty: Difficulty,
 	endGoal: EndGoal,
@@ -485,6 +490,14 @@ export function startGame(
 	localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
 	DB.set(json); // Update the store with the new value
 	location.reload();
+}
+
+function setUserDBIfNull() {
+	if (localStorage.getItem(USER_DB_NAME) === null) {
+		let def = default_user_db;
+		localStorage.setItem(USER_DB_NAME, JSON.stringify(def));
+		userDB.set(def);
+	}
 }
 
 function roundTo(n: number, digits: number) {
@@ -609,10 +622,19 @@ export let unique = writable({});
 export let paused = writable(false);
 export let showScoreboard = writable(false);
 export let showKnowledgeMenu = writable(false);
+export let showAchievementPopup = writable(false);
 export let showLabMenu = writable(false);
+export let showCompletedAchievements =
+	localStorage.getItem('showCompletedAchievements') === 'true'
+		? writable(true)
+		: writable(false);
 export let showOnlyAffordable =
 	localStorage.getItem('showOnlyAffordable') === 'true'
 		? writable(true)
 		: writable(false);
+export let pauseMenuTab =
+	localStorage.getItem('pauseMenuTab') === 'game'
+		? writable('game')
+		: writable('achievements');
 export let headerHeight = writable(250);
 export let speed = writable(500);

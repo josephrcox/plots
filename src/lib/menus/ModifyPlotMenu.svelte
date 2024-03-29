@@ -78,7 +78,8 @@
 		if ($showOnlyAffordable) {
 			reactiveOptions = reactiveOptions.filter((option) => option.affordable);
 		}
-		// iterate over plotTypeMaximums and remove any options that are at their maximum. If 'lab': 1, then make sure that if hasPlotOfType('lab') > 0, then remove that option from the list.
+		// iterate over plotTypeMaximums and remove any options that are at their maximum.
+		// If 'lab': 1, then make sure that if hasPlotOfType('lab') > 0, then remove that option from the list.
 		Object.keys(plotTypeMaximums).forEach((key) => {
 			let max = plotTypeMaximums[key];
 			if (max > 0) {
