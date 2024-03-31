@@ -46,7 +46,6 @@
 
 	// if key P is pressed, pause the game
 	document.addEventListener('keydown', (e) => {
-		// if input then return
 		if (
 			((document.activeElement != null &&
 				document.activeElement.nodeName === 'INPUT') ||
@@ -77,62 +76,11 @@
 					}
 				}
 				break;
-			case 'arrowleft':
-			case 'a':
-				e.preventDefault();
-				changeSelectedPlot(0, -1, 'up');
-				break;
-			case 'arrowright':
-			case 'd':
-				e.preventDefault();
-				changeSelectedPlot(0, 1, 'down');
-				break;
-			case 'arrowup':
-			case 'w':
-				e.preventDefault();
-				changeSelectedPlot(-1, 0, 'left');
-				break;
-			case 'arrowdown':
-			case 's':
-				e.preventDefault();
-				changeSelectedPlot(1, 0, 'right');
-				break;
+
 			default:
 				break;
 		}
 	});
-
-	function changeSelectedPlot(
-		changeX: number,
-		changeY: number,
-		direction: string,
-	) {
-		if (
-			$modifyPlotMenuOptions.visible === false &&
-			$modifyPlotMenuOptions.x === 0 &&
-			$modifyPlotMenuOptions.y === 0
-		) {
-			openPlotMenu(0, 0, direction);
-		} else {
-			let x = $modifyPlotMenuOptions.x;
-			let y = $modifyPlotMenuOptions.y;
-			if (x + changeX < 0) {
-				x = 0;
-			} else if (x + changeX > $DB.plots.length) {
-				x = $DB.plots.length;
-			} else {
-				x += changeX;
-			}
-			if (y + changeY < 0) {
-				y = 0;
-			} else if (y + changeY > $DB.plots.length) {
-				y = $DB.plots.length;
-			} else {
-				y += changeY;
-			}
-			openPlotMenu(x, y, direction);
-		}
-	}
 
 	export function openPlotMenu(x: number, y: number, direction: string) {
 		if (isOnReferencePlot == true) {
@@ -261,25 +209,17 @@
 		<Scoreboard />
 		<KnowledgeMenu />
 		<LabMenu />
+
 		<div
-			class="justify-center text-center
-		
-			align-middle
-			<!-- center horiz -->
-			flex
-			
-		"
-		>
-			<div
-				id="plot_grid"
-				style="margin-top: {$headerHeight}px"
-				class="scroll-smooth no-scrollbar
-					overflow-x
+			id="plot_grid"
+			style="margin-top: {$headerHeight}px"
+			class="scroll-smooth no-scrollbar
+					 overflow-y-scroll
+					 overflow-x-scroll
 				"
-			>
-				<PlotController />
-				<br />
-			</div>
+		>
+			<PlotController />
+			<br />
 		</div>
 
 		<style>

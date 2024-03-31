@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { KeyEvents } from 'lucide-svelte/dist/icons/key.svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique } from './store';
+	import { Keyboard } from 'lucide-svelte';
 
 	$: if ($DB) {
 		checkForAvailablePlots();
@@ -60,13 +62,17 @@
 </script>
 
 {#if $DB != null}
-	<div class="grid overflow-x-scroll overflow-visible">
-		{#each $DB.plots as plotRow}
+	<div class="grid overflow-x-scroll overflow-y-scroll plot_controller">
+		{#each $DB.plots as plotRow, rowIndex}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div class="row overflow-visible" on:click={restartModifyPlotMenu}>
+			<div
+				class="row {rowIndex % 2 !== 0 ? 'odd-row' : ''}"
+				on:click={restartModifyPlotMenu}
+			>
 				{#each plotRow as plot}
 					<Plot
+						classText="hexagon"
 						data={plot}
 						canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
 					/>
@@ -86,13 +92,26 @@
 {/if}
 
 <style>
+	/* CSS */
 	.grid {
-		display: flex;
+		display: inline-flex;
 		flex-direction: column;
+		align-items: center;
 		margin: 0;
+		padding: 0;
+		padding-top: 40px;
+		overflow-y: scroll;
+		overflow-x: scroll;
 	}
+
 	.row {
 		display: flex;
-		flex-direction: row;
+		justify-content: center;
+		margin-top: -20px;
+	}
+
+	.odd-row {
+		margin-left: 119px;
+		margin-top: -20px;
 	}
 </style>
