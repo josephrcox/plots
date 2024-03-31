@@ -11,6 +11,7 @@
 		type: -1,
 		styling: '',
 		referencePlot: [],
+		mineralSource: false,
 	};
 	export let canBeUpgraded = false;
 
@@ -39,7 +40,7 @@
 					$modifyPlotMenuOptions.x = data.x;
 					$modifyPlotMenuOptions.y = data.y;
 				}
-
+				$modifyPlotMenuOptions.isMineralSource = data.mineralSource;
 				$modifyPlotMenuOptions.visible = true;
 
 				plots.forEach((plot) => {
@@ -73,7 +74,10 @@
 	class="plot_container overflow-visible {data.type == -1 &&
 	canBeUpgraded == false
 		? 'border-slate-500 border-dashed border'
-		: ''}"
+		: ''}
+		
+		{data.mineralSource ? 'hidden' : ''}
+		"
 	style="background-color:{getColor(data.type, canBeUpgraded)}"
 	data-active={data.active}
 	data-id={data.id}
@@ -91,6 +95,7 @@
 		? data.referencePlot[0]
 		: null}
 	data-size={data.type > -1 ? options[data.type].requirements.size : null}
+	data-mineralSource={data.mineralSource}
 >
 	{#if data.type > -1}
 		<div>
@@ -105,7 +110,10 @@
 			</span>
 		</div>
 	{:else if data.type == -1 && data.x == 0 && data.y == 0}
-		<Tooltip text="Build your first home" happy="true" />
+		<Tooltip text="Build your first home" tone="happy" />
+	{/if}
+	{#if data.mineralSource && data.type == -1}
+		<Tooltip text="Mineral Source (mine)" emoji="⛏️" tone="standard" />
 	{/if}
 </div>
 

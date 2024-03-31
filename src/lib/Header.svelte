@@ -234,7 +234,7 @@
 					<br />
 
 					{#if $DB.economyAndLaws.tax_rate == 0}
-						<Tooltip text="Set this!!!" />
+						<Tooltip text="Set this!!!" tone="alert" emoji="⬆️" />
 					{/if}
 					{#if $DB.hasLab}
 						<Button

@@ -471,6 +471,9 @@ export function startGame(
 	}
 	const randomSize =
 		difficulty == '0' ? 8 : difficulty == '1' ? 12 : difficulty == '2' ? 16 : 1; // never should happen.
+	// random x can be anywhere from 3 -> randomSize. It can not be less than 3
+	const randomX = Math.floor(Math.random() * (randomSize - 3)) + 3;
+	const randomY = Math.floor(Math.random() * (randomSize - 3)) + 3;
 	for (let i = 0; i < randomSize; i++) {
 		default_plots.push([]);
 		for (let j = 0; j < randomSize; j++) {
@@ -481,6 +484,7 @@ export function startGame(
 				y: j,
 				type: -1,
 				typeId: '',
+				mineralSource: randomX === i && randomY === j ? true : false,
 			};
 		}
 	}
@@ -612,6 +616,7 @@ export let modifyPlotMenuOptions = writable({
 	visible: false,
 	x: 0,
 	y: 0,
+	isMineralSource: false,
 });
 
 export let startGameMenu = writable({

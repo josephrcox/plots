@@ -2,6 +2,38 @@ import { PlotOption } from '$lib/types';
 
 export const options: PlotOption[] = [
 	{
+		id: 'mine',
+		title: '⛏️ Mine',
+		type: 'mine',
+		description: '',
+		revenue_per_week: 0,
+		requirements: {
+			gold: 30000,
+			plots: [],
+			employees: 85,
+			climate: null,
+			knowledge: 0,
+			size: 1,
+			xp: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.0,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 16,
+		},
+		tourism_revenue_per_week: 0,
+		styling: '',
+		affordable: null,
+		selected: null,
+		check_for_variety: false,
+		enables_tourism: false,
+		knowledge_points_per_month: 0,
+	},
+	{
 		id: 'res_small',
 		title: '🏠 Residential (small)',
 		type: 'residential',
@@ -41,7 +73,7 @@ export const options: PlotOption[] = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 500,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 0,
 			climate: null,
 			knowledge: 0,
@@ -73,7 +105,7 @@ export const options: PlotOption[] = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 1500,
-			plots: [],
+			plots: ['tree_farm'],
 			employees: 0,
 			climate: null,
 			knowledge: 0,
@@ -94,6 +126,38 @@ export const options: PlotOption[] = [
 		affordable: null,
 		selected: null,
 		check_for_variety: false,
+		enables_tourism: false,
+		knowledge_points_per_month: 0,
+	},
+	{
+		id: 'tree_farm',
+		title: '🌲 Tree Farm',
+		type: 'farm',
+		description: 'Grow trees and sell the resources. Required for most plots.',
+		revenue_per_week: 12,
+		requirements: {
+			gold: 400,
+			plots: [],
+			employees: 10,
+			climate: null,
+			knowledge: 0,
+			size: 1,
+			xp: 0,
+		},
+		effect_modifiers: {
+			happiness: 1.0,
+			health: 1.0,
+		},
+		immediate_variable_changes: {
+			happiness: 0,
+			health: 0,
+			population: 0,
+		},
+		check_for_variety: true,
+		tourism_revenue_per_week: 0,
+		styling: '',
+		affordable: null,
+		selected: null,
 		enables_tourism: false,
 		knowledge_points_per_month: 0,
 	},
@@ -131,7 +195,7 @@ export const options: PlotOption[] = [
 	},
 	{
 		id: 'potato_and_carrot_farm',
-		title: '🥔 🥕 Potato & Carrot farm',
+		title: '🚜 Potato & Carrot farm',
 		type: 'farm',
 		description: 'Easy to farm, sells to local grocery stores and restaurants.',
 		revenue_per_week: 9,
@@ -365,7 +429,7 @@ export const options: PlotOption[] = [
 			plots: [
 				'fishery',
 				'tree_farm',
-				'carrot_farm',
+				'potato_and_carrot_farm',
 				'dairy_farm',
 				'bakery',
 				'wheat_farm',
@@ -533,8 +597,8 @@ export const options: PlotOption[] = [
 		revenue_per_week: 150,
 		requirements: {
 			gold: 3500,
-			plots: ['large_school', 'tree_farm'],
-			employees: 15,
+			plots: ['large_school', 'tree_farm', 'mine'],
+			employees: 8,
 			climate: null,
 			knowledge: 0,
 			size: 1,
@@ -566,7 +630,7 @@ export const options: PlotOption[] = [
 		revenue_per_week: 50,
 		requirements: {
 			gold: 800,
-			plots: [],
+			plots: ['library', 'tree_farm', 'small_school'],
 			employees: 6,
 			climate: null,
 			knowledge: 0,
@@ -696,7 +760,7 @@ export const options: PlotOption[] = [
 		revenue_per_week: 0,
 		requirements: {
 			gold: 40000,
-			plots: ['park_medium', 'inn', 'tree_farm'],
+			plots: ['inn', 'tree_farm'],
 			employees: 12,
 			climate: null,
 			size: 1,
@@ -826,7 +890,7 @@ export const options: PlotOption[] = [
 		knowledge_points_per_month: 0,
 		requirements: {
 			gold: 10000,
-			plots: ['tree_farm'],
+			plots: ['tree_farm', 'mine'],
 			employees: 18,
 			climate: null,
 			size: 1,
@@ -859,7 +923,7 @@ export const options: PlotOption[] = [
 		knowledge_points_per_month: 80,
 		requirements: {
 			gold: 45000,
-			plots: ['tree_farm'],
+			plots: ['tree_farm', 'mine'],
 			employees: 90,
 			climate: null,
 			size: 2,
@@ -889,7 +953,7 @@ export const options: PlotOption[] = [
 		description: `Rich get richer.
 			<ul>
 				<li>Enables converting tourism gold to gold</li>
-				<li>Enables converting knowledge to gold (TODO)</li>
+				<li>Enables converting knowledge to gold</li>
 			</ul>`,
 		revenue_per_week: 0,
 		knowledge_points_per_month: 0,
@@ -961,7 +1025,7 @@ export const options: PlotOption[] = [
 		knowledge_points_per_month: 0,
 		requirements: {
 			gold: 100000,
-			plots: ['community_center', 'university'],
+			plots: ['community_center', 'university', 'mine'],
 			employees: 24,
 			climate: null,
 			size: 1,
@@ -1000,6 +1064,7 @@ export const typeColors: any = {
 	bank: '#7b68ee',
 	federal: '#7b68ee',
 	science: 'rgba(42, 62, 230, 1.0)',
+	mine: '#ff9c19',
 };
 
 export function getColor(typeIndex: number, canBeUpgraded = false) {
@@ -1008,11 +1073,11 @@ export function getColor(typeIndex: number, canBeUpgraded = false) {
 			if (canBeUpgraded) {
 				return typeColors['empty_buildable'];
 			}
-			return typeColors['empty'];
+			return typeColors['empty_unusable'];
 		} else if (typeIndex == -2) {
 			return typeColors['recreation'];
 		} else {
-			return typeColors['empty'];
+			return typeColors['empty_unusable'];
 		}
 	}
 	const plotOption = options[typeIndex];
