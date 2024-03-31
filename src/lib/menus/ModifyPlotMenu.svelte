@@ -19,6 +19,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
 	import Stats from '../Stats.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	export let x = 0;
 	export let y = 0;
@@ -59,7 +60,7 @@
 		if (!isNegative) {
 			return `+${change}`;
 		} else {
-			return `-${change}`;
+			return `${change}`;
 		}
 	}
 
@@ -75,6 +76,8 @@
 			affordable: checkIfAffordable(option, $DB),
 			selected: isSelected(option),
 		}));
+		// remove id: mine from reactiveOptions
+		reactiveOptions = reactiveOptions.filter((option) => option.id !== 'mine');
 		if ($showOnlyAffordable) {
 			reactiveOptions = reactiveOptions.filter((option) => option.affordable);
 		}
@@ -165,6 +168,9 @@
 	}
 
 	export function canBulldoze(x: number, y: number) {
+		if ($modifyPlotMenuOptions.isMineralSource) {
+			return false;
+		}
 		let neighbors = 0;
 		if (x > 0) {
 			if ($DB.plots[x - 1][y].type !== -1) {
@@ -349,8 +355,12 @@
 		return +test.toFixed(digits);
 	}
 
-	function formatNumber(n: number) {
-		return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+	function formatNumber(n: number, decimal = true) {
+		let toReturn = n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+		if (!decimal) {
+			toReturn = toReturn.split('.')[0];
+		}
+		return toReturn;
 	}
 
 	function checkIfAffordable(plotChosen: any, z: Game) {
@@ -414,221 +424,312 @@
 			<Stats classText="w-full" clickEvents="false" />
 			<div class="mb-4"></div>
 		</Dialog.Header>
-		<div
-			class="flex flex-row w-full px-4 py-2 text-white
-		"
-		>
+		{#if $modifyPlotMenuOptions.isMineralSource === false}
 			<div
-				class="
+				class="flex flex-row w-full px-4 py-2 text-white
+		"
+			>
+				<div
+					class="
 			flex items-center
 			"
-			>
-				<Input
-					type="text"
-					id="search-bar"
-					placeholder="Search Plot Options..."
-					value={searchQuery}
-					on:input={handleInput}
-					bind:this={searchInput}
-					class="border rounded w-auto"
-				/>
-			</div>
-			<!-- toggle to only show affordable ones -->
-			<div class="flex items-center ml-6">
-				<input
-					type="checkbox"
-					id="toggle-affordable"
-					class="rounded"
-					on:change={() => {
-						toggleShowOnlyAffordable();
-					}}
-					checked={totalAffordableOptionsCount === reactiveOptions.length}
-				/>
-				<!-- no select -->
-				<label
-					for="toggle-affordable"
-					class="ml-2
+				>
+					<Input
+						type="text"
+						id="search-bar"
+						placeholder="Search Plot Options..."
+						value={searchQuery}
+						on:input={handleInput}
+						bind:this={searchInput}
+						class="border rounded w-auto"
+					/>
+				</div>
+				<!-- toggle to only show affordable ones -->
+				{#if $modifyPlotMenuOptions.isMineralSource === false}
+					<div class="flex items-center ml-6">
+						<input
+							type="checkbox"
+							id="toggle-affordable"
+							class="rounded"
+							on:change={() => {
+								toggleShowOnlyAffordable();
+							}}
+							checked={totalAffordableOptionsCount === reactiveOptions.length}
+						/>
+						<!-- no select -->
+						<label
+							for="toggle-affordable"
+							class="ml-2
 					no-select cursor-pointer
 				
 				">Show only affordable</label
-				>
-			</div>
-			<div class="flex justify-end ml-6">
-				{#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
-					<button
-						on:click={clearPlot}
-						id="bulldoze"
-						class="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
-						>🔥 Bulldoze</button
-					>
+						>
+					</div>
+					<div class="flex justify-end ml-6">
+						{#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
+							<button
+								on:click={clearPlot}
+								id="bulldoze"
+								class="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
+								>🔥 Bulldoze</button
+							>
+						{/if}
+					</div>
+
+					<label for="plotType" class="text-xs ml-4 gap-2">
+						<span class="mb-10">Quick scroll</span>
+						<div>
+							{#if reactiveOptions.length > 0}
+								{#each reactiveOptions as option}
+									{#if option.affordable}
+										<!-- svelte-ignore a11y-click-events-have-key-events -->
+										<!-- svelte-ignore a11y-no-static-element-interactions -->
+										<span
+											class="text-xl cursor-pointer hover:bg-slate-300 rounded-lg p-1"
+											on:click={() => {
+												const op = document.querySelector(
+													`[data-plotoptionid="${option.id}"]`,
+												);
+												if (op) {
+													op.scrollIntoView({
+														behavior: 'smooth',
+														block: 'center',
+													});
+												}
+											}}>{firstEmoji(option.title)}</span
+										>
+									{/if}
+								{/each}
+							{:else}
+								No options
+							{/if}
+						</div>
+					</label>
 				{/if}
 			</div>
-			<label for="plotType" class="text-xs ml-4 gap-2">
-				<span class="mb-10">Quick scroll</span>
-				<div>
-					{#if reactiveOptions.length > 0}
-						{#each reactiveOptions as option}
-							{#if option.affordable}
-								<!-- svelte-ignore a11y-click-events-have-key-events -->
-								<!-- svelte-ignore a11y-no-static-element-interactions -->
-								<span
-									class="text-xl cursor-pointer hover:bg-slate-300 rounded-lg p-1"
-									on:click={() => {
-										const op = document.querySelector(
-											`[data-plotoptionid="${option.id}"]`,
-										);
-										if (op) {
-											op.scrollIntoView({
-												behavior: 'smooth',
-												block: 'center',
-											});
-										}
-									}}>{firstEmoji(option.title)}</span
-								>
-							{/if}
-						{/each}
-					{:else}
-						No options
-					{/if}
-				</div>
-			</label>
-		</div>
+		{/if}
 		<Separator class="" />
 		<div
 			class="overflow-y-scroll
 		scroll-smooth no-scrollbar max-h-[60vh]
 		"
 		>
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-			<table
-				class="text-left table-auto text-xs w-full border-collapse rounded-lgshadow-lg"
-				on:click={handlePlotOptionClick}
-			>
-				<thead
-					class="
+			{#if $modifyPlotMenuOptions.isMineralSource === false}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+
+				<table
+					class="text-left table-auto text-xs w-full border-collapse rounded-lgshadow-lg"
+					on:click={handlePlotOptionClick}
+				>
+					<thead
+						class="
 					sticky top-0 z-10 bg-slate-900 position-sticky text-white text-left w-full px-5
 				"
-				>
-					<tr class="text-xs text-left">
-						<th class="px-2 py-2">Title</th>
-						<th class="px-2 pr-2 py-2 w-48">Desc</th>
-						<th class="px-2 py-2">Profit</th>
-						<th class="px-2 py-2">Employees</th>
-						<th class="px-2 py-2">Cost</th>
-						<th class="px-2 py-2">Requires</th>
-						<th class="px-2 py-2">Modifiers</th>
-						<th class="px-2 py-2">Instant effect</th>
-					</tr>
-				</thead>
-				<tbody class="overflow-hidden text-xs mx-2">
-					{#each reactiveOptions as option (option.id)}
-						<tr
-							class="plotOption border-b border-black {option.affordable
-								? 'cursor-pointer'
-								: 'unaffordable cursor-not-allowed bg-gray-200'}
+					>
+						<tr class="text-xs text-left">
+							<th class="px-2 py-2">Title</th>
+							<th class="px-2 pr-2 py-2 w-48">Desc</th>
+							<th class="px-2 py-2">Profit</th>
+							<th class="px-2 py-2">Employees</th>
+							<th class="px-2 py-2">Cost</th>
+							<th class="px-2 py-2">Requires</th>
+							<th class="px-2 py-2">Modifiers</th>
+							<th class="px-2 py-2">Instant effect</th>
+						</tr>
+					</thead>
+					<tbody class="overflow-hidden text-xs mx-2">
+						{#each reactiveOptions as option (option.id)}
+							<tr
+								class="plotOption border-b border-black {option.affordable
+									? 'cursor-pointer'
+									: 'unaffordable cursor-not-allowed bg-gray-200'}
 								{option.selected ? 'italic font-light opacity-50 ' : ''}
 								
 								"
-							data-plotoptionid={option.id}
-							style="background-color: 
+								data-plotoptionid={option.id}
+								style="background-color: 
 									{!option.selected
-								? getColor(
-										getOptionIndex(option.id),
-										checkIfPlotCanBeUpgraded(x, y),
-									)
-								: 'gray'}
+									? getColor(
+											getOptionIndex(option.id),
+											checkIfPlotCanBeUpgraded(x, y),
+										)
+									: 'gray'}
 							"
-						>
-							<td class="px-2 py-2 w-12">
-								{option.selected
-									? `✅ SELECTED ${option.title.substring(2)}`
-									: `${option.title}`}
-							</td>
-							<td class="px-2 py-2 w-24">{@html option.description}</td>
-							<td class="px-2 py-2 w-12 font-bold">
-								{#if option.revenue_per_week > 0}
-									<div>
+							>
+								<td class="px-2 py-2 w-12">
+									{option.selected
+										? `✅ SELECTED ${option.title.substring(2)}`
+										: `${option.title}`}
+								</td>
+								<td class="px-2 py-2 w-24">{@html option.description}</td>
+								<td class="px-2 py-2 w-12 font-bold">
+									{#if option.revenue_per_week > 0}
+										<div>
+											<span
+												>${formatNumber(
+													roundTo(
+														$DB.economyAndLaws.tax_rate *
+															option.revenue_per_week,
+														2,
+													),
+												)}</span
+											>
+										</div>
+									{/if}
+								</td>
+								<td class="px-2 py-2 w-8"
+									>{#if option.requirements.employees > 0}
+										<!-- do the same as below with gold requirement -->
 										<span
-											>${formatNumber(
-												roundTo(
-													$DB.economyAndLaws.tax_rate * option.revenue_per_week,
-													2,
-												),
+											class={option.requirements.employees >
+											$DB.townInfo.population_count - $DB.townInfo.employees
+												? 'bg-red-800 text-white px-2 py-1 rounded-sm overflow-ellipsis flex justify-center text-center mr-2'
+												: ''}
+											>{formatNumber(
+												option.requirements.employees,
+												false,
 											)}</span
 										>
-									</div>
-								{/if}
-							</td>
-							<td
-								class="px-2 py-2 w-8
-								{option.requirements.employees >
-								$DB.townInfo.population_count - $DB.townInfo.employees
-									? 'underline bg-red-800 text-white'
-									: ''}
-							">{option.requirements.employees || ''}</td
-							>
-							<td
-								class="px-2 py-2 w-8
-									{option.requirements.gold > $DB.townInfo.gold
-									? 'underline bg-red-800 text-white border-none'
-									: ''}
-					"
-								>${formatNumber(option.requirements.gold)}
-								{#if option.requirements.knowledge > 0}
-									<br />
-									{option.requirements.knowledge} KPts
-								{/if}
-							</td>
-							<td class="px-2 py-2 w-12">
-								<div
-									class="
-									 flex flex-col align-middle justify-center h-max w-max gap-1"
-								>
-									{#each option.requirements.plots as plot}
-										{#if hasPlotOfType(plot, $DB).length > 0}
+									{/if}
+								</td>
+								<td class="px-2 py-2 w-8">
+									<span
+										class={option.requirements.gold > $DB.townInfo.gold
+											? 'bg-red-800 text-white px-2 py-1 rounded-sm w-min overflow-ellipsis'
+											: ''}
+									>
+										${formatNumber(option.requirements.gold)}
+									</span>
+									<div class={option.requirements.knowledge != 0 ? 'mt-3' : ''}>
+										<!--same as above but for knowledge  -->
+										{#if option.requirements.knowledge > $DB.townInfo.knowledge_points}
 											<span
-												class="text-white bg-opacity-100 bg-green-900 p-1 rounded-sm w-min overflow-ellipsis"
-												>{plot}</span
-											>
-										{:else}
-											<span
-												class="text-red-100 bg-red-900 p-1 rounded-sm w-min overflow-ellipsis px-2"
-												>{plot}</span
+												class="bg-red-800 text-white px-2 py-1 rounded-sm w-min overflow-ellipsis"
+												>🧠 {formatNumber(
+													option.requirements.knowledge,
+													false,
+												)}</span
 											>
 										{/if}
-									{/each}
-								</div>
-							</td>
-							<td class="px-2 py-2 w-12 text-xs">
-								<div class="text-xs">
-									{#if option.effect_modifiers.happiness != 1.0}
-										😀 {formatModifier(option.effect_modifiers.happiness)}
+									</div>
+								</td>
+								<td class="px-2 py-2 w-12">
+									<div
+										class="
+									 flex flex-col align-middle justify-center h-max w-max gap-2"
+									>
+										{#each option.requirements.plots as plot}
+											{#if hasPlotOfType(plot, $DB).length > 0}
+												<span
+													class="text-white bg-opacity-100 bg-green-900 p-1 rounded-sm text-xs text-nowrap overflow-ellipsis w-max"
+												>
+													{PlotTypeOptions[
+														getOptionIndex(plot)
+													].title.substring(2)}
+												</span>
+											{:else}
+												<span
+													class="text-red-100 bg-red-900 p-1 rounded-sm w-min text-xs text-nowrap overflow-ellipsis px-2"
+													>{PlotTypeOptions[
+														getOptionIndex(plot)
+													].title.substring(2)}</span
+												>
+											{/if}
+										{/each}
+									</div>
+								</td>
+								<td class="px-2 py-2 w-12 text-xs">
+									<div class="text-xs">
+										{#if option.effect_modifiers.happiness != 1.0}
+											😀 {formatModifier(option.effect_modifiers.happiness)}
+										{/if}
+									</div>
+									<div class="mt-2">
+										{#if option.effect_modifiers.health != 1.0}
+											😷 {formatModifier(option.effect_modifiers.health)}
+										{/if}
+									</div>
+								</td>
+								<td class="px-2 py-2 w-12"
+									>{#if option.immediate_variable_changes.happiness != 0}
+										😀 {formatInstantChange(
+											option.immediate_variable_changes.happiness,
+										)}
 									{/if}
-								</div>
-								<div class="mt-2">
-									{#if option.effect_modifiers.health != 1.0}
-										😷 {formatModifier(option.effect_modifiers.health)}
+									{#if option.immediate_variable_changes.health != 0}
+										<br />
+										😷 {formatInstantChange(
+											option.immediate_variable_changes.health,
+										)}
 									{/if}
-								</div>
-							</td>
-							<td class="px-2 py-2 w-12"
-								>{#if option.immediate_variable_changes.happiness != 0}
-									😀 {formatInstantChange(
-										option.immediate_variable_changes.happiness,
-									)}
-								{/if}
-								{#if option.immediate_variable_changes.health != 0}
-									<br />
-									😷 {formatInstantChange(
-										option.immediate_variable_changes.health,
-									)}
-								{/if}
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{:else}
+				<div class="flex justify-center items-start p-3 text-center w-full">
+					<div class="flex flex-col w-1/3 h-3/5 p-2 bg-blue-800 rounded-lg">
+						<div class="text-white text-2xl pb-2">Build a mine</div>
+						<div>
+							<ul
+								class="flex flex-row justify-between px-6 bg-blue-900 text-blue-200 text-sm rounded-md py-1"
+							>
+								<li>
+									<!-- check or an x if they have enough  -->
+									{$DB.townInfo.gold >=
+									PlotTypeOptions[getOptionIndex('mine')].requirements.gold
+										? '✅'
+										: '❌'}
+									${formatNumber(
+										PlotTypeOptions[getOptionIndex('mine')].requirements.gold,
+									)} gold
+								</li>
+								<li>
+									{$DB.townInfo.population_count - $DB.townInfo.employees >=
+									PlotTypeOptions[getOptionIndex('mine')].requirements.employees
+										? '✅'
+										: '❌'}
+									{PlotTypeOptions[getOptionIndex('mine')].requirements
+										.employees}{' '}
+									employees
+								</li>
+							</ul>
+						</div>
+						<div class="flex flex-row w-full justify-between px-6 mt-4 h-full">
+							<div
+								class="text-8xl text-center h-5/6 mt-2 flex flex-col justify-center items-center align-middle w-1/3"
+							>
+								<div>⛏️</div>
+							</div>
+							<div class="w-2/3 text-start pl-6">
+								Used to extract minerals needed to build many advanced plots
+								including hospitals, labs, and more.
+							</div>
+						</div>
+						{#if hasPlotOfType('mine', $DB).length === 0}
+							<Button
+								class="my-6 w-full 
+								{checkIfAffordable(PlotTypeOptions[getOptionIndex('mine')], $DB)
+									? 'bg-green-500 hover:bg-green-600'
+									: 'bg-gray-900 hover:bg-gray-900 opacity-75 cursor-not-allowed'} disabled'}
+							"
+								tabindex={-1}
+								on:click={() => {
+									purchasePlot(x, y, 'mine');
+								}}
+							>
+								Build
+							</Button>
+						{:else}
+							<div class="text-yellow-500 text-xs mt-4 text-center">
+								You have built a mine here, and mine's can not be destroyed.
+							</div>
+						{/if}
+					</div>
+				</div>
+			{/if}
 		</div>
 	</Dialog.Content>
 </Dialog.Root>
