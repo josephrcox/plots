@@ -167,7 +167,7 @@
 </script>
 
 <Dialog.Root bind:open={$paused}>
-	<Dialog.Content class=" max-w-[90vw] max-h-[90vh]">
+	<Dialog.Content class=" max-w-[90vw] max-h-[90vh] bg-black">
 		<Dialog.Header>
 			<Dialog.Title>Pause Menu</Dialog.Title>
 			<Dialog.Description>Unpause any time by pressing 'P'</Dialog.Description>

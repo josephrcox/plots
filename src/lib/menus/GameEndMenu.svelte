@@ -23,7 +23,7 @@
 </script>
 
 <Dialog.Root bind:open={show}>
-	<Dialog.Content>
+	<Dialog.Content class="bg-black">
 		<Dialog.Header>
 			<Dialog.Title>
 				{$DB.endGameDetails.win == true

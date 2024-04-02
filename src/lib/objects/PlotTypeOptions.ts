@@ -35,9 +35,9 @@ export const options: PlotOption[] = [
 	},
 	{
 		id: 'res_small',
-		title: '🏠 Residential (small)',
+		title: '🏠 Small homes',
 		type: 'residential',
-		description: 'A few basic homes (+16 people)',
+		description: '+16 people',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 150,
@@ -67,9 +67,9 @@ export const options: PlotOption[] = [
 	},
 	{
 		id: 'res_medium',
-		title: '🏘️ Residential (medium)',
+		title: '🏘️ Residential Complex',
 		type: 'residential',
-		description: 'Some apartments (+64 people)',
+		description: '+64 people',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 500,
@@ -99,9 +99,9 @@ export const options: PlotOption[] = [
 	},
 	{
 		id: 'res_large',
-		title: '🏢 Residential (big)',
+		title: '🏢 Group of homes',
 		type: 'residential',
-		description: 'Many apartments (+256 people)',
+		description: '+256 people',
 		revenue_per_week: 0,
 		requirements: {
 			gold: 1500,
@@ -260,7 +260,7 @@ export const options: PlotOption[] = [
 	{
 		id: 'bakery',
 		title: '🥖 Bakery',
-		type: 'farm',
+		type: 'business',
 		description: 'Makes money by selling bread.',
 		revenue_per_week: 14,
 		requirements: {
@@ -356,7 +356,7 @@ export const options: PlotOption[] = [
 	{
 		id: 'cafe',
 		title: '☕️ Small café',
-		type: 'food',
+		type: 'business',
 		description: 'Great for eating & relaxing, not great for long-term health.',
 		revenue_per_week: 64,
 		requirements: {
@@ -388,7 +388,7 @@ export const options: PlotOption[] = [
 	{
 		id: 'fishery',
 		title: '🐠 Fishery',
-		type: 'food',
+		type: 'business',
 		description:
 			'Carve out some land, pour some water, and fish for fun & food.',
 		revenue_per_week: 40,
@@ -421,7 +421,7 @@ export const options: PlotOption[] = [
 	{
 		id: 'grocery',
 		title: '🏪 Grocery store',
-		type: 'food',
+		type: 'business',
 		description: 'People get hungry. This is where they go to get food.',
 		revenue_per_week: 140,
 		requirements: {
@@ -557,7 +557,7 @@ export const options: PlotOption[] = [
 	{
 		id: 'stables',
 		title: '🐴 Stables',
-		type: 'recreation',
+		type: 'business',
 		description:
 			'People love horses. This makes them happy, and can generate some money through lessons.',
 		revenue_per_week: 19,
@@ -591,7 +591,7 @@ export const options: PlotOption[] = [
 		// TODO: Make the blacksmith do a bit more. Also maybe require a mine or something like that if it does more.
 		id: 'blacksmith',
 		title: '⚔️ Blacksmith',
-		type: 'shop',
+		type: 'business',
 		description:
 			'Enables exporting of weapons and armor, and makes money by selling them.',
 		revenue_per_week: 150,
@@ -1052,19 +1052,19 @@ export const options: PlotOption[] = [
 
 export const typeColors: any = {
 	empty_unusable: 'rgb(21 28 41);',
-	empty_buildable: 'rgb(126, 158, 255)',
-	residential: '#e15f00',
-	farm: '#519c1f',
-	food: '#8a2be2',
-	recreation: '#4070ff',
-	shop: '#ff00ff',
-	tourism: '#ff00ff',
-	education: 'rgba(42, 62, 230, 1.0)',
-	medical: 'rgba(42, 62, 230, 1.0)',
-	bank: '#7b68ee',
-	federal: '#7b68ee',
-	science: 'rgba(42, 62, 230, 1.0)',
-	mine: '#ff9c19',
+	empty_buildable: 'rgb(204, 218, 209)',
+	residential: '#de7633',
+	farm: '#6b8f49',
+	business: '#9273a5',
+	recreation: '#5277b1',
+	shop: '#d896d8',
+	tourism: '#d896d8',
+	education: '#BFBEEB',
+	medical: '#4a5ba3',
+	bank: '#8477be',
+	federal: '#8477be',
+	science: '#4a5ba3',
+	mine: '#d9874a',
 };
 
 export function getColor(typeIndex: number, canBeUpgraded = false) {

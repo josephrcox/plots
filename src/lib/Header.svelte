@@ -151,7 +151,7 @@
 "
 >
 	<div
-		class="select-none flex flex-col justify-start align-left text-left bg-slate-300 border-b-2 border-black text-black p-3 border-r-20 rounded-lg w-10/12"
+		class="select-none flex flex-col justify-start align-left text-left border-b-2 border-black text-black p-3 border-r-20 rounded-lg w-10/12 bg-foreground shadow-lg"
 		id="headerObject"
 	>
 		<div class="select-none flex justify-evenly">
@@ -190,7 +190,7 @@
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div
 				class="
-			flex flex-col gap-2 drop-shadow-md text-center pb-6 rounded-lg max-h-24 h-24 hover:max-h-48 hover:h-48 transition-all ml-2 mr-2 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer text-slate-500 hover:text-blue-600 w-1/4
+			flex flex-col gap-2 drop-shadow-md text-center pb-6 rounded-lg max-h-24 h-24 hover:max-h-36 hover:h-36 transition-all ml-2 mr-2 overflow-y-scroll scroll-smooth no-scrollbar cursor-pointer hover:opacity-35 w-1/4
 			"
 				on:click={() => {
 					$DB.townLog = '';
@@ -229,7 +229,7 @@
 						step="0.05"
 						value={$DB.economyAndLaws.tax_rate}
 						on:input={setTaxRate}
-						class="cursor-pointer w-100"
+						class="cursor-pointer w-32"
 					/>
 					<br />
 
@@ -258,10 +258,7 @@
 				</div>
 			</div>
 		</div>
-		<Separator
-			class="mb-3 mt-0 bg-slate-700
-	"
-		/>
+		<Separator class="mb-3 mt-0 bg-slate-700" />
 		<Stats />
 	</div>
 </div>
@@ -270,9 +267,10 @@
 	input[type='range'] {
 		-webkit-appearance: none;
 		appearance: none;
-		background: transparent;
+
 		cursor: pointer;
 		width: 100px;
+		background-color: rgba(11, 139, 81, 0.375);
 	}
 
 	input[type='range']:focus {
@@ -280,7 +278,7 @@
 	}
 
 	input[type='range']::-webkit-slider-runnable-track {
-		background-color: rgb(3, 71, 117);
+		background-color: primary;
 		border-radius: 0.5rem;
 		height: 0.5rem;
 	}
@@ -289,7 +287,7 @@
 		-webkit-appearance: none;
 		appearance: none;
 		margin-top: -4px;
-		background-color: rgb(255, 255, 255);
+		background-color: rgb(0, 0, 0);
 		height: 1rem;
 		width: 1rem;
 	}
@@ -299,7 +297,7 @@
 	}
 
 	input[type='range']::-moz-range-track {
-		background-color: rgb(3, 71, 117);
+		background-color: rgba(11, 139, 81, 0.375);
 		border-radius: 0.5rem;
 		height: 0.5rem;
 	}
@@ -307,7 +305,7 @@
 	input[type='range']::-moz-range-thumb {
 		border: none;
 		border-radius: 0;
-		background-color: rgb(255, 255, 255);
+		background-color: rgb(0, 0, 0);
 		height: 1rem;
 		width: 1rem;
 	}

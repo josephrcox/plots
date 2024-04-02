@@ -410,7 +410,7 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="border-gray-500 border-r-2 overflow-clip max-w-[90vw] max-h-[90vh]
+		class="border-gray-500 border-r-2 overflow-clip max-w-[90vw] max-h-[90vh] bg-card-foreground text-primary-foreground
 		"
 	>
 		<Dialog.Header>
@@ -426,7 +426,7 @@
 		</Dialog.Header>
 		{#if $modifyPlotMenuOptions.isMineralSource === false}
 			<div
-				class="flex flex-row w-full px-4 py-2 text-white
+				class="flex flex-row w-full px-4 py-2
 		"
 			>
 				<div
@@ -441,7 +441,7 @@
 						value={searchQuery}
 						on:input={handleInput}
 						bind:this={searchInput}
-						class="border rounded w-auto"
+						class="border rounded w-auto bg-primary-foreground text-primary"
 					/>
 				</div>
 				<!-- toggle to only show affordable ones -->
@@ -462,7 +462,7 @@
 							class="ml-2
 					no-select cursor-pointer
 				
-				">Show only affordable</label
+				">Show only buildable</label
 						>
 					</div>
 					<div class="flex justify-end ml-6">
@@ -470,7 +470,7 @@
 							<button
 								on:click={clearPlot}
 								id="bulldoze"
-								class="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300 ease-in-out"
+								class="px-2 py-2 bg-red-500 rounded hover:bg-red-600 transition duration-300 ease-in-out"
 								>🔥 Bulldoze</button
 							>
 						{/if}
@@ -524,7 +524,7 @@
 				>
 					<thead
 						class="
-					sticky top-0 z-10 bg-slate-900 position-sticky text-white text-left w-full px-5
+					sticky top-0 z-10 bg-slate-900 position-sticky text-left w-full px-5
 				"
 					>
 						<tr class="text-xs text-left">
@@ -584,7 +584,7 @@
 										<span
 											class={option.requirements.employees >
 											$DB.townInfo.population_count - $DB.townInfo.employees
-												? 'bg-red-800 text-white px-2 py-1 rounded-sm overflow-ellipsis flex justify-center text-center mr-2'
+												? 'bg-red-800  px-2 py-1 rounded-sm overflow-ellipsis flex justify-center text-center mr-2'
 												: ''}
 											>{formatNumber(
 												option.requirements.employees,
@@ -596,7 +596,7 @@
 								<td class="px-2 py-2 w-8">
 									<span
 										class={option.requirements.gold > $DB.townInfo.gold
-											? 'bg-red-800 text-white px-2 py-1 rounded-sm w-min overflow-ellipsis'
+											? 'bg-red-800  px-2 py-1 rounded-sm w-min overflow-ellipsis'
 											: ''}
 									>
 										${formatNumber(option.requirements.gold)}
@@ -605,7 +605,7 @@
 										<!--same as above but for knowledge  -->
 										{#if option.requirements.knowledge > $DB.townInfo.knowledge_points}
 											<span
-												class="bg-red-800 text-white px-2 py-1 rounded-sm w-min overflow-ellipsis"
+												class="bg-red-800 px-2 py-1 rounded-sm w-min overflow-ellipsis"
 												>🧠 {formatNumber(
 													option.requirements.knowledge,
 													false,
@@ -622,7 +622,7 @@
 										{#each option.requirements.plots as plot}
 											{#if hasPlotOfType(plot, $DB).length > 0}
 												<span
-													class="text-white bg-opacity-100 bg-green-900 p-1 rounded-sm text-xs text-nowrap overflow-ellipsis w-max"
+													class=" bg-opacity-100 bg-green-900 p-1 rounded-sm text-xs text-nowrap overflow-ellipsis w-max"
 												>
 													{PlotTypeOptions[
 														getOptionIndex(plot)
@@ -630,7 +630,7 @@
 												</span>
 											{:else}
 												<span
-													class="text-red-100 bg-red-900 p-1 rounded-sm w-min text-xs text-nowrap overflow-ellipsis px-2"
+													class=" bg-red-900 p-1 rounded-sm w-min text-xs text-nowrap overflow-ellipsis px-2"
 													>{PlotTypeOptions[
 														getOptionIndex(plot)
 													].title.substring(2)}</span
@@ -671,7 +671,7 @@
 			{:else}
 				<div class="flex justify-center items-start p-3 text-center w-full">
 					<div class="flex flex-col w-1/3 h-3/5 p-2 bg-blue-800 rounded-lg">
-						<div class="text-white text-2xl pb-2">Build a mine</div>
+						<div class=" text-2xl pb-2">Build a mine</div>
 						<div>
 							<ul
 								class="flex flex-row justify-between px-6 bg-blue-900 text-blue-200 text-sm rounded-md py-1"

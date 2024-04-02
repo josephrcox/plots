@@ -31,7 +31,7 @@
 </script>
 
 <Dialog.Root bind:open={$startGameMenu.visible}>
-	<Dialog.Content transition={flyAndScale}>
+	<Dialog.Content transition={flyAndScale} class="bg-black">
 		<Dialog.Header>
 			<Dialog.Title>Welcome to Plots!</Dialog.Title>
 			<Dialog.Description>

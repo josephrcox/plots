@@ -13,6 +13,7 @@
 		referencePlot: [],
 		mineralSource: false,
 	};
+	export let classText = '';
 	export let canBeUpgraded = false;
 
 	function openMenu(e, a, b) {
@@ -71,15 +72,15 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-	class="plot_container overflow-visible {data.type == -1 &&
+	class="plot_container {classText} overflow-visible {data.type == -1 &&
 	canBeUpgraded == false
-		? 'border-slate-500 border-dashed border'
-		: ''}
-		
-		{data.mineralSource ? 'hidden' : ''}
-		"
+		? ''
+		: ''} {data.mineralSource ? 'hidden' : ''} {canBeUpgraded
+		? 'cursor-pointer'
+		: 'cursor-not-allowed'}"
 	style="background-color:{getColor(data.type, canBeUpgraded)}"
 	data-active={data.active}
+	data-hideHoverAnimation={data.type == -1 && data.x == 0 && data.y == 0}
 	data-id={data.id}
 	data-x={data.x}
 	data-y={data.y}
@@ -99,14 +100,15 @@
 >
 	{#if data.type > -1}
 		<div>
-			<span data-size={options[data.type].requirements.size}
-				><span class="text-lg">{options[data.type].title.substring(0, 2)}</span
-				><br />{options[data.type].title.substring(2)}
-				{options[data.type].requirements.size > 1
-					? `(${options[data.type].requirements.size}x${
-							options[data.type].requirements.size
-						})`
-					: ''}
+			<span data-size={options[data.type].requirements.size}>
+				<span class="text-lg align-text-top select-none"
+					>{options[data.type].title.substring(0, 2)}</span
+				>
+				<br />
+				<span
+					class="text-xs align-text-top font-normal text-black from-stone-600 select-none"
+					>{options[data.type].title.substring(2)}
+				</span>
 			</span>
 		</div>
 	{:else if data.type == -1 && data.x == 0 && data.y == 0}
@@ -119,33 +121,33 @@
 
 <style>
 	.plot_container {
-		width: 100px;
-		height: 100px;
-		background-color: rgb(126, 158, 255);
-		word-wrap: normal;
-		min-width: 100px;
+		position: relative;
+		width: 110px;
+		height: 125px;
+		background-color: rgb(204, 218, 209);
 		display: flex;
-		align-items: start;
 		justify-content: center;
 		align-items: center;
-		font-size: 0.7em;
-		box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		-webkit-box-sizing: border-box;
-		overflow: visible;
-		padding: 2px;
-
-		/* no select */
-		-webkit-touch-callout: none; /* iOS Safari */
-		-webkit-user-select: none; /* Safari */
-		-khtml-user-select: none; /* Konqueror HTML */
-		-moz-user-select: none; /* Old versions of Firefox */
-		-ms-user-select: none; /* Internet Explorer/Edge */
-		user-select: none; /* Non-prefixed version, currently
-                              supported by Chrome, Opera and Firefox */
+		text-align: center;
+		margin: 0 5px 0 5px;
+		clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+		transition: box-shadow 0.2s;
+		box-shadow: 0 0 0 0 transparent;
 	}
+
+	.plot_container[data-hideHoverAnimation='false']:hover:before {
+		opacity: 0.2;
+		scale: 1.05;
+	}
+	.plot_container:hover[data-canBeUpgraded='true'] {
+		scale: 1.05;
+		transition: ease-in-out 0.3s;
+		filter: brightness(1.2);
+		cursor: pointer;
+	}
+
 	.plot_container[data-active='true'] {
-		background-color: rgb(89 89 239);
+		background-color: rgb(204 218 209);
 	}
 	.plot_container[data-canBeUpgraded='false'] {
 		background-color: rgb(21 28 41);
@@ -164,7 +166,6 @@
 		background-color: rgb(42, 62, 230);
 		border: none;
 	}
-
 	.plot_container > div {
 		display: flex;
 		flex-direction: column;

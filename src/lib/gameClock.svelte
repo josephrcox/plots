@@ -583,9 +583,11 @@
 		}
 		if (z.modifiers.health > 1.0) {
 			if (
-				hasPlotOfType('small_hospital', z) ||
-				hasPlotOfType('large_hospital', z)
+				hasPlotOfType('small_hospital', z).length > 0 ||
+				hasPlotOfType('large_hospital', z).length > 0
 			) {
+				console.log(hasPlotOfType('small_hospital', z).length);
+				console.log(hasPlotOfType('large_hospital', z).length);
 				if (z.townLog.indexOf(messages.hospital_advantage) == -1) {
 					return (z = addToTownLog(messages.hospital_advantage, z));
 				}
