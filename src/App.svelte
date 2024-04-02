@@ -193,6 +193,16 @@
 			$unique = {};
 		}
 	}
+
+	// fetch 'https://plots-backend-599m5.ondigitalocean.app/test' and display resonse data message
+	fetch('https://plots-backend-599m5.ondigitalocean.app/test')
+		.then((response) => response.json())
+		.then((data) => {
+			console.log(data.message);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
 </script>
 
 {#if dbInitialized || $DB == null}
