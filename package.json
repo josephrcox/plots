@@ -1,33 +1,41 @@
 {
-	"name": "plots",
-	"version": "0.0.1",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"svelte": "^4.2.7",
-		"svelte-check": "^3.6.0",
-		"tslib": "^2.4.1",
-		"typescript": "^5.0.0",
-		"vite": "^5.0.3"
-	},
-	"dependencies": {
-		"@types/d3": "^7.4.3",
-		"autoprefixer": "^10.4.17",
-		"bits-ui": "^0.18.1",
-		"clsx": "^2.1.0",
-		"d3": "^7.8.5",
-		"lucide-svelte": "^0.331.0",
-		"tailwind-merge": "^2.2.1",
-		"tailwind-variants": "^0.2.0"
-	}
+  "name": "plots",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "svelte": "^4.2.7",
+    "svelte-check": "^3.6.0",
+    "tslib": "^2.4.1",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.3"
+  },
+  "dependencies": {
+    "@types/d3": "^7.4.3",
+    "autoprefixer": "^10.4.17",
+    "bits-ui": "^0.18.1",
+    "clsx": "^2.1.0",
+    "d3": "^7.8.5",
+    "lucide-svelte": "^0.378.0",
+    "tailwind-merge": "^2.2.1",
+    "tailwind-variants": "^0.2.0"
+  },
+  "description": "Plots is a zoning management game with an emphasis on a basic plot grid system. You can build homes, businesses, and special plots to grow your city toward different objectives.",
+  "main": "tailwind.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

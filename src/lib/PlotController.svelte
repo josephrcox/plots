@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { KeyEvents } from 'lucide-svelte/dist/icons/key.svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique } from './store';
-	import { Keyboard } from 'lucide-svelte';
 
 	$: if ($DB) {
 		checkForAvailablePlots();
