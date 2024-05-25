@@ -177,7 +177,7 @@
 </AlertDialog.Root>
 
 <Dialog.Root bind:open={$showLabMenu}>
-	<Dialog.Content>
+	<Dialog.Content class="bg-foreground text-foregroundText">
 		<Dialog.Header>
 			<Dialog.Title>
 				<span>Manage your Laboratory 🔬 🧪</span>
@@ -187,7 +187,7 @@
 				<span
 					>You have earned <span
 						class="italic
-				{$DB.lab.xp < 0 ? 'text-red-500' : 'text-green-500'}
+				{$DB.lab.xp < 0 ? 'text-textDanger1' : 'text-primaryText'}
 					">{$DB.lab.xp} XP</span
 					> from experiments. XP can be used to buy advanced plots and develop your
 					city.
@@ -244,7 +244,7 @@
 		{/if}
 		<Separator class="mt-4" />
 		<Dialog.Footer>
-			<span class="italic text-left text-red-800">
+			<span class="italic text-left text-textDanger1">
 				Keep in mind that not all experiments yield positive results.</span
 			>
 		</Dialog.Footer>

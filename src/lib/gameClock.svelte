@@ -30,6 +30,24 @@
 		db = _checkSpecialPlots(db);
 		db = _adjustKnowledgeGoldMarketRates(db);
 		db = _warnUser(db);
+		const startResources = {
+			food: db.resources.food,
+			wood: db.resources.wood,
+			stone: db.resources.stone,
+			coal: db.resources.coal,
+			metal: db.resources.metal,
+		};
+		db = _generateResources(db);
+		db = _feedCitizens(db);
+		const endResources = {
+			food: db.resources.food,
+			wood: db.resources.wood,
+			stone: db.resources.stone,
+			coal: db.resources.coal,
+			metal: db.resources.metal,
+		};
+		db = _calculateResourceRates(db, startResources, endResources);
+
 		return db;
 	}
 
@@ -37,7 +55,7 @@
 		db = _calculateKnowledge(db);
 		db = _banksEffect(db);
 		db = _federalGovEffect(db);
-
+		db = _reactToProductivity(db);
 		return db;
 	}
 
@@ -46,6 +64,7 @@
 		db = _bringStatsBackToNormal(db);
 		db = _movePeopleInMovePeopleOut(db);
 		db = _checkPlotCountForEffect(db);
+
 		return db;
 	}
 
@@ -86,6 +105,7 @@
 					currentDB = performWeeklyTasks(currentDB);
 				}
 				if (currentDB.environment.day % 30 === 0) {
+					currentDB.townLog = '';
 					currentDB = performMonthlyTasks(currentDB);
 				}
 				if (currentDB.environment.day % 90 === 0) {
@@ -164,6 +184,35 @@
 		return result;
 	}
 
+	function _reactToProductivity(z) {
+		const productivityPercentage = z.townInfo.productivity;
+		let multiplier = 1; // will be multiplied to get new happiness. higher == better.
+		if (productivityPercentage > 50 && productivityPercentage < 100) {
+			// Happy citizens
+			multiplier = 1.08;
+		} else if (productivityPercentage == 100) {
+			// Typical, no change needed.
+			return z;
+		} else if (productivityPercentage > 100 && productivityPercentage < 125) {
+			multiplier = 0.98;
+		} else if (productivityPercentage > 125 && productivityPercentage < 150) {
+			multiplier = 0.95;
+		} else if (productivityPercentage > 150 && productivityPercentage < 175) {
+			multiplier = 0.9;
+		} else if (productivityPercentage > 175 && productivityPercentage < 200) {
+			// Extremely upset
+			multiplier = 0.8;
+		}
+		const before = z.townInfo.happiness;
+		z.townInfo.happiness *= multiplier;
+
+		z = addToTownLog(
+			`Happiness has gone down by ${100 - Math.round((z.townInfo.happiness / before) * 100)}% due to productivity.`,
+			z,
+		);
+		return z;
+	}
+
 	function _warnUser(z) {
 		if (z.endGameDetails != null) {
 			return z;
@@ -185,6 +234,84 @@
 				z.last_warning_health = z.environment.day;
 			}
 		}
+		return z;
+	}
+
+	function _feedCitizens(z) {
+		// Each citizen needs 1 food per day. This removes it, with a tiny bit of randomness.
+		// If there is not enough food, then affect happiness by setting the happiness multiplier to z.modifiers.happiness * 0.95, and the same for z.modifiers.health
+		const foodNeeded = z.townInfo.population_count;
+		const foodAvailable = z.resources.food;
+		if (foodAvailable < foodNeeded) {
+			z.modifiers.happiness *= 0.95;
+			z.modifiers.health *= 0.95;
+			z = addToTownLog('not enough food', z);
+			z.resources.food = 0;
+		} else {
+			z.resources.food -= foodNeeded;
+		}
+		z.resources.food = Math.round(z.resources.food, 2);
+		return z;
+	}
+
+	function _generateResources(z) {
+		const productivityPercentage = z.townInfo.productivity;
+		let multiplier = 1; // will be multiplied to get new happiness. higher == better.
+		if (productivityPercentage < 50) {
+			multiplier = 0.5;
+		} else if (productivityPercentage > 50 && productivityPercentage < 100) {
+			// Happy citizens
+			multiplier = 0.75;
+		} else if (productivityPercentage == 100) {
+			// Typical, no change needed.
+			multiplier = 1;
+		} else if (productivityPercentage > 100 && productivityPercentage < 125) {
+			multiplier = 1.25;
+		} else if (productivityPercentage > 125 && productivityPercentage < 150) {
+			multiplier = 1.75;
+		} else if (productivityPercentage > 150 && productivityPercentage < 175) {
+			multiplier = 3;
+		} else if (productivityPercentage > 175 && productivityPercentage < 200) {
+			// Extremely upset
+			multiplier = 5;
+		}
+		console.log(multiplier);
+
+		// This iterates over each plot that is placed, and generates resources based on the plot type.
+		for (let i = 0; i < z.plots.length; i++) {
+			for (let j = 0; j < z.plots[i].length; j++) {
+				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+					let plotOptionForPlot = options[z.plots[i][j].type];
+					if (plotOptionForPlot.generated_resources != null) {
+						z.resources.food += Math.round(
+							plotOptionForPlot.generated_resources.food * multiplier,
+						);
+						z.resources.wood += Math.round(
+							plotOptionForPlot.generated_resources.wood * multiplier,
+						);
+						z.resources.stone += Math.round(
+							plotOptionForPlot.generated_resources.stone * multiplier,
+						);
+						z.resources.coal += Math.round(
+							plotOptionForPlot.generated_resources.coal * multiplier,
+						);
+						z.resources.metal += Math.round(
+							plotOptionForPlot.generated_resources.metal * multiplier,
+						);
+					}
+				}
+			}
+		}
+		return z;
+	}
+
+	function _calculateResourceRates(z, startResources, endResources) {
+		// This function calculates the rate of resource generation per week
+		z.resource_rate.food = endResources.food - startResources.food;
+		z.resource_rate.wood = endResources.wood - startResources.wood;
+		z.resource_rate.stone = endResources.stone - startResources.stone;
+		z.resource_rate.coal = endResources.coal - startResources.coal;
+		z.resource_rate.metal = endResources.metal - startResources.metal;
 		return z;
 	}
 
@@ -539,8 +666,8 @@
 			if (z.townLog.indexOf(messages.nobody_home) == -1)
 				z = addToTownLog(messages.nobody_home, z);
 		}
-		z.economyAndLaws.last_month_profit = roundTo(
-			z.economyAndLaws.last_month_profit,
+		z.economyAndLaws.weeklyProfit = roundTo(
+			z.economyAndLaws.weeklyProfit,
 			2,
 		);
 		if (z.townInfo.employees > z.townInfo.population_count) {
@@ -630,16 +757,18 @@
 	}
 
 	function _calculateProfits(z) {
-		z.economyAndLaws.last_month_profit = 0;
+		z.economyAndLaws.weeklyProfit = 0;
 		// Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
 		for (let i = 0; i < z.plots.length; i++) {
 			for (let j = 0; j < z.plots[i].length; j++) {
 				if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
 					// Iterate through all plots and do actions based on their conditions
-					let plotOptionForPlot = options[z.plots[i][j].type];
-					let profit = getProfit(plotOptionForPlot.revenue_per_week, z);
+					const plotOptionForPlot = options[z.plots[i][j].type];
+					const profit =
+						getProfit(plotOptionForPlot.revenue_per_week, z) *
+						(z.townInfo.productivity / 100);
 					z.townInfo.gold += profit;
-					z.economyAndLaws.last_month_profit += profit;
+					z.economyAndLaws.weeklyProfit += profit;
 
 					if (plotOptionForPlot.enables_tourism == true) {
 						z.townInfo.gold_from_tourism +=

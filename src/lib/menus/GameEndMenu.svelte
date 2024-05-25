@@ -23,7 +23,7 @@
 </script>
 
 <Dialog.Root bind:open={show}>
-	<Dialog.Content class="bg-black">
+	<Dialog.Content class="bg-foregroundDark text-foregroundText">
 		<Dialog.Header>
 			<Dialog.Title>
 				{$DB.endGameDetails.win == true
@@ -34,7 +34,7 @@
 				<span class="text-gray-500 text-sm">{$DB.endGameDetails.msg}</span>
 				<br />
 				<br />
-				<Button on:click={keepPlaying}>Keep playin'</Button>
+				<Button on:click={keepPlaying} class="bg-accent">Keep playin'</Button>
 			</Dialog.Description>
 		</Dialog.Header>
 

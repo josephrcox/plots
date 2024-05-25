@@ -207,7 +207,6 @@
 		let plotChosen = options[typeIndex];
 
 		if (checkIfAffordable(plotChosen, $DB) == false) {
-			console.log(plotChosen.requirements);
 			return alert(`${JSON.stringify(plotChosen.requirements)}`);
 		}
 
@@ -383,13 +382,12 @@
 				requirementsMet = false;
 			}
 		}
-		// some plots have requirements.plots which is an array of IDs, check if we have those by using hasPlotOfType
-		if (
-			plotChosen.requirements.plots !== undefined &&
-			plotChosen.requirements.plots.length > 0
-		) {
-			plotChosen.requirements.plots.forEach((plot: any) => {
-				if (hasPlotOfType(plot, z).length === 0) {
+		// Iterate over keys in plotChosen.requirements.resources
+		if (plotChosen.requirements.resources !== undefined) {
+			Object.keys(plotChosen.requirements.resources).forEach((resource) => {
+				if (
+					$DB.resources[resource] < plotChosen.requirements.resources[resource]
+				) {
 					requirementsMet = false;
 				}
 			});
@@ -410,7 +408,7 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content
-		class="border-gray-500 border-r-2 overflow-clip max-w-[90vw] max-h-[90vh] bg-card-foreground text-primary-foreground
+		class="border-gray-500 border-r-2 overflow-clip max-w-[90vw] max-h-[90vh] bg-foregroundDark text-foregroundText
 		"
 	>
 		<Dialog.Header>
@@ -441,7 +439,7 @@
 						value={searchQuery}
 						on:input={handleInput}
 						bind:this={searchInput}
-						class="border rounded w-auto bg-primary-foreground text-primary"
+						class="border rounded w-auto bg-foreground text-primary"
 					/>
 				</div>
 				<!-- toggle to only show affordable ones -->
@@ -533,7 +531,6 @@
 							<th class="px-2 py-2">Profit</th>
 							<th class="px-2 py-2">Employees</th>
 							<th class="px-2 py-2">Cost</th>
-							<th class="px-2 py-2">Requires</th>
 							<th class="px-2 py-2">Modifiers</th>
 							<th class="px-2 py-2">Instant effect</th>
 						</tr>
@@ -614,31 +611,7 @@
 										{/if}
 									</div>
 								</td>
-								<td class="px-2 py-2 w-12">
-									<div
-										class="
-									 flex flex-col align-middle justify-center h-max w-max gap-2"
-									>
-										{#each option.requirements.plots as plot}
-											{#if hasPlotOfType(plot, $DB).length > 0}
-												<span
-													class=" bg-opacity-100 bg-green-900 p-1 rounded-sm text-xs text-nowrap overflow-ellipsis w-max"
-												>
-													{PlotTypeOptions[
-														getOptionIndex(plot)
-													].title.substring(2)}
-												</span>
-											{:else}
-												<span
-													class=" bg-red-900 p-1 rounded-sm w-min text-xs text-nowrap overflow-ellipsis px-2"
-													>{PlotTypeOptions[
-														getOptionIndex(plot)
-													].title.substring(2)}</span
-												>
-											{/if}
-										{/each}
-									</div>
-								</td>
+
 								<td class="px-2 py-2 w-12 text-xs">
 									<div class="text-xs">
 										{#if option.effect_modifiers.happiness != 1.0}

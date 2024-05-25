@@ -24,6 +24,21 @@ export type Game = {
 		happiness: number; // can only go up to maximums.happiness, as it goes down people pay less taxes and leave.
 		health: number; // can only go up to maximums.happiness, as it goes down people die or leave.
 		knowledge_points: number; // goes up with education plots and with some experiments.
+		productivity: number; // from 0 -> 200, def 100, this can be set by the user, and it affects revenue gains and happiness. default 100.
+	};
+	resources: {
+		food: number;
+		wood: number;
+		stone: number;
+		coal: number;
+		metal: number;
+	};
+	resource_rate: {
+		food: number;
+		wood: number;
+		stone: number;
+		coal: number;
+		metal: number;
 	};
 	hasCityHall: boolean;
 	hasBank: boolean;
@@ -41,7 +56,7 @@ export type Game = {
 	economyAndLaws: {
 		tax_rate: number; // current tax rate set by user.
 		max_tax_rate: number; // the max the town is willing to pay, random each game between 0.2 and 0.6.
-		last_month_profit: number;
+		weeklyProfit: number;
 		knowledge_gold_market_rates: number[];
 	};
 	plotCounts: [][];
@@ -49,7 +64,6 @@ export type Game = {
 		// TODO: make this do anything meaningful, currently only using day and year.
 		day: number;
 		year: number;
-		climate: number;
 	};
 	difficulty: number;
 	endGoal: EndGoal;
@@ -107,12 +121,25 @@ export type PlotOption = {
 	enables_tourism: boolean;
 	requirements: {
 		gold: number;
-		plots: any[];
+		plots: any[]; // TODO REMOVE THIS, IT'S NOT USED AT ALL.
 		employees: number;
-		climate: number | null;
 		knowledge: number;
 		size: number;
 		xp: number;
+		resources: {
+			food: number;
+			wood: number;
+			stone: number;
+			coal: number;
+			metal: number;
+		};
+	};
+	generated_resources: {
+		food: number;
+		wood: number;
+		stone: number;
+		coal: number;
+		metal: number;
 	};
 	knowledge_points_per_month: number;
 	effect_modifiers: {

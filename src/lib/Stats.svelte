@@ -60,9 +60,9 @@
 				subtitle: `<span
 					class='
 						rounded-full px-1 py-1 text-xs
-						${$DB.economyAndLaws.last_month_profit < 0 ? 'text-red-300' : 'text-green-500'}
+						${$DB.economyAndLaws.weeklyProfit < 0 ? 'text-red-300' : 'text-green-500'}
 					'>
-					${numberWithCommas(roundTo($DB.economyAndLaws.last_month_profit, 0))}
+					${numberWithCommas(roundTo($DB.economyAndLaws.weeklyProfit, 0))}
 				</span>`,
 				tap: () => {
 					//

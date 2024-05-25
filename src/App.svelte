@@ -11,7 +11,6 @@
 		clearDB,
 		modifyPlotMenuOptions,
 		startGameMenu,
-		headerHeight,
 		// @ts-ignore
 	} from './lib/store.ts';
 	// @ts-ignore
@@ -21,6 +20,7 @@
 	import Scoreboard from '$lib/menus/Scoreboard.svelte';
 	import KnowledgeMenu from '$lib/menus/KnowledgeMenu.svelte';
 	import LabMenu from '$lib/menus/LabMenu.svelte';
+	import Hud from '$lib/Hud.svelte';
 
 	let dbInitialized = false;
 	runTests();
@@ -203,44 +203,39 @@
 			<PauseMenu />
 		{/if}
 
-		<Header />
+		<Hud />
 		<GameClock />
 		<GameEndMenu />
 		<Scoreboard />
 		<KnowledgeMenu />
 		<LabMenu />
 
-		<div
-			id="plot_grid"
-			style="margin-top: {$headerHeight}px"
-			class="scroll-smooth no-scrollbar
-					 overflow-y-scroll
-					 overflow-x-scroll
-				"
-		>
-			<PlotController />
-			<br />
-		</div>
-
 		<style>
-			#plot_grid {
-				overflow-x: scroll;
-				overflow-y: scroll;
-				scroll-behavior: smooth;
+			body {
+				margin-bottom: 0;
 			}
 			/* no visible scrollbars */
 			#plot_grid::-webkit-scrollbar {
 				display: none;
 			}
 
-			html {
-				overflow: scroll;
-			}
-
 			::-webkit-scrollbar {
 				width: 0px;
 				background: transparent; /* make scrollbar transparent */
 			}
+
+			/* no scrollbars on firefox either */
+			#plot_grid {
+				scrollbar-width: none;
+			}
+
+			/* no scrollbars for IE/Edge */
+			#plot_grid {
+				-ms-overflow-style: none;
+			}
 		</style>
 	{/if}
 {/if}
+
+<style>
+</style>

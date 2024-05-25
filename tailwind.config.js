@@ -18,39 +18,23 @@ const config = {
 		},
 		extend: {
 			colors: {
-				border: 'hsl(var(--border) / <alpha-value>)',
-				input: 'hsl(var(--input) / <alpha-value>)',
-				ring: 'hsl(var(--ring) / <alpha-value>)',
-				background: 'hsl(var(--background) / <alpha-value>)',
-				foreground: 'hsl(var(--foreground) / <alpha-value>)',
-				primary: {
-					DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
-					foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
-				},
-				secondary: {
-					DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
-					foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)',
-				},
-				destructive: {
-					DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
-					foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
-				},
-				muted: {
-					DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
-					foreground: 'hsl(var(--muted-foreground) / <alpha-value>)',
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
-					foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
-				},
-				popover: {
-					DEFAULT: 'hsl(var(--popover) / <alpha-value>)',
-					foreground: 'hsl(var(--popover-foreground) / <alpha-value>)',
-				},
-				card: {
-					DEFAULT: 'hsl(var(--card) / <alpha-value>)',
-					foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
-				},
+				background: '#28641C',
+				foreground: '#2F260C',
+				foregroundDark: '#272316',
+				foregroundText: '#FFFFFF',
+				textPrimary: '#E8F0F1',
+				secondary: '#5A6E73',
+				button: '#E2725B',
+				buttonDisabled: '#35221E',
+				textDisabled: '#7C7C7C',
+				accent: '#E2725B', // Maybe this one - 965306
+				accentText: '#DFE1D1',
+				border: '#5A6E63',
+				popover: '#FFFFFF',
+				textHappy: 'rgb(60 228 27)',
+				textDanger1: '#B03E3E',
+				textDanger2: '#CC752E',
+				textDanger3: '#CCA22E',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

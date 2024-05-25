@@ -18,6 +18,7 @@
 
 	function openMenu(e, a, b) {
 		let plots = document.querySelectorAll('.plot_container');
+		console.log(`test ${!data.active && !canBeUpgraded}`);
 		if ($paused == false) {
 			if (
 				data.referencePlot != undefined &&
@@ -71,16 +72,22 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
+<button
 	class="plot_container {classText} overflow-visible {data.type == -1 &&
 	canBeUpgraded == false
 		? ''
 		: ''} {data.mineralSource ? 'hidden' : ''} {canBeUpgraded
 		? 'cursor-pointer'
-		: 'cursor-not-allowed'}"
-	style="background-color:{getColor(data.type, canBeUpgraded)}"
+		: 'cursor-not-allowed'}
+		"
+	style="background-color: {$modifyPlotMenuOptions.x == data.x &&
+	$modifyPlotMenuOptions.y == data.y &&
+	$modifyPlotMenuOptions.visible
+		? 'white'
+		: getColor(data.type, canBeUpgraded)}"
 	data-active={data.active}
-	data-hideHoverAnimation={data.type == -1 && data.x == 0 && data.y == 0}
+	data-hideHoverAnimation={$modifyPlotMenuOptions.visible ||
+		(data.type == -1 && data.x == 0 && data.y == 0)}
 	data-id={data.id}
 	data-x={data.x}
 	data-y={data.y}
@@ -100,7 +107,11 @@
 >
 	{#if data.type > -1}
 		<div>
-			<span data-size={options[data.type].requirements.size}>
+			<span
+				data-size={options[data.type].requirements.size}
+				data-x={data.x}
+				data-y={data.y}
+			>
 				<span class="text-lg align-text-top select-none"
 					>{options[data.type].title.substring(0, 2)}</span
 				>
@@ -112,37 +123,36 @@
 			</span>
 		</div>
 	{:else if data.type == -1 && data.x == 0 && data.y == 0}
-		<Tooltip text="Build your first home" tone="happy" />
+		<!--  -->
 	{/if}
 	{#if data.mineralSource && data.type == -1}
 		<Tooltip text="Mineral Source (mine)" emoji="⛏️" tone="standard" />
 	{/if}
-</div>
+</button>
 
 <style>
 	.plot_container {
 		position: relative;
 		width: 110px;
 		height: 125px;
-		background-color: rgb(204, 218, 209);
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		text-align: center;
 		margin: 0 5px 0 5px;
 		clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-		transition: box-shadow 0.2s;
+		transition: box-shadow 0.1s;
 		box-shadow: 0 0 0 0 transparent;
 	}
 
 	.plot_container[data-hideHoverAnimation='false']:hover:before {
 		opacity: 0.2;
-		scale: 1.05;
+		scale: 1.01;
 	}
 	.plot_container:hover[data-canBeUpgraded='true'] {
-		scale: 1.05;
-		transition: ease-in-out 0.3s;
-		filter: brightness(1.2);
+		scale: 1.02;
+		transition: ease-in-out 0.1s;
+		filter: brightness(1.1);
 		cursor: pointer;
 	}
 

@@ -167,7 +167,9 @@
 </script>
 
 <Dialog.Root bind:open={$paused}>
-	<Dialog.Content class=" max-w-[90vw] max-h-[90vh] bg-black">
+	<Dialog.Content
+		class=" max-w-[90vw] max-h-[90vh] bg-foregroundDark text-foregroundText"
+	>
 		<Dialog.Header>
 			<Dialog.Title>Pause Menu</Dialog.Title>
 			<Dialog.Description>Unpause any time by pressing 'P'</Dialog.Description>
@@ -337,10 +339,7 @@
 						"
 							>
 								<div class="flex-col flex px-3 py-2 gap-0">
-									<div
-										class="min-w-32 flex
-"
-									>
+									<div class="min-w-32 flex">
 										<span class="flex flex-row justify-between w-[100%]">
 											<div
 												class="flex flex-row gap-3 w-[100%] text- items-center

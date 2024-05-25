@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BottomBar from './BottomBar.svelte';
 	import ModifyPlotMenu from './menus/ModifyPlotMenu.svelte';
 	import Plot from './Plot.svelte';
 	import { DB, modifyPlotMenuOptions, unique } from './store';
@@ -6,6 +7,20 @@
 	$: if ($DB) {
 		checkForAvailablePlots();
 	}
+
+	document.addEventListener('click', function (e) {
+		const elem = e.target as HTMLDivElement;
+		if (
+			(elem.dataset.x == undefined &&
+				elem.dataset.type != '-1' &&
+				elem.dataset.size != undefined) ||
+			elem.id == 'plotContainerMain' ||
+			elem.classList.contains('row') ||
+			elem.classList.contains('grid')
+		) {
+			$modifyPlotMenuOptions.visible = false;
+		}
+	});
 
 	export function checkIfPlotCanBeUpgraded(x: number, y: number) {
 		let plot = {
@@ -60,27 +75,37 @@
 </script>
 
 {#if $DB != null}
-	<div class="grid overflow-x-scroll overflow-y-scroll plot_controller">
-		{#each $DB.plots as plotRow, rowIndex}
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div
-				class="row {rowIndex % 2 !== 0 ? 'odd-row' : ''}"
-				on:click={restartModifyPlotMenu}
-			>
-				{#each plotRow as plot}
-					<Plot
-						classText="hexagon"
-						data={plot}
-						canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
-					/>
-				{/each}
-			</div>
-		{/each}
+	<div
+		id="plotContainerMain"
+		class="absolute left-[170px] top-[170px] overflow-scroll pl-20 pr-64 py-20"
+	>
+		<div class="grid overflow-x-scroll overflow-y-scroll plot_controller">
+			{#each $DB.plots as plotRow, rowIndex}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
+				<div
+					class="row {rowIndex % 2 !== 0 ? 'odd-row' : ''}"
+					on:click={restartModifyPlotMenu}
+				>
+					{#each plotRow as plot}
+						<Plot
+							classText="hexagon"
+							data={plot}
+							canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
+						/>
+					{/each}
+				</div>
+			{/each}
+		</div>
 	</div>
 	{#key $unique}
 		{#if $modifyPlotMenuOptions.visible}
-			<ModifyPlotMenu
+			<!-- <ModifyPlotMenu
+				x={$modifyPlotMenuOptions.x}
+				y={$modifyPlotMenuOptions.y}
+				open={$modifyPlotMenuOptions.visible}
+			/> -->
+			<BottomBar
 				x={$modifyPlotMenuOptions.x}
 				y={$modifyPlotMenuOptions.y}
 				open={$modifyPlotMenuOptions.visible}

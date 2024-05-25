@@ -642,4 +642,4 @@ export let pauseMenuTab =
 		? writable('game')
 		: writable('achievements');
 export let headerHeight = writable(250);
-export let speed = writable(500);
+export let speed = writable(750);

@@ -16,6 +16,21 @@ export const default_db: Game = {
 		happiness: 150,
 		health: 150,
 		knowledge_points: 0,
+		productivity: 100,
+	},
+	resources: {
+		food: 500,
+		wood: 500,
+		stone: 500,
+		coal: 0,
+		metal: 0,
+	},
+	resource_rate: {
+		food: 0,
+		wood: 0,
+		stone: 0,
+		coal: 0,
+		metal: 0,
 	},
 	hasCityHall: false,
 	hasBank: false,
@@ -28,15 +43,13 @@ export const default_db: Game = {
 	economyAndLaws: {
 		tax_rate: 0,
 		max_tax_rate: 1,
-		last_month_profit: 0,
+		weeklyProfit: 0,
 		knowledge_gold_market_rates: [],
 	},
 	plotCounts: [],
 	environment: {
 		day: 0,
 		year: 1,
-		climate: -1,
-		// -1 = none (needs to be set), 0 = cold, 1 = average, 2 = hot
 	},
 	maximums: {
 		health: 300,

@@ -62,7 +62,7 @@ export const achievements: Achievement[] = [
 		requirements: 'Last month profit is over $10,000',
 		icon: '🌛',
 		check: (z: Game) => {
-			return z.economyAndLaws.last_month_profit >= 10000;
+			return z.economyAndLaws.weeklyProfit >= 10000;
 		},
 		prize: 15000,
 	},

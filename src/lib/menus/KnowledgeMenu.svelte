@@ -40,7 +40,10 @@
 </script>
 
 <Dialog.Root bind:open={$showKnowledgeMenu}>
-	<Dialog.Content transitionConfig={{ duration: 0 }} class="bg-card-foreground">
+	<Dialog.Content
+		transitionConfig={{ duration: 0 }}
+		class="bg-foreground text-foregroundText"
+	>
 		<Dialog.Header>
 			<Dialog.Title
 				>Manage your Knowledge ({$DB.townInfo.knowledge_points} pts)</Dialog.Title
