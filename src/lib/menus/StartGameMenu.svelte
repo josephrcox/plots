@@ -1,126 +1,126 @@
 <script lang="ts">
-	import { startGame, DB, startGameMenu } from '../store';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { flyAndScale } from '$lib/utils';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Difficulty, EndGoal, WinScenario } from '$lib/types';
-	import { winScenarios } from '$lib/objects/WinScenarios';
+  import { startGame, DB, startGameMenu } from "../store";
+  import { Button, buttonVariants } from "$lib/components/ui/button";
+  import * as Dialog from "$lib/components/ui/dialog";
+  import { flyAndScale } from "$lib/utils";
+  import { Input } from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import { Difficulty, EndGoal, WinScenario } from "$lib/types";
+  import { winScenarios } from "$lib/objects/WinScenarios";
 
-	function captureAndStart() {
-		const difficulty = (
-			document.getElementById('difficulty') as HTMLSelectElement
-		).value;
-		const endGoal = (document.getElementById('endGoal') as HTMLSelectElement)
-			.value;
-		const townName = (document.getElementById('townName') as HTMLInputElement)
-			.value;
-		const cheats =
-			(document.getElementById('cheats') as HTMLSelectElement).value == 'true';
-		const dif = difficulty as Difficulty;
-		const eg = endGoal as EndGoal;
-		startGame(dif, eg, townName, cheats);
-	}
+  function captureAndStart() {
+    const difficulty = (
+      document.getElementById("difficulty") as HTMLSelectElement
+    ).value;
+    const endGoal = (document.getElementById("endGoal") as HTMLSelectElement)
+      .value;
+    const townName = (document.getElementById("townName") as HTMLInputElement)
+      .value;
+    const cheats =
+      (document.getElementById("cheats") as HTMLSelectElement).value == "true";
+    const dif = difficulty as Difficulty;
+    const eg = endGoal as EndGoal;
+    startGame(dif, eg, townName, cheats);
+  }
 
-	let selectedGameMode = 'land';
+  let selectedGameMode = "free_play";
 
-	const setSelectedGameMode = (e: Event) => {
-		selectedGameMode = (e.target as HTMLSelectElement).value;
-	};
+  const setSelectedGameMode = (e: Event) => {
+    selectedGameMode = (e.target as HTMLSelectElement).value;
+  };
 </script>
 
 <Dialog.Root bind:open={$startGameMenu.visible}>
-	<Dialog.Content
-		transition={flyAndScale}
-		class="bg-foregroundDark text-foregroundText"
-	>
-		<Dialog.Header>
-			<Dialog.Title>Welcome to Plots!</Dialog.Title>
-			<Dialog.Description>
-				<a
-					href="https://github.com/josephrcox/plots#how-to-play"
-					class="text-blue-500 text-sm mb-4 hover:underline"
-					target="_blank"
-				>
-					GitHub / Learn how to play</a
-				>
+  <Dialog.Content
+    transition={flyAndScale}
+    class="bg-foregroundDark text-foregroundText"
+  >
+    <Dialog.Header>
+      <Dialog.Title>Welcome to Plots!</Dialog.Title>
+      <Dialog.Description>
+        <a
+          href="https://github.com/josephrcox/plots#how-to-play"
+          class="text-blue-500 text-sm mb-4 hover:underline"
+          target="_blank"
+        >
+          GitHub / Learn how to play</a
+        >
 
-				<div class="flex flex-col justify-center gap-5 mt-4">
-					<div>
-						<Label for="difficulty" class="mt-2"
-							>Select a map size (difficulty)</Label
-						>
-						<select
-							id="difficulty"
-							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-						>
-							<option value="0">Easy (quick game)</option>
-							<option value="1" selected>Normal</option>
-							<option value="2">Hard (longest game)</option>
-						</select>
-					</div>
+        <div class="flex flex-col justify-center gap-5 mt-4">
+          <div>
+            <Label for="difficulty" class="mt-2"
+              >Select a map size (difficulty)</Label
+            >
+            <select
+              id="difficulty"
+              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            >
+              <option value="0">Easy (quick game)</option>
+              <option value="1" selected>Normal</option>
+              <option value="2">Hard (longest game)</option>
+            </select>
+          </div>
 
-					<div>
-						<Label for="endGoal" class="mt-2">Select a game mode</Label>
-						{#if selectedGameMode === 'land'}
-							<p class="text-gray-500 text-sm">
-								{winScenarios.land.description_title}
-							</p>
-						{:else}
-							<p class="text-gray-500 text-sm">
-								{winScenarios.free_play.description_title}
-							</p>
-						{/if}
+          <div>
+            <Label for="endGoal" class="mt-2">Select a game mode</Label>
+            {#if selectedGameMode === "land"}
+              <p class="text-gray-500 text-sm">
+                {winScenarios.land.description_title}
+              </p>
+            {:else}
+              <p class="text-gray-500 text-sm">
+                {winScenarios.free_play.description_title}
+              </p>
+            {/if}
 
-						<select
-							id="endGoal"
-							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							value={selectedGameMode}
-							on:change={setSelectedGameMode}
-						>
-							<option value="land">{winScenarios.land.short_title}</option>
-							<option value="free_play"
-								>{winScenarios.free_play.short_title}</option
-							>
-						</select>
-					</div>
+            <select
+              id="endGoal"
+              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={selectedGameMode}
+              on:change={setSelectedGameMode}
+            >
+              <option value="land">{winScenarios.land.short_title}</option>
+              <option value="free_play"
+                >{winScenarios.free_play.short_title}</option
+              >
+            </select>
+          </div>
 
-					<div>
-						<Label for="townName" class="mt-2">Town Name</Label>
-						<Input
-							id="townName"
-							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							placeholder="Will be randomized if you leave blank"
-						/>
-					</div>
-					<div>
-						<Label for="cheats" class="mt-2">Cheats</Label>
-						<select
-							id="cheats"
-							class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-						>
-							<option value="false" selected>No cheats</option>
-							<option value="true">Dev mode</option>
-						</select>
-					</div>
-				</div>
-			</Dialog.Description>
-		</Dialog.Header>
-		<Dialog.Footer>
-			<!-- Footer -->
-			<button
-				class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
-				on:click={captureAndStart}
-			>
-				Start game
-			</button>
-		</Dialog.Footer>
-	</Dialog.Content>
+          <div>
+            <Label for="townName" class="mt-2">Town Name</Label>
+            <Input
+              id="townName"
+              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Will be randomized if you leave blank"
+            />
+          </div>
+          <div>
+            <Label for="cheats" class="mt-2">Cheats</Label>
+            <select
+              id="cheats"
+              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value="false" selected>No cheats</option>
+              <option value="true">Dev mode</option>
+            </select>
+          </div>
+        </div>
+      </Dialog.Description>
+    </Dialog.Header>
+    <Dialog.Footer>
+      <!-- Footer -->
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+        on:click={captureAndStart}
+      >
+        Start game
+      </button>
+    </Dialog.Footer>
+  </Dialog.Content>
 </Dialog.Root>
 
 <style>
-	/* .dialog {
+  /* .dialog {
 		position: fixed;
 		top: 50%;
 		left: 50%;

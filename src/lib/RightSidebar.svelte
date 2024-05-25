@@ -85,9 +85,9 @@
 <div
   class="bg-foreground w-[160px] sidebar border-foregroundDark border-4
             			{$modifyPlotMenuOptions.visible
-    ? 'bottom-52 opacity-70'
+    ? 'bottom-72 opacity-70'
     : 'bottom-2'}
-	z-500 fixed right-3 top-[190px] rounded-xl p-2 transition-all duration-300"
+	z-10 fixed right-3 top-[190px] rounded-xl p-2 transition-all duration-300"
 >
   <h1 class="text-xl w-full text-center pb-2">Resources</h1>
   <div
@@ -109,7 +109,7 @@
               {/if}
             </span>
             <TooltipContent>
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-2 w-28">
                 <span class="text-md font-bold">{icon} {name}</span>
                 {#if rate > 0}
                   <span class="text-textHappy">+{rate}</span>
@@ -120,10 +120,10 @@
                 {/if}
                 <Separator />
                 {#if getRequiredPlots(name).length > 0}
-                  <span>Required to make:</span>
+                  <span class="text-sm font-semibold">Used to build:</span>
                 {/if}
                 {#each getRequiredPlots(name) as plot}
-                  <span>{plot}</span>
+                  <span class="text-xs">{plot}</span>
                 {/each}
               </div>
             </TooltipContent>

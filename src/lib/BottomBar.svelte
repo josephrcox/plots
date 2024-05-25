@@ -20,6 +20,7 @@
   import { Game, PlotOption } from "./types";
   import { Input } from "$lib/components/ui/input";
   import { onMount } from "svelte";
+  import { Button } from "./components/ui/button";
 
   export let x = 0;
   export let y = 0;
@@ -360,22 +361,14 @@
 
       DB.set(z);
       localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-      if (y < z.plots.length - 1 && z.plots[x][y + 1].active == false) {
-        $modifyPlotMenuOptions.y = y + 1;
-        const elem = document.querySelector(
-          `[data-id="${z.plots[x][y + 1].id}"]`,
-        )?.parentElement;
-
-        if (elem) {
-          document
-            .querySelector(`[data-id="${z.plots[x][y + 1].id}"]`)
-            ?.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
+      for (let i = 0; i < z.plots.length; i++) {
+        for (let j = 0; j < z.plots[i].length; j++) {
+          if (z.plots[i][j].active == false) {
+            $modifyPlotMenuOptions.x = i;
+            $modifyPlotMenuOptions.y = j;
+            return;
+          }
         }
-      } else {
-        $modifyPlotMenuOptions.visible = false;
       }
     } else {
       tooltip =
@@ -418,15 +411,17 @@
 
 {#if open}
   <div
-    class="w-[100vw] fixed bottom-0 mb-[-15px]
-    p-1 h-[210px] flex flex-col justify-center text-center items-center"
+    class="w-[100vw] fixed bottom-0 {$modifyPlotMenuOptions.isMineralSource ===
+    true
+      ? 'h-[210px] mb-[60px]'
+      : 'h-[210px] mb-[0px]'}
+    p-1 z-50 flex flex-col justify-center text-center items-center"
   >
     <div
       class="
         text-xl
         items-center justify-center
-        w-[80%]
-        z-500
+        w-[90%]
         align-bottom
         bg-foreground
         border-4 border-gray-400 shadow-2xl rounded-t-xl
@@ -444,25 +439,25 @@
             class="flex flex-row w-full
 		"
           >
-            <div
-              class="
+            {#if $modifyPlotMenuOptions.isMineralSource === false}
+              <div
+                class="
 			flex items-end
 			"
-            >
-              <Input
-                type="text"
-                autofocus
-                id="search-bar"
-                placeholder="Search Plot Options..."
-                value={searchQuery}
-                on:input={handleInput}
-                bind:this={searchInput}
-                class="border rounded w-auto bg-foreground text-primary text-xs"
-              />
-            </div>
-            <!-- toggle to only show affordable ones -->
-            {#if $modifyPlotMenuOptions.isMineralSource === false}
-              <div class="flex items-center ml-6">
+              >
+                <Input
+                  type="text"
+                  autofocus
+                  id="search-bar"
+                  placeholder="Search Plot Options..."
+                  value={searchQuery}
+                  on:input={handleInput}
+                  bind:this={searchInput}
+                  class="border rounded w-auto bg-white placeholder-black text-black text-xs"
+                />
+              </div>
+              <!-- toggle to only show affordable ones -->
+              <div class="flex items-center ml-4">
                 <input
                   type="checkbox"
                   id="toggle-affordable"
@@ -477,7 +472,7 @@
                   class="ml-2
 					no-select cursor-pointer
 				
-				">Show only buildable</label
+				">Buildable</label
                 >
               </div>
               <div class="flex justify-end ml-6">
@@ -493,106 +488,180 @@
             {/if}
           </div>
         </div>
-        <div
-          class="flex flex-row text-start justify-start items-start flex-wrap overflow-scroll max-h-36 w-full align-middle gap-4 min-h-32"
-        >
-          {#each reactiveOptions as option (option.id)}
-            <Tooltip.Root openDelay={300} closeDelay={0}>
-              <Tooltip.Trigger>
-                <div
-                  class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly
-                                {option.affordable || option.selected
-                    ? 'cursor-pointer'
-                    : 'opacity-20 cursor-not-allowed '}
-                                {option.selected
-                    ? 'border-4 border-yellow-200 opacity-100 mr-8'
-                    : ''}
-                                "
-                  data-plotoptionid={option.id}
-                  style="background-color: {getColor(
-                    getOptionIndex(option.id),
-                    true,
-                  )}"
-                >
-                  <span class="text-md text-center">
-                    {!option.selected ? firstEmoji(option.title) : "✅"}
-                  </span>
-                  <span class="text-xs text-center">
-                    {option.title.substring(2)}
-                  </span>
-                  <span style={option.styling} class="text-xs text-center">
-                    💰 {formatNumber(option.requirements.gold, false)}
-                  </span>
-                </div></Tooltip.Trigger
-              >
-              <Tooltip.Content>
-                <div class="flex flex-col gap-2">
-                  <span class="text-md"
-                    >{options[getOptionIndex(option.id)].title}</span
-                  >
-                  <span class="text-xs"
-                    >{options[getOptionIndex(option.id)].description}</span
-                  >
-                  <Separator class={"bg-secondary opacity-25 mt-1"} />
-                </div>
 
-                <div class="flex flex-col w-36 h-min pb-2 gap-4">
-                  <div class="mt-2 flex flex-col gap-1">
-                    {@html getRequirementString(
-                      "💰",
-                      options[getOptionIndex(option.id)].requirements.gold,
-                      $DB.townInfo.gold,
-                    )}
-                    {@html getRequirementString(
-                      "🥕",
-                      options[getOptionIndex(option.id)].requirements.resources
-                        .food,
-                      $DB.resources.food,
-                    )}
-                    {@html getRequirementString(
-                      "🪵",
-                      options[getOptionIndex(option.id)].requirements.resources
-                        .wood,
-                      $DB.resources.wood,
-                    )}
-                    {@html getRequirementString(
-                      "⛏️",
-                      options[getOptionIndex(option.id)].requirements.resources
-                        .stone,
-                      $DB.resources.stone,
-                    )}
-                    {@html getRequirementString(
-                      "🪨",
-                      options[getOptionIndex(option.id)].requirements.resources
-                        .coal,
-                      $DB.resources.coal,
-                    )}
-                    {@html getRequirementString(
-                      "🧲",
-                      options[getOptionIndex(option.id)].requirements.resources
-                        .metal,
-                      $DB.resources.metal,
-                    )}
-                  </div>
-                  {#if options[getOptionIndex(option.id)].requirements.employees != 0}
-                    <span
-                      class={options[getOptionIndex(option.id)].requirements
-                        .employees >
-                      $DB.townInfo.population_count - $DB.townInfo.employees
-                        ? "px-2 text-textDanger1 font-bold border-2 border-red-400"
-                        : "px-2"}
-                      >Employs {options[getOptionIndex(option.id)].requirements
-                        .employees}</span
-                    >
-                  {/if}
+        {#if $modifyPlotMenuOptions.isMineralSource === true}
+          <div class="flex justify-center items-start p-1 text-center w-full">
+            <div class="flex flex-col p-2 w-1/2 bg-blue-800 rounded-lg">
+              <div class=" text-2xl pb-2">Build a mine</div>
+              <div>
+                <ul
+                  class="flex flex-row justify-between px-6 bg-blue-900 text-blue-200 text-sm rounded-md py-1"
+                >
+                  <li>
+                    <!-- check or an x if they have enough  -->
+                    {$DB.townInfo.gold >=
+                    PlotTypeOptions[getOptionIndex("mine")].requirements.gold
+                      ? "✅"
+                      : "❌"}
+                    ${formatNumber(
+                      PlotTypeOptions[getOptionIndex("mine")].requirements.gold,
+                    )} gold
+                  </li>
+                  <li>
+                    {$DB.townInfo.population_count - $DB.townInfo.employees >=
+                    PlotTypeOptions[getOptionIndex("mine")].requirements
+                      .employees
+                      ? "✅"
+                      : "❌"}
+                    {PlotTypeOptions[getOptionIndex("mine")].requirements
+                      .employees}{" "}
+                    employees
+                  </li>
+                </ul>
+              </div>
+              <div
+                class="flex flex-row w-full justify-between px-6 mt-4 h-full"
+              >
+                <div
+                  class="text-8xl text-center h-5/6 mt-2 flex flex-col justify-center items-center align-middle w-1/3"
+                >
+                  <div>⛏️</div>
                 </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
-          {/each}
-          {#if reactiveOptions.length === 0}
-            <span class="text-sm pt-2">No plots available!</span>
-          {/if}
-        </div>
+                <div class="w-2/3 text-start pl-6">
+                  Used to extract minerals needed to build many advanced plots
+                  including hospitals, labs, and more.
+                </div>
+              </div>
+              {#if hasPlotOfType("mine", $DB).length === 0}
+                <Button
+                  class="my-6 w-full 
+								{checkIfAffordable(PlotTypeOptions[getOptionIndex('mine')], $DB)
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : 'bg-gray-900 hover:bg-gray-900 opacity-75 cursor-not-allowed'} disabled'}
+							"
+                  tabindex={-1}
+                  on:click={() => {
+                    purchasePlot(x, y, "mine");
+                  }}
+                >
+                  Build
+                </Button>
+              {:else}
+                <div class="text-yellow-500 text-xs mt-4 text-center">
+                  You have built a mine here, and mine's can not be destroyed.
+                </div>
+              {/if}
+            </div>
+          </div>
+        {:else}
+          <div
+            class="flex flex-row scroll-smooth overscroll-auto text-start justify-start items-start flex-wrap overflow-scroll h-64 pb-32 pt-4 w-full align-middle gap-4 min-h-32"
+          >
+            {#each reactiveOptions as option (option.id)}
+              <Tooltip.Root openDelay={300} closeDelay={0}>
+                <Tooltip.Trigger>
+                  <div
+                    class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly
+                                {option.affordable || option.selected
+                      ? 'cursor-pointer'
+                      : 'opacity-20 cursor-not-allowed '}
+                                {option.selected
+                      ? 'border-4 border-yellow-200 opacity-100 rounded-none'
+                      : ''}
+                                "
+                    data-plotoptionid={option.id}
+                    style="background-color: {getColor(
+                      getOptionIndex(option.id),
+                      true,
+                    )}"
+                  >
+                    <span class="text-md text-center">
+                      {!option.selected ? firstEmoji(option.title) : "✅"}
+                    </span>
+                    <span class="text-xs text-center">
+                      {option.title.substring(2)}
+                    </span>
+                    <span style={option.styling} class="text-xs text-center">
+                      💰 {formatNumber(option.requirements.gold, false)}
+                    </span>
+                  </div></Tooltip.Trigger
+                >
+                <Tooltip.Content>
+                  <div class="flex flex-col gap-2">
+                    <span class="text-md"
+                      >{options[getOptionIndex(option.id)].title}</span
+                    >
+                    <span class="text-xs"
+                      >{options[getOptionIndex(option.id)].description}</span
+                    >
+                    <Separator class={"bg-secondary opacity-25 mt-1"} />
+                  </div>
+
+                  <div class="flex flex-col w-36 h-min pb-2 gap-4">
+                    <div class="mt-2 flex flex-col gap-1">
+                      {@html getRequirementString(
+                        "💰",
+                        options[getOptionIndex(option.id)].requirements.gold,
+                        $DB.townInfo.gold,
+                      )}
+                      {@html getRequirementString(
+                        "🥕",
+                        options[getOptionIndex(option.id)].requirements
+                          .resources.food,
+                        $DB.resources.food,
+                      )}
+                      {@html getRequirementString(
+                        "🪵",
+                        options[getOptionIndex(option.id)].requirements
+                          .resources.wood,
+                        $DB.resources.wood,
+                      )}
+                      {@html getRequirementString(
+                        "⛏️",
+                        options[getOptionIndex(option.id)].requirements
+                          .resources.stone,
+                        $DB.resources.stone,
+                      )}
+                      {@html getRequirementString(
+                        "🪨",
+                        options[getOptionIndex(option.id)].requirements
+                          .resources.coal,
+                        $DB.resources.coal,
+                      )}
+                      {@html getRequirementString(
+                        "🧲",
+                        options[getOptionIndex(option.id)].requirements
+                          .resources.metal,
+                        $DB.resources.metal,
+                      )}
+                    </div>
+                    {#if options[getOptionIndex(option.id)].requirements.employees != 0}
+                      <span
+                        class={options[getOptionIndex(option.id)].requirements
+                          .employees >
+                        $DB.townInfo.population_count - $DB.townInfo.employees
+                          ? "px-2 text-textDanger1 font-bold border-2 border-red-400"
+                          : "px-2"}
+                        >Employs {options[getOptionIndex(option.id)]
+                          .requirements.employees}</span
+                      >
+                    {/if}
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Root>
+            {/each}
+
+            {#if reactiveOptions.length === 0}
+              <span class="text-sm pt-2">No plots available!</span>
+            {:else}
+              <div
+                class="text-xs opacity-50 h-full flex flex-col justify-center text-center"
+              >
+                No more :)
+              </div>
+            {/if}
+          </div>
+        {/if}
       </div>
     </div>
   </div>
