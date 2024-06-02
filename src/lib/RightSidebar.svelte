@@ -1,7 +1,7 @@
 <script lang="ts">
   import Header from "./Header.svelte";
   import PlotController from "./PlotController.svelte";
-  import { roundTo } from "./utils";
+  import { capitalizeFirstLetter, roundTo } from "./utils";
   import { DB, ACTIVE_GAME_DB_NAME, modifyPlotMenuOptions } from "./store";
   import LeftSidebar from "./LeftSidebar.svelte";
   import Slider from "./components/ui/slider/slider.svelte";
@@ -10,7 +10,16 @@
   import Separator from "./components/ui/separator/separator.svelte";
   import { options } from "./objects/PlotTypeOptions";
 
-  type ResourceKey = "food" | "wood" | "stone" | "coal" | "metal";
+  type ResourceKey =
+    | "food"
+    | "wood"
+    | "stone"
+    | "coal"
+    | "metal"
+    | "sugar"
+    | "power"
+    | "knowledge"
+    | "bureaucracy";
 
   function setTaxRate(newRate: number[]) {
     let z = $DB;
@@ -26,6 +35,8 @@
     localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
   }
 
+  console.log($DB.townInfo.knowledge_points_per_month);
+
   let resources = [];
   $: resources = [
     {
@@ -33,6 +44,21 @@
       name: "food",
       value: $DB.resources.food,
       rate: $DB.resource_rate.food,
+    },
+    {
+      icon: "🧠",
+      name: "knowledge",
+      value: $DB.townInfo.knowledge_points,
+      rate:
+        $DB.townInfo.knowledge_points_per_month != undefined
+          ? $DB.townInfo.knowledge_points_per_month / 4
+          : 0,
+    },
+    {
+      icon: "🍩",
+      name: "sugar",
+      value: $DB.resources.sugar,
+      rate: $DB.resource_rate.sugar,
     },
     {
       icon: "🪵",
@@ -58,20 +84,53 @@
       value: $DB.resources.metal,
       rate: $DB.resource_rate.metal,
     },
+    {
+      icon: "🔋",
+      name: "power",
+      value: $DB.resources.power + " (surplus)",
+      rate: null,
+    },
+    {
+      icon: "🧑‍⚖️",
+      name: "bureaucracy",
+      value: $DB.resources.bureaucracy,
+      rate: $DB.resource_rate.bureaucracy,
+    },
   ];
 
   function plotsThatNeed(resourceIndex: ResourceKey): string[] {
     let plotsThatNeed: string[] = [];
     for (let i = 0; i < options.length; i++) {
-      if (options[i].requirements.resources[resourceIndex] > 0) {
+      if (
+        resourceIndex != "knowledge" &&
+        options[i].requirements.resources[resourceIndex] > 0
+      ) {
         plotsThatNeed.push(options[i].title);
+      } else {
+        if (resourceIndex == "power" && options[i].active_costs.power > 0) {
+          plotsThatNeed.push(options[i].title);
+        } else if (
+          resourceIndex == "knowledge" &&
+          options[i].requirements.knowledge > 0
+        ) {
+          plotsThatNeed.push(options[i].title);
+        }
       }
     }
     return plotsThatNeed;
   }
 
   function isValidResourceKey(key: string): key is ResourceKey {
-    return ["food", "wood", "stone", "coal", "metal"].includes(key);
+    return [
+      "food",
+      "wood",
+      "stone",
+      "coal",
+      "metal",
+      "sugar",
+      "power",
+      "knowledge",
+    ].includes(key);
   }
 
   function getRequiredPlots(resourceName: string): string[] {
@@ -85,7 +144,7 @@
 <div
   class="bg-foreground w-[160px] sidebar border-foregroundDark border-4
             			{$modifyPlotMenuOptions.visible
-    ? 'bottom-72 opacity-70'
+    ? 'bottom-8 opacity-70'
     : 'bottom-2'}
 	z-10 fixed right-3 top-[190px] rounded-xl p-2 transition-all duration-300"
 >
@@ -95,7 +154,7 @@
   >
     <div class="flex flex-col text-sm text-nowrap gap-2">
       {#each resources as { icon, name, value, rate }}
-        <Tooltip.Root openDelay={300} closeDelay={0}>
+        <Tooltip.Root openDelay={200} closeDelay={0}>
           <Tooltip.Trigger>
             <span class="flex flex-row justify-between">
               {icon}
@@ -104,27 +163,36 @@
                 <span class="text-textHappy">+{rate}</span>
               {:else if rate < 0}
                 <span class="text-textDanger2">{rate}</span>
+              {:else if rate == null}
+                <span></span>
               {:else}
                 <span class="text-textPrimary">+{rate}</span>
               {/if}
             </span>
             <TooltipContent>
-              <div class="flex flex-col gap-2 w-28">
-                <span class="text-md font-bold">{icon} {name}</span>
+              <div class="flex flex-col gap-2 whitespace-nowrap">
+                <span class="text-md font-bold"
+                  >{icon} {capitalizeFirstLetter(name)}</span
+                >
                 {#if rate > 0}
-                  <span class="text-textHappy">+{rate}</span>
+                  <span class="text-textHappy">+{rate} (weekly)</span>
                 {:else if rate < 0}
-                  <span class="text-textDanger2">{rate}</span>
+                  <span class="text-textDanger2">{rate} (weekly)</span>
+                {:else if rate != null}
+                  <span class="">+{rate} (weekly)</span>
                 {:else}
-                  <span class="">+{rate}</span>
+                  <span class="display-none" />
                 {/if}
-                <Separator />
+
                 {#if getRequiredPlots(name).length > 0}
-                  <span class="text-sm font-semibold">Used to build:</span>
+                  <Separator />
+                  <span class="text-sm font-semibold">Required for</span>
                 {/if}
-                {#each getRequiredPlots(name) as plot}
-                  <span class="text-xs">{plot}</span>
-                {/each}
+                <div class="flex flex-col flex-wrap max-h-36">
+                  {#each getRequiredPlots(name) as plot}
+                    <span class="text-xs mr-4">{plot}</span>
+                  {/each}
+                </div>
               </div>
             </TooltipContent>
           </Tooltip.Trigger>
@@ -147,12 +215,12 @@
           min={0}
           max={200}
           step={5}
-          class="cursor-pointer w-3/4"
+          class="cursor-pointer"
         />
       </div>
       <div
         class="flex flex-col justify-center w-full text-center items-center gap-2
-        min-h-24 px-2 py-1 rounded-xl {$DB.economyAndLaws.tax_rate === 0
+        min-h-12 pb-2 rounded-xl {$DB.economyAndLaws.tax_rate === 0
           ? 'bg-textDanger1 animate-pulse font-bold'
           : ''}"
       >
@@ -168,7 +236,7 @@
           min={0}
           max={1.0}
           step={0.05}
-          class="cursor-pointer w-3/4"
+          class="cursor-pointer"
         />
       </div>
     </div>

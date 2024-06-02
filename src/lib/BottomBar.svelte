@@ -1,7 +1,15 @@
 <script lang="ts">
   import * as Tooltip from "$lib/components/ui/tooltip";
   import { Separator } from "$lib/components/ui/separator";
-  import { firstEmoji, formatNumber, roundTo } from "./utils";
+  import {
+    firstEmoji,
+    getOptionIndex,
+    formatModifier,
+    formatNumber,
+    roundTo,
+    formatInstantChange,
+    capitalizeFirstLetter,
+  } from "./utils";
   import {
     DB,
     ACTIVE_GAME_DB_NAME,
@@ -16,7 +24,6 @@
     options,
     plotTypeMaximums,
   } from "./objects/PlotTypeOptions";
-  import { getOptionIndex } from "./utils";
   import { Game, PlotOption } from "./types";
   import { Input } from "$lib/components/ui/input";
   import { onMount } from "svelte";
@@ -346,6 +353,7 @@
         z.resources.stone -= resourcesForPlot.stone;
         z.resources.coal -= resourcesForPlot.coal;
         z.resources.metal -= resourcesForPlot.metal;
+        z.resources.sugar -= resourcesForPlot.sugar;
       }
 
       switch (plotChosen.id) {
@@ -361,15 +369,23 @@
 
       DB.set(z);
       localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-      for (let i = 0; i < z.plots.length; i++) {
-        for (let j = 0; j < z.plots[i].length; j++) {
-          if (z.plots[i][j].active == false) {
-            $modifyPlotMenuOptions.x = i;
-            $modifyPlotMenuOptions.y = j;
-            return;
+      // find the next plot that is not active by going x +1, y +1, x +1, y +1, etc.
+      let found = false;
+      for (let i = x; i < z.plots.length; i++) {
+        for (let j = y; j < z.plots[i].length; j++) {
+          if (z.plots[i][j].active === false) {
+            x = i;
+            y = j;
+            found = true;
+            break;
           }
         }
+        if (found) {
+          break;
+        }
       }
+      $modifyPlotMenuOptions.x = x;
+      $modifyPlotMenuOptions.y = y;
     } else {
       tooltip =
         "You do not have enough resources to purchase this plot. If it's a 'Large' plot, make sure you have a 2x2 area available. ";
@@ -391,11 +407,11 @@
   ) {
     if (required == 0 || required == null) return "";
     let s = "";
-    let classText = "font-semibold";
+    let classText = "";
     if (current <= required) {
-      classText = "text-textDanger1 font-bold border-2 border-red-400";
+      classText = "text-textDanger1 border-2 border-red-400";
     }
-    s = `<span class='px-1 ${classText}'>${icon} ${required}</span>`;
+    s = `<span class='${classText}'>${icon} ${required}</span>`;
 
     return s;
   }
@@ -406,6 +422,31 @@
       plotOption.classList.remove("active");
     });
     reverseClear(x, y, $DB);
+  }
+
+  function getEmojiForResource(resource: string) {
+    switch (resource) {
+      case "food":
+        return "🥕";
+      case "knowledge":
+        return "🧠";
+      case "sugar":
+        return "🍩";
+      case "wood":
+        return "🪵";
+      case "stone":
+        return "⛏️";
+      case "coal":
+        return "🪨";
+      case "metal":
+        return "🧲";
+      case "power":
+        return "🔋";
+      case "bureaucracy":
+        return "🧑‍⚖️";
+      default:
+        return "";
+    }
   }
 </script>
 
@@ -554,112 +595,275 @@
             </div>
           </div>
         {:else}
-          <div
-            class="flex flex-row scroll-smooth overscroll-auto text-start justify-start items-start flex-wrap overflow-scroll h-64 pb-32 pt-4 w-full align-middle gap-4 min-h-32"
-          >
-            {#each reactiveOptions as option (option.id)}
-              <Tooltip.Root openDelay={300} closeDelay={0}>
-                <Tooltip.Trigger>
-                  <div
-                    class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly
-                                {option.affordable || option.selected
-                      ? 'cursor-pointer'
-                      : 'opacity-20 cursor-not-allowed '}
-                                {option.selected
-                      ? 'border-4 border-yellow-200 opacity-100 rounded-none'
-                      : ''}
-                                "
-                    data-plotoptionid={option.id}
-                    style="background-color: {getColor(
-                      getOptionIndex(option.id),
-                      true,
-                    )}"
-                  >
-                    <span class="text-md text-center">
-                      {!option.selected ? firstEmoji(option.title) : "✅"}
-                    </span>
-                    <span class="text-xs text-center">
-                      {option.title.substring(2)}
-                    </span>
-                    <span style={option.styling} class="text-xs text-center">
-                      💰 {formatNumber(option.requirements.gold, false)}
-                    </span>
-                  </div></Tooltip.Trigger
+          <div class="flex flex-col gap-8 w-full overflow-y-scroll h-64 pb-16">
+            {#each [1, 2, 3, 4] as level}
+              <div>
+                <div class="text-xl font-bold">Level {level}</div>
+                <div
+                  class="flex flex-row text-start justify-start items-start flex-wrap pb-6 pt-4 w-full align-middle gap-4"
                 >
-                <Tooltip.Content>
-                  <div class="flex flex-col gap-2">
-                    <span class="text-md"
-                      >{options[getOptionIndex(option.id)].title}</span
-                    >
-                    <span class="text-xs"
-                      >{options[getOptionIndex(option.id)].description}</span
-                    >
-                    <Separator class={"bg-secondary opacity-25 mt-1"} />
-                  </div>
+                  {#each reactiveOptions.filter((option) => option.level === level) as option (option.id)}
+                    <Tooltip.Root openDelay={200} closeDelay={0}>
+                      <Tooltip.Trigger>
+                        <div
+                          class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly
+            {option.affordable || option.selected
+                            ? 'cursor-pointer'
+                            : 'opacity-20 cursor-not-allowed '}
+            {option.selected
+                            ? 'border-4 border-yellow-200 opacity-100 rounded-none'
+                            : ''}
+            "
+                          data-plotoptionid={option.id}
+                          style="background-color: {getColor(
+                            getOptionIndex(option.id),
+                            true,
+                          )}"
+                        >
+                          <span class="text-md text-center">
+                            {!option.selected ? firstEmoji(option.title) : "✅"}
+                          </span>
+                          <span class="text-xs text-center">
+                            {option.title.substring(2)} ({hasPlotOfType(
+                              option.id,
+                              $DB,
+                            ).length})
+                          </span>
+                          <span
+                            style={option.styling}
+                            class="text-xs text-center"
+                          >
+                            💰 {formatNumber(option.requirements.gold, false)}
+                          </span>
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content>
+                        <div class="flex flex-col gap-2">
+                          <span class="text-md"
+                            >{options[getOptionIndex(option.id)].title}</span
+                          >
+                          <span class="text-xs"
+                            >{options[getOptionIndex(option.id)]
+                              .description}</span
+                          >
+                        </div>
 
-                  <div class="flex flex-col w-36 h-min pb-2 gap-4">
-                    <div class="mt-2 flex flex-col gap-1">
-                      {@html getRequirementString(
-                        "💰",
-                        options[getOptionIndex(option.id)].requirements.gold,
-                        $DB.townInfo.gold,
-                      )}
-                      {@html getRequirementString(
-                        "🥕",
-                        options[getOptionIndex(option.id)].requirements
-                          .resources.food,
-                        $DB.resources.food,
-                      )}
-                      {@html getRequirementString(
-                        "🪵",
-                        options[getOptionIndex(option.id)].requirements
-                          .resources.wood,
-                        $DB.resources.wood,
-                      )}
-                      {@html getRequirementString(
-                        "⛏️",
-                        options[getOptionIndex(option.id)].requirements
-                          .resources.stone,
-                        $DB.resources.stone,
-                      )}
-                      {@html getRequirementString(
-                        "🪨",
-                        options[getOptionIndex(option.id)].requirements
-                          .resources.coal,
-                        $DB.resources.coal,
-                      )}
-                      {@html getRequirementString(
-                        "🧲",
-                        options[getOptionIndex(option.id)].requirements
-                          .resources.metal,
-                        $DB.resources.metal,
-                      )}
-                    </div>
-                    {#if options[getOptionIndex(option.id)].requirements.employees != 0}
-                      <span
-                        class={options[getOptionIndex(option.id)].requirements
-                          .employees >
-                        $DB.townInfo.population_count - $DB.townInfo.employees
-                          ? "px-2 text-textDanger1 font-bold border-2 border-red-400"
-                          : "px-2"}
-                        >Employs {options[getOptionIndex(option.id)]
-                          .requirements.employees}</span
-                      >
-                    {/if}
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Root>
-            {/each}
+                        <div
+                          class="flex flex-col w-36 h-min pb-2 gap-1 text-xs"
+                        >
+                          <Separator class={"bg-secondary opacity-25 mt-1"} />
+                          <span class="font-semibold">Resources</span>
+                          <div class="flex flex-col gap-1">
+                            {@html getRequirementString(
+                              "💰",
+                              options[getOptionIndex(option.id)].requirements
+                                .gold,
+                              $DB.townInfo.gold,
+                            )}
+                            {@html getRequirementString(
+                              "Weekly 💰",
+                              options[getOptionIndex(option.id)].active_costs
+                                .gold,
+                              $DB.townInfo.gold,
+                            )}
+                            {@html getRequirementString(
+                              "🥕",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.food,
+                              $DB.resources.food,
+                            )}
+                            {@html getRequirementString(
+                              "🧠",
+                              options[getOptionIndex(option.id)].requirements
+                                .knowledge,
+                              $DB.townInfo.knowledge_points,
+                            )}
+                            {@html getRequirementString(
+                              "🍩",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.sugar,
+                              $DB.resources.sugar,
+                            )}
+                            {@html getRequirementString(
+                              "🪵",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.wood,
+                              $DB.resources.wood,
+                            )}
+                            {@html getRequirementString(
+                              "⛏️",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.stone,
+                              $DB.resources.stone,
+                            )}
+                            {@html getRequirementString(
+                              "🪨",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.coal,
+                              $DB.resources.coal,
+                            )}
+                            {@html getRequirementString(
+                              "🧲",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.metal,
+                              $DB.resources.metal,
+                            )}
+                            {@html getRequirementString(
+                              "🔋",
+                              options[getOptionIndex(option.id)].active_costs
+                                .power,
+                              $DB.resources.power,
+                            )}
+                            {@html getRequirementString(
+                              "🧑‍⚖️",
+                              options[getOptionIndex(option.id)].requirements
+                                .resources.bureaucracy,
+                              $DB.resources.bureaucracy,
+                            )}
+                          </div>
+                        </div>
+                        {#if options[getOptionIndex(option.id)].requirements.employees != 0}
+                          <div class="flex flex-col gap-1 text-xs">
+                            <Separator class={"bg-secondary opacity-25 mt-2"} />
+                            <span class="font-semibold">Required employees</span
+                            >
+                            <span
+                              class={options[getOptionIndex(option.id)]
+                                .requirements.employees >
+                              $DB.townInfo.population_count -
+                                $DB.townInfo.employees
+                                ? "px-1 text-textDanger1 font-bold border-2 border-red-400"
+                                : ""}
+                              >{options[getOptionIndex(option.id)].requirements
+                                .employees} employees
+                            </span>
+                          </div>
+                        {/if}
+                        {#if options[getOptionIndex(option.id)].revenue_per_week != 0}
+                          <div class="flex flex-col gap-1 text-xs">
+                            <Separator class={"bg-secondary opacity-25 mt-2"} />
+                            <span class="font-semibold">Weekly revenue</span>
+                            <span
+                              >💰 {options[getOptionIndex(option.id)]
+                                .revenue_per_week}
+                            </span>
+                          </div>
+                        {/if}
+                        {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers).some((value) => value != 1)}
+                          <div class="flex flex-col gap-1 text-xs">
+                            <Separator class={"bg-secondary opacity-25 mt-2"} />
+                            <span class="font-semibold">Effect modifiers</span>
+                            {#each Object.keys(options[getOptionIndex(option.id)].effect_modifiers) as key, index}
+                              {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers)[index] != 1}
+                                <span
+                                  class={Object.values(
+                                    options[getOptionIndex(option.id)]
+                                      .effect_modifiers,
+                                  )[index] > 1
+                                    ? "text-textHappyDark"
+                                    : "text-textDanger1"}
+                                  >{capitalizeFirstLetter(key)}
+                                  {formatModifier(
+                                    Object.values(
+                                      options[getOptionIndex(option.id)]
+                                        .effect_modifiers,
+                                    )[index],
+                                  )}
+                                </span>
+                              {/if}
+                            {/each}
+                          </div>
+                        {/if}
+                        {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes).some((value) => value != 0)}
+                          <div class="flex flex-col gap-1 text-xs">
+                            <Separator class={"bg-secondary opacity-25 mt-2"} />
+                            <span class="font-semibold">Instant changes</span>
+                            {#each Object.keys(options[getOptionIndex(option.id)].immediate_variable_changes) as key, index}
+                              {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes)[index] != 0}
+                                <span
+                                  class={Object.values(
+                                    options[getOptionIndex(option.id)]
+                                      .immediate_variable_changes,
+                                  )[index] > 0
+                                    ? "text-textHappyDark"
+                                    : "text-textDanger1"}
+                                  >{capitalizeFirstLetter(key)}
+                                  {formatInstantChange(
+                                    Object.values(
+                                      options[getOptionIndex(option.id)]
+                                        .immediate_variable_changes,
+                                    )[index],
+                                  )}
+                                </span>
+                              {/if}
+                            {/each}
+                          </div>
+                        {/if}
+                        {#if Object.values(options[getOptionIndex(option.id)].active_costs).some((value) => value != 0)}
+                          <div class="flex flex-col gap-1 text-xs">
+                            <Separator class={"bg-secondary opacity-25 mt-2"} />
+                            <span class="font-semibold">Weekly Costs</span>
+                            {#each Object.keys(options[getOptionIndex(option.id)].active_costs) as key, index}
+                              {#if Object.values(options[getOptionIndex(option.id)].active_costs)[index] != 0}
+                                <span
+                                  class={Object.values(
+                                    options[getOptionIndex(option.id)]
+                                      .active_costs,
+                                  )[index] > 0
+                                    ? "text-textDanger1"
+                                    : "text-textHappyDark"}
+                                  >{capitalizeFirstLetter(key)}
+                                  {formatInstantChange(
+                                    Object.values(
+                                      options[getOptionIndex(option.id)]
+                                        .active_costs,
+                                    )[index],
+                                  )}
+                                </span>
+                              {/if}
+                            {/each}
+                          </div>
+                        {/if}
+                        {#if Object.values(options[getOptionIndex(option.id)].generated_resources).some((value) => value != 0)}
+                          <div class="flex flex-col gap-1 text-xs">
+                            <Separator class={"bg-secondary opacity-25 mt-2"} />
+                            <span class="font-semibold"
+                              >Generated Resources</span
+                            >
+                            {#each Object.keys(options[getOptionIndex(option.id)].generated_resources) as key, index}
+                              {#if Object.values(options[getOptionIndex(option.id)].generated_resources)[index] != 0}
+                                <span
+                                  class={Object.values(
+                                    options[getOptionIndex(option.id)]
+                                      .generated_resources,
+                                  )[index] > 0
+                                    ? "text-textHappyDark"
+                                    : "text-textDanger1"}
+                                >
+                                  {getEmojiForResource(key)}
+                                  {capitalizeFirstLetter(key)}
+                                  {formatInstantChange(
+                                    Object.values(
+                                      options[getOptionIndex(option.id)]
+                                        .generated_resources,
+                                    )[index],
+                                    false,
+                                  )}
+                                </span>
+                              {/if}
+                            {/each}
+                          </div>
+                        {/if}
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  {/each}
 
-            {#if reactiveOptions.length === 0}
-              <span class="text-sm pt-2">No plots available!</span>
-            {:else}
-              <div
-                class="text-xs opacity-50 h-full flex flex-col justify-center text-center"
-              >
-                No more :)
+                  {#if reactiveOptions.filter((option) => option.level === level).length === 0}
+                    <span class="text-sm pt-2">No plots available!</span>
+                  {/if}
+                </div>
               </div>
-            {/if}
+            {/each}
           </div>
         {/if}
       </div>

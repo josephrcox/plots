@@ -7,11 +7,16 @@
     showLabMenu,
     showKnowledgeMenu,
     modifyPlotMenuOptions,
+    showTutorialStepConfetti,
   } from "./store";
+  import { Confetti } from "svelte-confetti";
+  import { fade } from "svelte/transition";
   import { formatDuration, roundTo } from "./utils";
   import { Separator } from "$lib/components/ui/separator";
   import Button from "./components/ui/button/button.svelte";
   import { Progress } from "$lib/components/ui/progress/index.js";
+  import { tutorialMessages } from "./objects/tutorial_messages";
+  import * as Tooltip from "$lib/components/ui/tooltip";
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -72,7 +77,7 @@
 </script>
 
 <div
-  class="flex justify-between px-6 gap-6 flex-row text-start fixed top-0 left-0 right-0 z-20 bg-foreground text-foregroundText h-max
+  class="flex justify-between px-6 gap-6 flex-row text-start fixed top-0 left-0 right-0 cursor-default z-20 bg-foreground text-foregroundText h-max
 		{$modifyPlotMenuOptions.visible ? 'opacity-70' : ''}
 	"
 >
@@ -112,14 +117,16 @@
         />
       </span>
       <span>
-        <span class="text-xs">Some other stat</span>
+        <span class="text-xs"
+          >Community (x{roundTo($DB.modifiers.community, 2)})</span
+        >
         <Progress
-          value={$DB.townInfo.health}
+          value={$DB.townInfo.community}
           max={300}
           class="w-full h-2"
-          color={parseInt($DB.townInfo.health) > 200
+          color={parseInt($DB.townInfo.community) > 200
             ? "bg-green-500"
-            : parseInt($DB.townInfo.health) > 100
+            : parseInt($DB.townInfo.community) > 100
               ? "bg-yellow-500"
               : "bg-red-500"}
         />
@@ -219,6 +226,63 @@
             {/if}
           {/if}
         </Button>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex flex-row flex-wrap align-middle justify-center items-center w-64 {$showTutorialStepConfetti
+      ? 'opacity-25 '
+      : ''}
+      transition-all duration-700"
+  >
+    <div class="flex flex-col justify-center w-full align-middle items-center">
+      {#if $DB.currentTutorialStep != 0}
+        <div
+          class="flex flex-col justify-center items-center
+  
+        "
+        >
+          <div
+            class=" flex flex-row justify-center text-xs bg-white rounded-t-2xl text-black py-2 whitespace-nowrap px-2 opacity-50"
+          >
+            <Tooltip.Root openDelay={200} closeDelay={0}>
+              <Tooltip.Trigger>
+                <span
+                  class="w-full no-select opacity-70 whitespace-nowrap text-center"
+                >
+                  Last reward
+                  <div>
+                    💰{tutorialMessages[$DB.currentTutorialStep - 1].goldReward}
+                  </div>
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content class="bg-black text-white rounded-2xl">
+                Last completed task: {tutorialMessages[
+                  $DB.currentTutorialStep - 1
+                ].message}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </div>
+        </div>
+      {/if}
+      {#if $showTutorialStepConfetti}
+        <Confetti y={[-0.5, 0.5]} x={[-0.5, 0.5]} duration={2000} />
+      {/if}
+
+      <div
+        class="gap flex-row items-center flex bg-white text-slate-800 py-1 px-2 rounded-xl w-full"
+      >
+        <div class="text-lg h-max">👨‍🦰</div>
+        <div class="text-xs ml-2 overflow-auto opacity-80">
+          {#if $DB.currentTutorialStep >= tutorialMessages.length}
+            No more goals!
+          {:else}
+            {tutorialMessages[$DB.currentTutorialStep].message}
+            <span class="opacity-40"
+              >(💰{tutorialMessages[$DB.currentTutorialStep].goldReward})</span
+            >
+          {/if}
+        </div>
       </div>
     </div>
   </div>

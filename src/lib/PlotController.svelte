@@ -1,6 +1,5 @@
 <script lang="ts">
   import BottomBar from "./BottomBar.svelte";
-  import ModifyPlotMenu from "./menus/ModifyPlotMenu.svelte";
   import Plot from "./Plot.svelte";
   import { DB, modifyPlotMenuOptions, unique } from "./store";
 

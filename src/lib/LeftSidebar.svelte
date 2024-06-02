@@ -7,7 +7,7 @@
 <div class="flex flex-row text-foregroundText">
   <div
     class="bg-foreground w-[160px] border-foregroundDark border-4
-			{$modifyPlotMenuOptions.visible ? 'bottom-72  opacity-70' : 'bottom-2'}
+			{$modifyPlotMenuOptions.visible ? 'bottom-8  opacity-70' : 'bottom-2'}
 		z-10 fixed left-3 p-3 top-[190px] drop-shadow-xl rounded-xl transition-all duration-300"
   >
     <!-- left sidebar -->

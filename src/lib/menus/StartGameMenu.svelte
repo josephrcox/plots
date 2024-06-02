@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { startGame, DB, startGameMenu } from "../store";
+  import { startGame, DB, startGameMenu, userDB, setUserDB } from "../store";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { flyAndScale } from "$lib/utils";
@@ -28,6 +28,19 @@
   const setSelectedGameMode = (e: Event) => {
     selectedGameMode = (e.target as HTMLSelectElement).value;
   };
+
+  function deleteAllData() {
+    alert("Deleted :)");
+    localStorage.clear();
+    window.location.href = "";
+  }
+
+  function setUsername() {
+    const newName = prompt("Enter new username");
+    let z = $userDB;
+    z.username = newName;
+    setUserDB(z);
+  }
 </script>
 
 <Dialog.Root bind:open={$startGameMenu.visible}>
@@ -109,12 +122,21 @@
     </Dialog.Header>
     <Dialog.Footer>
       <!-- Footer -->
-      <button
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
-        on:click={captureAndStart}
-      >
-        Start game
-      </button>
+      <div class="flex flex-row justify-between w-full px-1">
+        <span
+          class="italic opacity-30 text-xs py-2 text-start rounded h-full flex flex-col justify-center mr-10"
+          on:click={setUsername}>{$userDB.username}</span
+        >
+        <div>
+          <Button on:click={deleteAllData}>Reset user</Button>
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+            on:click={captureAndStart}
+          >
+            Start game
+          </button>
+        </div>
+      </div>
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>

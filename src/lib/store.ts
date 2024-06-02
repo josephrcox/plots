@@ -504,6 +504,7 @@ export function startGame(
 function setUserDBIfNull() {
   if (localStorage.getItem(USER_DB_NAME) === null) {
     let def = default_user_db;
+    def.username = "my_username_click_to_change";
     localStorage.setItem(USER_DB_NAME, JSON.stringify(def));
     userDB.set(def);
   }
@@ -628,7 +629,13 @@ export let startGameMenu = writable({
   visible: false,
 });
 
+export function setUserDB(z: UserDatabase) {
+  userDB.set(z);
+  localStorage.setItem(USER_DB_NAME, JSON.stringify(z));
+}
+
 export let unique = writable({});
+export let showTutorialStepConfetti = writable(false);
 export let paused = writable(false);
 export let showScoreboard = writable(false);
 export let showKnowledgeMenu = writable(false);
