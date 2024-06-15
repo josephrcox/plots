@@ -33,7 +33,6 @@ export type Game = {
     food: number;
     wood: number;
     stone: number;
-    coal: number;
     metal: number;
     sugar: number;
     power: number;
@@ -43,7 +42,6 @@ export type Game = {
     food: number;
     wood: number;
     stone: number;
-    coal: number;
     metal: number;
     sugar: number;
     bureaucracy: number;
@@ -142,7 +140,6 @@ export type PlotOption = {
       food: number;
       wood: number;
       stone: number;
-      coal: number;
       metal: number;
       sugar: number;
       power: number;
@@ -153,7 +150,6 @@ export type PlotOption = {
     gold: number;
     wood: number;
     stone: number;
-    coal: number;
     metal: number;
     power: number;
     sugar: number;
@@ -163,7 +159,6 @@ export type PlotOption = {
     food: number;
     wood: number;
     stone: number;
-    coal: number;
     metal: number;
     power: number;
     sugar: number;

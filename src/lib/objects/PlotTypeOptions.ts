@@ -18,8 +18,8 @@ export const options: PlotOption[] = [
       resources: {
         food: 0,
         wood: 25,
-        stone: 25,
-        coal: 0,
+        stone: 10,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -49,7 +49,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -61,7 +61,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -76,7 +76,7 @@ export const options: PlotOption[] = [
     requirements: {
       gold: 150,
       plots: [],
-      employees: 4,
+      employees: 2,
       knowledge: 0,
       size: 1,
       xp: 0,
@@ -84,7 +84,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 10,
         stone: 15,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -113,7 +113,7 @@ export const options: PlotOption[] = [
       food: 8,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -125,7 +125,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -149,7 +149,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 10,
         stone: 10,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -178,7 +178,7 @@ export const options: PlotOption[] = [
       food: 5,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -190,7 +190,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -213,7 +213,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 20,
         stone: 15,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -242,7 +242,7 @@ export const options: PlotOption[] = [
       food: 8,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -254,7 +254,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -279,7 +279,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 20,
         stone: 0,
-        coal: 0,
+
         metal: 5,
         sugar: 0,
         power: 0,
@@ -309,7 +309,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -321,7 +321,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -344,7 +344,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 50,
         stone: 50,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -374,7 +374,7 @@ export const options: PlotOption[] = [
       food: 10,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 2,
@@ -386,7 +386,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -396,7 +396,7 @@ export const options: PlotOption[] = [
     id: "quarry",
     title: "⛏️ Quarry",
     type: "quarry",
-    description: "Produces stone, small amounts of coal, metal",
+    description: "Produces stone, small amounts of metal",
     revenue_per_week: 0,
     requirements: {
       gold: 420,
@@ -409,7 +409,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 50,
         stone: 0,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -439,7 +439,6 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 8,
-      coal: 0.5,
       metal: 0.2,
       power: 0,
       sugar: 0,
@@ -451,7 +450,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -474,7 +473,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 0,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -504,7 +503,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 3,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -516,7 +515,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -539,7 +538,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 20,
         stone: 20,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -568,7 +567,7 @@ export const options: PlotOption[] = [
       food: 2,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -580,7 +579,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -604,7 +603,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 10,
         stone: 10,
-        coal: 0,
+
         metal: 0,
         sugar: 150,
         power: 0,
@@ -634,7 +633,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -646,7 +645,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -669,7 +668,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 120,
         stone: 0,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -699,7 +698,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -711,7 +710,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -734,7 +733,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 350,
         stone: 0,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -764,19 +763,19 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
       bureaucracy: 0,
     },
-    level: 1,
+    level: 2,
     active_costs: {
       gold: 0,
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -800,7 +799,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 175,
         stone: 50,
-        coal: 0,
+
         metal: 0,
         sugar: 200,
         power: 0,
@@ -829,7 +828,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -841,7 +840,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -864,7 +863,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 50,
         stone: 50,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -894,7 +893,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -906,7 +905,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -929,7 +928,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 100,
         stone: 0,
-        coal: 0,
+
         metal: 10,
         sugar: 0,
         power: 0,
@@ -959,7 +958,7 @@ export const options: PlotOption[] = [
       food: 40,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -971,7 +970,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -994,7 +993,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 250,
         stone: 250,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1024,7 +1023,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1036,7 +1035,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1059,7 +1058,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 0,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1089,7 +1088,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 5,
@@ -1101,7 +1100,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1124,7 +1123,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 200,
         stone: 50,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1154,7 +1153,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 50,
       sugar: 0,
@@ -1166,7 +1165,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1189,7 +1188,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 100,
         stone: 100,
-        coal: 0,
+
         metal: 20,
         sugar: 0,
         power: 0,
@@ -1219,7 +1218,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1231,7 +1230,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1254,7 +1253,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 150,
         stone: 100,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1284,7 +1283,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1296,7 +1295,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1320,7 +1319,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 500,
         stone: 100,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1349,7 +1348,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1361,7 +1360,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1384,7 +1383,6 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 250,
         stone: 250,
-        coal: 250,
         metal: 500,
         sugar: 0,
         power: 0,
@@ -1414,7 +1412,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1426,7 +1424,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1450,7 +1448,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 225,
         stone: 100,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1479,7 +1477,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1491,7 +1489,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1514,7 +1512,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 300,
         stone: 100,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 5,
@@ -1544,7 +1542,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1556,7 +1554,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1579,7 +1577,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 300,
         stone: 200,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 5,
@@ -1609,7 +1607,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1621,7 +1619,7 @@ export const options: PlotOption[] = [
       power: 10,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1645,7 +1643,6 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 300,
         stone: 1000,
-        coal: 1000,
         metal: 2000,
         sugar: 0,
         power: 0,
@@ -1674,7 +1671,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1686,7 +1683,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1709,7 +1706,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1000,
         stone: 200,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1739,7 +1736,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1751,7 +1748,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1776,7 +1773,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 450,
         stone: 450,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1805,7 +1802,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1817,7 +1814,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1840,7 +1837,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 1000,
-        coal: 0,
+
         metal: 50,
         sugar: 0,
         power: 15,
@@ -1870,7 +1867,6 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 125,
-      coal: 20,
       metal: 10,
       power: 0,
       sugar: 0,
@@ -1882,7 +1878,7 @@ export const options: PlotOption[] = [
       power: 20,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1906,7 +1902,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1000,
         stone: 1000,
-        coal: 0,
+
         metal: 0,
         sugar: 0,
         power: 0,
@@ -1935,7 +1931,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -1947,7 +1943,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -1972,7 +1968,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1000,
         stone: 10000,
-        coal: 0,
+
         metal: 5000,
         sugar: 0,
         power: 0,
@@ -2001,7 +1997,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -2013,7 +2009,7 @@ export const options: PlotOption[] = [
       power: 75,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,
@@ -2037,7 +2033,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 1000,
-        coal: 0,
+
         metal: 3000,
         sugar: 0,
         power: 15,
@@ -2066,7 +2062,7 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       power: 0,
       sugar: 0,
@@ -2078,7 +2074,7 @@ export const options: PlotOption[] = [
       power: 75,
       wood: 0,
       stone: 0,
-      coal: 0,
+
       metal: 0,
       sugar: 0,
       bureaucracy: 0,

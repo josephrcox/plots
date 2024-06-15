@@ -36,7 +36,6 @@
       food: db.resources.food,
       wood: db.resources.wood,
       stone: db.resources.stone,
-      coal: db.resources.coal,
       metal: db.resources.metal,
       sugar: db.resources.sugar,
       bureaucracy: db.resources.bureaucracy,
@@ -49,7 +48,6 @@
       food: db.resources.food,
       wood: db.resources.wood,
       stone: db.resources.stone,
-      coal: db.resources.coal,
       metal: db.resources.metal,
       sugar: db.resources.sugar,
       bureaucracy: db.resources.bureaucracy,
@@ -304,11 +302,9 @@
             z.resources.stone += Math.round(
               plotOptionForPlot.generated_resources.stone * multiplier,
             );
-            z.resources.coal += Math.round(
-              plotOptionForPlot.generated_resources.coal * multiplier,
-            );
-            z.resources.metal += Math.round(
+            z.resources.metal += roundTo(
               plotOptionForPlot.generated_resources.metal * multiplier,
+              2,
             );
             z.resources.sugar += Math.round(
               plotOptionForPlot.generated_resources.sugar * multiplier,
@@ -320,6 +316,13 @@
         }
       }
     }
+    z.resources.food = Math.round(z.resources.food, 2);
+    z.resources.wood = Math.round(z.resources.wood, 2);
+    z.resources.stone = Math.round(z.resources.stone, 2);
+    z.resources.metal = roundTo(z.resources.metal, 2);
+    z.resources.sugar = Math.round(z.resources.sugar, 2);
+    z.resources.bureaucracy = Math.round(z.resources.bureaucracy, 2);
+
     return z;
   }
 
@@ -387,14 +390,24 @@
 
   function _calculateResourceRates(z, startResources, endResources) {
     // This function calculates the rate of resource generation per week
-    z.resource_rate.food = endResources.food - startResources.food;
-    z.resource_rate.wood = endResources.wood - startResources.wood;
-    z.resource_rate.stone = endResources.stone - startResources.stone;
-    z.resource_rate.coal = endResources.coal - startResources.coal;
-    z.resource_rate.metal = endResources.metal - startResources.metal;
-    z.resource_rate.sugar = endResources.sugar - startResources.sugar;
-    z.resource_rate.bureaucracy =
-      endResources.bureaucracy - startResources.bureaucracy;
+    z.resource_rate.food = roundTo(endResources.food - startResources.food, 2);
+    z.resource_rate.wood = roundTo(endResources.wood - startResources.wood, 2);
+    z.resource_rate.stone = roundTo(
+      endResources.stone - startResources.stone,
+      2,
+    );
+    z.resource_rate.metal = roundTo(
+      endResources.metal - startResources.metal,
+      2,
+    );
+    z.resource_rate.sugar = roundTo(
+      endResources.sugar - startResources.sugar,
+      2,
+    );
+    z.resource_rate.bureaucracy = roundTo(
+      endResources.bureaucracy - startResources.bureaucracy,
+      2,
+    );
     return z;
   }
 
@@ -480,11 +493,11 @@
     }
     // Goes through the tutorialMessages array, and finds the first one that is not yet completed.
     // If a tutorial step goes up by 1, then the gold reward is added to the town's gold.
-    for (let i = z.currentTutorialStep; i < tutorialMessages.length; i++) {
+    for (let i = z.currentTutorialStep; i < z.currentTutorialStep + 1; i++) {
       if (tutorialMessages[i].isComplete(z)) {
         $showTutorialStepConfetti = true;
         dontCheckTutorialStep = true;
-        // wait 3 seconds and trigger again
+        // wait 3 seconds to trigger again
         setTimeout(() => {
           $showTutorialStepConfetti = false;
           z.currentTutorialStep++; //

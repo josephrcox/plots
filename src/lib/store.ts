@@ -471,14 +471,13 @@ export function startGame(
     json.resources.food = 1000000;
     json.resources.wood = 1000000;
     json.resources.stone = 1000000;
-    json.resources.coal = 1000000;
     json.resources.metal = 1000000;
   }
   const randomSize =
     difficulty == "0" ? 8 : difficulty == "1" ? 12 : difficulty == "2" ? 16 : 1; // never should happen.
-  // random x can be anywhere from 3 -> randomSize. It can not be less than 3
-  const randomX = Math.floor(Math.random() * (randomSize - 3)) + 3;
-  const randomY = Math.floor(Math.random() * (randomSize - 3)) + 3;
+  // random x and y that is within the first 1/2 of the grid
+  const randomX = Math.floor((Math.random() * randomSize) / 2);
+  const randomY = Math.floor((Math.random() * randomSize) / 2);
   for (let i = 0; i < randomSize; i++) {
     default_plots.push([]);
     for (let j = 0; j < randomSize; j++) {

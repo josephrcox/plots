@@ -14,7 +14,6 @@
     | "food"
     | "wood"
     | "stone"
-    | "coal"
     | "metal"
     | "sugar"
     | "power"
@@ -46,6 +45,18 @@
       rate: $DB.resource_rate.food,
     },
     {
+      icon: "🪵",
+      name: "wood",
+      value: $DB.resources.wood,
+      rate: $DB.resource_rate.wood,
+    },
+    {
+      icon: "🪨",
+      name: "stone",
+      value: $DB.resources.stone,
+      rate: $DB.resource_rate.stone,
+    },
+    {
       icon: "🧠",
       name: "knowledge",
       value: $DB.townInfo.knowledge_points,
@@ -59,24 +70,6 @@
       name: "sugar",
       value: $DB.resources.sugar,
       rate: $DB.resource_rate.sugar,
-    },
-    {
-      icon: "🪵",
-      name: "wood",
-      value: $DB.resources.wood,
-      rate: $DB.resource_rate.wood,
-    },
-    {
-      icon: "⛏️",
-      name: "stone",
-      value: $DB.resources.stone,
-      rate: $DB.resource_rate.stone,
-    },
-    {
-      icon: "🪨",
-      name: "coal",
-      value: $DB.resources.coal,
-      rate: $DB.resource_rate.coal,
     },
     {
       icon: "🧲",
@@ -125,7 +118,6 @@
       "food",
       "wood",
       "stone",
-      "coal",
       "metal",
       "sugar",
       "power",
@@ -156,7 +148,13 @@
       {#each resources as { icon, name, value, rate }}
         <Tooltip.Root openDelay={200} closeDelay={0}>
           <Tooltip.Trigger>
-            <span class="flex flex-row justify-between">
+            <span
+              class="flex flex-row justify-between
+              {value <= 0
+                ? 'text-textDanger1 font-semibold'
+                : 'text-textPrimary'}
+            "
+            >
               {icon}
               {value}
               {#if rate > 0}
@@ -215,7 +213,7 @@
           min={0}
           max={200}
           step={5}
-          class="cursor-pointer"
+          class="cursor-pointer w-3/4"
         />
       </div>
       <div
@@ -236,7 +234,7 @@
           min={0}
           max={1.0}
           step={0.05}
-          class="cursor-pointer"
+          class="cursor-pointer w-3/4"
         />
       </div>
     </div>

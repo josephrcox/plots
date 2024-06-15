@@ -39,6 +39,8 @@
   let searchInput: any;
   let totalAffordableOptionsCount: number;
 
+  const BOTTOM_MENU_HEIGHT = Math.round(window.innerHeight * 0.2) + "px";
+
   let reactiveOptions: PlotOption[] = PlotTypeOptions.map(
     (option: PlotOption | any) => ({
       ...option,
@@ -351,7 +353,6 @@
         z.resources.food -= resourcesForPlot.food;
         z.resources.wood -= resourcesForPlot.wood;
         z.resources.stone -= resourcesForPlot.stone;
-        z.resources.coal -= resourcesForPlot.coal;
         z.resources.metal -= resourcesForPlot.metal;
         z.resources.sugar -= resourcesForPlot.sugar;
       }
@@ -369,11 +370,15 @@
 
       DB.set(z);
       localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-      // find the next plot that is not active by going x +1, y +1, x +1, y +1, etc.
+
+      // Select the next plot
       let found = false;
       for (let i = x; i < z.plots.length; i++) {
         for (let j = y; j < z.plots[i].length; j++) {
-          if (z.plots[i][j].active === false) {
+          if (
+            z.plots[i][j].active === false &&
+            z.plots[i][j].mineralSource == false
+          ) {
             x = i;
             y = j;
             found = true;
@@ -435,8 +440,6 @@
       case "wood":
         return "🪵";
       case "stone":
-        return "⛏️";
-      case "coal":
         return "🪨";
       case "metal":
         return "🧲";
@@ -445,17 +448,17 @@
       case "bureaucracy":
         return "🧑‍⚖️";
       default:
-        return "";
+        return "💰";
     }
   }
 </script>
 
 {#if open}
   <div
-    class="w-[100vw] fixed bottom-0 {$modifyPlotMenuOptions.isMineralSource ===
+    class="w-[100vw] fixed bottom-0 h-[{BOTTOM_MENU_HEIGHT}] {$modifyPlotMenuOptions.isMineralSource ===
     true
-      ? 'h-[210px] mb-[60px]'
-      : 'h-[210px] mb-[0px]'}
+      ? `mb-[60px]`
+      : 'mb-[0px]'}
     p-1 z-50 flex flex-col justify-center text-center items-center"
   >
     <div
@@ -595,18 +598,18 @@
             </div>
           </div>
         {:else}
-          <div class="flex flex-col gap-8 w-full overflow-y-scroll h-64 pb-16">
+          <div class="flex flex-col gap-8 w-full overflow-y-scroll h-72 pb-24">
             {#each [1, 2, 3, 4] as level}
               <div>
                 <div class="text-xl font-bold">Level {level}</div>
                 <div
-                  class="flex flex-row text-start justify-start items-start flex-wrap pb-6 pt-4 w-full align-middle gap-4"
+                  class="flex flex-row text-start justify-start items-start flex-wrap pt-2 w-full align-middle gap-4"
                 >
                   {#each reactiveOptions.filter((option) => option.level === level) as option (option.id)}
                     <Tooltip.Root openDelay={200} closeDelay={0}>
                       <Tooltip.Trigger>
                         <div
-                          class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly
+                          class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly transition-all duration-100
             {option.affordable || option.selected
                             ? 'cursor-pointer'
                             : 'opacity-20 cursor-not-allowed '}
@@ -661,12 +664,6 @@
                               $DB.townInfo.gold,
                             )}
                             {@html getRequirementString(
-                              "Weekly 💰",
-                              options[getOptionIndex(option.id)].active_costs
-                                .gold,
-                              $DB.townInfo.gold,
-                            )}
-                            {@html getRequirementString(
                               "🥕",
                               options[getOptionIndex(option.id)].requirements
                                 .resources.food,
@@ -691,16 +688,10 @@
                               $DB.resources.wood,
                             )}
                             {@html getRequirementString(
-                              "⛏️",
+                              "🪨",
                               options[getOptionIndex(option.id)].requirements
                                 .resources.stone,
                               $DB.resources.stone,
-                            )}
-                            {@html getRequirementString(
-                              "🪨",
-                              options[getOptionIndex(option.id)].requirements
-                                .resources.coal,
-                              $DB.resources.coal,
                             )}
                             {@html getRequirementString(
                               "🧲",
@@ -813,12 +804,12 @@
                                     ? "text-textDanger1"
                                     : "text-textHappyDark"}
                                   >{capitalizeFirstLetter(key)}
-                                  {formatInstantChange(
+                                  {getEmojiForResource(key)}
+                                  {-1 *
                                     Object.values(
                                       options[getOptionIndex(option.id)]
                                         .active_costs,
-                                    )[index],
-                                  )}
+                                    )[index]}
                                 </span>
                               {/if}
                             {/each}

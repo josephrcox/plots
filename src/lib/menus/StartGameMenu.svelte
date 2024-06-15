@@ -1,12 +1,21 @@
 <script lang="ts">
-  import { startGame, DB, startGameMenu, userDB, setUserDB } from "../store";
-  import { Button, buttonVariants } from "$lib/components/ui/button";
+  import {
+    startGame,
+    DB,
+    startGameMenu,
+    userDB,
+    setUserDB,
+    paused,
+  } from "../store";
+  import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { flyAndScale } from "$lib/utils";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { Difficulty, EndGoal, WinScenario } from "$lib/types";
   import { winScenarios } from "$lib/objects/WinScenarios";
+
+  paused.set(false);
 
   function captureAndStart() {
     const difficulty = (

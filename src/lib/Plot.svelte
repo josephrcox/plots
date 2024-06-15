@@ -128,7 +128,7 @@
     <!--  -->
   {/if}
   {#if data.mineralSource && data.type == -1}
-    <Tooltip text="Mineral Source (mine)" emoji="⛏️" tone="standard" />
+    <span class="text-xs">Mineral source</span>
   {/if}
 </button>
 
