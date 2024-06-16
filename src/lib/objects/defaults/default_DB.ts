@@ -22,11 +22,10 @@ export const default_db: Game = {
   },
   resources: {
     food: 50,
-    wood: 75,
-    stone: 75,
+    wood: 150,
+    stone: 150,
     metal: 0,
     power: 0,
-    sugar: 0,
     bureaucracy: 0,
   },
   resource_rate: {
@@ -34,7 +33,6 @@ export const default_db: Game = {
     wood: 0,
     stone: 0,
     metal: 0,
-    sugar: 0,
     bureaucracy: 0,
   },
   hasCityHall: false,
@@ -47,7 +45,7 @@ export const default_db: Game = {
     community: 1,
   },
   economyAndLaws: {
-    tax_rate: 0.05,
+    tax_rate: 0.1,
     max_tax_rate: 1,
     weeklyProfit: 0,
     knowledge_gold_market_rates: [],

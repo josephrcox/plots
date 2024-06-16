@@ -37,7 +37,6 @@
       wood: db.resources.wood,
       stone: db.resources.stone,
       metal: db.resources.metal,
-      sugar: db.resources.sugar,
       bureaucracy: db.resources.bureaucracy,
     };
     db = _generateResources(db);
@@ -49,7 +48,6 @@
       wood: db.resources.wood,
       stone: db.resources.stone,
       metal: db.resources.metal,
-      sugar: db.resources.sugar,
       bureaucracy: db.resources.bureaucracy,
     };
     db = _calculateResourceRates(db, startResources, endResources);
@@ -306,9 +304,6 @@
               plotOptionForPlot.generated_resources.metal * multiplier,
               2,
             );
-            z.resources.sugar += Math.round(
-              plotOptionForPlot.generated_resources.sugar * multiplier,
-            );
             z.resources.bureaucracy += Math.round(
               plotOptionForPlot.generated_resources.bureaucracy * multiplier,
             );
@@ -320,7 +315,6 @@
     z.resources.wood = Math.round(z.resources.wood, 2);
     z.resources.stone = Math.round(z.resources.stone, 2);
     z.resources.metal = roundTo(z.resources.metal, 2);
-    z.resources.sugar = Math.round(z.resources.sugar, 2);
     z.resources.bureaucracy = Math.round(z.resources.bureaucracy, 2);
 
     return z;
@@ -398,10 +392,6 @@
     );
     z.resource_rate.metal = roundTo(
       endResources.metal - startResources.metal,
-      2,
-    );
-    z.resource_rate.sugar = roundTo(
-      endResources.sugar - startResources.sugar,
       2,
     );
     z.resource_rate.bureaucracy = roundTo(

@@ -48,7 +48,7 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
-      "My liege, after working hard, the villagers need a place to relax. Build a pub or a church. ",
+      "My liege, after working hard, the townspeople need a place to relax. Build a pub or a church. ",
     isComplete: (z: Game) => {
       return (
         hasPlotOfType("pub", z).length > 0 ||
@@ -75,7 +75,7 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
-      "My liege, many of the villagers have kids that need an education. Build a schoolhouse.",
+      "My liege, many of the townspeople have kids that need an education. Build a schoolhouse.",
     isComplete: (z: Game) => {
       return hasPlotOfType("schoolhouse", z).length > 0;
     },

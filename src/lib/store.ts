@@ -476,8 +476,8 @@ export function startGame(
   const randomSize =
     difficulty == "0" ? 8 : difficulty == "1" ? 12 : difficulty == "2" ? 16 : 1; // never should happen.
   // random x and y that is within the first 1/2 of the grid
-  const randomX = Math.floor((Math.random() * randomSize) / 2);
-  const randomY = Math.floor((Math.random() * randomSize) / 2);
+  const randomX = Math.floor((Math.random() * randomSize) / 2) + 1;
+  const randomY = Math.floor((Math.random() * randomSize) / 2) + 1;
   for (let i = 0; i < randomSize; i++) {
     default_plots.push([]);
     for (let j = 0; j < randomSize; j++) {
@@ -636,6 +636,8 @@ export function setUserDB(z: UserDatabase) {
 export let unique = writable({});
 export let showTutorialStepConfetti = writable(false);
 export let paused = writable(false);
+// only when DB.environment.day is 1
+export let showWelcome = writable(true);
 export let showScoreboard = writable(false);
 export let showKnowledgeMenu = writable(false);
 export let showAchievementPopup = writable(false);

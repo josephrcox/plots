@@ -354,7 +354,6 @@
         z.resources.wood -= resourcesForPlot.wood;
         z.resources.stone -= resourcesForPlot.stone;
         z.resources.metal -= resourcesForPlot.metal;
-        z.resources.sugar -= resourcesForPlot.sugar;
       }
 
       switch (plotChosen.id) {
@@ -435,8 +434,6 @@
         return "🥕";
       case "knowledge":
         return "🧠";
-      case "sugar":
-        return "🍩";
       case "wood":
         return "🪵";
       case "stone":
@@ -674,12 +671,6 @@
                               options[getOptionIndex(option.id)].requirements
                                 .knowledge,
                               $DB.townInfo.knowledge_points,
-                            )}
-                            {@html getRequirementString(
-                              "🍩",
-                              options[getOptionIndex(option.id)].requirements
-                                .resources.sugar,
-                              $DB.resources.sugar,
                             )}
                             {@html getRequirementString(
                               "🪵",

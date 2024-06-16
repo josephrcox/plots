@@ -21,7 +21,7 @@ export const options: PlotOption[] = [
         stone: 10,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -52,18 +52,18 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
     active_costs: {
       gold: 0,
       power: 0,
-      wood: 0,
+      wood: 2,
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -86,7 +86,7 @@ export const options: PlotOption[] = [
         stone: 15,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -116,7 +116,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -127,7 +127,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     check_for_variety: false,
@@ -151,7 +151,7 @@ export const options: PlotOption[] = [
         stone: 10,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -181,7 +181,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -192,7 +192,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     check_for_variety: false,
@@ -215,7 +215,7 @@ export const options: PlotOption[] = [
         stone: 15,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -245,7 +245,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -256,7 +256,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     check_for_variety: false,
@@ -281,7 +281,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 5,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -312,7 +312,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -323,7 +323,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -346,7 +346,7 @@ export const options: PlotOption[] = [
         stone: 50,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -377,7 +377,6 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 2,
       bureaucracy: 0,
     },
     level: 1,
@@ -388,7 +387,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -411,7 +410,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -441,7 +440,7 @@ export const options: PlotOption[] = [
       stone: 8,
       metal: 0.2,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -452,7 +451,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -475,7 +474,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -501,12 +500,12 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 0,
     generated_resources: {
       food: 0,
-      wood: 3,
+      wood: 5,
       stone: 0,
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -517,7 +516,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -540,7 +539,7 @@ export const options: PlotOption[] = [
         stone: 20,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -570,7 +569,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 1,
@@ -581,7 +580,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     check_for_variety: false,
@@ -605,7 +604,6 @@ export const options: PlotOption[] = [
         stone: 10,
 
         metal: 0,
-        sugar: 150,
         power: 0,
         bureaucracy: 0,
       },
@@ -636,7 +634,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 2,
@@ -647,7 +645,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -670,7 +668,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -701,7 +699,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 2,
@@ -712,7 +710,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -735,7 +733,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -766,7 +764,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 2,
@@ -777,7 +775,6 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
       bureaucracy: 0,
     },
   },
@@ -801,7 +798,6 @@ export const options: PlotOption[] = [
         stone: 50,
 
         metal: 0,
-        sugar: 200,
         power: 0,
         bureaucracy: 0,
       },
@@ -831,7 +827,6 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
       bureaucracy: 0,
     },
     level: 2,
@@ -842,7 +837,6 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
       bureaucracy: 0,
     },
   },
@@ -865,7 +859,7 @@ export const options: PlotOption[] = [
         stone: 50,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -896,7 +890,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 2,
@@ -907,7 +901,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -930,7 +924,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 10,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -961,7 +955,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 2,
@@ -972,7 +966,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -995,7 +989,7 @@ export const options: PlotOption[] = [
         stone: 250,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1026,7 +1020,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 2,
@@ -1037,7 +1031,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1060,7 +1054,7 @@ export const options: PlotOption[] = [
         stone: 0,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1091,7 +1085,6 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 5,
       bureaucracy: 0,
     },
     level: 3,
@@ -1102,7 +1095,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1125,7 +1118,7 @@ export const options: PlotOption[] = [
         stone: 50,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1156,7 +1149,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 50,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1167,7 +1160,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1190,7 +1183,7 @@ export const options: PlotOption[] = [
         stone: 100,
 
         metal: 20,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1221,7 +1214,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1232,7 +1225,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1255,7 +1248,7 @@ export const options: PlotOption[] = [
         stone: 100,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1286,7 +1279,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1297,7 +1290,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1321,7 +1314,7 @@ export const options: PlotOption[] = [
         stone: 100,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1351,7 +1344,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1362,7 +1355,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1384,7 +1377,7 @@ export const options: PlotOption[] = [
         wood: 250,
         stone: 250,
         metal: 500,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1415,7 +1408,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1426,7 +1419,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1450,7 +1443,7 @@ export const options: PlotOption[] = [
         stone: 100,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1480,7 +1473,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1491,7 +1484,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1514,7 +1507,7 @@ export const options: PlotOption[] = [
         stone: 100,
 
         metal: 0,
-        sugar: 0,
+
         power: 5,
         bureaucracy: 0,
       },
@@ -1545,7 +1538,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -1556,7 +1549,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1579,7 +1572,7 @@ export const options: PlotOption[] = [
         stone: 200,
 
         metal: 0,
-        sugar: 0,
+
         power: 5,
         bureaucracy: 0,
       },
@@ -1610,7 +1603,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -1621,7 +1614,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1644,7 +1637,7 @@ export const options: PlotOption[] = [
         wood: 300,
         stone: 1000,
         metal: 2000,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1674,7 +1667,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 3,
@@ -1685,7 +1678,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1708,7 +1701,7 @@ export const options: PlotOption[] = [
         stone: 200,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1739,7 +1732,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -1750,7 +1743,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1775,7 +1768,7 @@ export const options: PlotOption[] = [
         stone: 450,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1805,7 +1798,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 10,
     },
     level: 4,
@@ -1816,7 +1809,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1839,7 +1832,7 @@ export const options: PlotOption[] = [
         stone: 1000,
 
         metal: 50,
-        sugar: 0,
+
         power: 15,
         bureaucracy: 0,
       },
@@ -1869,7 +1862,7 @@ export const options: PlotOption[] = [
       stone: 125,
       metal: 10,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -1880,7 +1873,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1904,7 +1897,7 @@ export const options: PlotOption[] = [
         stone: 1000,
 
         metal: 0,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -1934,7 +1927,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -1945,7 +1938,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -1970,7 +1963,7 @@ export const options: PlotOption[] = [
         stone: 10000,
 
         metal: 5000,
-        sugar: 0,
+
         power: 0,
         bureaucracy: 0,
       },
@@ -2000,7 +1993,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -2011,7 +2004,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },
@@ -2035,7 +2028,7 @@ export const options: PlotOption[] = [
         stone: 1000,
 
         metal: 3000,
-        sugar: 0,
+
         power: 15,
         bureaucracy: 0,
       },
@@ -2065,7 +2058,7 @@ export const options: PlotOption[] = [
 
       metal: 0,
       power: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
     level: 4,
@@ -2076,7 +2069,7 @@ export const options: PlotOption[] = [
       stone: 0,
 
       metal: 0,
-      sugar: 0,
+
       bureaucracy: 0,
     },
   },

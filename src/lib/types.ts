@@ -34,7 +34,6 @@ export type Game = {
     wood: number;
     stone: number;
     metal: number;
-    sugar: number;
     power: number;
     bureaucracy: number;
   };
@@ -43,7 +42,6 @@ export type Game = {
     wood: number;
     stone: number;
     metal: number;
-    sugar: number;
     bureaucracy: number;
   };
   hasCityHall: boolean;
@@ -141,7 +139,6 @@ export type PlotOption = {
       wood: number;
       stone: number;
       metal: number;
-      sugar: number;
       power: number;
       bureaucracy: number;
     };
@@ -152,7 +149,6 @@ export type PlotOption = {
     stone: number;
     metal: number;
     power: number;
-    sugar: number;
     bureaucracy: number;
   };
   generated_resources: {
@@ -161,7 +157,6 @@ export type PlotOption = {
     stone: number;
     metal: number;
     power: number;
-    sugar: number;
     bureaucracy: number;
   };
   knowledge_points_per_month: number;

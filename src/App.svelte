@@ -11,6 +11,7 @@
     clearDB,
     modifyPlotMenuOptions,
     startGameMenu,
+    showWelcome,
     // @ts-ignore
   } from "./lib/store.ts";
   // @ts-ignore
@@ -21,6 +22,7 @@
   import KnowledgeMenu from "$lib/menus/KnowledgeMenu.svelte";
   import LabMenu from "$lib/menus/LabMenu.svelte";
   import Hud from "$lib/Hud.svelte";
+  import WelcomeScreen from "$lib/menus/WelcomeScreen.svelte";
 
   let dbInitialized = false;
   runTests();
@@ -209,6 +211,9 @@
     <Scoreboard />
     <KnowledgeMenu />
     <LabMenu />
+    {#if $DB.environment.day == 0 && $showWelcome}
+      <WelcomeScreen />
+    {/if}
 
     <style>
       body {

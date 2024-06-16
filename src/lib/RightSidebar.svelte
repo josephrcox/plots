@@ -15,7 +15,6 @@
     | "wood"
     | "stone"
     | "metal"
-    | "sugar"
     | "power"
     | "knowledge"
     | "bureaucracy";
@@ -66,12 +65,6 @@
           : 0,
     },
     {
-      icon: "🍩",
-      name: "sugar",
-      value: $DB.resources.sugar,
-      rate: $DB.resource_rate.sugar,
-    },
-    {
       icon: "🧲",
       name: "metal",
       value: $DB.resources.metal,
@@ -114,15 +107,9 @@
   }
 
   function isValidResourceKey(key: string): key is ResourceKey {
-    return [
-      "food",
-      "wood",
-      "stone",
-      "metal",
-      "sugar",
-      "power",
-      "knowledge",
-    ].includes(key);
+    return ["food", "wood", "stone", "metal", "power", "knowledge"].includes(
+      key,
+    );
   }
 
   function getRequiredPlots(resourceName: string): string[] {
