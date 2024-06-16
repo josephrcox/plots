@@ -218,7 +218,7 @@
             Be cautious and make sure to hover over plots before you buy them.
           </p>
           <img
-            src="src/lib/assets/welcome_example_plot.png"
+            src="public/welcome_example_plot.png"
             class="max-w-[60%] object-fit"
           />
         </div>
