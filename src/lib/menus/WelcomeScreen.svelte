@@ -217,10 +217,7 @@
           <p>
             Be cautious and make sure to hover over plots before you buy them.
           </p>
-          <img
-            src="public/welcome_example_plot.png"
-            class="max-w-[60%] object-fit"
-          />
+          <img src="welcome_example_plot.png" class="max-w-[60%] object-fit" />
         </div>
       </AlertDialog.Description>
     </AlertDialog.Header>
