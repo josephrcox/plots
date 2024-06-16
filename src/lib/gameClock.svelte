@@ -287,11 +287,30 @@
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          // check if the plot is adjacent to a water plot
+          let isAdjacentToWater =
+            (i > 0 && z.plots[i - 1][j].type == -9) || // top
+            (i < z.plots.length - 1 && z.plots[i + 1][j].type == -9) || // bottom
+            (j > 0 && z.plots[i][j - 1].type == -9) || // left
+            (j < z.plots[i].length - 1 && z.plots[i][j + 1].type == -9) || // right
+            (i > 0 && j > 0 && z.plots[i - 1][j - 1].type == -9) || // top-left
+            (i > 0 &&
+              j < z.plots[i].length - 1 &&
+              z.plots[i - 1][j + 1].type == -9) || // top-right
+            (i < z.plots.length - 1 &&
+              j > 0 &&
+              z.plots[i + 1][j - 1].type == -9) || // bottom-left
+            (i < z.plots.length - 1 &&
+              j < z.plots[i].length - 1 &&
+              z.plots[i + 1][j + 1].type == -9); // bottom-right
+
           let plotOptionForPlot = options[z.plots[i][j].type];
           if (plotOptionForPlot.generated_resources != null) {
-            z.resources.food += Math.round(
-              plotOptionForPlot.generated_resources.food * multiplier,
-            );
+            z.resources.food +=
+              Math.round(
+                plotOptionForPlot.generated_resources.food * multiplier,
+              ) * (isAdjacentToWater ? 2 : 1);
+
             z.resources.wood += Math.round(
               plotOptionForPlot.generated_resources.wood *
                 multiplier *
@@ -355,6 +374,17 @@
           );
           // A plot is disabled if it can not afford the active costs.
           z.plots[i][j].disabled = toBeDisabled;
+          if (z.plots[i][j].disabled) {
+            z.townInfo.happiness -= 1;
+          }
+
+          if (
+            toBeDisabled &&
+            options[z.plots[i][j].type].type == "residential"
+          ) {
+            z.townInfo.population_count -= 1;
+            z.townInfo.employees -= 1;
+          }
         }
       }
     }

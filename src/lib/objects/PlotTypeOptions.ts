@@ -278,9 +278,9 @@ export const options: PlotOption[] = [
       resources: {
         food: 0,
         wood: 20,
-        stone: 0,
+        stone: 3,
 
-        metal: 5,
+        metal: 0,
 
         power: 0,
         bureaucracy: 0,

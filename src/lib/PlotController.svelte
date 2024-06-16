@@ -99,11 +99,6 @@
   </div>
   {#key $unique}
     {#if $modifyPlotMenuOptions.visible}
-      <!-- <ModifyPlotMenu
-				x={$modifyPlotMenuOptions.x}
-				y={$modifyPlotMenuOptions.y}
-				open={$modifyPlotMenuOptions.visible}
-			/> -->
       <BottomBar
         x={$modifyPlotMenuOptions.x}
         y={$modifyPlotMenuOptions.y}

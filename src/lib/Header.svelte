@@ -149,7 +149,10 @@
             class="flex flex-row gap-4 flex-wrap
 						items-center"
           >
-            <span class="text-sm">👥 {$DB.townInfo.population_count}</span>
+            <span class="text-sm"
+              >👥 {$DB.townInfo.population_count} / {$DB.townInfo
+                .population_max}</span
+            >
             <span class="text-sm"
               >💰 {$DB.townInfo.gold}
               {#if $DB.economyAndLaws.weeklyProfit > 0}

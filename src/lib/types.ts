@@ -7,6 +7,7 @@ export type Plot = {
   y: number;
   type: number;
   disabled: boolean;
+  water: boolean;
 };
 
 export type Game = {

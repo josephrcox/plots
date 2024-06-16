@@ -475,20 +475,22 @@ export function startGame(
   }
   const randomSize =
     difficulty == "0" ? 8 : difficulty == "1" ? 12 : difficulty == "2" ? 16 : 1; // never should happen.
-  // random x and y that is within the first 1/2 of the grid
-  const randomX = Math.floor((Math.random() * randomSize) / 2) + 1;
-  const randomY = Math.floor((Math.random() * randomSize) / 2) + 1;
+  const mineX = Math.floor((Math.random() * randomSize) / 2) + 1;
+  const mineY = Math.floor((Math.random() * randomSize) / 2) + 1;
+
   for (let i = 0; i < randomSize; i++) {
     default_plots.push([]);
     for (let j = 0; j < randomSize; j++) {
+      const water = isWater(i, j, randomSize);
       default_plots[i][j] = {
         id: Math.random().toString(36).substring(2, 9),
         active: false,
         x: i,
         y: j,
-        type: -1,
+        type: water ? -9 : -1,
         typeId: "",
-        mineralSource: randomX === i && randomY === j ? true : false,
+        mineralSource: mineX === i && mineY === j ? true : false,
+        water: mineX === i && mineY === j ? false : water,
       };
     }
   }
@@ -498,6 +500,20 @@ export function startGame(
   localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
   DB.set(json); // Update the store with the new value
   location.reload();
+}
+
+function isWater(x: number, y: number, maxSize: number) {
+  let chance = 0.06; // default chance of being water.
+  if (x > 0 && y > 0 && x < maxSize - 1 && y < maxSize - 1) {
+    chance *= 2;
+  }
+  if (y == Math.round(maxSize / 2) || y == Math.round(maxSize / 2) - 1) {
+    chance *= 5;
+  }
+  if (x == 0 && y == 0) {
+    chance = 0;
+  }
+  return Math.random() < chance;
 }
 
 function setUserDBIfNull() {
