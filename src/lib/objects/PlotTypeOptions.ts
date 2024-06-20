@@ -1137,7 +1137,7 @@ export const options: PlotOption[] = [
       power: 0,
       bureaucracy: 0,
     },
-    level: 2,
+    level: 3,
     active_costs: {
       gold: 0,
       power: 0,
@@ -1456,7 +1456,7 @@ export const options: PlotOption[] = [
     description: "Produces metal and gold, requires power",
     revenue_per_week: 0,
     requirements: {
-      gold: 30000,
+      gold: 4000,
       plots: [],
       employees: 64,
       knowledge: 0,
@@ -1494,8 +1494,8 @@ export const options: PlotOption[] = [
     generated_resources: {
       food: 0,
       wood: 0,
-      stone: 125,
-      metal: 10,
+      stone: 100,
+      metal: 50,
       power: 0,
       bureaucracy: 0,
     },
@@ -1682,7 +1682,7 @@ export const options: PlotOption[] = [
     },
     level: 4,
     active_costs: {
-      gold: 1250,
+      gold: 300,
       power: 75,
       wood: 0,
       stone: 0,

@@ -139,7 +139,12 @@ export function formatInstantChange(change: number, divide: boolean = true) {
   }
 }
 
-export function isAdjacentToWater(x: number, y: number, z: Game) {
+export function isAdjacentToWater(
+  x: number,
+  y: number,
+  z: Game,
+  overrideType: boolean = false,
+) {
   // Checks if a farm is adjacent to water.
   // Not a general check – will only return true for farms.
   if (x < 0 || x >= z.plots.length || y < 0 || y >= z.plots[0].length) {
@@ -166,12 +171,18 @@ export function isAdjacentToWater(x: number, y: number, z: Game) {
       adjX < z.plots.length &&
       adjY >= 0 &&
       adjY < z.plots[0].length &&
-      z.plots[adjX][adjY].water &&
-      z.plots[x][y].active == true &&
-      z.plots[x][y].type > 0 &&
-      options[z.plots[x][y].type].type == "farm"
+      z.plots[adjX][adjY].water
     ) {
-      return true;
+      if (overrideType) {
+        return true;
+      }
+
+      if (
+        z.plots[x][y].active == true &&
+        z.plots[x][y].type > 0 &&
+        options[z.plots[x][y].type].id == "farm"
+      )
+        return true;
     }
   }
   return false;
@@ -203,8 +214,9 @@ export function isAdjacentToPlots(
   for (let i = 0; i < requiredPlots.length; i++) {
     let found = false;
     if (requiredPlots[i] == "water") {
+      console.log("water");
       // use isAdjacentToWater
-      if (isAdjacentToWater(x, y, z)) {
+      if (isAdjacentToWater(x, y, z, true)) {
         found = true;
         break;
       }

@@ -21,7 +21,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.employees > 0;
     },
-    goldReward: 500,
+    goldReward: 250,
   },
   {
     message:
@@ -29,7 +29,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("tree_farm", z).length > 0;
     },
-    goldReward: 500,
+    goldReward: 250,
   },
   {
     message:
@@ -37,7 +37,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.employees >= z.townInfo.population_count;
     },
-    goldReward: 500,
+    goldReward: 250,
   },
   {
     message:
@@ -45,31 +45,15 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("quarry", z).length > 0;
     },
-    goldReward: 1000,
+    goldReward: 500,
   },
   {
     message:
-      "My liege, things are picking up but we will need far more money. Get weekly revenue to >=75 gold. ",
+      "My liege, things are picking up but we will need far more money. Get weekly revenue to >=200 gold. ",
     isComplete: (z: Game) => {
-      return z.economyAndLaws.weeklyProfit >= 75;
+      return z.economyAndLaws.weeklyProfit >= 200;
     },
     goldReward: 1000,
-  },
-  {
-    message:
-      "My liege, many of the townspeople have kids that need an education. Build a schoolhouse.",
-    isComplete: (z: Game) => {
-      return hasPlotOfType("schoolhouse", z).length > 0;
-    },
-    goldReward: 850,
-  },
-  {
-    message:
-      "My liege, the village is growing - woohoo! But we need to have more workers. Get the population to 100.",
-    isComplete: (z: Game) => {
-      return z.townInfo.population_count >= 100;
-    },
-    goldReward: 1500,
   },
   {
     message:
@@ -79,6 +63,15 @@ export const tutorialMessages: TutorialStep[] = [
     },
     goldReward: 1500,
   },
+  {
+    message:
+      "My liege, the village is growing - woohoo! But we need to have more workers. Get the population to 100.",
+    isComplete: (z: Game) => {
+      return z.townInfo.population_count >= 100;
+    },
+    goldReward: 1500,
+  },
+
   {
     message:
       "My liege, some advanced buildings require power. Start generating power with a waterwheel.",
