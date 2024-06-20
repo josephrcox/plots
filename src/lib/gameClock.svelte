@@ -18,6 +18,7 @@
   import { plotCountMaximums } from "./objects/difficulty.js";
   import { achievements } from "./objects/AchievementList.ts";
   import { tutorialMessages } from "./objects/tutorial_messages";
+  import { isAdjacentToWater, randomizeNumber } from "./utils.ts";
 
   let z = $DB;
   const GAME_TICK_SPEED = 30;
@@ -25,7 +26,6 @@
   function performWeeklyTasks(db) {
     db = _unemployment(db);
     db = _taxRateEffects(db);
-    db = _calculateProfits(db);
     db = _applyModifiers(db);
     db = _healthEffects(db); //////////
     db = _bringModifiersBackToNormal(db);
@@ -73,6 +73,7 @@
   }
 
   function performDailyTasks(db) {
+    db = _calculateProfits(db);
     db = _fixVariables(db);
     db = _checkExperiment(db);
     if (db.overtime == false) {
@@ -81,6 +82,7 @@
     }
     db = _setTutorialStep(db);
     db = _checkForAchievements(db);
+
     return db;
   }
 
@@ -280,6 +282,7 @@
       // Extremely upset
       multiplier = 5;
     }
+    multiplier = randomizeNumber(multiplier, 2);
     let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.25;
     if (hasLumberMillMultiplier === 0) hasLumberMillMultiplier = 1;
 
@@ -288,28 +291,14 @@
       for (let j = 0; j < z.plots[i].length; j++) {
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           // check if the plot is adjacent to a water plot
-          let isAdjacentToWater =
-            (i > 0 && z.plots[i - 1][j].type == -9) || // top
-            (i < z.plots.length - 1 && z.plots[i + 1][j].type == -9) || // bottom
-            (j > 0 && z.plots[i][j - 1].type == -9) || // left
-            (j < z.plots[i].length - 1 && z.plots[i][j + 1].type == -9) || // right
-            (i > 0 && j > 0 && z.plots[i - 1][j - 1].type == -9) || // top-left
-            (i > 0 &&
-              j < z.plots[i].length - 1 &&
-              z.plots[i - 1][j + 1].type == -9) || // top-right
-            (i < z.plots.length - 1 &&
-              j > 0 &&
-              z.plots[i + 1][j - 1].type == -9) || // bottom-left
-            (i < z.plots.length - 1 &&
-              j < z.plots[i].length - 1 &&
-              z.plots[i + 1][j + 1].type == -9); // bottom-right
+          let nearWater = isAdjacentToWater(i, j, z);
 
           let plotOptionForPlot = options[z.plots[i][j].type];
           if (plotOptionForPlot.generated_resources != null) {
             z.resources.food +=
               Math.round(
                 plotOptionForPlot.generated_resources.food * multiplier,
-              ) * (isAdjacentToWater ? 2 : 1);
+              ) * (nearWater ? 2 : 1);
 
             z.resources.wood += Math.round(
               plotOptionForPlot.generated_resources.wood *
@@ -743,7 +732,7 @@
         z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
       if (randomness < lenientChance) {
         if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate * 2) {
-          z.modifiers.happiness -= 0.03;
+          z.modifiers.happiness -= 0.02;
           z = addToTownLog(
             messages.very_high_tax_rate +
               "  (" +
@@ -810,12 +799,12 @@
       if (z.townLog.indexOf(messages.nobody_home) == -1)
         z = addToTownLog(messages.nobody_home, z);
     }
-    z.economyAndLaws.weeklyProfit = roundTo(z.economyAndLaws.weeklyProfit, 2);
+    z.economyAndLaws.weeklyProfit = roundTo(z.economyAndLaws.weeklyProfit, 0);
     if (z.townInfo.employees > z.townInfo.population_count) {
       z.townInfo.employees = z.townInfo.population_count;
     }
 
-    z.townInfo.gold = roundTo(z.townInfo.gold, 2);
+    z.townInfo.gold = roundTo(z.townInfo.gold, 0);
     z.townInfo.population_count = roundTo(z.townInfo.population_count, 0);
     z.townInfo.employees = roundTo(z.townInfo.employees, 0);
     z.townInfo.population_max = roundTo(z.townInfo.population_max, 0);
@@ -925,8 +914,9 @@
             // Don't collect profits from this. Instead, cost the amount that it's meant to generate.
             const plotOptionForPlot = options[z.plots[i][j].type];
             const profit =
-              getProfit(plotOptionForPlot.revenue_per_week, z) *
-              (z.townInfo.productivity / 100);
+              (getProfit(plotOptionForPlot.revenue_per_week, z) *
+                (z.townInfo.productivity / 100)) /
+              7;
             z.townInfo.gold -= profit;
             z = addToTownLog(
               `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week!`,
@@ -935,11 +925,14 @@
           } else {
             // Iterate through all plots and do actions based on their conditions
             const plotOptionForPlot = options[z.plots[i][j].type];
-            const profit =
-              getProfit(plotOptionForPlot.revenue_per_week, z) *
-              (z.townInfo.productivity / 100);
+            let profit =
+              (getProfit(plotOptionForPlot.revenue_per_week, z) *
+                (z.townInfo.productivity / 100)) /
+              7;
+            let nearWater = isAdjacentToWater(i, j, z);
+            profit *= nearWater ? 2 : 1;
             z.townInfo.gold += profit;
-            z.economyAndLaws.weeklyProfit += profit;
+            z.economyAndLaws.weeklyProfit += profit * 7;
 
             if (plotOptionForPlot.enables_tourism == true) {
               z.townInfo.gold_from_tourism +=

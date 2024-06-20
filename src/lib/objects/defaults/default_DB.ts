@@ -22,8 +22,8 @@ export const default_db: Game = {
   },
   resources: {
     food: 50,
-    wood: 150,
-    stone: 150,
+    wood: 300,
+    stone: 300,
     metal: 0,
     power: 0,
     bureaucracy: 0,

@@ -143,6 +143,7 @@ export type PlotOption = {
       power: number;
       bureaucracy: number;
     };
+    adjacent_plots: string[];
   };
   active_costs: {
     gold: number;

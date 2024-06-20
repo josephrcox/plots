@@ -9,6 +9,7 @@
     roundTo,
     formatInstantChange,
     capitalizeFirstLetter,
+    isAdjacentToPlots,
   } from "./utils";
   import {
     DB,
@@ -190,6 +191,24 @@
 
     if (checkIfAffordable(plotChosen, $DB) == false) {
       return alert(`${JSON.stringify(plotChosen.requirements)}`);
+    }
+
+    // check if the plot has required adjacent_plots
+    if (plotChosen.requirements.adjacent_plots !== undefined) {
+      let adjacentPlots = plotChosen.requirements.adjacent_plots;
+      let adjacentPlotsMet = isAdjacentToPlots(
+        x,
+        y,
+        z,
+        plotChosen.requirements.adjacent_plots,
+      );
+      if (adjacentPlotsMet === false) {
+        return alert(
+          `This plot requires adjacent plots of type: ${adjacentPlots.join(
+            ", ",
+          )}`,
+        );
+      }
     }
 
     // go over requirements

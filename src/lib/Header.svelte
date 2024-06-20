@@ -153,11 +153,12 @@
               >👥 {$DB.townInfo.population_count} / {$DB.townInfo
                 .population_max}</span
             >
-            <span class="text-sm"
-              >💰 {$DB.townInfo.gold}
+            <span class="text-xs"
+              ><span class="text-sm">💰 {$DB.townInfo.gold}</span>
+              <span class="pl-2"></span>
               {#if $DB.economyAndLaws.weeklyProfit > 0}
                 <span class="text-textHappy"
-                  >+{$DB.economyAndLaws.weeklyProfit}</span
+                  >+${$DB.economyAndLaws.weeklyProfit}</span
                 >
               {:else if $DB.economyAndLaws.weeklyProfit < 0}
                 <span class="text-textDanger2"
@@ -165,9 +166,10 @@
                 >
               {:else}
                 <span class="text-textPrimary"
-                  >+{$DB.economyAndLaws.weeklyProfit}</span
+                  >+${$DB.economyAndLaws.weeklyProfit}</span
                 >
               {/if}
+              <span class="text-gray-400">(weekly)</span>
             </span>
           </div>
 

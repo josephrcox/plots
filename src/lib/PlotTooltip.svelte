@@ -30,6 +30,7 @@
   import { Button } from "./components/ui/button";
 
   export let option: PlotOption;
+  export let checkRequirements: boolean = true;
 
   function getRequirementString(
     icon: string,
@@ -39,7 +40,7 @@
     if (required == 0 || required == null) return "";
     let s = "";
     let classText = "";
-    if (current <= required) {
+    if (current < required && checkRequirements) {
       classText = "text-textDanger1 border-2 border-red-400";
     }
     s = `<span class='${classText}'>${icon} ${required}</span>`;
@@ -128,7 +129,8 @@
       <span class="font-semibold">Required employees</span>
       <span
         class={options[getOptionIndex(option.id)].requirements.employees >
-        $DB.townInfo.population_count - $DB.townInfo.employees
+          $DB.townInfo.population_count - $DB.townInfo.employees &&
+        checkRequirements
           ? "px-1 text-textDanger1 font-bold border-2 border-red-400"
           : ""}
         >{options[getOptionIndex(option.id)].requirements.employees} employees
@@ -142,7 +144,7 @@
       <span>💰 {options[getOptionIndex(option.id)].revenue_per_week} </span>
     </div>
   {/if}
-  {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers).some((value) => value != 1)}
+  <!-- {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers).some((value) => value != 1)}
     <div class="flex flex-col gap-1 text-xs">
       <Separator class={"bg-secondary opacity-25 mt-2"} />
       <span class="font-semibold">Effect modifiers</span>
@@ -164,7 +166,7 @@
         {/if}
       {/each}
     </div>
-  {/if}
+  {/if} -->
   {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes).some((value) => value != 0)}
     <div class="flex flex-col gap-1 text-xs">
       <Separator class={"bg-secondary opacity-25 mt-2"} />
@@ -182,6 +184,7 @@
               Object.values(
                 options[getOptionIndex(option.id)].immediate_variable_changes,
               )[index],
+              key != "population",
             )}
           </span>
         {/if}

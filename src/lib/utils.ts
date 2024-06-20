@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
 import { options } from "./objects/PlotTypeOptions";
+import { Game } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -136,4 +137,107 @@ export function formatInstantChange(change: number, divide: boolean = true) {
   } else {
     return `${change}`;
   }
+}
+
+export function isAdjacentToWater(x: number, y: number, z: Game) {
+  // Checks if a farm is adjacent to water.
+  // Not a general check – will only return true for farms.
+  if (x < 0 || x >= z.plots.length || y < 0 || y >= z.plots[0].length) {
+    return false; // Ensure x and y are within valid bounds of the grid
+  }
+
+  let adjacent = [
+    [x - 1, y], // left
+    [x + 1, y], // right
+    [x, y - 1], // up
+    [x, y + 1], // down
+    [x - 1, y - 1], // top-left diagonal
+    [x - 1, y + 1], // bottom-left diagonal
+    [x + 1, y - 1], // top-right diagonal
+    [x + 1, y + 1], // bottom-right diagonal
+  ];
+
+  for (let i = 0; i < adjacent.length; i++) {
+    let adjX = adjacent[i][0];
+    let adjY = adjacent[i][1];
+
+    if (
+      adjX >= 0 &&
+      adjX < z.plots.length &&
+      adjY >= 0 &&
+      adjY < z.plots[0].length &&
+      z.plots[adjX][adjY].water &&
+      z.plots[x][y].active == true &&
+      z.plots[x][y].type > 0 &&
+      options[z.plots[x][y].type].type == "farm"
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// function that takes x, y, the game state, and required plots (ids by string) and returns true if the plot is adjacent to all of the required plots.
+export function isAdjacentToPlots(
+  x: number,
+  y: number,
+  z: Game,
+  requiredPlots: string[],
+) {
+  if (x < 0 || x >= z.plots.length || y < 0 || y >= z.plots[0].length) {
+    return false; // Ensure x and y are within valid bounds of the grid
+  }
+
+  let adjacent = [
+    [x - 1, y], // left
+    [x + 1, y], // right
+    [x, y - 1], // up
+    [x, y + 1], // down
+    [x - 1, y - 1], // top-left diagonal
+    [x - 1, y + 1], // bottom-left diagonal
+    [x + 1, y - 1], // top-right diagonal
+    [x + 1, y + 1], // bottom-right diagonal
+  ];
+
+  let allAreAdjacent = true;
+  for (let i = 0; i < requiredPlots.length; i++) {
+    let found = false;
+    if (requiredPlots[i] == "water") {
+      // use isAdjacentToWater
+      if (isAdjacentToWater(x, y, z)) {
+        found = true;
+        break;
+      }
+    }
+
+    for (let j = 0; j < adjacent.length; j++) {
+      let adjX = adjacent[j][0];
+      let adjY = adjacent[j][1];
+
+      if (
+        adjX >= 0 &&
+        adjX < z.plots.length &&
+        adjY >= 0 &&
+        adjY < z.plots[0].length &&
+        z.plots[adjX][adjY].active == true &&
+        z.plots[adjX][adjY].type > 0 &&
+        options[z.plots[adjX][adjY].type].id == requiredPlots[i]
+      ) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      allAreAdjacent = false;
+      break;
+    }
+  }
+  return allAreAdjacent;
+}
+
+// function that takes a number and returns one that is within 15% below or above
+export function randomizeNumber(n: number, round: number = 0) {
+  let min = n * 0.85;
+  let max = n * 1.15;
+  return roundTo(Math.random() * (max - min) + min, round);
 }

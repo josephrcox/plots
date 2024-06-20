@@ -17,14 +17,13 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 25,
+        wood: 50,
         stone: 10,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -49,10 +48,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 1,
@@ -61,85 +58,18 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 2,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
   {
-    id: "grain_farm",
-    title: "🌾 Grain farm",
+    id: "farm",
+    title: "🥕 Farm",
     type: "farm",
-    description: "Similar to potato farm",
+    description: "Produces veggies, grains, fruit",
     revenue_per_week: 6,
     requirements: {
-      gold: 150,
-      plots: [],
-      employees: 2,
-      knowledge: 0,
-      size: 1,
-      xp: 0,
-      resources: {
-        food: 0,
-        wood: 10,
-        stone: 15,
-
-        metal: 0,
-
-        power: 0,
-        bureaucracy: 0,
-      },
-    },
-    effect_modifiers: {
-      happiness: 1.03,
-      health: 1.03,
-      community: 1,
-    },
-    immediate_variable_changes: {
-      happiness: 0,
-      health: 0,
-      population: 0,
-      community: 0,
-      bureaucracy: 0,
-    },
-    tourism_revenue_per_week: 0,
-    enables_tourism: false,
-    knowledge_points_per_month: 0,
-    styling: "",
-    affordable: null,
-    selected: null,
-    generated_resources: {
-      food: 8,
-      wood: 0,
-      stone: 0,
-
-      metal: 0,
-      power: 0,
-
-      bureaucracy: 0,
-    },
-    level: 1,
-    active_costs: {
-      gold: 0,
-      power: 0,
-      wood: 0,
-      stone: 0,
-
-      metal: 0,
-
-      bureaucracy: 0,
-    },
-    check_for_variety: false,
-  },
-  {
-    id: "vegetable_farm",
-    title: "🥕 Vegetable farm",
-    type: "farm",
-    description: "Produces food",
-    revenue_per_week: 6,
-    requirements: {
-      gold: 100,
+      gold: 80,
       plots: [],
       employees: 4,
       knowledge: 0,
@@ -149,12 +79,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 10,
         stone: 10,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.03,
@@ -175,13 +104,11 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 5,
+      food: 6,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 1,
@@ -190,20 +117,19 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
     check_for_variety: false,
   },
   {
-    id: "potato_farm",
-    title: "🥔 Potato farm",
-    type: "farm",
-    description: "Produces more food than vegetable farm",
+    id: "tree_farm",
+    title: "🌲 Tree Farm",
+    type: "lumber",
+    description: "Produces some wood",
+    revenue_per_week: 8,
     requirements: {
-      gold: 150,
+      gold: 300,
       plots: [],
       employees: 4,
       knowledge: 0,
@@ -211,18 +137,17 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 20,
-        stone: 15,
-
+        wood: 0,
+        stone: 0,
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 1.03,
-      health: 1.03,
+      happiness: 1.0,
+      health: 1.0,
       community: 1,
     },
     immediate_variable_changes: {
@@ -232,149 +157,17 @@ export const options: PlotOption[] = [
       community: 0,
       bureaucracy: 0,
     },
+    check_for_variety: true,
     tourism_revenue_per_week: 0,
-    enables_tourism: false,
-    knowledge_points_per_month: 0,
     styling: "",
     affordable: null,
     selected: null,
-    generated_resources: {
-      food: 8,
-      wood: 0,
-      stone: 0,
-
-      metal: 0,
-      power: 0,
-
-      bureaucracy: 0,
-    },
-    level: 1,
-    active_costs: {
-      gold: 0,
-      power: 0,
-      wood: 0,
-      stone: 0,
-
-      metal: 0,
-
-      bureaucracy: 0,
-    },
-    check_for_variety: false,
-    revenue_per_week: 8,
-  },
-  {
-    id: "small_park",
-    title: "🌲 Small park",
-    type: "recreation",
-    description: "Makes people happy, costs a small amount",
-    revenue_per_week: 0,
-    requirements: {
-      gold: 190,
-      plots: [],
-      employees: 1,
-      knowledge: 0,
-      size: 1,
-      xp: 0,
-      resources: {
-        food: 0,
-        wood: 20,
-        stone: 3,
-
-        metal: 0,
-
-        power: 0,
-        bureaucracy: 0,
-      },
-    },
-    effect_modifiers: {
-      happiness: 1.05,
-      health: 1.1,
-      community: 1,
-    },
-    immediate_variable_changes: {
-      happiness: 15,
-      health: 15,
-      population: 0,
-      community: 0,
-      bureaucracy: 0,
-    },
-    tourism_revenue_per_week: 0,
     enables_tourism: false,
     knowledge_points_per_month: 0,
-    styling: "",
-    affordable: null,
-    selected: null,
-    check_for_variety: false,
     generated_resources: {
       food: 0,
-      wood: 0,
+      wood: 15,
       stone: 0,
-
-      metal: 0,
-      power: 0,
-
-      bureaucracy: 0,
-    },
-    level: 1,
-    active_costs: {
-      gold: 0,
-      power: 0,
-      wood: 0,
-      stone: 0,
-
-      metal: 0,
-
-      bureaucracy: 0,
-    },
-  },
-  {
-    id: "orchard",
-    title: "🍏 Orchard",
-    type: "farm",
-    description: "Produces food and sugar",
-    revenue_per_week: 5,
-    requirements: {
-      gold: 600,
-      plots: [],
-      employees: 4,
-      knowledge: 0,
-      size: 1,
-      xp: 0,
-      resources: {
-        food: 0,
-        wood: 50,
-        stone: 50,
-
-        metal: 0,
-
-        power: 0,
-        bureaucracy: 0,
-      },
-    },
-    effect_modifiers: {
-      happiness: 1.1,
-      health: 1.2,
-      community: 1,
-    },
-    immediate_variable_changes: {
-      happiness: 10,
-      health: 10,
-      population: 0,
-      community: 0,
-      bureaucracy: 0,
-    },
-    tourism_revenue_per_week: 0,
-    enables_tourism: false,
-    knowledge_points_per_month: 0,
-    styling: "",
-    affordable: null,
-    selected: null,
-    check_for_variety: true,
-    generated_resources: {
-      food: 10,
-      wood: 0,
-      stone: 0,
-
       metal: 0,
       power: 0,
       bureaucracy: 0,
@@ -385,9 +178,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -398,7 +189,7 @@ export const options: PlotOption[] = [
     description: "Produces stone, small amounts of metal",
     revenue_per_week: 0,
     requirements: {
-      gold: 420,
+      gold: 800,
       plots: [],
       employees: 6,
       knowledge: 0,
@@ -408,12 +199,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 50,
         stone: 0,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -437,10 +227,9 @@ export const options: PlotOption[] = [
     generated_resources: {
       food: 0,
       wood: 0,
-      stone: 8,
-      metal: 0.2,
+      stone: 25,
+      metal: 1,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 1,
@@ -449,100 +238,32 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
   {
-    id: "tree_farm",
-    title: "🌲 Tree Farm",
+    id: "livestock_farm",
+    title: "🐄 Livestock farm",
     type: "farm",
-    description: "Produces some wood",
-    revenue_per_week: 8,
+    description: "Makes more money and food than a regular farm",
+    revenue_per_week: 42,
     requirements: {
       gold: 300,
       plots: [],
-      employees: 4,
-      knowledge: 0,
-      size: 1,
-      xp: 0,
-      resources: {
-        food: 0,
-        wood: 0,
-        stone: 0,
-
-        metal: 0,
-
-        power: 0,
-        bureaucracy: 0,
-      },
-    },
-    effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1,
-    },
-    immediate_variable_changes: {
-      happiness: 0,
-      health: 0,
-      population: 0,
-      community: 0,
-      bureaucracy: 0,
-    },
-    check_for_variety: true,
-    tourism_revenue_per_week: 0,
-    styling: "",
-    affordable: null,
-    selected: null,
-    enables_tourism: false,
-    knowledge_points_per_month: 0,
-    generated_resources: {
-      food: 0,
-      wood: 5,
-      stone: 0,
-
-      metal: 0,
-      power: 0,
-
-      bureaucracy: 0,
-    },
-    level: 1,
-    active_costs: {
-      gold: 0,
-      power: 0,
-      wood: 0,
-      stone: 0,
-
-      metal: 0,
-
-      bureaucracy: 0,
-    },
-  },
-  {
-    id: "dairy_farm",
-    title: "🐄 Dairy farm",
-    type: "farm",
-    description: "Produces the most revenue but not as much food",
-    revenue_per_week: 12,
-    requirements: {
-      gold: 300,
-      plots: [],
-      employees: 5,
+      employees: 8,
       knowledge: 0,
       size: 1,
       xp: 0,
       resources: {
         food: 0,
         wood: 20,
-        stone: 20,
-
+        stone: 0,
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.1,
@@ -563,13 +284,11 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 2,
+      food: 14,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 1,
@@ -578,9 +297,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
     check_for_variety: false,
@@ -589,10 +306,11 @@ export const options: PlotOption[] = [
     id: "bakery",
     title: "🥖 Bakery",
     type: "business",
-    description: "Requires sugars, increases happiness",
-    revenue_per_week: 23,
+    description:
+      "Sells baked goods, increases happiness at the cost of a little health.",
+    revenue_per_week: 40,
     requirements: {
-      gold: 300,
+      gold: 500,
       plots: [],
       employees: 3,
       knowledge: 0,
@@ -600,13 +318,13 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 10,
-        stone: 10,
-
+        wood: 30,
+        stone: 30,
         metal: 0,
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.11,
@@ -631,10 +349,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 2,
@@ -643,9 +359,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -653,8 +367,8 @@ export const options: PlotOption[] = [
     id: "stables",
     title: "🐴 Stables",
     type: "business",
-    description: "Makes money and people happy",
-    revenue_per_week: 14,
+    description: "Makes money and people happy by providing horse rides.",
+    revenue_per_week: 24,
     requirements: {
       gold: 400,
       plots: [],
@@ -666,15 +380,14 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 120,
         stone: 0,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 1.05,
+      happiness: 1.2,
       health: 1.02,
       community: 1,
     },
@@ -696,10 +409,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 2,
@@ -708,9 +419,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -718,7 +427,7 @@ export const options: PlotOption[] = [
     id: "church",
     title: "⛪️ Church",
     type: "recreation",
-    description: "Just makes people happy",
+    description: "Makes people VERY happy for a short period.",
     revenue_per_week: 0,
     requirements: {
       gold: 500,
@@ -731,20 +440,19 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 350,
         stone: 0,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 1.1,
+      happiness: 2.0,
       health: 1.0,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 5,
+      happiness: 50,
       health: 0,
       population: 0,
       community: 0,
@@ -761,10 +469,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 2,
@@ -773,7 +479,6 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       bureaucracy: 0,
     },
@@ -782,7 +487,8 @@ export const options: PlotOption[] = [
     id: "pub",
     title: "🍻 Pub",
     type: "recreation",
-    description: "Increases knowledge, happiness, community",
+    description:
+      "Increases knowledge, happiness, community. Isn't great for health.",
     revenue_per_week: 40,
     knowledge_points_per_month: 1,
     requirements: {
@@ -794,18 +500,18 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 175,
+        wood: 100,
         stone: 50,
-
         metal: 0,
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.2,
-      health: 0.8,
-      community: 1,
+      health: 0.93,
+      community: 1.1,
     },
     immediate_variable_changes: {
       happiness: 10,
@@ -824,7 +530,6 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
       bureaucracy: 0,
@@ -835,7 +540,6 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       bureaucracy: 0,
     },
@@ -844,25 +548,24 @@ export const options: PlotOption[] = [
     id: "village_market",
     title: "🛒 Village Market",
     type: "business",
-    description: "Requires wood and stone, makes revenue",
-    revenue_per_week: 30,
+    description: "Sells goods and employs many. ",
+    revenue_per_week: 100,
     requirements: {
-      gold: 500,
+      gold: 800,
       plots: [],
-      employees: 10,
+      employees: 16,
       knowledge: 0,
       size: 1,
       xp: 0,
       resources: {
         food: 0,
-        wood: 50,
-        stone: 50,
-
+        wood: 150,
+        stone: 150,
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.05,
@@ -887,10 +590,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 2,
@@ -899,9 +600,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -909,10 +608,11 @@ export const options: PlotOption[] = [
     id: "fishery",
     title: "🐠 Fishery",
     type: "business",
-    description: "Produces food, must be on outer edge, requires metal",
+    description:
+      "Requires metal but generates a lot of food. Must be near water.",
     revenue_per_week: 35,
     requirements: {
-      gold: 600,
+      gold: 500,
       plots: [],
       employees: 9,
       knowledge: 0,
@@ -922,12 +622,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 100,
         stone: 0,
-
-        metal: 10,
-
+        metal: 50,
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: ["water"],
     },
     effect_modifiers: {
       happiness: 1.05,
@@ -949,13 +648,11 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 40,
+      food: 50,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 2,
@@ -964,9 +661,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -987,12 +682,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 250,
         stone: 250,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.1,
@@ -1017,10 +711,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 2,
@@ -1029,9 +721,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1039,10 +729,11 @@ export const options: PlotOption[] = [
     id: "vineyard",
     title: "🍇 Vineyard",
     type: "farm",
-    description: "Produces sugars, makes money but hurts health mod",
-    revenue_per_week: 40,
+    description:
+      "Makes a lot of money, lowers health. Generates knowledge too.",
+    revenue_per_week: 95,
     requirements: {
-      gold: 800,
+      gold: 700,
       plots: [],
       employees: 6,
       knowledge: 0,
@@ -1052,12 +743,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 0,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.5,
@@ -1073,7 +763,7 @@ export const options: PlotOption[] = [
     },
     tourism_revenue_per_week: 0,
     enables_tourism: false,
-    knowledge_points_per_month: 0,
+    knowledge_points_per_month: 3,
     styling: "",
     affordable: null,
     selected: null,
@@ -1082,7 +772,6 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
       bureaucracy: 0,
@@ -1093,9 +782,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1116,12 +803,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 200,
         stone: 50,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: ["water"],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -1146,10 +832,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 50,
-
       bureaucracy: 0,
     },
     level: 3,
@@ -1158,9 +842,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1168,10 +850,10 @@ export const options: PlotOption[] = [
     id: "park",
     title: "🎪 Park",
     type: "recreation",
-    description: "Makes people happier",
+    description: "Makes people extremely happy & healthy for a period.",
     revenue_per_week: 0,
     requirements: {
-      gold: 900,
+      gold: 800,
       plots: [],
       employees: 4,
       knowledge: 0,
@@ -1181,23 +863,22 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 100,
         stone: 100,
-
         metal: 20,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 1.2,
-      health: 1.2,
+      happiness: 2.0,
+      health: 2.0,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 25,
-      health: 20,
+      happiness: 40,
+      health: 40,
       population: 0,
-      community: 0,
+      community: 40,
       bureaucracy: 0,
     },
     tourism_revenue_per_week: 0,
@@ -1211,21 +892,17 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
-    level: 3,
+    level: 2,
     active_costs: {
       gold: 0,
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1233,10 +910,10 @@ export const options: PlotOption[] = [
     id: "village_inn",
     title: "🛌 Village Inn",
     type: "tourism",
-    description: "Requires wood and stone, makes money",
+    description: "Enables tourism revenue",
     revenue_per_week: 23,
     requirements: {
-      gold: 1000,
+      gold: 1500,
       plots: [],
       employees: 16,
       knowledge: 0,
@@ -1246,12 +923,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 150,
         stone: 100,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -1276,10 +952,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 3,
@@ -1288,9 +962,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1298,7 +970,7 @@ export const options: PlotOption[] = [
     id: "schoolhouse",
     title: "🏫 Schoolhouse",
     type: "education",
-    description: "Produces knowledge, costs money",
+    description: "Produces knowledge, costs money to run.",
     revenue_per_week: 0,
     knowledge_points_per_month: 25,
     requirements: {
@@ -1312,12 +984,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 500,
         stone: 100,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.05,
@@ -1341,21 +1012,17 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 3,
     active_costs: {
-      gold: 0,
+      gold: 50,
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1363,12 +1030,13 @@ export const options: PlotOption[] = [
     id: "blacksmith",
     title: "⚒️ Blacksmith",
     type: "business",
-    description: "Converts metal to goods, makes money",
-    revenue_per_week: 100,
+    description:
+      "Converts metal into tools for money. Make sure you have enough metal!",
+    revenue_per_week: 500,
     requirements: {
-      gold: 3500,
+      gold: 3000,
       plots: [],
-      employees: 10,
+      employees: 24,
       knowledge: 0,
       size: 1,
       xp: 0,
@@ -1377,10 +1045,10 @@ export const options: PlotOption[] = [
         wood: 250,
         stone: 250,
         metal: 500,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -1405,21 +1073,17 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 3,
     active_costs: {
-      gold: 50,
+      gold: 0,
       power: 0,
       wood: 0,
       stone: 0,
-
-      metal: 0,
-
+      metal: 10,
       bureaucracy: 0,
     },
   },
@@ -1429,9 +1093,9 @@ export const options: PlotOption[] = [
     type: "recreation",
     description: "Produces knowledge and happiness",
     revenue_per_week: 0,
-    knowledge_points_per_month: 5,
+    knowledge_points_per_month: 15,
     requirements: {
-      gold: 3500,
+      gold: 2000,
       plots: [],
       employees: 6,
       knowledge: 0,
@@ -1441,12 +1105,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 225,
         stone: 100,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.3,
@@ -1470,21 +1133,17 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
-    level: 3,
+    level: 2,
     active_costs: {
       gold: 0,
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1492,7 +1151,8 @@ export const options: PlotOption[] = [
     id: "lumber_mill",
     title: "🏭 Lumber Mill",
     type: "industrial",
-    description: "Increases wood production by 25%",
+    description:
+      "Increases wood production by 25%, has to be next to a tree farm",
     revenue_per_week: 0,
     requirements: {
       gold: 4000,
@@ -1505,12 +1165,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 300,
         stone: 100,
-
         metal: 0,
-
         power: 5,
         bureaucracy: 0,
       },
+      adjacent_plots: ["tree_farm"],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -1533,12 +1192,10 @@ export const options: PlotOption[] = [
     check_for_variety: false,
     generated_resources: {
       food: 0,
-      wood: 0,
+      wood: 50,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -1547,9 +1204,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1558,7 +1213,7 @@ export const options: PlotOption[] = [
     title: "🛒 General Store",
     type: "business",
     description: "Makes the most money, requires power",
-    revenue_per_week: 80,
+    revenue_per_week: 600,
     requirements: {
       gold: 5000,
       plots: [],
@@ -1570,12 +1225,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 300,
         stone: 200,
-
         metal: 0,
-
         power: 5,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.05,
@@ -1600,10 +1254,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -1612,9 +1264,7 @@ export const options: PlotOption[] = [
       power: 10,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1637,10 +1287,10 @@ export const options: PlotOption[] = [
         wood: 300,
         stone: 1000,
         metal: 2000,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.25,
@@ -1664,10 +1314,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 3,
@@ -1676,9 +1324,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1699,12 +1345,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1000,
         stone: 200,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.09,
@@ -1729,10 +1374,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -1741,9 +1384,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1766,12 +1407,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 450,
         stone: 450,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 0.92,
@@ -1795,10 +1435,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 10,
     },
     level: 4,
@@ -1807,9 +1445,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1830,12 +1466,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 1000,
-
         metal: 50,
-
         power: 15,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -1862,7 +1497,6 @@ export const options: PlotOption[] = [
       stone: 125,
       metal: 10,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -1871,9 +1505,7 @@ export const options: PlotOption[] = [
       power: 20,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1895,12 +1527,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1000,
         stone: 1000,
-
         metal: 0,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 1.0,
@@ -1924,10 +1555,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -1936,9 +1565,7 @@ export const options: PlotOption[] = [
       power: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -1961,12 +1588,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1000,
         stone: 10000,
-
         metal: 5000,
-
         power: 0,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 0.8,
@@ -1990,10 +1616,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -2002,9 +1626,7 @@ export const options: PlotOption[] = [
       power: 75,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
@@ -2026,12 +1648,11 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 1000,
-
         metal: 3000,
-
         power: 15,
         bureaucracy: 0,
       },
+      adjacent_plots: [],
     },
     effect_modifiers: {
       happiness: 0.98,
@@ -2055,10 +1676,8 @@ export const options: PlotOption[] = [
       food: 0,
       wood: 0,
       stone: 0,
-
       metal: 0,
       power: 0,
-
       bureaucracy: 0,
     },
     level: 4,
@@ -2067,19 +1686,17 @@ export const options: PlotOption[] = [
       power: 75,
       wood: 0,
       stone: 0,
-
       metal: 0,
-
       bureaucracy: 0,
     },
   },
 ];
-
 export const typeColors: any = {
   empty_unusable: "rgba(21, 40, 20, 0.70)",
   empty_buildable: "#CBB827",
   residential: "#de7633",
   farm: "#6b8f49",
+  lumber: "#8E805C",
   business: "#9273a5",
   recreation: "#5277b1",
   shop: "#d896d8",

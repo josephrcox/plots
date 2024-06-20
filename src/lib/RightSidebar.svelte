@@ -127,7 +127,27 @@
     : 'bottom-2'}
 	z-10 fixed right-3 top-[190px] rounded-xl p-2 transition-all duration-300"
 >
-  <h1 class="text-xl w-full text-center pb-2">Resources</h1>
+  <div class="flex flex-row justify-center">
+    <Tooltip.Root openDelay={200} closeDelay={0}>
+      <Tooltip.Trigger>
+        <div class="flex flex-row items-center pb-2 gap-2">
+          <h1 class="text-xl w-full text-center">Resources</h1>
+          <button class="text-textPrimary text-sm">ℹ️</button>
+        </div>
+        <Tooltip.Content class="text-sm w-[200px]">
+          <div class="text-sm">
+            Resources are generated from plots. Generation rate can be increased
+            by raising the productivity of the town, at the cost of some
+            happiness.
+            <br />
+            <br />
+            There is also a slight bit of randomness as townspeople aren't robots.
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Trigger>
+    </Tooltip.Root>
+  </div>
+
   <div
     class="flex flex-col justify-between gap-4 text-foregroundText h-full pb-12"
   >
@@ -200,7 +220,7 @@
           min={0}
           max={200}
           step={5}
-          class="cursor-pointer w-3/4"
+          class="cursor-pointer w-full"
         />
       </div>
       <div
@@ -221,7 +241,7 @@
           min={0}
           max={1.0}
           step={0.05}
-          class="cursor-pointer w-3/4"
+          class="cursor-pointer w-full"
         />
       </div>
     </div>

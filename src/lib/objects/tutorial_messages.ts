@@ -1,13 +1,6 @@
 import { DB, hasPlotOfType } from "$lib/store";
 import { Game } from "$lib/types";
 
-/*
-  houses
-  resources
-  quarry
-
-*/
-
 type TutorialStep = {
   message: string;
   isComplete: (z: Game) => boolean;
@@ -36,6 +29,14 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("tree_farm", z).length > 0;
     },
+    goldReward: 500,
+  },
+  {
+    message:
+      "My liege, for the village to be successful, everyone needs a job. ",
+    isComplete: (z: Game) => {
+      return z.townInfo.employees >= z.townInfo.population_count;
+    },
     goldReward: 250,
   },
   {
@@ -63,15 +64,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.economyAndLaws.weeklyProfit >= 75;
     },
-    goldReward: 500,
-  },
-  {
-    message:
-      "My liege, the village is growing - woohoo! But we need to have more workers. Get the population to 100.",
-    isComplete: (z: Game) => {
-      return z.townInfo.population_count >= 100;
-    },
-    goldReward: 1500,
+    goldReward: 1000,
   },
   {
     message:
@@ -80,6 +73,14 @@ export const tutorialMessages: TutorialStep[] = [
       return hasPlotOfType("schoolhouse", z).length > 0;
     },
     goldReward: 850,
+  },
+  {
+    message:
+      "My liege, the village is growing - woohoo! But we need to have more workers. Get the population to 100.",
+    isComplete: (z: Game) => {
+      return z.townInfo.population_count >= 100;
+    },
+    goldReward: 1500,
   },
   {
     message:

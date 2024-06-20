@@ -228,7 +228,7 @@
           showWelcome.set(false);
         }}
       >
-        Close
+        Get started
       </AlertDialog.Cancel>
     </AlertDialog.Footer>
   </AlertDialog.Content>

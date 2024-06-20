@@ -489,7 +489,11 @@ export function startGame(
         y: j,
         type: water ? -9 : -1,
         typeId: "",
-        mineralSource: mineX === i && mineY === j ? true : false,
+        mineralSource: water
+          ? false
+          : mineX === i && mineY === j
+            ? true
+            : false,
         water: mineX === i && mineY === j ? false : water,
       };
     }

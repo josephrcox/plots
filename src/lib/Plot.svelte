@@ -3,6 +3,7 @@
   import { DB, modifyPlotMenuOptions, unique, paused } from "./store.ts";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import PlotTooltip from "./PlotTooltip.svelte";
+  import { isAdjacentToWater } from "./utils";
 
   export let data = {
     id: 0,
@@ -78,50 +79,6 @@
       $modifyPlotMenuOptions.visible = false;
     }
   }
-
-  function isAdjacentToWater(x, y) {
-    console.log(`Checking plot at (${x}, ${y})`);
-
-    // Checks if a farm is adjacent to water.
-    // Not a general check – will only return true for farms.
-    if (x < 0 || x >= $DB.plots.length || y < 0 || y >= $DB.plots[0].length) {
-      console.log("Out of bounds.");
-      return false; // Ensure x and y are within valid bounds of the grid
-    }
-
-    let adjacent = [
-      [x - 1, y], // left
-      [x + 1, y], // right
-      [x, y - 1], // up
-      [x, y + 1], // down
-      [x - 1, y - 1], // top-left diagonal
-      [x - 1, y + 1], // bottom-left diagonal
-      [x + 1, y - 1], // top-right diagonal
-      [x + 1, y + 1], // bottom-right diagonal
-    ];
-
-    for (let i = 0; i < adjacent.length; i++) {
-      let adjX = adjacent[i][0];
-      let adjY = adjacent[i][1];
-      //console.log(`Checking adjacent plot at (${adjX}, ${adjY})`);
-
-      if (
-        adjX >= 0 &&
-        adjX < $DB.plots.length &&
-        adjY >= 0 &&
-        adjY < $DB.plots[0].length &&
-        $DB.plots[adjX][adjY].water &&
-        $DB.plots[x][y].active == true &&
-        $DB.plots[x][y].type > 0 &&
-        options[$DB.plots[x][y].type].type == "farm"
-      ) {
-        //console.log("Adjacent to water.");
-        return true;
-      }
-    }
-    //console.log("Not adjacent to water.");
-    return false;
-  }
 </script>
 
 <Tooltip.Root openDelay={100} closeDelay={0}>
@@ -162,7 +119,7 @@
       data-size={data.type > -1 ? options[data.type].requirements.size : null}
       data-mineralSource={data.mineralSource}
       data-water={data.water}
-      data-nearWater={isAdjacentToWater(data.x, data.y)}
+      data-nearWater={isAdjacentToWater(data.x, data.y, $DB)}
     >
       {#if data.type > -1}
         <div>
@@ -189,16 +146,19 @@
       {/if}
     </button>
   </Tooltip.Trigger>
-  <Tooltip.Content class={data.type < 0 ? "hidden" : ""}>
+  <Tooltip.Content class={data.type < 0 && !data.water ? "hidden" : ""}>
     <div class="flex flex-col gap-2">
-      {#if isAdjacentToWater(data.x, data.y)}
+      {#if data.water}
+        Water - Place farms nearby for more food & revenue!
+      {/if}
+      {#if isAdjacentToWater(data.x, data.y, $DB)}
         <span class="text-xs bg-blue-500 text-white p-1"
-          >Near water - Generating more food!</span
+          >Near water - Generating more food & revenue!</span
         >
       {/if}
 
       {#if data.active}
-        <PlotTooltip option={currentPlotOption} />
+        <PlotTooltip option={currentPlotOption} checkRequirements={false} />
       {/if}
     </div>
   </Tooltip.Content>
@@ -255,8 +215,8 @@
       rgba(255, 255, 255, 0.1) 60%,
       transparent 90%
     );
-    background-size: 100% 100%;
-    animation: sparkleAnimation 6s ease-in-out infinite;
+    background-size: 200% 200%;
+    animation: sparkleAnimation 4s ease-in-out infinite;
   }
 
   @keyframes waterAnimation1 {
