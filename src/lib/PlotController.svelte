@@ -128,7 +128,7 @@
   }
 
   .odd-row {
-    margin-left: 119px;
+    margin-left: 100px;
     margin-top: -20px;
   }
 </style>

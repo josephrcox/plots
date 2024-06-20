@@ -4,7 +4,7 @@ export const options: PlotOption[] = [
   // Level 1 Plots
   {
     id: "small_homes",
-    title: "🏠 Small homes",
+    title: "🏠 Homes",
     type: "residential",
     description: "+16 people",
     revenue_per_week: 0,
@@ -244,14 +244,14 @@ export const options: PlotOption[] = [
   },
   {
     id: "livestock_farm",
-    title: "🐄 Livestock farm",
+    title: "🐄 Livestock",
     type: "farm",
-    description: "Makes more money and food than a regular farm",
+    description: "Farm. Makes more money and food than a regular farm",
     revenue_per_week: 42,
     requirements: {
       gold: 300,
       plots: [],
-      employees: 8,
+      employees: 12,
       knowledge: 0,
       size: 1,
       xp: 0,
@@ -473,7 +473,7 @@ export const options: PlotOption[] = [
       power: 0,
       bureaucracy: 0,
     },
-    level: 2,
+    level: 1,
     active_costs: {
       gold: 0,
       power: 0,
@@ -672,7 +672,7 @@ export const options: PlotOption[] = [
     description: "+64 people",
     revenue_per_week: 0,
     requirements: {
-      gold: 750,
+      gold: 700,
       plots: [],
       employees: 0,
       knowledge: 0,

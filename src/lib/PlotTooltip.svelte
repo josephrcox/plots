@@ -37,7 +37,8 @@
     required: number,
     current: number,
   ) {
-    if (required == 0 || required == null) return "";
+    if (required == 0 || required == null)
+      return "<span class='hidden'></span>";
     let s = "";
     let classText = "";
     if (current < required && checkRequirements) {
@@ -77,9 +78,9 @@
     >
   </div>
 
-  <div class="flex flex-col w-36 h-min pb-2 gap-1 text-xs">
-    <Separator class={"bg-secondary opacity-25 mt-1"} />
-    <span class="font-semibold">Resources</span>
+  <div class="flex flex-col w-36 h-min gap-0 text-xs">
+    <Separator class={"bg-secondary opacity-25 mt-1 mb-1"} />
+    <span class="font-semibold">Requirements</span>
     <div class="flex flex-col gap-1">
       {@html getRequirementString(
         "💰",
@@ -121,29 +122,26 @@
         options[getOptionIndex(option.id)].requirements.resources.bureaucracy,
         $DB.resources.bureaucracy,
       )}
+      {#if options[getOptionIndex(option.id)].requirements.employees != 0}
+        <span
+          class={options[getOptionIndex(option.id)].requirements.employees >
+            $DB.townInfo.population_count - $DB.townInfo.employees &&
+          checkRequirements
+            ? "px-1 text-textDanger1 font-bold border-2 border-red-400"
+            : ""}
+          >👥 {options[getOptionIndex(option.id)].requirements.employees} employees
+        </span>
+      {/if}
     </div>
   </div>
-  {#if options[getOptionIndex(option.id)].requirements.employees != 0}
-    <div class="flex flex-col gap-1 text-xs">
-      <Separator class={"bg-secondary opacity-25 mt-2"} />
-      <span class="font-semibold">Required employees</span>
-      <span
-        class={options[getOptionIndex(option.id)].requirements.employees >
-          $DB.townInfo.population_count - $DB.townInfo.employees &&
-        checkRequirements
-          ? "px-1 text-textDanger1 font-bold border-2 border-red-400"
-          : ""}
-        >{options[getOptionIndex(option.id)].requirements.employees} employees
-      </span>
-    </div>
-  {/if}
   {#if options[getOptionIndex(option.id)].revenue_per_week != 0}
     <div class="flex flex-col gap-1 text-xs">
-      <Separator class={"bg-secondary opacity-25 mt-2"} />
+      <Separator class={"bg-secondary opacity-25 mt-0"} />
       <span class="font-semibold">Weekly revenue</span>
       <span>💰 {options[getOptionIndex(option.id)].revenue_per_week} </span>
     </div>
   {/if}
+  <!-- Modifiers -->
   <!-- {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers).some((value) => value != 1)}
     <div class="flex flex-col gap-1 text-xs">
       <Separator class={"bg-secondary opacity-25 mt-2"} />
@@ -167,7 +165,8 @@
       {/each}
     </div>
   {/if} -->
-  {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes).some((value) => value != 0)}
+  <!-- Instant changes -->
+  <!-- {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes).some((value) => value != 0)}
     <div class="flex flex-col gap-1 text-xs">
       <Separator class={"bg-secondary opacity-25 mt-2"} />
       <span class="font-semibold">Instant changes</span>
@@ -190,7 +189,7 @@
         {/if}
       {/each}
     </div>
-  {/if}
+  {/if} -->
   {#if Object.values(options[getOptionIndex(option.id)].active_costs).some((value) => value != 0)}
     <div class="flex flex-col gap-1 text-xs">
       <Separator class={"bg-secondary opacity-25 mt-2"} />

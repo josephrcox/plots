@@ -167,8 +167,8 @@
 <style>
   .plot_container {
     position: relative;
-    width: 110px;
-    height: 125px;
+    width: 90px;
+    height: 105px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -267,7 +267,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    gap: 10px;
+    gap: 8px;
     color: black;
   }
 </style>

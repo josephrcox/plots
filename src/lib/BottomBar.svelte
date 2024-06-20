@@ -590,10 +590,10 @@
                     <Tooltip.Root openDelay={200} closeDelay={0}>
                       <Tooltip.Trigger>
                         <div
-                          class="plotOption cursor-pointer min-w-28 max-w-28 h-[100px] rounded-xl flex flex-col align-middle justify-evenly transition-all duration-100
+                          class="plotOption cursor-pointer min-w-40 h-[120px] rounded-xl flex flex-col align-middle transition-all duration-100
             {option.affordable || option.selected
                             ? 'cursor-pointer'
-                            : 'opacity-20 cursor-not-allowed '}
+                            : 'opacity-25 cursor-not-allowed '}
             {option.selected
                             ? 'border-4 border-yellow-200 opacity-100 rounded-none'
                             : ''}
@@ -604,20 +604,41 @@
                             true,
                           )}"
                         >
-                          <span class="text-md text-center">
-                            {!option.selected ? firstEmoji(option.title) : "✅"}
-                          </span>
-                          <span class="text-xs text-center">
-                            {option.title.substring(2)} ({hasPlotOfType(
-                              option.id,
-                              $DB,
-                            ).length})
-                          </span>
+                          <div class="pt-2">
+                            <span class="text-md text-center">
+                              {!option.selected
+                                ? firstEmoji(option.title)
+                                : "✅"}
+                            </span>
+                            <span class="text-xs text-center font-bold">
+                              {option.title.substring(2)}
+                            </span>
+                          </div>
+
                           <span
                             style={option.styling}
-                            class="text-xs text-center"
+                            class="text-xs text-center pt-4"
                           >
-                            💰 {formatNumber(option.requirements.gold, false)}
+                            Costs 💰 {formatNumber(
+                              option.requirements.gold,
+                              false,
+                            )}
+
+                            {#if option.revenue_per_week > 0}
+                              <br />
+                              Makes 💰 {formatNumber(
+                                option.revenue_per_week,
+                                false,
+                              )}/week
+                            {/if}
+
+                            {#if option.requirements.employees > 0}
+                              <br />
+                              Employs {formatNumber(
+                                option.requirements.employees,
+                                false,
+                              )}
+                            {/if}
                           </span>
                         </div>
                       </Tooltip.Trigger>

@@ -37,7 +37,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.employees >= z.townInfo.population_count;
     },
-    goldReward: 250,
+    goldReward: 500,
   },
   {
     message:
@@ -46,17 +46,6 @@ export const tutorialMessages: TutorialStep[] = [
       return hasPlotOfType("quarry", z).length > 0;
     },
     goldReward: 1000,
-  },
-  {
-    message:
-      "My liege, after working hard, the townspeople need a place to relax. Build a pub or a church. ",
-    isComplete: (z: Game) => {
-      return (
-        hasPlotOfType("pub", z).length > 0 ||
-        hasPlotOfType("church", z).length > 0
-      );
-    },
-    goldReward: 500,
   },
   {
     message:
@@ -84,27 +73,19 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
+      "My liege, as the town grows, we need a lot more knowledge. Get to 250 knowledge.  ",
+    isComplete: (z: Game) => {
+      return z.townInfo.knowledge_points >= 250;
+    },
+    goldReward: 1500,
+  },
+  {
+    message:
       "My liege, some advanced buildings require power. Start generating power with a waterwheel.",
     isComplete: (z: Game) => {
       return z.resources.power > 0;
     },
-    goldReward: 500,
-  },
-  {
-    message:
-      "My liege, we found a great area that would be perfect for a vineyard. Build a vineyard.",
-    isComplete: (z: Game) => {
-      return hasPlotOfType("vineyard", z).length > 0;
-    },
-    goldReward: 500,
-  },
-  {
-    message:
-      "My liege, to continue investing in knowledge & growth, we need a library. Build a library. ",
-    isComplete: (z: Game) => {
-      return hasPlotOfType("library", z).length > 0;
-    },
-    goldReward: 1000,
+    goldReward: 2000,
   },
   {
     message:
