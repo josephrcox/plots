@@ -10,7 +10,6 @@ export const default_db: Game = {
   townInfo: {
     name: "Your town",
     gold: 150,
-    gold_from_tourism: 0,
     population_count: 0,
     population_max: 0,
     employees: 0,
@@ -34,6 +33,7 @@ export const default_db: Game = {
     stone: 0,
     metal: 0,
     bureaucracy: 0,
+    knowledge: 0,
   },
   hasCityHall: false,
   hasBank: false,

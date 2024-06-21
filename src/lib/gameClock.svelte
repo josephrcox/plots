@@ -31,6 +31,7 @@
     db = _bringModifiersBackToNormal(db);
     db = _checkSpecialPlots(db);
     db = _adjustKnowledgeGoldMarketRates(db);
+
     db = _warnUser(db);
     const startResources = {
       food: db.resources.food,
@@ -42,6 +43,8 @@
     db = _generateResources(db);
     db = _handleActiveCosts(db); // TODO
     db = _calculatePower(db);
+    db = _bringStatsBackToNormal(db);
+    db = _calculateKnowledge(db);
     db = _feedCitizens(db);
     const endResources = {
       food: db.resources.food,
@@ -56,7 +59,6 @@
   }
 
   function performMonthlyTasks(db) {
-    db = _calculateKnowledge(db);
     db = _banksEffect(db);
     db = _federalGovEffect(db);
     db = _reactToProductivity(db);
@@ -65,7 +67,6 @@
 
   function performQuarterlyTasks(db) {
     db = _boredom(db);
-    db = _bringStatsBackToNormal(db);
     db = _movePeopleInMovePeopleOut(db);
     db = _checkPlotCountForEffect(db);
 
@@ -308,9 +309,8 @@
             z.resources.stone += Math.round(
               plotOptionForPlot.generated_resources.stone * multiplier,
             );
-            z.resources.metal += roundTo(
+            z.resources.metal += Math.round(
               plotOptionForPlot.generated_resources.metal * multiplier,
-              2,
             );
             z.resources.bureaucracy += Math.round(
               plotOptionForPlot.generated_resources.bureaucracy * multiplier,
@@ -322,7 +322,7 @@
     z.resources.food = Math.round(z.resources.food, 2);
     z.resources.wood = Math.round(z.resources.wood, 2);
     z.resources.stone = Math.round(z.resources.stone, 2);
-    z.resources.metal = roundTo(z.resources.metal, 2);
+    z.resources.metal = Math.round(z.resources.metal, 2);
     z.resources.bureaucracy = Math.round(z.resources.bureaucracy, 2);
 
     return z;
@@ -628,7 +628,7 @@
 
   function _boredom(z) {
     if (
-      z.lastChangeDay + (Math.random() * 500 + 180) < z.environment.day &&
+      z.lastChangeDay + (Math.random() * 500 + 365) < z.environment.day &&
       z.townInfo.population_count > 0
     ) {
       if (z.townInfo.population_count > 0) {
@@ -728,10 +728,20 @@
       z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate &&
       z.townInfo.population_count > 0
     ) {
+      let bankModifier = 1;
+
+      if (z.hasBank) {
+        // If they have a bank, then the actual max tax rate should be 2x higher.
+        bankModifier = 2;
+      }
+
       const lenientChance = // higher == more lenient
         z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2;
       if (randomness < lenientChance) {
-        if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate * 2) {
+        if (
+          z.economyAndLaws.tax_rate >
+          z.economyAndLaws.max_tax_rate * 2 * bankModifier
+        ) {
           z.modifiers.happiness -= 0.02;
           z = addToTownLog(
             messages.very_high_tax_rate +
@@ -810,6 +820,7 @@
     z.townInfo.population_max = roundTo(z.townInfo.population_max, 0);
     z.townInfo.happiness = roundTo(z.townInfo.happiness, 2);
     z.townInfo.health = roundTo(z.townInfo.health, 2);
+    z.townInfo.knowledge_points = roundTo(z.townInfo.knowledge_points, 0);
 
     if (z.townInfo.happiness > z.maximums.happiness) {
       // Maxed out happiness
@@ -849,19 +860,14 @@
       }
     }
     if (z.modifiers.health > 1.0) {
-      if (
-        hasPlotOfType("small_hospital", z).length > 0 ||
-        hasPlotOfType("large_hospital", z).length > 0
-      ) {
-        console.log(hasPlotOfType("small_hospital", z).length);
-        console.log(hasPlotOfType("large_hospital", z).length);
+      if (hasPlotOfType("healing_house", z).length > 0) {
         if (z.townLog.indexOf(messages.hospital_advantage) == -1) {
           return (z = addToTownLog(messages.hospital_advantage, z));
         }
         let percentAboveOne = z.modifiers.health - 1.0;
         z.modifiers.health -=
-          percentAboveOne * hasPlotOfType("large_hospital", z) ? 0.04 : 0.06;
-        if (z.modifiers.health < 1.03) {
+          percentAboveOne * hasPlotOfType("healing_house", z) ? 0.03 : 0.06;
+        if (z.modifiers.health < 1.05) {
           z.modifiers.health = 1.0;
         }
       } else {
@@ -870,6 +876,10 @@
         if (z.modifiers.health < 1.05) {
           z.modifiers.health = 1.0;
         }
+      }
+    } else {
+      if (hasPlotOfType("healing_house", z).length > 0) {
+        z.modifiers.health += 0.1;
       }
     }
     return z;
@@ -914,7 +924,11 @@
             // Don't collect profits from this. Instead, cost the amount that it's meant to generate.
             const plotOptionForPlot = options[z.plots[i][j].type];
             const profit =
-              (getProfit(plotOptionForPlot.revenue_per_week, z) *
+              (getProfit(
+                plotOptionForPlot.revenue_per_week,
+                z,
+                plotOptionForPlot.type,
+              ) *
                 (z.townInfo.productivity / 100)) /
               7;
             z.townInfo.gold -= profit;
@@ -926,20 +940,17 @@
             // Iterate through all plots and do actions based on their conditions
             const plotOptionForPlot = options[z.plots[i][j].type];
             let profit =
-              (getProfit(plotOptionForPlot.revenue_per_week, z) *
+              (getProfit(
+                plotOptionForPlot.revenue_per_week,
+                z,
+                plotOptionForPlot.type,
+              ) *
                 (z.townInfo.productivity / 100)) /
               7;
             let nearWater = isAdjacentToWater(i, j, z);
             profit *= nearWater ? 2 : 1;
             z.townInfo.gold += profit;
             z.economyAndLaws.weeklyProfit += profit * 7;
-
-            if (plotOptionForPlot.enables_tourism == true) {
-              z.townInfo.gold_from_tourism +=
-                plotOptionForPlot.tourism_revenue_per_week *
-                z.economyAndLaws.tax_rate *
-                z.townInfo.population_count;
-            }
           }
         }
       }
@@ -955,17 +966,21 @@
   }
 
   function _calculateKnowledge(z) {
+    let starting = 0;
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           let plotOptionForPlot = options[z.plots[i][j].type];
           if (plotOptionForPlot.knowledge_points_per_month != null) {
-            z.townInfo.knowledge_points +=
-              plotOptionForPlot.knowledge_points_per_month;
+            z.townInfo.knowledge_points += Math.round(
+              plotOptionForPlot.knowledge_points_per_month / 4,
+            );
+            starting += plotOptionForPlot.knowledge_points_per_month;
           }
         }
       }
     }
+    z.resource_rate.knowledge = roundTo(starting / 4, 0);
     return z;
   }
 
@@ -976,14 +991,21 @@
     return z;
   }
 
-  function getProfit(revenue, z) {
+  function getProfit(revenue, z, type) {
     // This takes in revenue, and returns the gold profit.
     // Profit is revenue * tax rate * percentage of population out of the max population
     let profitModifiers = z.townInfo.happiness / 100;
-    if (profitModifiers > 2.25) {
-      profitModifiers = 2.25;
+    if (profitModifiers > 1.75) {
+      profitModifiers = 1.75;
     } else if (profitModifiers < 0.75) {
       profitModifiers = 0.75;
+    }
+
+    if (hasPlotOfType("village_inn", z).length > 0) {
+      // Has village inn.
+      if (type == "shop") {
+        profitModifiers *= 1.3;
+      }
     }
 
     let profit =

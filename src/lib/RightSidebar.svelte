@@ -33,8 +33,6 @@
     localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
   }
 
-  console.log($DB.townInfo.knowledge_points_per_month);
-
   let resources = [];
   $: resources = [
     {
@@ -59,10 +57,7 @@
       icon: "🧠",
       name: "knowledge",
       value: $DB.townInfo.knowledge_points,
-      rate:
-        $DB.townInfo.knowledge_points_per_month != undefined
-          ? $DB.townInfo.knowledge_points_per_month / 4
-          : 0,
+      rate: $DB.resource_rate.knowledge,
     },
     {
       icon: "🧲",

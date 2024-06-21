@@ -582,7 +582,9 @@
           <div class="flex flex-col gap-8 w-full overflow-y-scroll h-72 pb-24">
             {#each [1, 2, 3, 4] as level}
               <div>
-                <div class="text-xl font-bold">Level {level}</div>
+                {#if searchQuery.length == 0}
+                  <div class="text-xl font-bold">Level {level}</div>
+                {/if}
                 <div
                   class="flex flex-row text-start justify-start items-start flex-wrap pt-2 w-full align-middle gap-4"
                 >
@@ -590,7 +592,7 @@
                     <Tooltip.Root openDelay={200} closeDelay={0}>
                       <Tooltip.Trigger>
                         <div
-                          class="plotOption cursor-pointer min-w-40 h-[120px] rounded-xl flex flex-col align-middle transition-all duration-100
+                          class="plotOption cursor-pointer min-w-40 relative h-[120px] rounded-xl flex flex-col align-middle transition-all duration-100
             {option.affordable || option.selected
                             ? 'cursor-pointer'
                             : 'opacity-25 cursor-not-allowed '}
@@ -610,11 +612,16 @@
                                 ? firstEmoji(option.title)
                                 : "✅"}
                             </span>
-                            <span class="text-xs text-center font-bold">
+                            <span class="text-xs text-center font-bold mx-1">
                               {option.title.substring(2)}
                             </span>
                           </div>
-
+                          {#if option.requirements.resources.power > 0}
+                            <span
+                              class="bg-yellow-300 text-xs text-black tex px-1 py-0.5 rounded-2xl absolute top-[-5px] right-[-5px]"
+                              >🔋{option.requirements.resources.power}
+                            </span>
+                          {/if}
                           <span
                             style={option.styling}
                             class="text-xs text-center pt-4"
@@ -648,7 +655,7 @@
                     </Tooltip.Root>
                   {/each}
 
-                  {#if reactiveOptions.filter((option) => option.level === level).length === 0}
+                  {#if reactiveOptions.filter((option) => option.level === level).length === 0 && searchQuery.length == 0}
                     <span class="text-sm pt-2">No plots available!</span>
                   {/if}
                 </div>

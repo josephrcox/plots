@@ -11,7 +11,7 @@
   } from "./store";
   import { Confetti } from "svelte-confetti";
   import { fade } from "svelte/transition";
-  import { formatDuration, roundTo } from "./utils";
+  import { formatDuration, formatNumber, roundTo } from "./utils";
   import { Separator } from "$lib/components/ui/separator";
   import Button from "./components/ui/button/button.svelte";
   import { Progress } from "$lib/components/ui/progress/index.js";
@@ -46,19 +46,6 @@
       button.classList.remove("active");
     });
     return $speed;
-  }
-
-  export function transferFundsFromBank() {
-    let z = $DB;
-    // Checks gold_from_tourism and as long as you have a bank, it should transfer
-    if (z.hasBank === true) {
-      z.townInfo.gold += z.townInfo.gold_from_tourism;
-      z.townInfo.gold_from_tourism = 0;
-      DB.set(z);
-      localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-    } else {
-      alert("You need a bank to transfer funds from tourism activities.");
-    }
   }
 
   function showTheLabMenu() {
@@ -154,7 +141,9 @@
                 .population_max}</span
             >
             <span class="text-xs"
-              ><span class="text-sm">💰 {$DB.townInfo.gold}</span>
+              ><span class="text-sm"
+                >💰 {formatNumber($DB.townInfo.gold, false)}</span
+              >
               <span class="pl-2"></span>
               {#if $DB.economyAndLaws.weeklyProfit > 0}
                 <span class="text-textHappy"
@@ -204,7 +193,11 @@
           >
         </div>
       </div>
-      <div class="flex flex-row gap-2">
+      <div
+        class="flex flex-row gap-2 align-middle
+        justify-center items-center
+      "
+      >
         <Button
           class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
           on:click={function () {

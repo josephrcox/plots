@@ -20,7 +20,6 @@ export type Game = {
   townInfo: {
     name: string;
     gold: number; // you start with 1000, and generally profits go up slowly.
-    gold_from_tourism: number; // you start with 0, and this goes up with a village inn or with general other tourism plots.
     population_count: number;
     population_max: number;
     employees: number;
@@ -44,6 +43,7 @@ export type Game = {
     stone: number;
     metal: number;
     bureaucracy: number;
+    knowledge: number;
   };
   hasCityHall: boolean;
   hasBank: boolean;
@@ -126,8 +126,6 @@ export type PlotOption = {
   type: string;
   description: string;
   revenue_per_week: number;
-  tourism_revenue_per_week: number;
-  enables_tourism: boolean;
   requirements: {
     gold: number;
     plots: any[]; // TODO REMOVE THIS, IT'S NOT USED AT ALL.
