@@ -210,19 +210,20 @@
             ? 'bg-button cursor-pointer text-textPrimary'
             : 'bg-button cursor-not-allowed text-textPrimary opacity-35'}"
           on:click={showTheLabMenu}
-          ><div>Manage Lab</div>
-          {#if $DB.lab.active_experiment !== null}
-            {#if $DB.lab.active_experiment.duration > 0}
-              <span>{$DB.lab.active_experiment.duration}d</span>
-            {:else if $DB.lab.active_experiment.duration === 0}
-              <span
-                class="
-									
+          ><div>
+            Manage Lab
+            {#if $DB.lab.active_experiment !== null}
+              {#if $DB.lab.active_experiment.duration > 0}
+                <span>{$DB.lab.active_experiment.duration}d</span>
+              {:else if $DB.lab.active_experiment.duration === 0}
+                <span
+                  class="
 										animate-pulse
 									">✅ DONE!</span
-              >
+                >
+              {/if}
             {/if}
-          {/if}
+          </div>
         </Button>
       </div>
     </div>

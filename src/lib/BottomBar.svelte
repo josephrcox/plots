@@ -616,10 +616,10 @@
                               {option.title.substring(2)}
                             </span>
                           </div>
-                          {#if option.requirements.resources.power > 0}
+                          {#if option.active_costs.power > 0}
                             <span
                               class="bg-yellow-300 text-xs text-black tex px-1 py-0.5 rounded-2xl absolute top-[-5px] right-[-5px]"
-                              >🔋{option.requirements.resources.power}
+                              >🔋{option.active_costs.power}
                             </span>
                           {/if}
                           <span

@@ -144,6 +144,7 @@ export type PlotOption = {
     adjacent_plots: string[];
   };
   active_costs: {
+    food: number;
     gold: number;
     wood: number;
     stone: number;

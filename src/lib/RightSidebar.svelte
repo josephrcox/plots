@@ -170,7 +170,7 @@
               {/if}
             </span>
             <TooltipContent>
-              <div class="flex flex-col gap-2 whitespace-nowrap">
+              <div class="flex flex-col gap-2 whitespace-nowrap min-w-fit">
                 <span class="text-md font-bold"
                   >{icon} {capitalizeFirstLetter(name)}</span
                 >
@@ -188,7 +188,7 @@
                   <Separator />
                   <span class="text-sm font-semibold">Required for</span>
                 {/if}
-                <div class="flex flex-col flex-wrap max-h-36">
+                <div class="flex flex-col flex-wrap min-w-full">
                   {#each getRequiredPlots(name) as plot}
                     <span class="text-xs mr-4">{plot}</span>
                   {/each}
