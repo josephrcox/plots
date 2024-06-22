@@ -603,7 +603,7 @@ export const options: PlotOption[] = [
       "Requires metal but generates a lot of food. Must be near water.",
     revenue_per_week: 35,
     requirements: {
-      gold: 950,
+      gold: 1000,
       plots: [],
       employees: 9,
       knowledge: 0,
@@ -1491,10 +1491,10 @@ export const options: PlotOption[] = [
     id: "mine",
     title: "⛏️ Mine",
     type: "mine",
-    description: "Produces metal and gold, requires power",
+    description: "Produces a significant amount of metal and stone.",
     revenue_per_week: 0,
     requirements: {
-      gold: 4000,
+      gold: 50000,
       plots: [],
       employees: 64,
       knowledge: 0,
@@ -1503,8 +1503,8 @@ export const options: PlotOption[] = [
       resources: {
         food: 0,
         wood: 0,
-        stone: 1000,
-        metal: 50,
+        stone: 0,
+        metal: 150,
         power: 0,
         bureaucracy: 0,
       },
@@ -1530,7 +1530,7 @@ export const options: PlotOption[] = [
     generated_resources: {
       food: 0,
       wood: 0,
-      stone: 100,
+      stone: 50,
       metal: 50,
       power: 0,
       bureaucracy: 0,
@@ -1538,7 +1538,7 @@ export const options: PlotOption[] = [
     level: 4,
     active_costs: {
       gold: 0,
-      power: 30,
+      power: 60,
       wood: 0,
       stone: 0,
       metal: 0,

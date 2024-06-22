@@ -28,7 +28,6 @@
     db = _taxRateEffects(db);
     db = _applyModifiers(db);
     db = _healthEffects(db); //////////
-    db = _bringModifiersBackToNormal(db);
     db = _checkSpecialPlots(db);
     db = _adjustKnowledgeGoldMarketRates(db);
 
@@ -75,8 +74,10 @@
 
   function performDailyTasks(db) {
     db = _calculateProfits(db);
+    db = _bringModifiersBackToNormal(db);
     db = _fixVariables(db);
     db = _checkExperiment(db);
+
     if (db.overtime == false) {
       db = _checkGameLost(db);
       db = _checkGameWin(db);
@@ -844,17 +845,18 @@
   }
 
   export function _bringModifiersBackToNormal(z) {
+    const modifierVariable = 0.1;
     if (z.modifiers.happiness > 1.0) {
       // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
       let percentAboveOne = z.modifiers.happiness - 1.0;
-      z.modifiers.happiness -= percentAboveOne * 0.08;
+      z.modifiers.happiness -= percentAboveOne * modifierVariable;
       if (z.modifiers.happiness < 1.05) {
         z.modifiers.happiness = 1.0;
       }
     }
     if (z.modifiers.community > 1.0) {
       let percentAboveOne = z.modifiers.community - 1.0;
-      z.modifiers.community -= percentAboveOne * 0.08;
+      z.modifiers.community -= percentAboveOne * modifierVariable;
       if (z.modifiers.community < 1.05) {
         z.modifiers.community = 1.0;
       }
@@ -872,7 +874,7 @@
         }
       } else {
         let percentAboveOne = z.modifiers.health - 1.0;
-        z.modifiers.health -= percentAboveOne * 0.08;
+        z.modifiers.health -= percentAboveOne * modifierVariable;
         if (z.modifiers.health < 1.05) {
           z.modifiers.health = 1.0;
         }
