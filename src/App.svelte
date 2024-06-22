@@ -23,6 +23,7 @@
   import LabMenu from "$lib/menus/LabMenu.svelte";
   import Hud from "$lib/Hud.svelte";
   import WelcomeScreen from "$lib/menus/WelcomeScreen.svelte";
+  import CityHallMenu from "$lib/menus/CityHallMenu.svelte";
 
   let dbInitialized = false;
   runTests();
@@ -211,6 +212,7 @@
     <Scoreboard />
     <KnowledgeMenu />
     <LabMenu />
+    <CityHallMenu />
     {#if $DB.environment.day == 0 && $showWelcome}
       <WelcomeScreen />
     {/if}

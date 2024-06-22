@@ -8,6 +8,7 @@
     showKnowledgeMenu,
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
+    showCityHallMenu,
   } from "./store";
   import { Confetti } from "svelte-confetti";
   import { fade } from "svelte/transition";
@@ -204,6 +205,13 @@
             $showKnowledgeMenu = !$showKnowledgeMenu;
           }}
           ><div>Manage Knowledge</div>
+        </Button>
+        <Button
+          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
+          on:click={function () {
+            $showCityHallMenu = !$showCityHallMenu;
+          }}
+          ><div>City Management</div>
         </Button>
         <Button
           class="text-xs flex flex-col h-min p-1.5 {$DB.hasLab

@@ -10,6 +10,13 @@ export type Plot = {
   water: boolean;
 };
 
+export type Law = {
+  id: string;
+  description: string;
+  cost: number;
+  weekly_effect: (game: Game) => void;
+};
+
 export type Game = {
   plots: Plot[][]; // 2d array of plot-like objects that mark what is in each plot.
   timeSpent: number; // in seconds
@@ -65,6 +72,7 @@ export type Game = {
     max_tax_rate: number; // the max the town is willing to pay, random each game between 0.2 and 0.6.
     weeklyProfit: number;
     knowledge_gold_market_rates: number[];
+    enacted: string[];
   };
   plotCounts: [][];
   environment: {

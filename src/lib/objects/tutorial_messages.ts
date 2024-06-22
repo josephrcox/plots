@@ -61,7 +61,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.knowledge_points >= 250;
     },
-    goldReward: 1500,
+    goldReward: 2000,
   },
   {
     message:
@@ -71,7 +71,6 @@ export const tutorialMessages: TutorialStep[] = [
     },
     goldReward: 1500,
   },
-
   {
     message:
       "My liege, some advanced buildings require power. Start generating power with a waterwheel.",

@@ -215,10 +215,17 @@
         {/each}
       </div>
     {/if}
-    {#if Object.values(options[getOptionIndex(option.id)].generated_resources).some((value) => value != 0)}
+    {#if Object.values(options[getOptionIndex(option.id)].generated_resources).some((value) => value != 0) || options[getOptionIndex(option.id)].knowledge_points_per_month > 0}
       <div class="flex flex-col gap-1 text-xs">
         <Separator class={"bg-secondary opacity-25 mt-2"} />
         <span class="font-semibold">Generated Resources</span>
+        {#if options[getOptionIndex(option.id)].knowledge_points_per_month > 0}
+          <span
+            >🧠 {Math.round(
+              options[getOptionIndex(option.id)].knowledge_points_per_month,
+            )} (monthly)
+          </span>
+        {/if}
         {#each Object.keys(options[getOptionIndex(option.id)].generated_resources) as key, index}
           {#if Object.values(options[getOptionIndex(option.id)].generated_resources)[index] != 0}
             <span

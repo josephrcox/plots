@@ -49,6 +49,7 @@ export const default_db: Game = {
     max_tax_rate: 1,
     weeklyProfit: 0,
     knowledge_gold_market_rates: [],
+    enacted: [],
   },
   plotCounts: [],
   environment: {

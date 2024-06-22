@@ -664,6 +664,7 @@ export let showScoreboard = writable(false);
 export let showKnowledgeMenu = writable(false);
 export let showAchievementPopup = writable(false);
 export let showLabMenu = writable(false);
+export let showCityHallMenu = writable(false);
 export let showCompletedAchievements =
   localStorage.getItem("showCompletedAchievements") === "true"
     ? writable(true)

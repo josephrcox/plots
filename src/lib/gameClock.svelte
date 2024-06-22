@@ -19,12 +19,12 @@
   import { achievements } from "./objects/AchievementList.ts";
   import { tutorialMessages } from "./objects/tutorial_messages";
   import { isAdjacentToWater, randomizeNumber } from "./utils.ts";
+  import { laws } from "./objects/Laws";
 
   let z = $DB;
   const GAME_TICK_SPEED = 30;
 
   function performWeeklyTasks(db) {
-    db = _unemployment(db);
     db = _taxRateEffects(db);
     db = _healthEffects(db); //////////
     db = _checkSpecialPlots(db);
@@ -39,6 +39,7 @@
       bureaucracy: db.resources.bureaucracy,
     };
     db = _generateResources(db);
+    db = _lawEffects(db);
     db = _handleActiveCosts(db); // TODO
     db = _calculatePower(db);
     db = _bringStatsBackToNormal(db);
@@ -57,6 +58,7 @@
   }
 
   function performMonthlyTasks(db) {
+    db = _unemployment(db);
     db = _banksEffect(db);
     db = _federalGovEffect(db);
     db = _reactToProductivity(db);
@@ -295,7 +297,7 @@
       // Extremely upset
       multiplier = 5;
     }
-    multiplier = randomizeNumber(multiplier, 2);
+    multiplier = 1; // randomizeNumber(multiplier, 2);
     let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.25;
     if (hasLumberMillMultiplier === 0) hasLumberMillMultiplier = 1;
 
@@ -529,8 +531,6 @@
       }
     }
 
-    console.log(z.currentTutorialStep);
-
     return z;
   }
 
@@ -566,7 +566,7 @@
   function _unemployment(z) {
     let unemployed = z.townInfo.population_count - z.townInfo.employees;
     if (unemployed > 0) {
-      z.townInfo.happiness -= unemployed * 0.6;
+      z.townInfo.happiness -= unemployed * 0.06;
       z = addToTownLog(unemployed + messages.unemployment_num, z);
     }
     return z;
@@ -610,6 +610,19 @@
   function _federalGovEffect(z) {
     if (z.hasCityHall === true) {
       // TODO
+    }
+    return z;
+  }
+
+  function _lawEffects(z) {
+    // Looks at laws enacted in the economyAndLaws object, and applies effects to the town.
+    for (let i = 0; i < z.economyAndLaws.enacted.length; i++) {
+      let l = laws.find((l) => l.id == z.economyAndLaws.enacted[i]);
+      if (l != null) {
+        if (l.weekly_effect != null) {
+          z = l.weekly_effect(z);
+        }
+      }
     }
     return z;
   }
