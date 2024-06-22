@@ -60,7 +60,6 @@
   function performMonthlyTasks(db) {
     db = _unemployment(db);
     db = _banksEffect(db);
-    db = _federalGovEffect(db);
     db = _reactToProductivity(db);
     db = _applyModifiers(db);
     db = _mineEffects(db);
@@ -297,7 +296,7 @@
       // Extremely upset
       multiplier = 5;
     }
-    multiplier = 1; // randomizeNumber(multiplier, 2);
+    multiplier = randomizeNumber(multiplier, 2);
     let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.25;
     if (hasLumberMillMultiplier === 0) hasLumberMillMultiplier = 1;
 
@@ -604,13 +603,6 @@
       z.modifiers.happiness * 0.95;
     }
 
-    return z;
-  }
-
-  function _federalGovEffect(z) {
-    if (z.hasCityHall === true) {
-      // TODO
-    }
     return z;
   }
 
