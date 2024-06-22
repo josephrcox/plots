@@ -481,7 +481,9 @@ export function startGame(
   for (let i = 0; i < randomSize; i++) {
     default_plots.push([]);
     for (let j = 0; j < randomSize; j++) {
-      const water = isWater(i, j, randomSize);
+      const water =
+        i == mineX && j == mineY ? false : isWater(i, j, randomSize);
+
       default_plots[i][j] = {
         id: Math.random().toString(36).substring(2, 9),
         active: false,

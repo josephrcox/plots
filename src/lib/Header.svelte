@@ -244,7 +244,7 @@
           <div
             class=" flex flex-row justify-center text-xs bg-white rounded-t-2xl text-black py-2 whitespace-nowrap px-2 opacity-50"
           >
-            <Tooltip.Root openDelay={200} closeDelay={0}>
+            <Tooltip.Root openDelay={400} closeDelay={0}>
               <Tooltip.Trigger>
                 <span
                   class="w-full no-select opacity-70 whitespace-nowrap text-center"

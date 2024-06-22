@@ -26,7 +26,6 @@
   function performWeeklyTasks(db) {
     db = _unemployment(db);
     db = _taxRateEffects(db);
-    db = _applyModifiers(db);
     db = _healthEffects(db); //////////
     db = _checkSpecialPlots(db);
     db = _adjustKnowledgeGoldMarketRates(db);
@@ -61,6 +60,8 @@
     db = _banksEffect(db);
     db = _federalGovEffect(db);
     db = _reactToProductivity(db);
+    db = _applyModifiers(db);
+    db = _mineEffects(db);
     return db;
   }
 
@@ -198,14 +199,16 @@
     let multiplier = 1; // will be multiplied to get new happiness. higher == better.
     if (productivityPercentage > 50 && productivityPercentage < 100) {
       // Happy citizens
-      multiplier = 1.08;
+      multiplier = 1.05;
     } else if (productivityPercentage == 100) {
       // Typical, no change needed.
       return z;
+    } else if (productivityPercentage < 50) {
+      multiplier = 1.2;
     } else if (productivityPercentage > 100 && productivityPercentage < 125) {
       multiplier = 0.98;
     } else if (productivityPercentage > 125 && productivityPercentage < 150) {
-      multiplier = 0.95;
+      multiplier = 0.96;
     } else if (productivityPercentage > 150 && productivityPercentage < 175) {
       multiplier = 0.9;
     } else if (productivityPercentage > 175 && productivityPercentage < 200) {
@@ -213,12 +216,20 @@
       multiplier = 0.8;
     }
     const before = z.townInfo.happiness;
-    z.townInfo.happiness *= multiplier;
+    z.townInfo.happines *= multiplier;
 
-    z = addToTownLog(
-      `Happiness has gone down by ${100 - Math.round((z.townInfo.happiness / before) * 100)}% due to productivity.`,
-      z,
-    );
+    if (multiplier > 1.0) {
+      z = addToTownLog(
+        `Happiness has gone up by ${Math.round((z.townInfo.happiness / before) * 100)}% due to productivity.`,
+        z,
+      );
+    } else {
+      z = addToTownLog(
+        `Happiness has gone down by ${100 - Math.round((z.townInfo.happiness / before) * 100)}% due to productivity.`,
+        z,
+      );
+    }
+
     return z;
   }
 
@@ -555,7 +566,7 @@
   function _unemployment(z) {
     let unemployed = z.townInfo.population_count - z.townInfo.employees;
     if (unemployed > 0) {
-      z.modifiers.happiness -= unemployed * 0.0004;
+      z.townInfo.happiness -= unemployed * 0.6;
       z = addToTownLog(unemployed + messages.unemployment_num, z);
     }
     return z;
@@ -964,6 +975,22 @@
     z.townInfo.happiness *= z.modifiers.happiness;
     z.townInfo.health *= z.modifiers.health;
     z.townInfo.community *= z.modifiers.community;
+    return z;
+  }
+
+  function _mineEffects(z) {
+    if (hasPlotOfType("mine", z).length > 0) {
+      // When a mine is in the town, the health should be hurt.
+      // This is called monthly, and every month, the health modifier should drop by 0.01
+      z.modifiers.health -= 0.01;
+      if (hasPlotOfType("healing_house", z).length == 0) {
+        z = addToTownLog(
+          "The mine is actively hurting the health of the town. Time to look into a healing house.",
+          z,
+        );
+      }
+    }
+
     return z;
   }
 

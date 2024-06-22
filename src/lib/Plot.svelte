@@ -81,7 +81,7 @@
   }
 </script>
 
-<Tooltip.Root openDelay={100} closeDelay={0}>
+<Tooltip.Root openDelay={400} closeDelay={0}>
   <Tooltip.Trigger>
     <button
       class="plot_container {classText}  overflow-visible {data.type == -1 &&
@@ -98,7 +98,9 @@
             $modifyPlotMenuOptions.y == data.y &&
             $modifyPlotMenuOptions.visible
           ? 'white'
-          : getColor(data.type, canBeUpgraded)}"
+          : data.mineralSource
+            ? 'black'
+            : getColor(data.type, canBeUpgraded)}"
       data-active={data.active}
       data-hideHoverAnimation={$modifyPlotMenuOptions.visible ||
         (data.type == -1 && data.x == 0 && data.y == 0)}
@@ -142,7 +144,7 @@
         <!--  -->
       {/if}
       {#if data.mineralSource && data.type == -1}
-        <span class="text-xs">Mineral source</span>
+        <span class="text-lg">🧲</span>
       {/if}
     </button>
   </Tooltip.Trigger>

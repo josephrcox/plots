@@ -249,7 +249,7 @@ export function isAdjacentToPlots(
 
 // function that takes a number and returns one that is within 15% below or above
 export function randomizeNumber(n: number, round: number = 0) {
-  let min = n * 0.85;
-  let max = n * 1.15;
+  let min = n * 0.92;
+  let max = n * 1.08;
   return roundTo(Math.random() * (max - min) + min, round);
 }

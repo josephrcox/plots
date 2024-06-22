@@ -517,13 +517,13 @@
         <div
           class="flex flex-col {$modifyPlotMenuOptions.isMineralSource ||
           searchQuery.length > 0
-            ? 'gap-0 pt-2'
-            : 'gap-8'} w-full overflow-y-scroll h-72 pb-24"
+            ? 'gap-0 pt-0'
+            : 'gap-4'} w-full overflow-y-scroll h-72 pb-24"
         >
           {#each $modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0 ? [1] : [1, 2, 3, 4] as level}
             <div>
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource}
-                <div class="text-xl font-bold">Level {level}</div>
+                <div class="text-sm font-extralight pb-3">Level {level}</div>
               {/if}
               <div
                 class="flex flex-row text-start justify-start items-start flex-wrap
@@ -534,7 +534,7 @@
                  w-full align-middle"
               >
                 {#each searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource ? reactiveOptions.filter((option) => option.level === level) : reactiveOptions as option (option.id)}
-                  <Tooltip.Root openDelay={200} closeDelay={0}>
+                  <Tooltip.Root openDelay={400} closeDelay={0}>
                     <Tooltip.Trigger>
                       <div
                         class="plotOption cursor-pointer min-w-40
@@ -566,8 +566,14 @@
                         </div>
                         {#if option.active_costs.power > 0}
                           <span
-                            class="bg-yellow-300 text-xs text-black tex px-1 py-0.5 rounded-2xl absolute top-[-5px] right-[-5px]"
+                            class="bg-yellow-300 text-xs text-black tex px-1 py-0.5 rounded-2xl absolute top-[-5px] right-[-2px]"
                             >🔋{option.active_costs.power}
+                          </span>
+                        {/if}
+                        {#if hasPlotOfType(option.id, $DB).length > 0}
+                          <span
+                            class="bg-black text-xs text-white tex px-1 py-0.5 rounded-2xl absolute top-[-5px] left-[-2px]"
+                            >x{hasPlotOfType(option.id, $DB).length}
                           </span>
                         {/if}
                         <span

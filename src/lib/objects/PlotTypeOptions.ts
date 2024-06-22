@@ -1019,7 +1019,7 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     knowledge_points_per_month: 25,
     requirements: {
-      gold: 2000,
+      gold: 2500,
       plots: [],
       employees: 20,
       knowledge: 0,
@@ -1136,7 +1136,7 @@ export const options: PlotOption[] = [
     type: "recreation",
     description: "Produces knowledge and happiness",
     revenue_per_week: 0,
-    knowledge_points_per_month: 15,
+    knowledge_points_per_month: 10,
     requirements: {
       gold: 2000,
       plots: [],
@@ -1512,7 +1512,7 @@ export const options: PlotOption[] = [
     },
     effect_modifiers: {
       happiness: 1.0,
-      health: 1.0,
+      health: 0.95,
       community: 1,
     },
     immediate_variable_changes: {

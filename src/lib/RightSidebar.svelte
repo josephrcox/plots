@@ -123,7 +123,7 @@
 	z-10 fixed right-3 top-[190px] rounded-xl p-2 transition-all duration-300"
 >
   <div class="flex flex-row justify-center">
-    <Tooltip.Root openDelay={200} closeDelay={0}>
+    <Tooltip.Root openDelay={400} closeDelay={0}>
       <Tooltip.Trigger>
         <div class="flex flex-row items-center pb-2 gap-2">
           <h1 class="text-xl w-full text-center">Resources</h1>
@@ -148,7 +148,7 @@
   >
     <div class="flex flex-col text-sm text-nowrap gap-2">
       {#each resources as { icon, name, value, rate }}
-        <Tooltip.Root openDelay={200} closeDelay={0}>
+        <Tooltip.Root openDelay={400} closeDelay={0}>
           <Tooltip.Trigger>
             <span
               class="flex flex-row justify-between
