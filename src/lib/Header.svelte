@@ -18,6 +18,7 @@
   import { Progress } from "$lib/components/ui/progress/index.js";
   import { tutorialMessages } from "./objects/tutorial_messages";
   import * as Tooltip from "$lib/components/ui/tooltip";
+  import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -62,6 +63,43 @@
   } else {
     formattedTime = "00:00:00";
   }
+  let attributes: any[];
+  $: {
+    attributes = [
+      {
+        name: "Happiness",
+        description:
+          "Happy townspeople spend more money and are less likely to leave.",
+        value: $DB.townInfo.happiness,
+        modifier: $DB.modifiers.happiness,
+      },
+      {
+        name: "Health",
+        description:
+          "Healthy townspeople are less likely to die (and leave the town obviously).",
+        value: $DB.townInfo.health,
+        modifier: $DB.modifiers.health,
+      },
+      {
+        name: "Community",
+        description:
+          "Townspeople that feel at home are less likely to leave, and less likely to get bored.",
+        value: $DB.townInfo.community,
+        modifier: $DB.modifiers.community,
+      },
+    ];
+  }
+
+  const getColor = (value: number) => {
+    if (value > 149) {
+      return "bg-green-500";
+    } else if (value < 149 && value > 99) {
+      2;
+      return "bg-yellow-500";
+    } else {
+      return "bg-red-500";
+    }
+  };
 </script>
 
 <div
@@ -69,56 +107,32 @@
 		{$modifyPlotMenuOptions.visible ? 'opacity-70' : ''}
 	"
 >
-  <div class="flex flex-row gap-6 my-2 h-max">
+  <div class="flex flex-row gap-2 my-2 h-max">
     <div
-      class="flex flex-col w-36 h-full justify-center text-foregroundText bg-accent p-2 rounded-xl"
+      class="flex flex-col w-36 text-foregroundText bg-accent p-2 rounded-xl gap-2 mr-2"
     >
-      <span>
-        <h2 class="text-lg text-white">Stats</h2>
-        <Separator class="bg-white" />
-        <span class="text-xs"
-          >Happiness (x{roundTo($DB.modifiers.happiness, 2)})</span
-        >
-        <Progress
-          value={$DB.townInfo.happiness}
-          max={300}
-          class="w-full h-2"
-          color={parseInt($DB.townInfo.happiness) > 200
-            ? "bg-green-500"
-            : parseInt($DB.townInfo.happiness) > 100
-              ? "bg-yellow-500"
-              : "bg-red-500"}
-        />
-      </span>
-      <span>
-        <span class="text-xs">Health (x{roundTo($DB.modifiers.health, 2)})</span
-        >
-        <Progress
-          value={$DB.townInfo.health}
-          max={300}
-          class="w-full h-2"
-          color={parseInt($DB.townInfo.health) > 200
-            ? "bg-green-500"
-            : parseInt($DB.townInfo.health) > 100
-              ? "bg-yellow-500"
-              : "bg-red-500"}
-        />
-      </span>
-      <span>
-        <span class="text-xs"
-          >Community (x{roundTo($DB.modifiers.community, 2)})</span
-        >
-        <Progress
-          value={$DB.townInfo.community}
-          max={300}
-          class="w-full h-2"
-          color={parseInt($DB.townInfo.community) > 200
-            ? "bg-green-500"
-            : parseInt($DB.townInfo.community) > 100
-              ? "bg-yellow-500"
-              : "bg-red-500"}
-        />
-      </span>
+      {#each attributes as { name, value, modifier }}
+        <div class="flex flex-col gap-2">
+          <Tooltip.Root openDelay={400} closeDelay={0}>
+            <Tooltip.Trigger class="h-min w-full mt-0 flex flex-col">
+              <span class="text-xs pb-1">{name} (x{roundTo(modifier, 2)})</span>
+              <Progress
+                {value}
+                max={300}
+                class="w-full h-2"
+                color={getColor(value)}
+              />
+            </Tooltip.Trigger>
+            <Tooltip.Content class={getColor(value)}>
+              <div class="flex flex-col justify-between p-0 m-0">
+                <span class="text-sm font-bold">{name}</span>
+                <span class="text-xs">Base: {roundTo(value, 0)} / 300</span>
+                <span class="text-xs">Modifier: {roundTo(modifier, 0)}</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </div>
+      {/each}
     </div>
     <div class="flex justify-between flex-col">
       <div class=" rounded-xl">
@@ -237,7 +251,7 @@
     </div>
   </div>
   <div
-    class="flex flex-row flex-wrap align-middle justify-center items-center w-64 {$showTutorialStepConfetti
+    class="flex flex-row flex-wrap align-middle justify-center items-center w-80 {$showTutorialStepConfetti
       ? 'opacity-25 '
       : ''}
       transition-all duration-700"

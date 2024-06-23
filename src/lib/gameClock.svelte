@@ -29,6 +29,7 @@
     db = _healthEffects(db); //////////
     db = _checkSpecialPlots(db);
     db = _adjustKnowledgeGoldMarketRates(db);
+    db = _bringModifiersBackToNormal(db);
 
     db = _warnUser(db);
     const startResources = {
@@ -40,9 +41,8 @@
     };
     db = _generateResources(db);
     db = _lawEffects(db);
-    db = _handleActiveCosts(db); // TODO
+    db = _handleActiveCosts(db);
     db = _calculatePower(db);
-    db = _bringStatsBackToNormal(db);
     db = _calculateKnowledge(db);
     db = _feedCitizens(db);
     const endResources = {
@@ -63,6 +63,7 @@
     db = _reactToProductivity(db);
     db = _applyModifiers(db);
     db = _mineEffects(db);
+    db = _bringStatsBackToNormal(db);
     return db;
   }
 
@@ -76,7 +77,6 @@
 
   function performDailyTasks(db) {
     db = _calculateProfits(db);
-    db = _bringModifiersBackToNormal(db);
     db = _fixVariables(db);
     db = _checkExperiment(db);
 
@@ -644,6 +644,12 @@
   }
 
   function _boredom(z) {
+    // check if to proceed based on z.townInfo.community. Pick a random number and if it's under 100, then proceed.
+    if (z.townInfo.community < 100) {
+      if (Math.random() * 100 < z.townInfo.community) {
+        return z;
+      }
+    }
     if (
       z.lastChangeDay + (Math.random() * 500 + 365) < z.environment.day &&
       z.townInfo.population_count > 0
@@ -652,9 +658,8 @@
         z.townInfo.population_count -= 1;
         z.townInfo.employees -= 1;
         z.modifiers.happiness -= 0.01;
+        z = addToTownLog(messages.bored, z);
       }
-
-      z = addToTownLog(messages.bored, z);
     }
     return z;
   }
@@ -724,6 +729,10 @@
     if (z.townInfo.happiness < 50 && z.townInfo.population_count > 0) {
       // When the happiness is low, some people should leave
       let unhappyPeople = Math.round((100 - z.townInfo.happiness) / 5);
+      // If community is around 150 (default), then some people leave.
+      // If community drops, then more people leave.
+      // If community rises, then less people leave.
+      unhappyPeople = unhappyPeople * (z.townInfo.community / 200);
       z.townInfo.population_count -= unhappyPeople;
       // When people leave, so does employment
       if (z.townInfo.employees > 0) {
@@ -1029,8 +1038,8 @@
     // This takes in revenue, and returns the gold profit.
     // Profit is revenue * tax rate * percentage of population out of the max population
     let profitModifiers = z.townInfo.happiness / 100;
-    if (profitModifiers > 1.75) {
-      profitModifiers = 1.75;
+    if (profitModifiers > 2.0) {
+      profitModifiers = 2.0;
     } else if (profitModifiers < 0.75) {
       profitModifiers = 0.75;
     }
@@ -1046,7 +1055,8 @@
       revenue *
       z.economyAndLaws.tax_rate *
       (z.townInfo.population_count / z.townInfo.population_max) *
-      profitModifiers;
+      profitModifiers *
+      (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1);
     return roundTo(profit, 2);
   }
 

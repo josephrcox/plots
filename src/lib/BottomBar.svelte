@@ -360,6 +360,10 @@
         z.modifiers.health * plotChosen.effect_modifiers.health,
         2,
       );
+      z.modifiers.community = roundTo(
+        z.modifiers.community * plotChosen.effect_modifiers.community,
+        2,
+      );
       // Employer modifications
       z.townInfo.employees += plotChosen.requirements.employees;
 

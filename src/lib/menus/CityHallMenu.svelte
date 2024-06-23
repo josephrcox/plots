@@ -35,8 +35,8 @@
       <Dialog.Description class="w-3/4"></Dialog.Description>
       <Separator class="mb-4" />
       <div class="w-full">
-        <span class="text-lg font-bold"> Laws 🧑‍⚖️ </span>
         {#if hasPlotOfType("city_hall", $DB).length > 0}
+          <span class="text-lg font-bold"> Laws 🧑‍⚖️ </span>
           <!-- each Law in laws -->
           {#each laws as law}
             <div

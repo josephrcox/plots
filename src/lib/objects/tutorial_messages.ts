@@ -57,7 +57,7 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
-      "My liege, as the town grows, we need a lot more knowledge. Get to 250 knowledge.  ",
+      "My liege, as the town develops we will need the smartest and brightest. Build plots to get our Knowledge to 250.",
     isComplete: (z: Game) => {
       return z.townInfo.knowledge_points >= 250;
     },

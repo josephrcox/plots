@@ -603,7 +603,7 @@ export const options: PlotOption[] = [
       "Requires metal but generates a lot of food. Must be near water.",
     revenue_per_week: 35,
     requirements: {
-      gold: 1000,
+      gold: 1500,
       plots: [],
       employees: 9,
       knowledge: 0,
@@ -611,7 +611,7 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 500,
+        wood: 1500,
         stone: 0,
         metal: 100,
         power: 0,
@@ -896,12 +896,13 @@ export const options: PlotOption[] = [
     id: "park",
     title: "🎪 Park",
     type: "recreation",
-    description: "Makes people extremely happy & healthy for a period.",
+    description:
+      "Makes people extremely happy & healthy for a period. Improves community.",
     revenue_per_week: 0,
     requirements: {
-      gold: 800,
+      gold: 600,
       plots: [],
-      employees: 4,
+      employees: 3,
       knowledge: 0,
       size: 1,
       xp: 0,
@@ -909,16 +910,16 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 100,
         stone: 100,
-        metal: 20,
+        metal: 10,
         power: 0,
         bureaucracy: 0,
       },
       adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 2.0,
-      health: 2.0,
-      community: 1,
+      happiness: 1.5,
+      health: 1.5,
+      community: 1.3,
     },
     immediate_variable_changes: {
       happiness: 40,
@@ -978,7 +979,7 @@ export const options: PlotOption[] = [
     effect_modifiers: {
       happiness: 1.0,
       health: 1.0,
-      community: 1,
+      community: 1.02,
     },
     immediate_variable_changes: {
       happiness: 10,
@@ -1036,9 +1037,9 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 1.05,
+      happiness: 1.1,
       health: 1.1,
-      community: 1,
+      community: 1.2,
     },
     immediate_variable_changes: {
       happiness: 15,
@@ -1157,7 +1158,7 @@ export const options: PlotOption[] = [
     effect_modifiers: {
       happiness: 1.3,
       health: 1.0,
-      community: 1,
+      community: 1.1,
     },
     immediate_variable_changes: {
       happiness: 15,
@@ -1335,7 +1336,7 @@ export const options: PlotOption[] = [
     effect_modifiers: {
       happiness: 1.05,
       health: 1.0,
-      community: 1,
+      community: 1.1,
     },
     immediate_variable_changes: {
       happiness: 20,
@@ -1395,7 +1396,7 @@ export const options: PlotOption[] = [
     effect_modifiers: {
       happiness: 1.25,
       health: 1.5,
-      community: 1,
+      community: 1.1,
     },
     immediate_variable_changes: {
       happiness: 5,
@@ -1453,7 +1454,7 @@ export const options: PlotOption[] = [
     effect_modifiers: {
       happiness: 1.09,
       health: 1.0,
-      community: 1,
+      community: 2,
     },
     immediate_variable_changes: {
       happiness: 50,
@@ -1505,16 +1506,16 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 1250,
         stone: 800,
-        metal: 500,
+        metal: 100,
         power: 0,
         bureaucracy: 0,
       },
       adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 0.98,
+      happiness: 0.99,
       health: 1.0,
-      community: 1.1,
+      community: 1.2,
     },
     immediate_variable_changes: {
       happiness: 0,
@@ -1537,7 +1538,7 @@ export const options: PlotOption[] = [
     },
     level: 4,
     active_costs: {
-      gold: 1000,
+      gold: 300,
       power: 0,
       wood: 0,
       stone: 0,
