@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 // @ts-ignore
 import { default_db, default_user_db } from "./objects/defaults/default_DB.js";
 // @ts-ignore
-import { Difficulty, EndGoal, Game, UserDatabase } from "./types";
+import { Difficulty, EndGoal, Game, UserDatabase, Plot } from "./types";
 // @ts-ignore
 import { max_tax_rates_based_on_difficulty } from "./objects/difficulty.js";
 // @ts-ignore
@@ -619,6 +619,50 @@ export function hasPlotOfType(type: string, z: Game) {
   }
 
   return plotsOfType;
+}
+
+export function expandTown(z: Game, direction: string) {
+  const numRows = z.plots.length;
+  const numCols = numRows > 0 ? z.plots[0].length : 0;
+  const newCols = direction == "east" ? 5 : 0;
+  const newRows = direction == "south" ? 5 : 0;
+
+  // Expand existing rows to the right
+  for (let i = 0; i < numRows; i++) {
+    for (let j = numCols; j < numCols + newCols; j++) {
+      z.plots[i].push({
+        id: Math.random().toString(36).substring(2, 9),
+        active: false,
+        x: i,
+        y: j,
+        type: -1,
+        typeId: "",
+        mineralSource: false,
+        water: false,
+        disabled: false,
+      });
+    }
+  }
+
+  // Add new rows to the bottom
+  for (let i = numRows; i < numRows + newRows; i++) {
+    const newRow: any[] = [];
+    for (let j = 0; j < numCols + newCols; j++) {
+      newRow.push({
+        id: Math.random().toString(36).substring(2, 9),
+        active: false,
+        x: i,
+        y: j,
+        type: -1,
+        typeId: "",
+        mineralSource: false,
+        water: false,
+      });
+    }
+    z.plots.push(newRow);
+  }
+
+  DB.set(z);
 }
 
 export function clearDB(overridenFile: File | null = null) {

@@ -7,6 +7,8 @@ export type Plot = {
   y: number;
   type: number;
   disabled: boolean;
+  typeId: string;
+  mineralSource: boolean;
   water: boolean;
 };
 

@@ -13,31 +13,18 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.population_max > 0;
     },
-    goldReward: 250,
+    goldReward: 600,
   },
   {
     message:
-      "My liege, the village is going to run out of food soon. Build some farms. ",
+      "My liege, the village is going to run out of food soon. Build 3 farms and a tree farm. ",
     isComplete: (z: Game) => {
-      return z.townInfo.employees > 0;
+      return (
+        hasPlotOfType("farm", z).length >= 3 &&
+        hasPlotOfType("tree_farm", z).length >= 1
+      );
     },
-    goldReward: 250,
-  },
-  {
-    message:
-      "My liege, lumber is needed for most buildings. Build a tree farm. ",
-    isComplete: (z: Game) => {
-      return hasPlotOfType("tree_farm", z).length > 0;
-    },
-    goldReward: 250,
-  },
-  {
-    message:
-      "My liege, for the village to be successful, everyone needs a job. ",
-    isComplete: (z: Game) => {
-      return z.townInfo.employees >= z.townInfo.population_count;
-    },
-    goldReward: 250,
+    goldReward: 300,
   },
   {
     message:
@@ -73,7 +60,7 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
-      "My liege, some advanced buildings require power. Start generating power with a waterwheel.",
+      "My liege, some advanced buildings require power. Start generating power with a water wheel or a solar farm.",
     isComplete: (z: Game) => {
       return z.resources.power > 0;
     },
@@ -86,5 +73,21 @@ export const tutorialMessages: TutorialStep[] = [
       return hasPlotOfType("mine", z).length > 0;
     },
     goldReward: 2000,
+  },
+  {
+    message:
+      "My liege, mining resources has taken a toll on the towns health. Build a Healing House to lower the chance of sickness.",
+    isComplete: (z: Game) => {
+      return hasPlotOfType("healing_house", z).length > 0;
+    },
+    goldReward: 5000,
+  },
+  {
+    message:
+      "My liege, now that we have metals, power, and people, your next goal is a big one. Build your town a City Hall.",
+    isComplete: (z: Game) => {
+      return hasPlotOfType("city_hall", z).length > 0;
+    },
+    goldReward: 10000,
   },
 ];

@@ -1377,7 +1377,7 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     knowledge_points_per_month: 0,
     requirements: {
-      gold: 10000,
+      gold: 20000,
       plots: [],
       employees: 18,
       knowledge: 0,
@@ -1496,17 +1496,17 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     knowledge_points_per_month: 0,
     requirements: {
-      gold: 30000,
+      gold: 50000,
       plots: [],
       employees: 48,
-      knowledge: 500,
+      knowledge: 1000,
       size: 1,
       xp: 0,
       resources: {
         food: 0,
-        wood: 1250,
+        wood: 3250,
         stone: 800,
-        metal: 100,
+        metal: 200,
         power: 0,
         bureaucracy: 0,
       },
@@ -1539,7 +1539,7 @@ export const options: PlotOption[] = [
     level: 4,
     active_costs: {
       gold: 300,
-      power: 0,
+      power: 50,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -1622,7 +1622,7 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 1600,
+        wood: 5000,
         stone: 1600,
         metal: 0,
         power: 0,

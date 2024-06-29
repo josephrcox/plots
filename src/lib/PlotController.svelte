@@ -1,7 +1,8 @@
 <script lang="ts">
   import BottomBar from "./BottomBar.svelte";
+  import ExpandButton from "./ExpandButton.svelte";
   import Plot from "./Plot.svelte";
-  import { DB, modifyPlotMenuOptions, unique } from "./store";
+  import { DB, expandTown, modifyPlotMenuOptions, unique } from "./store";
 
   $: if ($DB) {
     checkForAvailablePlots();
@@ -74,29 +75,40 @@
 </script>
 
 {#if $DB != null}
-  <div
-    id="plotContainerMain"
-    class="absolute left-[170px] top-[170px] overflow-scroll pl-32 pt-32 pb-80 pr-80"
-  >
-    <div class="grid overflow-x-scroll overflow-y-scroll plot_controller">
-      {#each $DB.plots as plotRow, rowIndex}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
-          class="row {rowIndex % 2 !== 0 ? 'odd-row' : ''}"
-          on:click={restartModifyPlotMenu}
-        >
-          {#each plotRow as plot}
-            <Plot
-              classText="hexagon"
-              data={plot}
-              canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
-            />
+  <div class="flex flex-col">
+    <div
+      id="plotContainerMain"
+      class="absolute left-[170px] items-center h-max flex flex-col top-[170px] pl-32 pt-32 pb-80 pr-80 bg-background"
+    >
+      <div class="flex flex-row items-center">
+        <div class="grid plot_controller">
+          {#each $DB.plots as plotRow, rowIndex}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div
+              class="row {rowIndex % 2 !== 0 ? 'odd-row' : ''}"
+              on:click={restartModifyPlotMenu}
+            >
+              {#each plotRow as plot}
+                <Plot
+                  classText="hexagon"
+                  data={plot}
+                  canBeUpgraded={checkIfPlotCanBeUpgraded(plot.x, plot.y)}
+                />
+              {/each}
+            </div>
           {/each}
         </div>
-      {/each}
+        <span>
+          <ExpandButton direction="east" />
+        </span>
+      </div>
+      <span>
+        <ExpandButton direction="south" />
+      </span>
     </div>
   </div>
+
   {#key $unique}
     {#if $modifyPlotMenuOptions.visible}
       <BottomBar
@@ -115,10 +127,8 @@
     flex-direction: column;
     align-items: center;
     margin: 0;
-    padding: 0;
+    padding: 25px;
     padding-top: 40px;
-    overflow-y: scroll;
-    overflow-x: scroll;
   }
 
   .row {
