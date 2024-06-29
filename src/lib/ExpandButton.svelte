@@ -21,7 +21,10 @@
         using
         <br />your
         <span class="text-blue-200 bold mx-1">City Hall</span>!<br /><br />
-        <span class="italic">May trigger a discovery</span>
+        <span class="opacity-75 text-xs"
+          >Requires {$DB.kingdom_expansions * 5} Guardians <br />to be employed.
+          (see city mgmt menu)</span
+        >
       </div>
     </Button>
   {:else}

@@ -627,7 +627,17 @@ export function expandTown(z: Game, direction: string) {
   const newCols = direction == "east" ? 5 : 0;
   const newRows = direction == "south" ? 5 : 0;
 
-  // Expand existing rows to the right
+  if (
+    z.townInfo.guardians < 5 ||
+    z.townInfo.guardians < z.kingdom_expansions * 5
+  ) {
+    alert(
+      `You need ${z.kingdom_expansions * 5 - z.townInfo.guardians} more guardians to expand the kingdom.`,
+    );
+    return;
+  }
+
+  // East
   for (let i = 0; i < numRows; i++) {
     for (let j = numCols; j < numCols + newCols; j++) {
       z.plots[i].push({
@@ -644,7 +654,7 @@ export function expandTown(z: Game, direction: string) {
     }
   }
 
-  // Add new rows to the bottom
+  // South
   for (let i = numRows; i < numRows + newRows; i++) {
     const newRow: any[] = [];
     for (let j = 0; j < numCols + newCols; j++) {
@@ -661,6 +671,8 @@ export function expandTown(z: Game, direction: string) {
     }
     z.plots.push(newRow);
   }
+
+  z.kingdom_expansions++;
 
   DB.set(z);
 }

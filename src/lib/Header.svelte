@@ -114,7 +114,7 @@
       {#each attributes as { name, value, modifier }}
         <div class="flex flex-col gap-2">
           <Tooltip.Root openDelay={400} closeDelay={0}>
-            <Tooltip.Trigger class="h-min w-full mt-0 flex flex-col">
+            <Tooltip.Trigger class="h-7 w-full mt-0 flex flex-col">
               <span class="text-xs pb-1">{name} (x{roundTo(modifier, 2)})</span>
               <Progress
                 {value}
@@ -178,7 +178,7 @@
           </div>
 
           <div
-            class="text-xs pt-1 {$DB.townInfo.employees ==
+            class="text-xs pt-0 opacity-70 {$DB.townInfo.employees ==
             $DB.townInfo.population_count
               ? 'text-textPrimary'
               : $DB.townInfo.employees > $DB.townInfo.population_count * 0.95
