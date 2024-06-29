@@ -24,6 +24,7 @@
   import Hud from "$lib/Hud.svelte";
   import WelcomeScreen from "$lib/menus/WelcomeScreen.svelte";
   import CityHallMenu from "$lib/menus/CityHallMenu.svelte";
+  import CustomAlert from "$lib/components/CustomAlert.svelte";
 
   let dbInitialized = false;
   runTests();
@@ -213,6 +214,7 @@
     <KnowledgeMenu />
     <LabMenu />
     <CityHallMenu />
+    <CustomAlert />
     {#if $DB.environment.day == 0 && $showWelcome}
       <WelcomeScreen />
     {/if}

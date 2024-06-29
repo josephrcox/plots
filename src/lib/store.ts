@@ -627,14 +627,10 @@ export function expandTown(z: Game, direction: string) {
   const newCols = direction == "east" ? 5 : 0;
   const newRows = direction == "south" ? 5 : 0;
 
-  if (
-    z.townInfo.guardians < 5 ||
-    z.townInfo.guardians < z.kingdom_expansions * 5
-  ) {
-    alert(
-      `You need ${z.kingdom_expansions * 5 - z.townInfo.guardians} more guardians to expand the kingdom.`,
-    );
-    return;
+  const requiredGuardians = Math.round(Math.pow(1.5, z.kingdom_expansions + 5));
+
+  if (z.townInfo.guardians < requiredGuardians) {
+    return `You need ${requiredGuardians - z.townInfo.guardians} more guardians to expand the kingdom.`;
   }
 
   // East
@@ -721,6 +717,7 @@ export let showKnowledgeMenu = writable(false);
 export let showAchievementPopup = writable(false);
 export let showLabMenu = writable(false);
 export let showCityHallMenu = writable(false);
+export let showCustomAlert = writable("");
 export let showCompletedAchievements =
   localStorage.getItem("showCompletedAchievements") === "true"
     ? writable(true)
