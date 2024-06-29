@@ -630,7 +630,7 @@ export function expandTown(z: Game, direction: string) {
   const requiredGuardians = Math.round(Math.pow(1.5, z.kingdom_expansions + 5));
 
   if (z.townInfo.guardians < requiredGuardians) {
-    return `You need ${requiredGuardians - z.townInfo.guardians} more guardians to expand the kingdom.`;
+    return `You need ${requiredGuardians - z.townInfo.guardians} more Guardians to expand the kingdom. See the City mgmt menu.`;
   }
 
   // East

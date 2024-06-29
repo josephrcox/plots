@@ -108,7 +108,7 @@
       data-x={data.x}
       data-y={data.y}
       data-optionIndex={data.optionIndex}
-      on:click={openMenu}
+      on:click={data.water ? null : openMenu}
       data-canBeUpgraded={canBeUpgraded}
       data-type={data.type}
       data-type-id={data.typeId}

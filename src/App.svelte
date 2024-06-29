@@ -42,7 +42,7 @@
   // TODO: Make this a proper alert.
   // window.addEventListener('resize', () => {
   // 	if (window.innerWidth < 800) {
-  // 		alert(
+  // 		showCustomAlert.set(
   // 			'Your screen is too small to play this game. Please use a larger screen.',
   // 		);
   // 	}

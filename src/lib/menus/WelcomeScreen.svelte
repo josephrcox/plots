@@ -10,6 +10,7 @@
     pauseMenuTab,
     showAchievementPopup,
     showWelcome,
+    showCustomAlert,
   } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
@@ -120,12 +121,12 @@
       const contents = e.target.result;
       if (typeof contents === "string") {
         if (!isValidFile(contents)) {
-          alert("Invalid game file");
+          showCustomAlert.set("Invalid game file");
           return;
         }
         clearDB(JSON.parse(contents));
       } else {
-        alert("Invalid game file: is not String.");
+        showCustomAlert.set("Invalid game file: is not String.");
       }
     };
     reader.readAsText(file);

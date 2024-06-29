@@ -241,7 +241,7 @@
     // if happiness or health is lower than 25, then warn the user via an alert. change z.last_warning_happiness and for health to the day triggered and only show if it hasn't been shown in 90 days
     if (z.townInfo.happiness < 70) {
       if (z.last_warning_happiness + 365 < z.environment.day) {
-        alert(
+        showCustomAlert.set(
           "Your citizens are very unhappy. You should do something about it.",
         );
         z.last_warning_happiness = z.environment.day;
@@ -249,7 +249,7 @@
     }
     if (z.townInfo.health < 70) {
       if (z.last_warning_health + 365 < z.environment.day) {
-        alert(
+        showCustomAlert.set(
           "Your citizens are very unhealthy. You should do something about it.",
         );
         z.last_warning_health = z.environment.day;

@@ -19,6 +19,7 @@
     hasPlotOfType,
     showOnlyAffordable,
     toggleShowOnlyAffordable,
+    showCustomAlert,
   } from "./store";
   import {
     getColor,
@@ -195,7 +196,7 @@
     let plotChosen = options[typeIndex];
 
     if (checkIfAffordable(plotChosen, $DB) == false) {
-      return alert(`${JSON.stringify(plotChosen.requirements)}`);
+      return showCustomAlert.set(`${JSON.stringify(plotChosen.requirements)}`);
     }
 
     // check if the plot has required adjacent_plots
@@ -208,7 +209,7 @@
         plotChosen.requirements.adjacent_plots,
       );
       if (adjacentPlotsMet === false) {
-        return alert(
+        return showCustomAlert.set(
           `This plot requires adjacent plots of type: ${adjacentPlots.join(
             ", ",
           )}`,

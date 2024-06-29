@@ -6,6 +6,7 @@
     userDB,
     setUserDB,
     paused,
+    showCustomAlert,
   } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
@@ -39,7 +40,7 @@
   };
 
   function deleteAllData() {
-    alert("Deleted :)");
+    showCustomAlert.set("Deleted :)");
     localStorage.clear();
     window.location.href = "";
   }
