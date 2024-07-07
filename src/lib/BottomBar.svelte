@@ -124,6 +124,7 @@
     if (plotChosen.requirements.resources !== undefined) {
       Object.keys(plotChosen.requirements.resources).forEach((resource) => {
         if (
+          plotChosen.requirements.resources[resource] != 0 &&
           $DB.resources[resource] < plotChosen.requirements.resources[resource]
         ) {
           requirementsMet = false;
@@ -550,11 +551,10 @@
                         relative h-[120px] rounded-xl flex flex-col align-middle transition-all duration-100
             {option.affordable || option.selected
                           ? 'cursor-pointer'
-                          : 'opacity-25 cursor-not-allowed '}
+                          : 'opacity-40 cursor-not-allowed '}
             {option.selected
                           ? 'border-4 border-yellow-200 opacity-100 rounded-none'
-                          : ''}
-            "
+                          : ''} "
                         data-plotoptionid={option.id}
                         style="background-color: {getColor(
                           getOptionIndex(option.id),

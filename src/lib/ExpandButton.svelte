@@ -17,13 +17,13 @@
       }}
     >
       <div>
-        My liege, you can expand your <br />kingdom
+        spanMy liege, you can expand your <br />kingdom
         <span class=" font-extrabold text-blue-200"
           >{direction.toUpperCase()}</span
         >
         using
         <br />your
-        <span class="text-blue-200 bold mx-1">City Hall</span>!<br /><br />
+        <span class="text-blue-200 bold">City Hall</span>!<br /><br />
         <span class="opacity-75 text-xs"
           >Requires {Math.round(Math.pow(1.5, $DB.kingdom_expansions + 5))} Guardians
           <br />to be employed. (see city mgmt menu)</span
@@ -31,7 +31,7 @@
       </div>
     </Button>
   {:else}
-    <span>
+    <span class="text-xs">
       My liege, if you build a City Hall, you can expand your city {direction}
     </span>
   {/if}

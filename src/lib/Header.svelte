@@ -254,7 +254,9 @@
     class="flex flex-row flex-wrap align-middle justify-center items-center w-80 {$showTutorialStepConfetti
       ? 'opacity-25 '
       : ''}
-      transition-all duration-700"
+      transition-all duration-700
+      {$DB.environment.day === 0 ? 'wiggle' : ''}
+      "
   >
     <div class="flex flex-col justify-center w-full align-middle items-center">
       {#if $DB.currentTutorialStep != 0}
@@ -364,49 +366,25 @@
 </div>
 
 <style>
-  input[type="range"] {
-    background: black;
-    color: black;
-    cursor: pointer;
-    width: 100px;
+  .wiggle {
+    animation: wiggle 3s infinite;
   }
 
-  input[type="range"]:focus {
-    outline: none;
-  }
-
-  input[type="range"]::-webkit-slider-runnable-track {
-    border-radius: 0.5rem;
-    height: 0.5rem;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    background-color: black;
-    color: black;
-    margin-top: -4px;
-    height: 1rem;
-    width: 1rem;
-  }
-
-  input[type="range"]:focus::-webkit-slider-thumb {
-    border: none;
-  }
-
-  input[type="range"]::-moz-range-track {
-    border-radius: 0.5rem;
-    height: 0.5rem;
-  }
-
-  input[type="range"]::-moz-range-thumb {
-    border: none;
-    border-radius: 0;
-    height: 1rem;
-    width: 1rem;
-  }
-
-  input[type="range"]:focus::-moz-range-thumb {
-    border: none;
-    outline: 3px solid #000000;
-    outline-offset: 0.125rem;
+  @keyframes wiggle {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(5deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    75% {
+      transform: rotate(-5deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
   }
 </style>

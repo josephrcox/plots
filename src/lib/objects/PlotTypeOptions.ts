@@ -161,7 +161,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 0,
     generated_resources: {
       food: 0,
-      wood: 15,
+      wood: 10,
       stone: 0,
       metal: 0,
       power: 0,
@@ -423,7 +423,7 @@ export const options: PlotOption[] = [
     description: "Makes people VERY happy for a short period.",
     revenue_per_week: 0,
     requirements: {
-      gold: 500,
+      gold: 900,
       plots: [],
       employees: 1,
       knowledge: 0,
@@ -431,7 +431,7 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 350,
+        wood: 1000,
         stone: 0,
         metal: 0,
         power: 0,
@@ -440,12 +440,12 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 2.0,
+      happiness: 1.3,
       health: 1.0,
-      community: 1,
+      community: 1.3,
     },
     immediate_variable_changes: {
-      happiness: 50,
+      happiness: 25,
       health: 0,
       population: 0,
       community: 0,
@@ -1317,7 +1317,7 @@ export const options: PlotOption[] = [
       "Makes the most money of any plot, requires power. Makes significantly more from tourism if you have a Village Inn.",
     revenue_per_week: 500,
     requirements: {
-      gold: 7000,
+      gold: 15000,
       plots: [],
       employees: 32,
       knowledge: 0,
@@ -1325,8 +1325,8 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 1000,
-        stone: 1000,
+        wood: 5000,
+        stone: 5000,
         metal: 0,
         power: 0,
         bureaucracy: 0,
@@ -1361,7 +1361,7 @@ export const options: PlotOption[] = [
     level: 4,
     active_costs: {
       gold: 0,
-      power: 40,
+      power: 60,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -1496,10 +1496,10 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     knowledge_points_per_month: 0,
     requirements: {
-      gold: 50000,
+      gold: 35000,
       plots: [],
-      employees: 48,
-      knowledge: 1000,
+      employees: 32,
+      knowledge: 3000,
       size: 1,
       xp: 0,
       resources: {
@@ -1513,7 +1513,7 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     effect_modifiers: {
-      happiness: 0.99,
+      happiness: 1.0,
       health: 1.0,
       community: 1.2,
     },
@@ -1539,7 +1539,7 @@ export const options: PlotOption[] = [
     level: 4,
     active_costs: {
       gold: 300,
-      power: 50,
+      power: 20,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -1572,13 +1572,13 @@ export const options: PlotOption[] = [
     },
     effect_modifiers: {
       happiness: 1.0,
-      health: 0.95,
+      health: 0.9,
       community: 1,
     },
     immediate_variable_changes: {
       happiness: 0,
       health: 0,
-      population: 16,
+      population: 0,
       community: 0,
       bureaucracy: 0,
     },
@@ -1590,7 +1590,7 @@ export const options: PlotOption[] = [
     generated_resources: {
       food: 0,
       wood: 0,
-      stone: 50,
+      stone: 15,
       metal: 50,
       power: 0,
       bureaucracy: 0,
@@ -1598,7 +1598,7 @@ export const options: PlotOption[] = [
     level: 4,
     active_costs: {
       gold: 0,
-      power: 60,
+      power: 80,
       wood: 0,
       stone: 0,
       metal: 0,

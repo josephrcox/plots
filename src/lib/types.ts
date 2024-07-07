@@ -16,7 +16,21 @@ export type Law = {
   id: string;
   description: string;
   cost: number;
-  weekly_effect: (game: Game) => void;
+  // returns game
+  weekly_effect: (game: Game) => Game;
+};
+
+// enum for good, bad, normal
+export enum Vibe {
+  GOOD,
+  BAD,
+  NORMAL,
+}
+
+export type TownLog = {
+  message: string;
+  vibe: Vibe | Vibe.NORMAL;
+  day: number;
 };
 
 export type Game = {
@@ -25,7 +39,7 @@ export type Game = {
   currentTutorialStep: number; // Index
   devMode: boolean;
   lastChangeDay: number; // when the last change in the town was made.
-  townLog: string;
+  townLog: TownLog[];
   townInfo: {
     name: string;
     gold: number; // you start with 1000, and generally profits go up slowly.
@@ -78,7 +92,7 @@ export type Game = {
     knowledge_gold_market_rates: number[];
     enacted: string[];
   };
-  plotCounts: [][];
+  plotCounts: number[];
   environment: {
     // TODO: make this do anything meaningful, currently only using day and year.
     day: number;
@@ -89,6 +103,7 @@ export type Game = {
   endGameDetails: {
     msg: string;
     win: boolean;
+    still_playing: boolean;
   };
   tick: number;
   overtime: boolean;

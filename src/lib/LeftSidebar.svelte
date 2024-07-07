@@ -11,23 +11,24 @@
 		z-10 fixed left-3 p-3 top-[190px] drop-shadow-xl rounded-xl transition-all duration-300"
   >
     <!-- left sidebar -->
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <h1
       class="
                 text-xl
                 w-full
                 pb-2
                 text-center
+                cursor-pointer
             "
+      on:click={() => {
+        $DB.townLog = [];
+      }}
     >
       Alerts
     </h1>
-    {#if $DB.townLog == ""}
-      <span class="text-sm italic text-center opacity-70"
-        >No alerts in the last 30d</span
-      >
-    {/if}
-    {#each $DB.townLog.split("\n") as log}
-      <p class="text-xs">{log}</p>
+    {#each $DB.townLog as log}
+      <p class="text-sm">{log.day}</p>
+      <p class="text-xs">{log.message}</p>
       <br />
     {/each}
 
@@ -39,11 +40,7 @@
                 flex
                 flex-col text-xs
             "
-    >
-      <!-- <li class="text-textDanger3">Citizens are somewhat horny</li>
-			<li class="text-textDanger2">Citizens are mildly horny</li>
-			<li class="text-textDanger1">Citizens are incredibly horny</li> -->
-    </ul>
+    ></ul>
   </div>
 </div>
 

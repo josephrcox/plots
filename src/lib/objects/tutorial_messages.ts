@@ -13,14 +13,13 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.population_max > 0;
     },
-    goldReward: 600,
+    goldReward: 1000,
   },
   {
-    message:
-      "My liege, the village is going to run out of food soon. Build 3 farms and a tree farm. ",
+    message: "My liege, you need to start making food and wood.",
     isComplete: (z: Game) => {
       return (
-        hasPlotOfType("farm", z).length >= 3 &&
+        hasPlotOfType("farm", z).length >= 1 &&
         hasPlotOfType("tree_farm", z).length >= 1
       );
     },
@@ -40,7 +39,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.economyAndLaws.weeklyProfit >= 200;
     },
-    goldReward: 1000,
+    goldReward: 2000,
   },
   {
     message:
@@ -52,7 +51,7 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
-      "My liege, the village is growing - woohoo! But we need to have more workers. Get the population to 100.",
+      "My liege, the village is growing - yay! But we need to have more workers. Get the population to 100.",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 100;
     },
@@ -72,7 +71,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("mine", z).length > 0;
     },
-    goldReward: 2000,
+    goldReward: 10000,
   },
   {
     message:
@@ -80,7 +79,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("healing_house", z).length > 0;
     },
-    goldReward: 5000,
+    goldReward: 15000,
   },
   {
     message:

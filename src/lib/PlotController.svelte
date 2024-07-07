@@ -78,7 +78,7 @@
   <div class="flex flex-col">
     <div
       id="plotContainerMain"
-      class="absolute left-[170px] items-center h-max flex flex-col top-[170px] pl-32 pt-32 pb-80 pr-80 bg-background"
+      class="absolute left-[170px] items-center h-max flex flex-col top-[170px] pl-16 pt-16 pb-80 pr-80 bg-background"
     >
       <div class="flex flex-row items-center">
         <div class="grid plot_controller">
@@ -122,6 +122,10 @@
 
 <style>
   /* CSS */
+
+  #plotContainerMain {
+    scale: 0.85;
+  }
   .grid {
     display: inline-flex;
     flex-direction: column;

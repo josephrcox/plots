@@ -1,7 +1,7 @@
 <script lang="ts">
   import Header from "./Header.svelte";
   import PlotController from "./PlotController.svelte";
-  import { capitalizeFirstLetter, roundTo } from "./utils";
+  import { capitalizeFirstLetter, formatNumber, roundTo } from "./utils";
   import { DB, ACTIVE_GAME_DB_NAME, modifyPlotMenuOptions } from "./store";
   import LeftSidebar from "./LeftSidebar.svelte";
   import Slider from "./components/ui/slider/slider.svelte";
@@ -66,9 +66,9 @@
       rate: $DB.resource_rate.metal,
     },
     {
-      icon: "🔋",
+      icon: "🔋 Surplus",
       name: "power",
-      value: $DB.resources.power + " (surplus)",
+      value: $DB.resources.power,
       rate: null,
     },
     {
@@ -158,7 +158,7 @@
             "
             >
               {icon}
-              {value}
+              {formatNumber(parseInt(value), false)}
               {#if rate > 0}
                 <span class="text-textHappy">+{rate}</span>
               {:else if rate < 0}

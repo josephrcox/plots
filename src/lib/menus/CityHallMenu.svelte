@@ -4,6 +4,7 @@
     hasPlotOfType,
     showCityHallMenu,
     reverseClear,
+    showCustomAlert,
   } from "../store.js";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
@@ -23,7 +24,9 @@
 </script>
 
 <Dialog.Root bind:open={$showCityHallMenu}>
-  <Dialog.Content class="bg-foreground text-foregroundText">
+  <Dialog.Content
+    class="bg-foreground text-foregroundText h-[80vh] overflow-scroll"
+  >
     <Dialog.Header>
       <Dialog.Title class="text-xl">
         <div class="flex justify-between mr-10">
@@ -32,62 +35,64 @@
         </div>
       </Dialog.Title>
 
-      <Dialog.Description class="w-3/4"></Dialog.Description>
-      <Separator class="mb-4" />
-      <div class="w-full">
-        <span class="text-lg font-bold"> Hire Guardians ⚔️ </span>
-        <br />
-        <span class="text-sm italic"
-          >Guardians work for you and are required to expand your kingdom. They
-          do not generate revenue, but still require housing & food.
-        </span>
-        <div
-          class="flex flex-row justify-between
+      <Dialog.Description class="w-3/4 overflow-scroll "></Dialog.Description>
+      {#if hasPlotOfType("city_hall", $DB).length > 0}
+        <Separator class="mb-4" />
+        <div class="w-full">
+          <span class="text-lg font-bold"> Hire Guardians ⚔️ </span>
+          <br />
+          <span class="text-sm italic"
+            >Guardians work for you and are required to expand your kingdom.
+            They do not generate revenue, but still require housing & food.
+          </span>
+          <div
+            class="flex flex-row justify-between
          align-middle items-center pt-2 pb-2 gap-2
         "
-        >
-          <div>
-            <!-- left minus, center text value, right plus -->
-            <Button
-              class="bg-button rounded-2xl h-min select-none
+          >
+            <div>
+              <!-- left minus, center text value, right plus -->
+              <Button
+                class="bg-button rounded-2xl h-min select-none
             {$DB.townInfo.guardians <= 0 ? 'opacity-50 cursor-not-allowed' : ''}
             "
-              on:click={() => {
-                if ($DB.townInfo.guardians > 0) {
-                  $DB.townInfo.guardians -= 1;
-                  $DB.townInfo.employees -= 1;
-                } else {
-                  showCustomAlert.set("No guardians to fire.");
-                }
-              }}>-</Button
-            >
-            <span class="text-lg font-bold select-none px-2">
-              {$DB.townInfo.guardians}
-            </span>
-            <Button
-              class="bg-button rounded-2xl h-min select-none
+                on:click={() => {
+                  if ($DB.townInfo.guardians > 0) {
+                    $DB.townInfo.guardians -= 1;
+                    $DB.townInfo.employees -= 1;
+                  } else {
+                    showCustomAlert.set("No guardians to fire.");
+                  }
+                }}>-</Button
+              >
+              <span class="text-lg font-bold select-none px-2">
+                {$DB.townInfo.guardians}
+              </span>
+              <Button
+                class="bg-button rounded-2xl h-min select-none
             
               {$DB.townInfo.employees >= $DB.townInfo.population_count
-                ? 'opacity-50 cursor-not-allowed'
-                : ''}
+                  ? 'opacity-50 cursor-not-allowed'
+                  : ''}
             "
-              on:click={() => {
-                if ($DB.townInfo.employees < $DB.townInfo.population_count) {
-                  // There are unemployed people.
-                  $DB.townInfo.guardians += 1;
-                  $DB.townInfo.employees += 1;
-                } else {
-                  showCustomAlert.set("Not enough people.");
-                }
-              }}>+</Button
+                on:click={() => {
+                  if ($DB.townInfo.employees < $DB.townInfo.population_count) {
+                    // There are unemployed people.
+                    $DB.townInfo.guardians += 1;
+                    $DB.townInfo.employees += 1;
+                  } else {
+                    showCustomAlert.set("Not enough people.");
+                  }
+                }}>+</Button
+              >
+            </div>
+            <span class="w-max"
+              >{$DB.townInfo.population_count - $DB.townInfo.employees}
+              unemployed available for hire.</span
             >
           </div>
-          <span class="w-max"
-            >{$DB.townInfo.population_count - $DB.townInfo.employees}
-            unemployed available for hire.</span
-          >
         </div>
-      </div>
+      {/if}
       <Separator class="mb-4" />
       <div class="w-full">
         {#if hasPlotOfType("city_hall", $DB).length > 0}
@@ -99,7 +104,17 @@
             >
               <span>{law.description}</span>
               <Button
-                class="bg-button rounded-2xl"
+                class="bg-button rounded-2xl 
+                {$DB.economyAndLaws.enacted.includes(law.id)
+                  ? 'bg-textDanger1'
+                  : 'bg-button'}
+
+                {!$DB.economyAndLaws.enacted.includes(law.id)
+                  ? law.cost <= $DB.resources.bureaucracy
+                    ? 'cursor-pointer'
+                    : 'cursor-not-allowed opacity-30'
+                  : 'cursor-pointer'}
+                "
                 on:click={() => {
                   if ($DB.economyAndLaws.enacted.includes(law.id)) {
                     // Repeal

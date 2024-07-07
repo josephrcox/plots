@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import {
     DB,
@@ -11,20 +11,30 @@
     USER_DB_NAME,
     showAchievementPopup,
     showTutorialStepConfetti,
-  } from "./store.ts";
+    showCustomAlert,
+  } from "./store";
   import { messages } from "./objects/TownLogMessages.js";
   import { options } from "./objects/PlotTypeOptions";
   import { winScenarios } from "./objects/WinScenarios.js";
-  import { plotCountMaximums } from "./objects/difficulty.js";
-  import { achievements } from "./objects/AchievementList.ts";
+  import { achievements } from "./objects/AchievementList";
   import { tutorialMessages } from "./objects/tutorial_messages";
-  import { isAdjacentToWater, randomizeNumber } from "./utils.ts";
+  import { isAdjacentToWater, randomizeNumber } from "./utils";
   import { laws } from "./objects/Laws";
+  import { Achievement, Game, TownLog, Vibe } from "./types.js";
 
   let z = $DB;
   const GAME_TICK_SPEED = 30;
 
-  function performWeeklyTasks(db) {
+  type resourceObject = {
+    food: number;
+    wood: number;
+    stone: number;
+    metal: number;
+    bureaucracy: number;
+    power: number;
+  };
+
+  function performWeeklyTasks(db: Game) {
     db = _taxRateEffects(db);
     db = _healthEffects(db); //////////
     db = _checkSpecialPlots(db);
@@ -38,6 +48,7 @@
       stone: db.resources.stone,
       metal: db.resources.metal,
       bureaucracy: db.resources.bureaucracy,
+      power: db.resources.power,
     };
     db = _generateResources(db);
     db = _lawEffects(db);
@@ -51,13 +62,14 @@
       stone: db.resources.stone,
       metal: db.resources.metal,
       bureaucracy: db.resources.bureaucracy,
+      power: db.resources.power,
     };
     db = _calculateResourceRates(db, startResources, endResources);
 
     return db;
   }
 
-  function performMonthlyTasks(db) {
+  function performMonthlyTasks(db: Game) {
     db = _unemployment(db);
     db = _banksEffect(db);
     db = _reactToProductivity(db);
@@ -67,7 +79,7 @@
     return db;
   }
 
-  function performQuarterlyTasks(db) {
+  function performQuarterlyTasks(db: Game) {
     db = _boredom(db);
     db = _movePeopleInMovePeopleOut(db);
     db = _checkPlotCountForEffect(db);
@@ -75,7 +87,7 @@
     return db;
   }
 
-  function performDailyTasks(db) {
+  function performDailyTasks(db: Game) {
     db = _calculateProfits(db);
     db = _fixVariables(db);
     db = _checkExperiment(db);
@@ -116,7 +128,6 @@
           currentDB = performWeeklyTasks(currentDB);
         }
         if (currentDB.environment.day % 30 === 0) {
-          currentDB.townLog = "";
           currentDB = performMonthlyTasks(currentDB);
         }
         if (currentDB.environment.day % 90 === 0) {
@@ -146,7 +157,7 @@
     }
   });
 
-  function _checkSpecialPlots(z) {
+  function _checkSpecialPlots(z: Game) {
     // this function checks and updates if the city has a bank, hospital, and city hall
     let hasBank = false;
     let hasHospital = false;
@@ -182,7 +193,7 @@
     return z;
   }
 
-  function _isAllPlotsFilled(z) {
+  function _isAllPlotsFilled(z: Game) {
     let result = true;
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
@@ -195,7 +206,7 @@
     return result;
   }
 
-  function _reactToProductivity(z) {
+  function _reactToProductivity(z: Game) {
     const productivityPercentage = z.townInfo.productivity;
     let multiplier = 1; // will be multiplied to get new happiness. higher == better.
     if (productivityPercentage > 50 && productivityPercentage < 100) {
@@ -217,24 +228,26 @@
       multiplier = 0.8;
     }
     const before = z.townInfo.happiness;
-    z.townInfo.happines *= multiplier;
+    z.townInfo.happiness *= multiplier;
 
     if (multiplier > 1.0) {
       z = addToTownLog(
         `Happiness has gone up by ${Math.round((z.townInfo.happiness / before) * 100)}% due to productivity.`,
         z,
+        Vibe.GOOD,
       );
     } else {
       z = addToTownLog(
         `Happiness has gone down by ${100 - Math.round((z.townInfo.happiness / before) * 100)}% due to productivity.`,
         z,
+        Vibe.BAD,
       );
     }
 
     return z;
   }
 
-  function _warnUser(z) {
+  function _warnUser(z: Game) {
     if (z.endGameDetails != null) {
       return z;
     }
@@ -258,7 +271,7 @@
     return z;
   }
 
-  function _feedCitizens(z) {
+  function _feedCitizens(z: Game) {
     // Each citizen needs 1 food per day. This removes it, with a tiny bit of randomness.
     // If there is not enough food, then affect happiness by setting the happiness multiplier to z.modifiers.happiness * 0.95, and the same for z.modifiers.health
     const foodNeeded = z.townInfo.population_count;
@@ -266,16 +279,16 @@
     if (foodAvailable < foodNeeded) {
       z.modifiers.happiness *= 0.95;
       z.modifiers.health *= 0.95;
-      z = addToTownLog("not enough food", z);
+      z = addToTownLog("There isn't enough food for everyone!", z, Vibe.BAD);
       z.resources.food = 0;
     } else {
       z.resources.food -= foodNeeded;
     }
-    z.resources.food = Math.round(z.resources.food, 2);
+    z.resources.food = Math.round(z.resources.food);
     return z;
   }
 
-  function _generateResources(z) {
+  function _generateResources(z: Game) {
     const productivityPercentage = z.townInfo.productivity;
     let multiplier = 1; // will be multiplied to get new happiness. higher == better.
     if (productivityPercentage < 50) {
@@ -332,16 +345,24 @@
         }
       }
     }
-    z.resources.food = Math.round(z.resources.food, 2);
-    z.resources.wood = Math.round(z.resources.wood, 2);
-    z.resources.stone = Math.round(z.resources.stone, 2);
-    z.resources.metal = Math.round(z.resources.metal, 2);
-    z.resources.bureaucracy = Math.round(z.resources.bureaucracy, 2);
+    z.resources.food = Math.round(z.resources.food);
+    z.resources.wood = Math.round(z.resources.wood);
+    z.resources.stone = Math.round(z.resources.stone);
+    z.resources.metal = Math.round(z.resources.metal);
+    z.resources.bureaucracy = Math.round(z.resources.bureaucracy);
 
     return z;
   }
 
-  function _handleActiveCosts(z) {
+  enum ResourceKey {
+    food = "food",
+    wood = "wood",
+    stone = "stone",
+    metal = "metal",
+    bureaucracy = "bureaucracy",
+  }
+
+  function _handleActiveCosts(z: Game) {
     // Some plots have active costs which can be found at let plotOptionForPlot = options[z.plots[i][j].type].active_costs with keys.
     // This function reads the active costs, and checks if we have enough resources for each to cover.
     for (let i = 0; i < z.plots.length; i++) {
@@ -365,10 +386,10 @@
                     z.townInfo.gold -= requiredQuantity;
                   }
                 } else {
-                  if (z.resources[resource] < requiredQuantity) {
+                  if (z.resources[resource as ResourceKey] < requiredQuantity) {
                     toBeDisabled = true;
                   } else {
-                    z.resources[resource] -= requiredQuantity;
+                    z.resources[resource as ResourceKey] -= requiredQuantity;
                   }
                 }
               }
@@ -393,7 +414,7 @@
     return z;
   }
 
-  function _calculatePower(z) {
+  function _calculatePower(z: Game) {
     let runningTotal = 0;
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
@@ -408,13 +429,26 @@
         }
       }
     }
-    z.resource_rate.power = runningTotal;
     z.resources.power = runningTotal;
+
+    if (z.resources.power < 0) {
+      z.modifiers.happiness * 0.98;
+      z.townInfo.happiness -= 5;
+      z = addToTownLog(
+        "🔋 POWER SHORTAGE. HAPPINESS DROPPING THROUGH BLACKOUTS.",
+        z,
+        Vibe.BAD,
+      );
+    }
 
     return z;
   }
 
-  function _calculateResourceRates(z, startResources, endResources) {
+  function _calculateResourceRates(
+    z: Game,
+    startResources: resourceObject,
+    endResources: resourceObject,
+  ) {
     // This function calculates the rate of resource generation per week
     z.resource_rate.food = roundTo(endResources.food - startResources.food, 2);
     z.resource_rate.wood = roundTo(endResources.wood - startResources.wood, 2);
@@ -433,61 +467,22 @@
     return z;
   }
 
-  function _checkGameWin(z) {
-    const gameWinScenario = z.endGoal;
-
-    if (gameWinScenario == "land") {
-      let allPlotsFilled = true;
-      if (
-        z.townInfo.population_max == z.townInfo.population_count &&
-        z.townInfo.happiness >=
-          winScenarios.land.requirements[z.difficulty].happiness &&
-        z.townInfo.health >=
-          winScenarios.land.requirements[z.difficulty].health &&
-        z.townInfo.employees / z.townInfo.population_count >=
-          winScenarios.land.requirements[z.difficulty].employment &&
-        z.townInfo.population_count >
-          winScenarios.land.requirements[z.difficulty].population_count &&
-        z.townInfo.knowledge_points >=
-          winScenarios.land.requirements[z.difficulty].knowledge
-      ) {
-        let hasRequiredPlots = true;
-        for (
-          let i = 0;
-          i <
-          winScenarios.land.requirements[z.difficulty].required_plots.length;
-          i++
-        ) {
-          let plotId =
-            winScenarios.land.requirements[z.difficulty].required_plots[i];
-          if (hasPlotOfType(plotId, z) == false) {
-            hasRequiredPlots = false;
-            break;
-          }
-        }
-        const allPlotsFilled = _isAllPlotsFilled(z);
-
-        if (allPlotsFilled && hasRequiredPlots) {
-          z.endGameDetails = {
-            msg: winScenarios.land.win,
-            win: true,
-            still_playing: false,
-          };
-        }
-      }
-    }
+  function _checkGameWin(z: Game) {
+    // TODO, deleting until ready with TS.
 
     return z;
   }
 
-  function _checkForAchievements(z) {
+  function _checkForAchievements(z: Game) {
     if (z.devMode) {
       return z;
     }
     let user_db = $userDB;
     for (let i = 0; i < achievements.length; i++) {
       if (
-        user_db.achievements.find((a) => a[0] == achievements[i].id) == null
+        user_db.achievements.find(
+          (a: String[]) => a[0] == achievements[i].id,
+        ) == null
       ) {
         if (achievements[i].check(z)) {
           user_db.achievements.push([
@@ -507,10 +502,10 @@
     return z;
   }
 
-  let dontCheckTutorialStep = false;
+  let doNotCheckTutorialStep = false;
 
-  function _setTutorialStep(z) {
-    if (dontCheckTutorialStep) {
+  function _setTutorialStep(z: Game) {
+    if (doNotCheckTutorialStep) {
       return z;
     }
     // Goes through the tutorialMessages array, and finds the first one that is not yet completed.
@@ -518,13 +513,13 @@
     for (let i = z.currentTutorialStep; i < z.currentTutorialStep + 1; i++) {
       if (tutorialMessages[i].isComplete(z)) {
         $showTutorialStepConfetti = true;
-        dontCheckTutorialStep = true;
+        doNotCheckTutorialStep = true;
         // wait 3 seconds to trigger again
         setTimeout(() => {
           $showTutorialStepConfetti = false;
           z.currentTutorialStep++; //
           z.townInfo.gold += tutorialMessages[i].goldReward;
-          dontCheckTutorialStep = false;
+          doNotCheckTutorialStep = false;
         }, 1000);
         break;
       }
@@ -533,7 +528,7 @@
     return z;
   }
 
-  function _checkGameLost(z) {
+  function _checkGameLost(z: Game) {
     // GAME LOSS SCENARIOS
     if (z.townInfo.happiness <= 3) {
       z.townInfo.happiness = 0;
@@ -562,16 +557,16 @@
     return z;
   }
 
-  function _unemployment(z) {
+  function _unemployment(z: Game) {
     let unemployed = z.townInfo.population_count - z.townInfo.employees;
     if (unemployed > 0) {
       z.townInfo.happiness -= unemployed * 0.06;
-      z = addToTownLog(unemployed + messages.unemployment_num, z);
+      z = addToTownLog(unemployed + messages.unemployment_num, z, Vibe.BAD);
     }
     return z;
   }
 
-  function _banksEffect(z) {
+  function _banksEffect(z: Game) {
     // Check if there are any banks and store the count of banks
     if (z.hasBank === true) {
       // TODO
@@ -579,7 +574,7 @@
     return z;
   }
 
-  function _checkPlotCountForEffect(z) {
+  function _checkPlotCountForEffect(z: Game) {
     let totalPlotsPlaced = z.plotCounts.reduce((a, b) => a + b, 0);
     let negativeEffect = false;
     let plotCausingNegativeEffect = "";
@@ -589,24 +584,23 @@
         continue;
       }
 
-      if (
-        z.plotCounts[i] / totalPlotsPlaced >=
-        plotCountMaximums[z.difficulty]
-      ) {
+      const dif: number = z.difficulty;
+
+      if (z.plotCounts[i] / totalPlotsPlaced >= 0.25) {
         plotCausingNegativeEffect = options[i].title;
 
         negativeEffect = true;
       }
     }
     if (negativeEffect) {
-      z = addToTownLog(messages.notEnoughVariety, z);
+      z = addToTownLog(messages.notEnoughVariety, z, Vibe.BAD);
       z.modifiers.happiness * 0.95;
     }
 
     return z;
   }
 
-  function _lawEffects(z) {
+  function _lawEffects(z: Game) {
     // Looks at laws enacted in the economyAndLaws object, and applies effects to the town.
     for (let i = 0; i < z.economyAndLaws.enacted.length; i++) {
       let l = laws.find((l) => l.id == z.economyAndLaws.enacted[i]);
@@ -619,7 +613,7 @@
     return z;
   }
 
-  function _healthEffects(z) {
+  function _healthEffects(z: Game) {
     let health = z.townInfo.health;
     let peopleLeaving = 0;
 
@@ -627,12 +621,12 @@
 
     if (health < Math.random() * 50) {
       if (health < 25) {
-        z = addToTownLog(messages.sickAndDying, z);
+        z = addToTownLog(messages.sickAndDying, z, Vibe.BAD);
         z.townInfo.happiness -= 10;
         // 10% of population
         peopleLeaving = Math.round(z.townInfo.population_count * 0.1);
       } else {
-        z = addToTownLog(messages.sickAndLeaving, z);
+        z = addToTownLog(messages.sickAndLeaving, z, Vibe.BAD);
         z.townInfo.happiness -= 5;
         // 5%
         peopleLeaving = Math.round(z.townInfo.population_count * 0.05);
@@ -643,7 +637,7 @@
     return z;
   }
 
-  function _boredom(z) {
+  function _boredom(z: Game) {
     // check if to proceed based on z.townInfo.community. Pick a random number and if it's under 100, then proceed.
     if (z.townInfo.community < 100) {
       if (Math.random() * 100 < z.townInfo.community) {
@@ -658,13 +652,13 @@
         z.townInfo.population_count -= 1;
         z.townInfo.employees -= 1;
         z.modifiers.happiness -= 0.01;
-        z = addToTownLog(messages.bored, z);
+        z = addToTownLog(messages.bored, z, Vibe.BAD);
       }
     }
     return z;
   }
 
-  function _adjustKnowledgeGoldMarketRates(z) {
+  function _adjustKnowledgeGoldMarketRates(z: Game) {
     let currentRate =
       z.economyAndLaws.knowledge_gold_market_rates[
         z.economyAndLaws.knowledge_gold_market_rates.length - 1
@@ -705,7 +699,7 @@
     return z;
   }
 
-  function _movePeopleInMovePeopleOut(z) {
+  function _movePeopleInMovePeopleOut(z: Game) {
     if (z.townInfo.population_count < z.townInfo.population_max) {
       if (z.townInfo.happiness > 50) {
         let availableSpots =
@@ -723,7 +717,7 @@
         if (z.townInfo.employees > z.townInfo.population_count) {
           z.townInfo.employees = z.townInfo.population_count;
         }
-        z = addToTownLog(newPeople + messages.new_people_num, z);
+        z = addToTownLog(newPeople + messages.new_people_num, z, Vibe.NORMAL);
       }
     }
     if (z.townInfo.happiness < 50 && z.townInfo.population_count > 0) {
@@ -739,7 +733,7 @@
         z.townInfo.employees -= unhappyPeople;
       }
 
-      z = addToTownLog(unhappyPeople + messages.leave_town_num, z);
+      z = addToTownLog(unhappyPeople + messages.leave_town_num, z, Vibe.BAD);
     } else {
       if (z.townInfo.population_count == z.townInfo.population_max) {
         // z = addToTownLog(messages.people_want_to_move_in, z);
@@ -748,7 +742,7 @@
     return z;
   }
 
-  function _taxRateEffects(z) {
+  function _taxRateEffects(z: Game) {
     const randomness = Math.random();
     if (
       z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate &&
@@ -775,6 +769,7 @@
               z.economyAndLaws.tax_rate +
               "%)",
             z,
+            Vibe.BAD,
           );
         } else {
           z.modifiers.happiness -= 0.01;
@@ -784,6 +779,7 @@
               z.economyAndLaws.tax_rate * 100 +
               "%)",
             z,
+            Vibe.BAD,
           );
         }
       } else {
@@ -795,13 +791,14 @@
             z.economyAndLaws.tax_rate * 100 +
             "%)",
           z,
+          Vibe.BAD,
         );
       }
     }
     return z;
   }
 
-  export function _checkExperiment(z) {
+  export function _checkExperiment(z: Game) {
     if (z.lab.active_experiment == null) return z;
     let active = z.lab.active_experiment;
     if (active.duration > 0) {
@@ -811,12 +808,15 @@
     return z;
   }
 
-  export function _fixVariables(z) {
+  export function _fixVariables(z: Game) {
     if (z.townInfo.happiness < 0) {
       z.townInfo.happiness = 0;
     }
     if (z.townInfo.health < 0) {
       z.townInfo.health = 0;
+    }
+    if (z.townInfo.community < 0) {
+      z.townInfo.community = 0;
     }
     if (z.townInfo.gold < 0) {
       z.townInfo.gold = 0;
@@ -830,11 +830,7 @@
     if (z.townInfo.population_count < 0) {
       z.townInfo.population_count = 0;
     }
-    // Recommend building more buildings
-    if (z.townInfo.population_max == 0) {
-      if (z.townLog.indexOf(messages.nobody_home) == -1)
-        z = addToTownLog(messages.nobody_home, z);
-    }
+
     z.economyAndLaws.weeklyProfit = roundTo(z.economyAndLaws.weeklyProfit, 0);
     if (z.townInfo.employees > z.townInfo.population_count) {
       z.townInfo.employees = z.townInfo.population_count;
@@ -856,6 +852,10 @@
       // Maxed out health
       z.townInfo.health = z.maximums.health;
     }
+    if (z.townInfo.community > 300) {
+      // Maxed out health
+      z.townInfo.community = 300;
+    }
     // If modifiers are below 0.50, set to 0.50
     if (z.modifiers.happiness < 0.5) {
       z.modifiers.happiness = 0.5;
@@ -869,7 +869,7 @@
     return z;
   }
 
-  export function _bringModifiersBackToNormal(z) {
+  export function _bringModifiersBackToNormal(z: Game) {
     const modifierVariable = 0.1;
     if (z.modifiers.happiness > 1.0) {
       // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
@@ -888,12 +888,12 @@
     }
     if (z.modifiers.health > 1.0) {
       if (hasPlotOfType("healing_house", z).length > 0) {
-        if (z.townLog.indexOf(messages.hospital_advantage) == -1) {
-          return (z = addToTownLog(messages.hospital_advantage, z));
-        }
+        z = addToTownLog(messages.hospital_advantage, z, Vibe.GOOD);
         let percentAboveOne = z.modifiers.health - 1.0;
         z.modifiers.health -=
-          percentAboveOne * hasPlotOfType("healing_house", z) ? 0.03 : 0.06;
+          percentAboveOne * hasPlotOfType("healing_house", z).length
+            ? 0.03
+            : 0.06;
         if (z.modifiers.health < 1.05) {
           z.modifiers.health = 1.0;
         }
@@ -912,7 +912,7 @@
     return z;
   }
 
-  export function _bringStatsBackToNormal(z) {
+  export function _bringStatsBackToNormal(z: Game) {
     const midpoint = 150;
     if (z.townInfo.happiness > midpoint) {
       // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
@@ -941,7 +941,7 @@
     return z;
   }
 
-  function _calculateProfits(z) {
+  function _calculateProfits(z: Game) {
     z.economyAndLaws.weeklyProfit = 0;
     // Calculate profits by checking plots and doing (plot.revenue_per_week * tax_rate)
     for (let i = 0; i < z.plots.length; i++) {
@@ -958,10 +958,12 @@
               ) *
                 (z.townInfo.productivity / 100)) /
               7;
+
             z.townInfo.gold -= profit;
             z = addToTownLog(
               `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week!`,
               z,
+              Vibe.BAD,
             );
           } else {
             // Iterate through all plots and do actions based on their conditions
@@ -974,6 +976,7 @@
               ) *
                 (z.townInfo.productivity / 100)) /
               7;
+            console.log(`profit 2: ${profit}`);
             let nearWater = isAdjacentToWater(i, j, z);
             profit *= nearWater ? 2 : 1;
             z.townInfo.gold += profit;
@@ -985,14 +988,14 @@
     return z;
   }
 
-  function _applyModifiers(z) {
+  function _applyModifiers(z: Game) {
     z.townInfo.happiness *= z.modifiers.happiness;
     z.townInfo.health *= z.modifiers.health;
     z.townInfo.community *= z.modifiers.community;
     return z;
   }
 
-  function _mineEffects(z) {
+  function _mineEffects(z: Game) {
     if (hasPlotOfType("mine", z).length > 0) {
       // When a mine is in the town, the health should be hurt.
       // This is called monthly, and every month, the health modifier should drop by 0.01
@@ -1001,6 +1004,7 @@
         z = addToTownLog(
           "The mine is actively hurting the health of the town. Time to look into a healing house.",
           z,
+          Vibe.BAD,
         );
       }
     }
@@ -1008,7 +1012,7 @@
     return z;
   }
 
-  function _calculateKnowledge(z) {
+  function _calculateKnowledge(z: Game) {
     let starting = 0;
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
@@ -1027,14 +1031,18 @@
     return z;
   }
 
-  function addToTownLog(message, z) {
-    z.townLog =
-      "Day " + $DB.environment.day + " - " + message + "\n" + z.townLog;
-
+  function addToTownLog(message: string, z: Game, vibe: Vibe) {
+    let log = z.townLog || [];
+    // push to start of array
+    log.unshift({
+      message: message,
+      day: z.environment.day,
+      vibe: vibe,
+    });
     return z;
   }
 
-  function getProfit(revenue, z, type) {
+  function getProfit(revenue: number, z: Game, type: string) {
     // This takes in revenue, and returns the gold profit.
     // Profit is revenue * tax rate * percentage of population out of the max population
     let profitModifiers = z.townInfo.happiness / 100;
@@ -1044,6 +1052,16 @@
       profitModifiers = 0.75;
     }
 
+    if (profitModifiers < 1) {
+      z = addToTownLog(
+        `When townspeople are unhappy, they spend less money (and you). (${Math.round(
+          profitModifiers * 100,
+        )}%)`,
+        z,
+        Vibe.BAD,
+      );
+    }
+
     if (hasPlotOfType("village_inn", z).length > 0) {
       // Has village inn.
       if (type == "shop") {
@@ -1051,16 +1069,17 @@
       }
     }
 
-    let profit =
+    let profit = Math.round(
       revenue *
-      z.economyAndLaws.tax_rate *
-      (z.townInfo.population_count / z.townInfo.population_max) *
-      profitModifiers *
-      (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1);
+        z.economyAndLaws.tax_rate *
+        (z.townInfo.population_count / z.townInfo.population_max) *
+        profitModifiers *
+        (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1),
+    );
     return roundTo(profit, 2);
   }
 
-  function roundTo(n, digits) {
+  function roundTo(n: number, digits: number) {
     if (digits === undefined) {
       digits = 0;
     }

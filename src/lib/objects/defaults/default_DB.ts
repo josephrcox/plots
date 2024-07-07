@@ -5,7 +5,7 @@ export const default_db: Game = {
   timeSpent: 0,
   devMode: false,
   lastChangeDay: 0,
-  townLog: "",
+  townLog: [],
   currentTutorialStep: 0,
   townInfo: {
     name: "Your town",
@@ -23,8 +23,8 @@ export const default_db: Game = {
   kingdom_expansions: 0,
   resources: {
     food: 50,
-    wood: 300,
-    stone: 300,
+    wood: 750,
+    stone: 750,
     metal: 0,
     power: 0,
     bureaucracy: 0,
@@ -68,6 +68,7 @@ export const default_db: Game = {
   endGameDetails: {
     msg: "",
     win: false,
+    still_playing: true,
   },
   tick: 0,
   overtime: false,
