@@ -220,13 +220,13 @@
     let plotChosen = options[typeIndex];
 
     //// We may do this eventually but not now :)
-    // if (checkIfAffordable(plotChosen, $DB) == false) {
-    //   return showCustomAlert.set(
-    //     `You can not afford this.
-    //     <br/><br/>
-    //     ${list}`,
-    //   );
-    // }
+    if (checkIfAffordable(plotChosen, $DB) == false) {
+      return showCustomAlert.set(
+        `You can not afford this.
+        <br/><br/>
+        ${list}`,
+      );
+    }
 
     // check if the plot has required adjacent_plots
     if (plotChosen.requirements.adjacent_plots !== undefined) {

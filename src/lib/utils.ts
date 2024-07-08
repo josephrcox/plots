@@ -214,8 +214,6 @@ export function isAdjacentToPlots(
   for (let i = 0; i < requiredPlots.length; i++) {
     let found = false;
     if (requiredPlots[i] == "water") {
-      console.log("water");
-      // use isAdjacentToWater
       if (isAdjacentToWater(x, y, z, true)) {
         found = true;
         break;
@@ -249,7 +247,7 @@ export function isAdjacentToPlots(
 
 // function that takes a number and returns one that is within 15% below or above
 export function randomizeNumber(n: number, round: number = 0) {
-  let min = n * 0.92;
-  let max = n * 1.08;
+  let min = n * 0.95;
+  let max = n * 1.05;
   return roundTo(Math.random() * (max - min) + min, round);
 }

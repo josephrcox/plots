@@ -621,6 +621,14 @@ export function hasPlotOfType(type: string, z: Game) {
   return plotsOfType;
 }
 
+export function isLiegeOnPlot(x: number, y: number, z: Game) {
+  return (
+    z.liege_location != null &&
+    z.liege_location[0] === x &&
+    z.liege_location[1] === y
+  );
+}
+
 export function expandTown(z: Game, direction: string) {
   const numRows = z.plots.length;
   const numCols = numRows > 0 ? z.plots[0].length : 0;
@@ -698,7 +706,6 @@ export function setLiegeLocation(x: number, y: number, z: Game) {
   plots.forEach((plot: any) => {
     plot.style.cursor = "";
   });
-  console.log(z.liege_location);
 
   DB.set(z);
 }

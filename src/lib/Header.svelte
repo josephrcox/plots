@@ -137,16 +137,19 @@
     <div class="flex justify-between flex-col">
       <div class=" rounded-xl">
         <div class="flex flex-col justify-between">
-          <div
-            on:click={changeName}
-            class="cursor-pointer transition-all duration=150 min-h-8"
-          >
-            <h1
-              class="font-bold cursor-pointer w-full pb-2 text-start select-none"
+          <div class="flex flex-row items-start gap-4">
+            <div
+              on:click={changeName}
+              class="cursor-pointer transition-all duration=150 min-h-8 flex flex-row justify-start"
             >
-              {$DB.townInfo.name}
-            </h1>
+              <h1
+                class="font-bold cursor-pointer w-full pb-2 text-start select-none"
+              >
+                {$DB.townInfo.name}
+              </h1>
+            </div>
           </div>
+
           <div
             class="flex flex-row gap-4 flex-wrap
 						items-center"

@@ -2,6 +2,11 @@
   import { roundTo } from "./utils";
   import { DB, ACTIVE_GAME_DB_NAME, modifyPlotMenuOptions } from "./store";
   import { Vibe } from "./types";
+  let mute: string = localStorage.getItem("mute") || "false";
+
+  $: {
+    mute = localStorage.getItem("mute") || "false";
+  }
 </script>
 
 <!-- fixed to left side and fill entire height -->
@@ -13,27 +18,40 @@
   >
     <!-- left sidebar -->
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-    <h1
-      class="
+    <div class="flex flex-row gap-2 items-start justify-center">
+      <h1
+        class="
                 text-xl
-                w-full
+
                 pb-2
-                text-center
+                
                 cursor-pointer
             "
-      on:click={() => {
-        $DB.townLog = [];
-      }}
-    >
-      Alerts
-    </h1>
-    <div class="overflow-y-scroll h-[100%] w-[100%] px-1">
+        on:click={() => {
+          $DB.townLog = [];
+        }}
+      >
+        Alerts
+      </h1>
+      <button
+        on:click={() => {
+          localStorage.setItem(
+            "mute",
+            mute == "false" ? "true" : mute === "true" ? "false" : "true",
+          );
+          mute = localStorage.getItem("mute") || "false";
+        }}
+      >
+        {mute == "true" ? "🔇" : "🔊"}
+      </button>
+    </div>
+    <div class="overflow-y-scroll h-[100%] w-[100%] px-1 pb-16 scroll-smooth">
       {#if $DB.townLog.length == 0}
         <p class="text-center">No alerts</p>
       {/if}
       {#each $DB.townLog as log}
         <div
-          class=" p-2 rounded-2xl
+          class=" p-2 rounded-2xl fade-in
         {log.vibe == Vibe.BAD
             ? 'bg-red-600'
             : log.vibe == Vibe.GOOD
@@ -50,7 +68,7 @@
           >
             DAY {log.day}
           </p>
-          <p class="text-sm pb-1">{log.message}</p>
+          <p class="text-xs pb-1">{log.message}</p>
         </div>
         <br />
       {/each}
@@ -70,4 +88,16 @@
 
 <style>
   /*  */
+  .fade-in {
+    animation: fadeIn 0.5s;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 </style>

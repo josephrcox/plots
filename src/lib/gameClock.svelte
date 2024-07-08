@@ -12,6 +12,7 @@
     showAchievementPopup,
     showTutorialStepConfetti,
     showCustomAlert,
+    isLiegeOnPlot,
   } from "./store";
   import { messages } from "./objects/TownLogMessages.js";
   import { options } from "./objects/PlotTypeOptions";
@@ -65,6 +66,7 @@
       power: db.resources.power,
     };
     if (db.environment.day % 14 === 0) {
+      // Biweekly tasks
       db = _applyModifiers(db);
     }
     db = _calculateResourceRates(db, startResources, endResources);
@@ -78,6 +80,7 @@
     db = _mineEffects(db);
     db = _bringStatsBackToNormal(db);
     db = _unemployment(db);
+    db = _listenToTownspeople(db);
     return db;
   }
 
@@ -273,6 +276,212 @@
     return z;
   }
 
+  const townPeopleNames: string[] = [
+    "Abigail",
+    "Elijah",
+    "Mabel",
+    "Silas",
+    "Beatrice",
+    "Clarence",
+    "Dorothy",
+    "Edgar",
+    "Florence",
+    "George",
+    "Harriet",
+    "Isaac",
+    "Josephine",
+    "Levi",
+    "Matilda",
+    "Nathaniel",
+    "Olive",
+    "Percy",
+    "Quincy",
+    "Rose",
+    "Samuel",
+    "Theodore",
+    "Ursula",
+    "Vincent",
+    "Winifred",
+    "Xavier",
+    "Yvette",
+    "Zachary",
+    "Amos",
+    "Betsy",
+    "Cecil",
+    "Delia",
+    "Emmett",
+    "Fanny",
+    "Gideon",
+    "Hazel",
+    "Irving",
+    "Jeannette",
+    "Karl",
+    "Lucinda",
+    "Mortimer",
+    "Nettie",
+    "Otis",
+    "Prudence",
+    "Rufus",
+    "Sophronia",
+    "Titus",
+    "Ulysses",
+    "Vera",
+    "Winston",
+    "Xenia",
+    "Yolanda",
+    "Zeke",
+    "Ada",
+    "Bernard",
+    "Cornelia",
+    "Duncan",
+    "Esther",
+    "Fletcher",
+    "Genevieve",
+  ];
+  const townPeopleJobsHobbies: string[] = [
+    "Farmer",
+    "Blacksmith",
+    "Biscuit Sculptor",
+    "Baker",
+    "Carpenter",
+    "Chicken Whisperer",
+    "Fisher",
+    "Herbalist",
+    "Miner",
+    "Mason",
+    "Mustache Twirler",
+    "Brewer",
+    "Butcher",
+    "Candlemaker",
+    "Cloud Watcher",
+    "Dressmaker",
+    "Gardener",
+    "Hunter",
+    "Innkeeper",
+    "Jeweler",
+    "Locksmith",
+    "Miller",
+    "Painter",
+    "Potter",
+    "Quilter",
+    "Rancher",
+    "Saddler",
+    "Tanner",
+    "Upholsterer",
+    "Vintner",
+    "Watchmaker",
+    "Wheelwright",
+    "Wooly Sock Knitter",
+    "Yarn Spinner",
+    "Zodiac Interpreter",
+    "Archivist",
+    "Bookbinder",
+    "Cobbler",
+    "Dyer",
+    "Engraver",
+    "Fletcher",
+    "Glassblower",
+    "Haberdasher",
+    "Illuminator",
+    "Joiner",
+    "Knitter",
+    "Lace Maker",
+    "Mapmaker",
+    "Navigator",
+    "Orchardist",
+    "Potion Tester",
+    "Quarryman",
+    "Roofer",
+    "Soapmaker",
+    "Tobacconist",
+    "Undertaker",
+    "Victualler",
+    "Wainwright",
+    "Xylographer",
+    "Yeoman",
+    "Pumpkin Carver",
+    "Mud Pie Maker",
+    "Folk Tale Teller",
+    "Leaf Collector",
+    "Sunset Chaser",
+    "Dream Interpreter",
+    "Star Gazer",
+  ];
+
+  function _listenToTownspeople(z: Game) {
+    // If the liege is on a residential plot, they should recieve tips or general advice in the alerts.
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (
+          isLiegeOnPlot(i, j, z) &&
+          z.plots[i][j].active == true &&
+          options[z.plots[i][j].type].type == "residential"
+        ) {
+          if (Math.random() < 0.99) {
+            // Proceed and give a message 10% of the time.
+            let msg = `👑🏠 ${
+              townPeopleNames[
+                Math.floor(Math.random() * townPeopleNames.length)
+              ]
+            } the ${
+              townPeopleJobsHobbies[
+                Math.floor(Math.random() * townPeopleJobsHobbies.length)
+              ]
+            }: `;
+
+            let tip = getRandomTip(z);
+            msg += tip;
+
+            if (tip != "") z = addToTownLog(msg, z, Vibe.NORMAL);
+          }
+        }
+      }
+    }
+
+    return z;
+  }
+
+  function getRandomTip(z: Game) {
+    const tips = [
+      () =>
+        z.townInfo.happiness < 100
+          ? `I heard that the town is unhappy. We miss our churches and parks...`
+          : "",
+      () =>
+        z.townInfo.health < 100
+          ? `My kids keep getting sick, probably not enough farms around here!`
+          : "",
+      () =>
+        z.townInfo.happiness < 50
+          ? `I'm thinking of moving out if things don't improve soon!`
+          : "",
+      () =>
+        z.townInfo.employees < z.townInfo.population_count
+          ? `I am unemployed and I hate it here`
+          : "",
+      () =>
+        z.townInfo.knowledge_points < 100 ? `I wish we had more schools!` : "",
+      () =>
+        z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate
+          ? `I wish the taxes were lower, I could use a break!`
+          : "",
+      () =>
+        z.townInfo.productivity > 100
+          ? `I think we should take a day or two to just be chill, we've been working hard!`
+          : "",
+      () =>
+        z.economyAndLaws.tax_rate < z.economyAndLaws.max_tax_rate
+          ? `We would probably be ok chipping in more gold for village improvements.`
+          : "",
+    ];
+
+    // Randomly select one of the conditions to check
+    const randomTipIndex = Math.floor(Math.random() * tips.length);
+    const msg = tips[randomTipIndex]();
+
+    return msg;
+  }
+
   function _feedCitizens(z: Game) {
     // Each citizen needs 1 food per day. This removes it, with a tiny bit of randomness.
     // If there is not enough food, then affect happiness by setting the happiness multiplier to z.modifiers.happiness * 0.95, and the same for z.modifiers.health
@@ -324,28 +533,35 @@
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           // check if the plot is adjacent to a water plot
           let nearWater = isAdjacentToWater(i, j, z);
+          let liegeBonus = isLiegeOnPlot(i, j, z) ? 1.5 : 1;
 
           let plotOptionForPlot = options[z.plots[i][j].type];
           if (plotOptionForPlot.generated_resources != null) {
             z.resources.food +=
               Math.round(
                 plotOptionForPlot.generated_resources.food * multiplier,
-              ) * (nearWater ? 2 : 1);
+              ) *
+              (nearWater ? 2 : 1) *
+              liegeBonus;
 
-            z.resources.wood += Math.round(
-              plotOptionForPlot.generated_resources.wood *
-                multiplier *
-                hasLumberMillMultiplier,
-            );
-            z.resources.stone += Math.round(
-              plotOptionForPlot.generated_resources.stone * multiplier,
-            );
-            z.resources.metal += Math.round(
-              plotOptionForPlot.generated_resources.metal * multiplier,
-            );
-            z.resources.bureaucracy += Math.round(
-              plotOptionForPlot.generated_resources.bureaucracy * multiplier,
-            );
+            z.resources.wood +=
+              Math.round(
+                plotOptionForPlot.generated_resources.wood *
+                  multiplier *
+                  hasLumberMillMultiplier,
+              ) * liegeBonus;
+            z.resources.stone +=
+              Math.round(
+                plotOptionForPlot.generated_resources.stone * multiplier,
+              ) * liegeBonus;
+            z.resources.metal +=
+              Math.round(
+                plotOptionForPlot.generated_resources.metal * multiplier,
+              ) * liegeBonus;
+            z.resources.bureaucracy +=
+              Math.round(
+                plotOptionForPlot.generated_resources.bureaucracy * multiplier,
+              ) * liegeBonus;
           }
         }
       }
@@ -739,11 +955,10 @@
     }
     if (z.townInfo.happiness < 50 && z.townInfo.population_count > 0) {
       // When the happiness is low, some people should leave
-      let unhappyPeople = Math.round((100 - z.townInfo.happiness) / 5);
+      let unhappyPeople = Math.round((150 - z.townInfo.happiness) / 5);
       // If community is around 150 (default), then some people leave.
       // If community drops, then more people leave.
       // If community rises, then less people leave.
-      unhappyPeople = unhappyPeople * (z.townInfo.community / 200);
       z.townInfo.population_count -= unhappyPeople;
       // When people leave, so does employment
       if (z.townInfo.employees > 0) {
@@ -972,6 +1187,8 @@
                 plotOptionForPlot.revenue_per_week,
                 z,
                 plotOptionForPlot.type,
+                i,
+                j,
               ) *
                 (z.townInfo.productivity / 100)) /
               7;
@@ -990,10 +1207,12 @@
                 plotOptionForPlot.revenue_per_week,
                 z,
                 plotOptionForPlot.type,
+                i,
+                j,
               ) *
                 (z.townInfo.productivity / 100)) /
               7;
-            console.log(`profit 2: ${profit}`);
+
             let nearWater = isAdjacentToWater(i, j, z);
             profit *= nearWater ? 2 : 1;
             z.townInfo.gold += profit;
@@ -1056,10 +1275,20 @@
       day: z.environment.day,
       vibe: vibe,
     });
+    if (localStorage.mute != "true") {
+      const audio = new Audio("alert.mp3");
+      audio.play();
+    }
     return z;
   }
 
-  function getProfit(revenue: number, z: Game, type: string) {
+  function getProfit(
+    revenue: number,
+    z: Game,
+    type: string,
+    x: number,
+    y: number,
+  ) {
     // This takes in revenue, and returns the gold profit.
     // Profit is revenue * tax rate * percentage of population out of the max population
     let profitModifiers = z.townInfo.happiness / 100;
@@ -1069,35 +1298,15 @@
       profitModifiers = 0.75;
     }
 
-    if (
-      profitModifiers < 1 &&
-      z.environment.day % 30 == 0 &&
-      z.townLog.filter((log) =>
-        log.message.includes(
-          "When townspeople are unhappy, they spend less money (and you get less).",
-        ),
-      ).length == 0
-    ) {
-      z = addToTownLog(
-        `When townspeople are unhappy, they spend less money (and you get less).`,
-        z,
-        Vibe.BAD,
-      );
-    } else {
-      // remove it
-      z.townLog = z.townLog.filter(
-        (log) =>
-          !log.message.includes(
-            "When townspeople are unhappy, they spend less money (and you get less).",
-          ),
-      );
-    }
-
     if (hasPlotOfType("village_inn", z).length > 0) {
       // Has village inn.
       if (type == "shop") {
         profitModifiers *= 1.3;
       }
+    }
+
+    if (isLiegeOnPlot(x, y, z)) {
+      profitModifiers *= 2;
     }
 
     let profit = Math.round(
