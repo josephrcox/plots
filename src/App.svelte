@@ -41,7 +41,7 @@
         if (plot.dataset.canbeupgraded == "true") {
           plot.style.cursor = "pointer";
           plot.style.cursor =
-            "url('https://github.com/josephrcox/plots/raw/95bf3a085edb1df65628d989504973782b7b3487/public/liege_place.cur'), auto";
+            "url('https://github.com/josephrcox/plots/raw/ebfceed1f3d21b6ed7858358190589e5299f4a4c/public/liege_place.cur'), auto";
         }
       });
     }
