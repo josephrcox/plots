@@ -12,6 +12,7 @@
     modifyPlotMenuOptions,
     startGameMenu,
     showWelcome,
+    settingLiegeLocation,
     // @ts-ignore
   } from "./lib/store.ts";
   // @ts-ignore
@@ -27,11 +28,23 @@
   import CustomAlert from "$lib/components/CustomAlert.svelte";
 
   let dbInitialized = false;
+  let resetLiegeLocationSetting = true;
   runTests();
 
   $: if ($DB) {
     $startGameMenu.visible = false;
     dbInitialized = true;
+    if ($settingLiegeLocation == true) {
+      // where data-active=="true"
+      const plots = document.querySelectorAll(".plot_container");
+      plots.forEach((plot: any) => {
+        if (plot.dataset.canbeupgraded == "true") {
+          plot.style.cursor = "pointer";
+          plot.style.cursor =
+            "url('https://github.com/josephrcox/plots/raw/95bf3a085edb1df65628d989504973782b7b3487/public/liege_place.cur'), auto";
+        }
+      });
+    }
   } else {
     $startGameMenu.visible = true;
     dbInitialized = false;
@@ -78,6 +91,13 @@
           if ($modifyPlotMenuOptions.visible == true) {
             $modifyPlotMenuOptions.visible = false;
           }
+        }
+        if ($settingLiegeLocation == true) {
+          $settingLiegeLocation = false;
+          const plots = document.querySelectorAll(".plot_container");
+          plots.forEach((plot: any) => {
+            plot.style.cursor = "";
+          });
         }
         break;
 

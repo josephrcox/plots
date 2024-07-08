@@ -9,6 +9,7 @@
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
     showCityHallMenu,
+    settingLiegeLocation,
   } from "./store";
   import { Confetti } from "svelte-confetti";
   import { fade } from "svelte/transition";
@@ -213,11 +214,20 @@
       "
       >
         <Button
-          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
+          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5
+          
+            {$settingLiegeLocation ? 'bg-green-500' : ''}
+          "
           on:click={function () {
-            $DB.liege_location = [-1, -1];
+            $settingLiegeLocation = true;
           }}
-          ><div>Set your location!</div>
+          ><div>
+            {#if !$settingLiegeLocation}
+              Set your location!
+            {:else}
+              Pick an active Plot
+            {/if}
+          </div>
         </Button>
         <Button
           class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
