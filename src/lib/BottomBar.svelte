@@ -167,6 +167,14 @@
   }
 
   function canBulldoze(x: number, y: number) {
+    if (
+      $DB.liege_location != null &&
+      x == $DB.liege_location[0] &&
+      y == $DB.liege_location[1]
+    ) {
+      return false;
+    }
+
     if ($modifyPlotMenuOptions.isMineralSource) {
       return false;
     }
@@ -211,13 +219,14 @@
 
     let plotChosen = options[typeIndex];
 
-    if (checkIfAffordable(plotChosen, $DB) == false) {
-      return showCustomAlert.set(
-        `You can not afford this.
-        <br/><br/>
-        ${list}`,
-      );
-    }
+    //// We may do this eventually but not now :)
+    // if (checkIfAffordable(plotChosen, $DB) == false) {
+    //   return showCustomAlert.set(
+    //     `You can not afford this.
+    //     <br/><br/>
+    //     ${list}`,
+    //   );
+    // }
 
     // check if the plot has required adjacent_plots
     if (plotChosen.requirements.adjacent_plots !== undefined) {

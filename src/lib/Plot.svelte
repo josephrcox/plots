@@ -1,6 +1,13 @@
 <script>
   import { options, getColor } from "./objects/PlotTypeOptions";
-  import { DB, modifyPlotMenuOptions, unique, paused } from "./store.ts";
+  import {
+    DB,
+    modifyPlotMenuOptions,
+    unique,
+    paused,
+    settingLiegeLocation,
+    setLiegeLocation,
+  } from "./store.ts";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import PlotTooltip from "./PlotTooltip.svelte";
   import { isAdjacentToWater } from "./utils";
@@ -27,6 +34,14 @@
   }
   export let classText = "";
   export let canBeUpgraded = false;
+
+  const isLiegeLocationPlot = (x, y) => {
+    return (
+      $DB.liege_location != null &&
+      x == $DB.liege_location[0] &&
+      y == $DB.liege_location[1]
+    );
+  };
 
   function openMenu(e, a, b) {
     let plots = document.querySelectorAll(".plot_container");
@@ -108,7 +123,11 @@
       data-x={data.x}
       data-y={data.y}
       data-optionIndex={data.optionIndex}
-      on:click={data.water ? null : openMenu}
+      on:click={data.water
+        ? null
+        : $settingLiegeLocation
+          ? setLiegeLocation(data.x, data.y, $DB)
+          : openMenu}
       data-canBeUpgraded={canBeUpgraded}
       data-type={data.type}
       data-type-id={data.typeId}
@@ -122,6 +141,7 @@
       data-mineralSource={data.mineralSource}
       data-water={data.water}
       data-nearWater={isAdjacentToWater(data.x, data.y, $DB)}
+      data-liegeLocation={isLiegeLocationPlot(data.x, data.y)}
     >
       {#if data.type > -1}
         <div>
@@ -145,6 +165,9 @@
       {/if}
       {#if data.mineralSource && data.type == -1}
         <span class="text-lg">🧲</span>
+      {/if}
+      {#if isLiegeLocationPlot(data.x, data.y)}
+        <span class="text-xl absolute top-0">👑</span>
       {/if}
     </button>
   </Tooltip.Trigger>

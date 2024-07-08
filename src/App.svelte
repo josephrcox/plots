@@ -13,6 +13,7 @@
     startGameMenu,
     showWelcome,
     settingLiegeLocation,
+    setLiegeLocation,
     // @ts-ignore
   } from "./lib/store.ts";
   // @ts-ignore
@@ -41,7 +42,7 @@
         if (plot.dataset.canbeupgraded == "true") {
           plot.style.cursor = "pointer";
           plot.style.cursor =
-            "url('https://github.com/josephrcox/plots/raw/ebfceed1f3d21b6ed7858358190589e5299f4a4c/public/liege_place.cur'), auto";
+            "url('https://github.com/josephrcox/plots/raw/main/public/liege_place.cur'), auto";
         }
       });
     }
@@ -93,7 +94,7 @@
           }
         }
         if ($settingLiegeLocation == true) {
-          $settingLiegeLocation = false;
+          settingLiegeLocation.set(false);
           const plots = document.querySelectorAll(".plot_container");
           plots.forEach((plot: any) => {
             plot.style.cursor = "";

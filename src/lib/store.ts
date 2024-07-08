@@ -691,6 +691,18 @@ export function toggleShowOnlyAffordable() {
   );
 }
 
+export function setLiegeLocation(x: number, y: number, z: Game) {
+  z.liege_location = [x, y];
+  settingLiegeLocation.set(false);
+  const plots = document.querySelectorAll(".plot_container");
+  plots.forEach((plot: any) => {
+    plot.style.cursor = "";
+  });
+  console.log(z.liege_location);
+
+  DB.set(z);
+}
+
 export let modifyPlotMenuOptions = writable({
   visible: false,
   x: 0,
