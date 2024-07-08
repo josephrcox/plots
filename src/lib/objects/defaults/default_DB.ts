@@ -79,6 +79,7 @@ export const default_db: Game = {
     past_experiments: [],
     xp: 0,
   },
+  liege_location: null,
 };
 
 export const default_user_db: UserDatabase = {

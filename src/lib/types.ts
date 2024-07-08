@@ -114,6 +114,7 @@ export type Game = {
     past_experiments: Experiment[];
     xp: number;
   };
+  liege_location: [number, number] | null;
 };
 
 export type UserDatabase = {

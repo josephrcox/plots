@@ -6,6 +6,15 @@
 
   $: if ($DB) {
     checkForAvailablePlots();
+
+    // if $DB.liege_location == [-1,-1] then change cursor
+    if ($DB.liege_location[0] == -1 && $DB.liege_location[1] == -1) {
+      document.body.style.cursor = "not-allowed";
+      console.log("test");
+
+      document.getElementsByTagName("body")[0].style.cursor =
+        "/liege_place.cur, auto";
+    }
   }
 
   document.addEventListener("click", function (e) {

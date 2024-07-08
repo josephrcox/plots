@@ -215,6 +215,13 @@
         <Button
           class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
           on:click={function () {
+            $DB.liege_location = [-1, -1];
+          }}
+          ><div>Set your location!</div>
+        </Button>
+        <Button
+          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
+          on:click={function () {
             $showKnowledgeMenu = !$showKnowledgeMenu;
           }}
           ><div>Manage Knowledge</div>
