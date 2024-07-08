@@ -58,6 +58,15 @@
       affordable: checkIfAffordable(option, $DB),
       selected: isSelected(option),
     }));
+    // if hasPlotOfType('tree_farm').length == 0, then only show small home, farm, and tree farm
+    if (hasPlotOfType("tree_farm", $DB).length === 0) {
+      reactiveOptions = reactiveOptions.filter(
+        (option) =>
+          option.id === "small_homes" ||
+          option.id === "farm" ||
+          option.id === "tree_farm",
+      );
+    }
     if ($modifyPlotMenuOptions.isMineralSource) {
       // only show if ID is "mine"
       reactiveOptions = reactiveOptions.filter(
@@ -193,11 +202,21 @@
     let z = $DB;
     // get the index from the typeID
     const typeIndex = options.findIndex((option) => option.id === typeID);
+    // bulleted list of requirement keys and values
+    const list = Object.entries(options[typeIndex].requirements).map(
+      ([key, value]) => {
+        return `<li>${capitalizeFirstLetter(key)}: ${value}</li>`;
+      },
+    );
 
     let plotChosen = options[typeIndex];
 
     if (checkIfAffordable(plotChosen, $DB) == false) {
-      return showCustomAlert.set(`${JSON.stringify(plotChosen.requirements)}`);
+      return showCustomAlert.set(
+        `You can not afford this.
+        <br/><br/>
+        ${list}`,
+      );
     }
 
     // check if the plot has required adjacent_plots
@@ -464,7 +483,7 @@
     >
       <!-- content -->
       <div
-        class="flex flex-col gap-2 px-2 no-scrollbar justify-end"
+        class="flex flex-col gap-2 px-2 justify-end"
         on:click={handlePlotOptionClick}
       >
         <div class="text-sm">
@@ -526,7 +545,7 @@
             ? 'gap-0 pt-0'
             : 'gap-4'} w-full overflow-y-scroll h-72 pb-24"
         >
-          {#each $modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0 ? [1] : [1, 2, 3, 4] as level}
+          {#each $modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0 ? [1] : hasPlotOfType("tree_farm", $DB).length != 0 ? [1, 2, 3, 4] : [1] as level}
             <div>
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource}
                 <div class="text-sm font-extralight pb-3">Level {level}</div>

@@ -243,9 +243,9 @@ export const options: PlotOption[] = [
     type: "farm",
     description:
       "Makes more money and food than a regular farm, but doesn't bonus from water.",
-    revenue_per_week: 42,
+    revenue_per_week: 72,
     requirements: {
-      gold: 300,
+      gold: 600,
       plots: [],
       employees: 12,
       knowledge: 0,

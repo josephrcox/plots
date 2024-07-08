@@ -13,7 +13,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.population_max > 0;
     },
-    goldReward: 1000,
+    goldReward: 750,
   },
   {
     message: "My liege, you need to start making food and wood.",

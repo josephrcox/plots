@@ -224,7 +224,7 @@
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel
-        class="bg-button rounded-2xl text-foregroundText px-4 py-2 hover:rounded-lg transition-all duration-300"
+        class="bg-button rounded-2xl text-foregroundText px-4 py-2 hover:scale-110 transition-all duration-300 "
         on:click={() => {
           showWelcome.set(false);
         }}

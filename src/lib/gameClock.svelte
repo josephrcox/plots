@@ -64,18 +64,20 @@
       bureaucracy: db.resources.bureaucracy,
       power: db.resources.power,
     };
+    if (db.environment.day % 14 === 0) {
+      db = _applyModifiers(db);
+    }
     db = _calculateResourceRates(db, startResources, endResources);
 
     return db;
   }
 
   function performMonthlyTasks(db: Game) {
-    db = _unemployment(db);
     db = _banksEffect(db);
     db = _reactToProductivity(db);
-    db = _applyModifiers(db);
     db = _mineEffects(db);
     db = _bringStatsBackToNormal(db);
+    db = _unemployment(db);
     return db;
   }
 
@@ -282,6 +284,9 @@
       z = addToTownLog("There isn't enough food for everyone!", z, Vibe.BAD);
       z.resources.food = 0;
     } else {
+      z.townLog = z.townLog.filter(
+        (log) => !log.message.includes("There isn't enough food for everyone!"),
+      );
       z.resources.food -= foodNeeded;
     }
     z.resources.food = Math.round(z.resources.food);
@@ -560,8 +565,16 @@
   function _unemployment(z: Game) {
     let unemployed = z.townInfo.population_count - z.townInfo.employees;
     if (unemployed > 0) {
-      z.townInfo.happiness -= unemployed * 0.06;
+      let toRemove = unemployed * 0.2;
+      if (toRemove < 15) {
+        toRemove = 15;
+      }
+      z.townInfo.happiness -= toRemove;
       z = addToTownLog(unemployed + messages.unemployment_num, z, Vibe.BAD);
+    } else {
+      z.townLog = z.townLog.filter(
+        (log) => !log.message.includes(messages.unemployment_num),
+      );
     }
     return z;
   }
@@ -654,6 +667,10 @@
         z.modifiers.happiness -= 0.01;
         z = addToTownLog(messages.bored, z, Vibe.BAD);
       }
+    } else {
+      z.townLog = z.townLog.filter(
+        (log) => !log.message.includes(messages.bored),
+      );
     }
     return z;
   }
@@ -872,17 +889,17 @@
   export function _bringModifiersBackToNormal(z: Game) {
     const modifierVariable = 0.1;
     if (z.modifiers.happiness > 1.0) {
-      // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
+      // check % above 1.0 that z.modifiers.happiness is, and get it X% closer to 1.0
       let percentAboveOne = z.modifiers.happiness - 1.0;
       z.modifiers.happiness -= percentAboveOne * modifierVariable;
-      if (z.modifiers.happiness < 1.05) {
+      if (z.modifiers.happiness < 1.02) {
         z.modifiers.happiness = 1.0;
       }
     }
     if (z.modifiers.community > 1.0) {
       let percentAboveOne = z.modifiers.community - 1.0;
       z.modifiers.community -= percentAboveOne * modifierVariable;
-      if (z.modifiers.community < 1.05) {
+      if (z.modifiers.community < 1.02) {
         z.modifiers.community = 1.0;
       }
     }
@@ -894,13 +911,13 @@
           percentAboveOne * hasPlotOfType("healing_house", z).length
             ? 0.03
             : 0.06;
-        if (z.modifiers.health < 1.05) {
+        if (z.modifiers.health < 1.02) {
           z.modifiers.health = 1.0;
         }
       } else {
         let percentAboveOne = z.modifiers.health - 1.0;
         z.modifiers.health -= percentAboveOne * modifierVariable;
-        if (z.modifiers.health < 1.05) {
+        if (z.modifiers.health < 1.02) {
           z.modifiers.health = 1.0;
         }
       }
@@ -1052,13 +1069,27 @@
       profitModifiers = 0.75;
     }
 
-    if (profitModifiers < 1) {
+    if (
+      profitModifiers < 1 &&
+      z.environment.day % 30 == 0 &&
+      z.townLog.filter((log) =>
+        log.message.includes(
+          "When townspeople are unhappy, they spend less money (and you get less).",
+        ),
+      ).length == 0
+    ) {
       z = addToTownLog(
-        `When townspeople are unhappy, they spend less money (and you). (${Math.round(
-          profitModifiers * 100,
-        )}%)`,
+        `When townspeople are unhappy, they spend less money (and you get less).`,
         z,
         Vibe.BAD,
+      );
+    } else {
+      // remove it
+      z.townLog = z.townLog.filter(
+        (log) =>
+          !log.message.includes(
+            "When townspeople are unhappy, they spend less money (and you get less).",
+          ),
       );
     }
 

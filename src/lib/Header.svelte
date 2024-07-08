@@ -93,8 +93,7 @@
   const getColor = (value: number) => {
     if (value > 149) {
       return "bg-green-500";
-    } else if (value < 149 && value > 99) {
-      2;
+    } else if (value > 99) {
       return "bg-yellow-500";
     } else {
       return "bg-red-500";
@@ -126,7 +125,7 @@
             <Tooltip.Content class={getColor(value)}>
               <div class="flex flex-col justify-between p-0 m-0">
                 <span class="text-sm font-bold">{name}</span>
-                <span class="text-xs">Base: {roundTo(value, 0)} / 300</span>
+                <span class="text-xs">Base: {value} / 300</span>
                 <span class="text-xs">Modifier: {roundTo(modifier, 0)}</span>
               </div>
             </Tooltip.Content>
