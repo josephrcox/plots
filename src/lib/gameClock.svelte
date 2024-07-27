@@ -221,16 +221,16 @@
       // Typical, no change needed.
       return z;
     } else if (productivityPercentage < 50) {
-      multiplier = 1.2;
+      multiplier = 1.3;
     } else if (productivityPercentage > 100 && productivityPercentage < 125) {
-      multiplier = 0.98;
+      multiplier = 0.95;
     } else if (productivityPercentage > 125 && productivityPercentage < 150) {
-      multiplier = 0.96;
-    } else if (productivityPercentage > 150 && productivityPercentage < 175) {
       multiplier = 0.9;
+    } else if (productivityPercentage > 150 && productivityPercentage < 175) {
+      multiplier = 0.85;
     } else if (productivityPercentage > 175 && productivityPercentage < 200) {
       // Extremely upset
-      multiplier = 0.8;
+      multiplier = 0.75;
     }
     const before = z.townInfo.happiness;
     z.townInfo.happiness *= multiplier;
