@@ -16,6 +16,7 @@ export const default_db: Game = {
     guardians: 0,
     happiness: 150,
     health: 150,
+    recreation: 0,
     community: 150,
     knowledge_points: 0,
     productivity: 100,

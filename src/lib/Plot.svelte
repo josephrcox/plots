@@ -172,18 +172,23 @@
       {/if}
     </button>
   </Tooltip.Trigger>
-  <Tooltip.Content class={data.type < 0 && !data.water ? "hidden" : ""}>
+  <Tooltip.Content
+    class="max-w-64 rounded-3xl {data.type < 0 && !data.water ? 'hidden' : ''}"
+  >
     <div class="flex flex-col gap-2">
       {#if data.water}
         Water - Place farms nearby for more food & revenue!
       {/if}
       {#if isAdjacentToWater(data.x, data.y, $DB)}
-        <span class="text-xs bg-blue-500 text-white p-2 roudned-2xl"
+        <span
+          class="text-xs bg-blue-500 text-white px-2 py-3 italic rounded-2xl text-center"
           >Near water - Generating more food & revenue!</span
         >
       {/if}
       {#if isLiegeOnPlot(data.x, data.y, $DB)}
-        <span class="text-xs bg-yellow-300 text-black p-2 italic rounded-2xl">
+        <span
+          class="text-xs bg-pink-700 text-white px-2 py-3 italic rounded-2xl text-center"
+        >
           {#if options[data.type].liege_on_plot_hint == null}
             You are hanging out on the {options[data.type].title} plot, but nothing
             seems to be changing except a revenue boost.

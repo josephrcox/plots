@@ -122,6 +122,7 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "Your presence on the farm is encouraging the farmers to work harder!",
   },
+
   {
     id: "tree_farm",
     title: "🌲 Tree Farm",
@@ -293,7 +294,7 @@ export const options: PlotOption[] = [
       power: 0,
       bureaucracy: 0,
     },
-    level: 1,
+    level: 2,
     active_costs: {
       gold: 0,
       power: 0,
@@ -372,8 +373,8 @@ export const options: PlotOption[] = [
   {
     id: "stables",
     title: "🐴 Stables",
-    type: "business",
-    description: "Makes money and improves health",
+    type: "recreation",
+    description: "Improves the health of the town and provides recreation.",
     revenue_per_week: 24,
     requirements: {
       gold: 400,
@@ -477,7 +478,7 @@ export const options: PlotOption[] = [
       power: 0,
       bureaucracy: 0,
     },
-    level: 1,
+    level: 3,
     active_costs: {
       gold: 0,
       power: 0,
@@ -552,7 +553,7 @@ export const options: PlotOption[] = [
   },
   {
     id: "village_market",
-    title: "🛒 Village Market",
+    title: "🛒 Market",
     type: "shop",
     description:
       "Turns food into money. Sells goods and employs many. Makes significantly more money from tourism if you have a Village Inn.",
@@ -653,7 +654,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 75,
+      food: 100,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -855,6 +856,68 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint:
       "You are trying to improve the efficiency of the water wheel, but you aren't making a difference.",
+  },
+  {
+    id: "adv_farm",
+    title: "🌾 Adv. Farm",
+    type: "farm",
+    description:
+      "Uses knowledge and technology to produce more food, with only 1 employee.",
+    revenue_per_week: 35,
+    requirements: {
+      gold: 750,
+      plots: [],
+      employees: 1,
+      knowledge: 0,
+      size: 1,
+      xp: 0,
+      resources: {
+        food: 0,
+        wood: 0,
+        stone: 0,
+        metal: 100,
+        power: 0,
+        bureaucracy: 0,
+      },
+      adjacent_plots: [],
+    },
+    effect_modifiers: {
+      happiness: 1.0,
+      health: 1.0,
+      community: 1,
+    },
+    immediate_variable_changes: {
+      happiness: 15,
+      health: 15,
+      population: 0,
+      community: 0,
+      bureaucracy: 0,
+    },
+    knowledge_points_per_month: 0,
+    styling: "",
+    affordable: null,
+    selected: null,
+    generated_resources: {
+      food: 75,
+      wood: 0,
+      stone: 0,
+      metal: 0,
+      power: 0,
+      bureaucracy: 0,
+    },
+    level: 3,
+    active_costs: {
+      gold: 0,
+      power: 10,
+      wood: 0,
+      stone: 0,
+      metal: 1,
+      bureaucracy: 0,
+      food: 0,
+    },
+    check_for_variety: false,
+    liege_on_plot_hint:
+      "Your presence on the farm is encouraging the farmers to work harder!",
   },
   {
     id: "park",
@@ -1774,9 +1837,9 @@ export const typeColors: any = {
   lumber: "#8E805C",
   business: "#9273a5",
   recreation: "#5277b1",
-  shop: "#d896d8",
+  shop: "#5277b1",
   tourism: "#d896d8",
-  education: "#BFBEEB",
+  education: "#9997DF",
   medical: "#4a5ba3",
   bank: "#8477be",
   federal: "#8477be",

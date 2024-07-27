@@ -12,6 +12,7 @@
   import { Progress } from "$lib/components/ui/progress/index.js";
   import { tutorialMessages } from "./objects/tutorial_messages";
   import * as Tooltip from "$lib/components/ui/tooltip";
+  import Separator from "./components/ui/separator/separator.svelte";
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -63,6 +64,7 @@
         modifier: $DB.modifiers.happiness,
         color: getColor($DB.townInfo.happiness),
         hover: true,
+        max: null,
       },
       {
         name: "Health",
@@ -72,6 +74,7 @@
         modifier: $DB.modifiers.health,
         color: getColor($DB.townInfo.health),
         hover: true,
+        max: null,
       },
       {
         name: "Community",
@@ -81,6 +84,7 @@
         modifier: $DB.modifiers.community,
         color: getColor($DB.townInfo.community),
         hover: true,
+        max: null,
       },
       {
         name: "Employment",
@@ -92,8 +96,34 @@
           $DB.townInfo.employees / $DB.townInfo.population_count,
         ),
         hover: false,
+        max: null,
+      },
+      {
+        name: `🛝 Recreation`,
+        description:
+          "Tracker for how many plots you have for recreation, which keeps townspeople happy. <br/><br/>Make sure as your town grows that you build enough 🛝 plots. ",
+        value: $DB.townInfo.recreation,
+        modifier: null,
+        color:
+          $DB.townInfo.recreation / getTotalPlotCount($DB) >= 0.2
+            ? "bg-green-500"
+            : "bg-orange-300",
+        hover: true,
+        max: getTotalPlotCount($DB),
       },
     ];
+  }
+
+  function getTotalPlotCount(z: any) {
+    let count = 0;
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
   const getEmploymentColor = (value: number) => {
@@ -207,7 +237,7 @@
     <div
       class="flex flex-col text-foregroundText py-1 rounded-xl gap-4 flex-wrap max-h-[110px]"
     >
-      {#each attributes as { name, value, modifier, color, hover }}
+      {#each attributes as { name, value, modifier, color, hover, description, max }}
         <div class="flex flex-col gap-2">
           <Tooltip.Root openDelay={400} closeDelay={0}>
             <Tooltip.Trigger class="w-full mt-0 flex flex-col">
@@ -216,21 +246,21 @@
                 {#if modifier != null}(x{roundTo(modifier, 2)})
                 {/if}</span
               >
-              <Progress {value} max={300} class="w-full" {color} />
+              <Progress {value} max={max ?? 300} class="w-full" {color} />
             </Tooltip.Trigger>
             {#if hover}
               <Tooltip.Content
-                class={getColor(value)
-                  // slightly lighter
-                  .replace("500", "300")}
+                class="rounded-3xl {color ??
+                  getColor(value)
+                    // slightly lighter
+                    .replace('500', '300')}"
               >
-                <div class="flex flex-col justify-between text-black p-0 m-0">
-                  <span class="text-sm font-bold">{name}</span>
-                  <span class="text-xs">Base: {value} / 300</span>
-                  {#if modifier != null}
-                    <span class="text-xs">Modifier: {roundTo(modifier, 0)}</span
-                    >
-                  {/if}
+                <div
+                  class="flex flex-col justify-between text-black p-0 m-0 max-w-32"
+                >
+                  <span class="text-md font-bold">{name} - {value}</span>
+                  <Separator class="mb-2 mt-1" />
+                  <span>{@html description}</span>
                 </div>
               </Tooltip.Content>
             {/if}

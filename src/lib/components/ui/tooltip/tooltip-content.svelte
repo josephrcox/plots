@@ -9,7 +9,7 @@
   export let transition: $$Props["transition"] = flyAndScale;
   export let transitionConfig: $$Props["transitionConfig"] = {
     y: 8,
-    duration: 150,
+    duration: 100,
   };
   export { className as class };
 </script>
@@ -19,7 +19,7 @@
   {transitionConfig}
   {sideOffset}
   class={cn(
-    "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-black shadow-md",
+    "z-50 overflow-hidden border bg-popover px-3 py-1.5 text-sm text-black shadow-md rounded-2xl",
     className,
   )}
   {...$$restProps}

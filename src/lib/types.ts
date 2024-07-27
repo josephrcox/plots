@@ -49,6 +49,7 @@ export type Game = {
     guardians: number;
     happiness: number; // can only go up to maximums.happiness, as it goes down people pay less taxes and leave.
     health: number; // can only go up to maximums.health, as it goes down people die or leave.
+    recreation: number;
     community: number; // can go up to maximums.community, as it goes down, the community can have problems.
     knowledge_points: number; // goes up with education plots and with some experiments.
     productivity: number; // from 0 -> 200, def 100, this can be set by the user, and it affects revenue gains and happiness. default 100.

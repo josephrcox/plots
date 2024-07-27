@@ -9,6 +9,7 @@
     roundTo,
     formatInstantChange,
     capitalizeFirstLetter,
+    getOptionFromId,
   } from "./utils";
   import {
     DB,
@@ -72,7 +73,7 @@
 </script>
 
 {#if option != null}
-  <div class="p-2">
+  <div class="p-2 max-w-64">
     <div class="flex flex-col gap-2">
       <span class="text-md">{options[getOptionIndex(option.id)].title}</span>
       <span class="text-xs"
@@ -181,15 +182,15 @@
                 )[index],
                 $DB,
               ).length == 0
-                ? 'text-textDanger1 border-2 border-red-400 px-2'
+                ? 'text-textDanger1 border-2 border-red-400 font-semibold px-1'
                 : 'text-textHappyDark'}
             "
             >
-              {capitalizeFirstLetter(
+              {getOptionFromId(
                 Object.values(
                   options[getOptionIndex(option.id)].requirements.plots,
                 )[index],
-              )}
+              )?.title}
             </span>
           {/if}
         {/each}

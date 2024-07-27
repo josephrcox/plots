@@ -19,7 +19,7 @@
   import { winScenarios } from "./objects/WinScenarios.js";
   import { achievements } from "./objects/AchievementList";
   import { tutorialMessages } from "./objects/tutorial_messages";
-  import { isAdjacentToWater, randomizeNumber } from "./utils";
+  import { getOptionIndex, isAdjacentToWater, randomizeNumber } from "./utils";
   import { laws } from "./objects/Laws";
   import { Achievement, Game, TownLog, Vibe } from "./types.js";
 
@@ -81,6 +81,7 @@
     db = _bringStatsBackToNormal(db);
     db = _unemployment(db);
     db = _listenToTownspeople(db);
+    db = _recreationImpact(db);
     //db = _boredom(db);
     return db;
   }
@@ -96,6 +97,7 @@
     db = _calculateProfits(db);
     db = _fixVariables(db);
     db = _checkExperiment(db);
+    db = _countRecreation(db);
 
     if (db.overtime == false) {
       db = _checkGameLost(db);
@@ -103,6 +105,7 @@
     }
     db = _setTutorialStep(db);
     db = _checkForAchievements(db);
+    db = _fixPlotIds(db);
 
     return db;
   }
@@ -209,6 +212,66 @@
       }
     }
     return result;
+  }
+
+  function _recreationImpact(z: Game) {
+    let recreationCount = 0;
+    let activeCount = 0;
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          let plotOptionForPlot = options[z.plots[i][j].type].type;
+          activeCount++;
+          if (
+            plotOptionForPlot == "recreation" ||
+            plotOptionForPlot == "shop"
+          ) {
+            recreationCount++;
+          }
+        }
+      }
+    }
+    z.townInfo.recreation = recreationCount;
+    if (activeCount > 40) {
+      // The city is large enough that citizens are now demanding more recreation.
+      // Optimal % of recreation plots is 20% of all plots. Calculate the percentage.
+      const optimalRecreationPercentage = 0.2;
+      const currentRecreationPercentage = recreationCount / activeCount;
+      if (currentRecreationPercentage < optimalRecreationPercentage) {
+        z.modifiers.happiness * 0.95;
+        z = addToTownLog(
+          "The city is growing and citizens are demanding more recreation, look for plots with 🛝 icons.",
+          z,
+          Vibe.BAD,
+        );
+      } else {
+        z.modifiers.happiness * 1.01;
+        z = addToTownLog(
+          "The city is growing and citizens are happy with the amount of recreation available.",
+          z,
+          Vibe.GOOD,
+        );
+      }
+    }
+
+    return z;
+  }
+
+  function _fixPlotIds(z: Game) {
+    //// WHY DOES THIS FUNCTION EXIST? ////
+    // Well, i'll tell ya why. Right now, we base a lot of logic off of plots[x][y].type, which is an index number.
+    // But if we add or remove plots to the plot option list, then the index numbers may change.
+    // This function checks every day if this case does exist where index (type) and id (typeId) don't match, and it fixes it.
+    //// We should fix this later, but not now as it will likely cause regressions. ////
+
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true) {
+          z.plots[i][j].type = getOptionIndex(z.plots[i][j].typeId);
+        }
+      }
+    }
+    return z;
   }
 
   function _reactToProductivity(z: Game) {
@@ -437,6 +500,26 @@
         }
       }
     }
+
+    return z;
+  }
+
+  function _countRecreation(z: Game) {
+    let recreationCount = 0;
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          let plotOptionForPlot = options[z.plots[i][j].type].type;
+          if (
+            plotOptionForPlot == "recreation" ||
+            plotOptionForPlot == "shop"
+          ) {
+            recreationCount++;
+          }
+        }
+      }
+    }
+    z.townInfo.recreation = recreationCount;
 
     return z;
   }

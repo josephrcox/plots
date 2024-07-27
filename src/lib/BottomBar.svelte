@@ -42,7 +42,7 @@
   let searchInput: any;
   let totalAffordableOptionsCount: number;
 
-  const BOTTOM_MENU_HEIGHT = Math.round(window.innerHeight * 0.2) + "px";
+  const BOTTOM_MENU_HEIGHT = "50vh";
 
   let reactiveOptions: PlotOption[] = PlotTypeOptions.map(
     (option: PlotOption | any) => ({
@@ -475,17 +475,17 @@
 
 {#if open}
   <div
-    class="w-[100vw] fixed bottom-[-10px] h-[{BOTTOM_MENU_HEIGHT}]
-    p-1 z-50 flex flex-col justify-center text-center items-center"
+    class="w-[100vw] fixed bottom-[-5px] h-[{BOTTOM_MENU_HEIGHT}]
+     z-50 flex flex-col justify-center text-center items-center"
   >
     <div
       class="
         text-xl
         items-center justify-center
-        w-[90%]
+        w-[100%]
         align-bottom
-        bg-foreground
-        border-4 border-gray-400 shadow-2xl rounded-t-xl
+        bg-foregroundDark
+        shadow-3xl rounded-t-xl
         py-2
 
         "
@@ -547,18 +547,26 @@
             </div>
           </div>
         </div>
+        <div
+          class="absolute top-[-15px] right-3 text-xs text-black p-2 bg-white rounded-xl cursor-pointer"
+          on:click={() => ($modifyPlotMenuOptions.visible = false)}
+        >
+          Press escape or click to close
+        </div>
 
         <div
           class="flex flex-col {$modifyPlotMenuOptions.isMineralSource ||
           searchQuery.length > 0 ||
           $showOnlyAffordable
             ? 'gap-0 pt-0'
-            : 'gap-4'} w-full overflow-y-scroll h-72 pb-24"
+            : 'gap-4'} w-full overflow-y-scroll h-[{BOTTOM_MENU_HEIGHT}] pb-24"
         >
           {#each $modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0 || $showOnlyAffordable ? [1] : hasPlotOfType("tree_farm", $DB).length != 0 ? [1, 2, 3, 4] : [1] as level}
-            <div>
+            <div class="px-2">
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource}
-                <div class="text-sm font-extralight pb-3">Level {level}</div>
+                <div class="text-sm font-extralight pb-3">
+                  Level {level}
+                </div>
               {/if}
               <div
                 class="flex flex-row text-start justify-start items-start flex-wrap
@@ -600,13 +608,25 @@
                         </div>
                         {#if option.active_costs.power > 0}
                           <span
-                            class="bg-yellow-300 text-xs text-black tex px-1 py-0.5 rounded-2xl absolute top-[-5px] right-[-2px]"
+                            class="bg-yellow-300 text-xs text-black px-1 py-0.5 rounded-2xl absolute top-[-8px] right-[-2px]
+                              border-2 border-green-700
+                            "
                             >🔋{option.active_costs.power}
+                          </span>
+                        {/if}
+                        {#if option.type == "recreation" || option.type == "shop"}
+                          <span
+                            class="bg-blue-200 text-xs text-black px-1 py-0.5 rounded-2xl absolute bottom-[2px] left-[-2px]
+                              border-2 border-blue-600
+                            "
+                            >🛝
                           </span>
                         {/if}
                         {#if hasPlotOfType(option.id, $DB).length > 0}
                           <span
-                            class="bg-black text-xs text-white tex px-1 py-0.5 rounded-2xl absolute top-[-5px] left-[-2px]"
+                            class="bg-black text-xs text-white px-1 py-0.5 rounded-2xl absolute top-[-5px] left-[-2px]
+                              border-2 border-white
+                            "
                             >x{hasPlotOfType(option.id, $DB).length}
                           </span>
                         {/if}
@@ -637,7 +657,7 @@
                         </span>
                       </div>
                     </Tooltip.Trigger>
-                    <Tooltip.Content>
+                    <Tooltip.Content class="">
                       <PlotTooltip {option} />
                     </Tooltip.Content>
                   </Tooltip.Root>

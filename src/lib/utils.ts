@@ -100,6 +100,10 @@ export function getOptionIndex(id: string) {
   return options.findIndex((option) => option.id === id);
 }
 
+export function getOptionFromId(id: string | null) {
+  return options.find((option) => option.id === id);
+}
+
 export function firstEmoji(s: string): string | null {
   const regex = /\p{Emoji}/u;
   const match = regex.exec(s);
