@@ -1207,7 +1207,7 @@
             z.townInfo.happiness -= 1;
 
             z = addToTownLog(
-              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week! It is also lowering overall happiness by 1.`,
+              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week! It is also lowering overall happiness by 1. Look at available resources and fix the problem! `,
               z,
               Vibe.BAD,
             );
