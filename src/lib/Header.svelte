@@ -4,22 +4,14 @@
     DB,
     ACTIVE_GAME_DB_NAME,
     speed,
-    showLabMenu,
-    showKnowledgeMenu,
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
-    showCityHallMenu,
-    settingLiegeLocation,
   } from "./store";
   import { Confetti } from "svelte-confetti";
-  import { fade } from "svelte/transition";
   import { formatDuration, formatNumber, roundTo } from "./utils";
-  import { Separator } from "$lib/components/ui/separator";
-  import Button from "./components/ui/button/button.svelte";
   import { Progress } from "$lib/components/ui/progress/index.js";
   import { tutorialMessages } from "./objects/tutorial_messages";
   import * as Tooltip from "$lib/components/ui/tooltip";
-  import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -51,10 +43,6 @@
     return $speed;
   }
 
-  function showTheLabMenu() {
-    if ($DB.hasLab) showLabMenu.set(true);
-  }
-
   // Assuming $DB.timeSpent is reactive and stores time in milliseconds
   let formattedTime = "00:00:00";
 
@@ -73,6 +61,8 @@
           "Happy townspeople spend more money and are less likely to leave.",
         value: $DB.townInfo.happiness,
         modifier: $DB.modifiers.happiness,
+        color: getColor($DB.townInfo.happiness),
+        hover: true,
       },
       {
         name: "Health",
@@ -80,6 +70,8 @@
           "Healthy townspeople are less likely to die (and leave the town obviously).",
         value: $DB.townInfo.health,
         modifier: $DB.modifiers.health,
+        color: getColor($DB.townInfo.health),
+        hover: true,
       },
       {
         name: "Community",
@@ -87,9 +79,32 @@
           "Townspeople that feel at home are less likely to leave, and less likely to get bored.",
         value: $DB.townInfo.community,
         modifier: $DB.modifiers.community,
+        color: getColor($DB.townInfo.community),
+        hover: true,
+      },
+      {
+        name: "Employment",
+        description:
+          "The number of people employed in your town. Unemployed people are more likely to leave.",
+        value: ($DB.townInfo.employees / $DB.townInfo.population_count) * 300,
+        modifier: null,
+        color: getEmploymentColor(
+          $DB.townInfo.employees / $DB.townInfo.population_count,
+        ),
+        hover: false,
       },
     ];
   }
+
+  const getEmploymentColor = (value: number) => {
+    if (value === 1) {
+      return "bg-green-500";
+    } else if (value > 0.9) {
+      return "bg-yellow-500";
+    } else {
+      return "bg-red-500";
+    }
+  };
 
   const getColor = (value: number) => {
     if (value > 149) {
@@ -103,99 +118,77 @@
 </script>
 
 <div
-  class="flex justify-between px-6 gap-6 flex-row text-start fixed top-0 left-0 right-0 cursor-default z-20 bg-foreground text-foregroundText h-max
+  class="flex justify-between px-6 gap-6 flex-row text-start fixed top-0 left-0 right-0 cursor-default z-10 bg-foreground text-foregroundText max-h-[135px] h-[135px]
 		{$modifyPlotMenuOptions.visible ? 'opacity-70' : ''}
 	"
 >
-  <div class="flex flex-row gap-2 my-2 h-max">
-    <div
-      class="flex flex-col w-36 text-foregroundText bg-accent p-2 rounded-xl gap-2 mr-2"
-    >
-      {#each attributes as { name, value, modifier }}
-        <div class="flex flex-col gap-2">
-          <Tooltip.Root openDelay={400} closeDelay={0}>
-            <Tooltip.Trigger class="h-7 w-full mt-0 flex flex-col">
-              <span class="text-xs pb-1">{name} (x{roundTo(modifier, 2)})</span>
-              <Progress
-                {value}
-                max={300}
-                class="w-full h-2"
-                color={getColor(value)}
-              />
-            </Tooltip.Trigger>
-            <Tooltip.Content class={getColor(value)}>
-              <div class="flex flex-col justify-between p-0 m-0">
-                <span class="text-sm font-bold">{name}</span>
-                <span class="text-xs">Base: {value} / 300</span>
-                <span class="text-xs">Modifier: {roundTo(modifier, 0)}</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Root>
+  <div class="flex justify-between flex-col py-2 max-w-[25%] w-[25%]">
+    <div class="rounded-xl">
+      <div
+        class="flex flex-col gap-1
+        "
+      >
+        <div class="flex flex-row items-start text-md">
+          <div
+            on:click={changeName}
+            class="cursor-pointer flex flex-row justify-start"
+          >
+            <h1
+              class="font-bold cursor-pointer w-full text-start select-none text-lg"
+            >
+              {$DB.townInfo.name}
+            </h1>
+          </div>
         </div>
-      {/each}
-    </div>
-    <div class="flex justify-between flex-col">
-      <div class=" rounded-xl">
-        <div class="flex flex-col justify-between">
-          <div class="flex flex-row items-start gap-4">
-            <div
-              on:click={changeName}
-              class="cursor-pointer transition-all duration=150 min-h-8 flex flex-row justify-start"
-            >
-              <h1
-                class="font-bold cursor-pointer w-full pb-2 text-start select-none"
-              >
-                {$DB.townInfo.name}
-              </h1>
-            </div>
-          </div>
 
-          <div
-            class="flex flex-row gap-4 flex-wrap
+        <div
+          class="flex flex-row gap-4 flex-wrap
 						items-center"
+        >
+          <span class="text-sm"
+            >👥 {$DB.townInfo.population_count} / {$DB.townInfo
+              .population_max}</span
           >
-            <span class="text-sm"
-              >👥 {$DB.townInfo.population_count} / {$DB.townInfo
-                .population_max}</span
+        </div>
+        <div>
+          <span class="text-xs"
+            ><span class="text-sm"
+              >💰 {formatNumber($DB.townInfo.gold, false)}</span
             >
-            <span class="text-xs"
-              ><span class="text-sm"
-                >💰 {formatNumber($DB.townInfo.gold, false)}</span
-              >
-              <span class="pl-2"></span>
-              {#if $DB.economyAndLaws.weeklyProfit > 0}
-                <span class="text-textHappy"
-                  >+${$DB.economyAndLaws.weeklyProfit}</span
-                >
-              {:else if $DB.economyAndLaws.weeklyProfit < 0}
-                <span class="text-textDanger2"
-                  >{$DB.economyAndLaws.weeklyProfit}</span
-                >
-              {:else}
-                <span class="text-textPrimary"
-                  >+${$DB.economyAndLaws.weeklyProfit}</span
-                >
-              {/if}
-              <span class="text-gray-400">(weekly)</span>
-            </span>
-          </div>
+          </span>
+        </div>
+        <div class="text-xs">
+          {#if $DB.economyAndLaws.weeklyProfit > 0}
+            <span class="text-textHappy"
+              >+${$DB.economyAndLaws.weeklyProfit}</span
+            >
+          {:else if $DB.economyAndLaws.weeklyProfit < 0}
+            <span class="text-textDanger2"
+              >{$DB.economyAndLaws.weeklyProfit}</span
+            >
+          {:else}
+            <span class="text-textPrimary"
+              >+${$DB.economyAndLaws.weeklyProfit}</span
+            >
+          {/if}
+          <span class="text-gray-400">(weekly)</span>
+        </div>
 
-          <div
-            class="text-xs pt-0 opacity-70 {$DB.townInfo.employees ==
-            $DB.townInfo.population_count
-              ? 'text-textPrimary'
-              : $DB.townInfo.employees > $DB.townInfo.population_count * 0.95
-                ? 'text-textDanger3'
-                : $DB.townInfo.employees > $DB.townInfo.population_count * 0.9
-                  ? 'text-textDanger2'
-                  : 'text-textDanger1'}
+        <div
+          class="text-xs pt-0 opacity-70 {$DB.townInfo.employees ==
+          $DB.townInfo.population_count
+            ? 'text-textPrimary'
+            : $DB.townInfo.employees > $DB.townInfo.population_count * 0.95
+              ? 'text-textDanger3'
+              : $DB.townInfo.employees > $DB.townInfo.population_count * 0.9
+                ? 'text-textDanger2'
+                : 'text-textDanger1'}
 					"
-          >
+        >
+          <span class="text-xs">
             {#if $DB.townInfo.employees == $DB.townInfo.population_count}
               {#if $DB.townInfo.population_count === 0}
                 Nobody lives here , build some homes
-              {:else}
-                All citizens employed
               {/if}
             {:else}
               {roundTo(
@@ -205,138 +198,56 @@
                 .population_count} - {$DB.townInfo.population_count -
                 $DB.townInfo.employees} unemployed)
             {/if}
-          </div>
-          <span class="text-xs text-secondary cursor-pointer"
-            >Game time: {formattedTime}</span
-          >
+          </span>
         </div>
-      </div>
-      <div
-        class="flex flex-row gap-2 align-middle
-        justify-center items-center
-      "
-      >
-        <Button
-          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5
-          
-            {$settingLiegeLocation ? 'bg-green-500' : ''}
-          "
-          on:click={function () {
-            $settingLiegeLocation = true;
-          }}
-          ><div>
-            {#if !$settingLiegeLocation}
-              Set your location!
-            {:else}
-              Pick an active Plot
-            {/if}
-          </div>
-        </Button>
-        <Button
-          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
-          on:click={function () {
-            $showKnowledgeMenu = !$showKnowledgeMenu;
-          }}
-          ><div>Manage Knowledge</div>
-        </Button>
-        <Button
-          class="text-xs flex flex-col h-min  bg-button cursor-pointer text-textPrimary p-1.5"
-          on:click={function () {
-            $showCityHallMenu = !$showCityHallMenu;
-          }}
-          ><div>City Management</div>
-        </Button>
-        <Button
-          class="text-xs flex flex-col h-min p-1.5 {$DB.hasLab
-            ? 'bg-button cursor-pointer text-textPrimary'
-            : 'bg-button cursor-not-allowed text-textPrimary opacity-35'}"
-          on:click={showTheLabMenu}
-          ><div>
-            Manage Lab
-            {#if $DB.lab.active_experiment !== null}
-              {#if $DB.lab.active_experiment.duration > 0}
-                <span>{$DB.lab.active_experiment.duration}d</span>
-              {:else if $DB.lab.active_experiment.duration === 0}
-                <span
-                  class="
-										animate-pulse
-									">✅ DONE!</span
-                >
-              {/if}
-            {/if}
-          </div>
-        </Button>
       </div>
     </div>
   </div>
-  <div
-    class="flex flex-row flex-wrap align-middle justify-center items-center w-80 {$showTutorialStepConfetti
-      ? 'opacity-25 '
-      : ''}
-      transition-all duration-700
-      {$DB.environment.day === 0 ? 'wiggle' : ''}
-      "
-  >
-    <div class="flex flex-col justify-center w-full align-middle items-center">
-      {#if $DB.currentTutorialStep != 0}
-        <div
-          class="flex flex-col justify-center items-center
-  
-        "
-        >
-          <div
-            class=" flex flex-row justify-center text-xs bg-white rounded-t-2xl text-black py-2 whitespace-nowrap px-2 opacity-50"
-          >
-            <Tooltip.Root openDelay={400} closeDelay={0}>
-              <Tooltip.Trigger>
-                <span
-                  class="w-full no-select opacity-70 whitespace-nowrap text-center"
-                >
-                  Last reward
-                  <div>
-                    💰{tutorialMessages[$DB.currentTutorialStep - 1].goldReward}
-                  </div>
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content class="bg-black text-white rounded-2xl">
-                Last completed task: {tutorialMessages[
-                  $DB.currentTutorialStep - 1
-                ].message}
+  <div class="flex flex-row gap-2 my-2">
+    <div
+      class="flex flex-col text-foregroundText py-1 rounded-xl gap-4 flex-wrap max-h-[110px]"
+    >
+      {#each attributes as { name, value, modifier, color, hover }}
+        <div class="flex flex-col gap-2">
+          <Tooltip.Root openDelay={400} closeDelay={0}>
+            <Tooltip.Trigger class="w-full mt-0 flex flex-col">
+              <span class="text-xs pb-2"
+                >{name}
+                {#if modifier != null}(x{roundTo(modifier, 2)})
+                {/if}</span
+              >
+              <Progress {value} max={300} class="w-full" {color} />
+            </Tooltip.Trigger>
+            {#if hover}
+              <Tooltip.Content
+                class={getColor(value)
+                  // slightly lighter
+                  .replace("500", "300")}
+              >
+                <div class="flex flex-col justify-between text-black p-0 m-0">
+                  <span class="text-sm font-bold">{name}</span>
+                  <span class="text-xs">Base: {value} / 300</span>
+                  {#if modifier != null}
+                    <span class="text-xs">Modifier: {roundTo(modifier, 0)}</span
+                    >
+                  {/if}
+                </div>
               </Tooltip.Content>
-            </Tooltip.Root>
-          </div>
+            {/if}
+          </Tooltip.Root>
         </div>
-      {/if}
-      {#if $showTutorialStepConfetti}
-        <Confetti y={[-0.5, 0.5]} x={[-0.5, 0.5]} duration={2000} />
-      {/if}
-
-      <div
-        class="gap flex-row items-center flex bg-white text-slate-800 py-1 px-2 rounded-xl w-full"
-      >
-        <div class="text-lg h-max">👨‍🦰</div>
-        <div class="text-xs ml-2 overflow-auto opacity-80">
-          {#if $DB.currentTutorialStep >= tutorialMessages.length}
-            No more goals!
-          {:else}
-            {tutorialMessages[$DB.currentTutorialStep].message}
-            <span class="opacity-40"
-              >(💰{tutorialMessages[$DB.currentTutorialStep].goldReward})</span
-            >
-          {/if}
-        </div>
-      </div>
+      {/each}
     </div>
   </div>
 
-  <div class="flex justify-center align-middle flex-col">
+  <div class="flex justify-end align-end w-[25%]">
     <!-- right -->
     <div class="flex flex-col">
       <!-- circle div that says the day number, with the day and year below (outside of circle) -->
       <div class="flex flex-col items-center h-max">
         <div>
           <span class="text-xs text-secondary cursor-pointer"
-            >Press P to Pause</span
+            >Game time · {formattedTime}</span
           >
         </div>
         <div
@@ -379,6 +290,45 @@
             on:click={() => toggleSpeed(200)}>Fast</span
           >
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class=" {$showTutorialStepConfetti ? 'opacity-25 ' : ''}
+      transition-all duration-1000
+      {$DB.environment.day === 0 ? 'wiggle' : ''}
+      "
+>
+  <div
+    class="flex flex-col justify-center w-full align-middle items-center fixed max-w-[50vw] z-10
+
+          {$DB.environment.day === 0 ? 'top-[160px]' : 'top-[130px]'}
+    left-0 right-0 mx-auto
+  "
+  >
+    {#if $showTutorialStepConfetti}
+      <Confetti y={[-0.5, 0.5]} x={[-0.5, 0.5]} duration={2000} />
+    {/if}
+
+    <div
+      class="gap flex-row items-center flex bg-white text-slate-800 py-1 px-2 rounded-xl w-full
+        
+      "
+    >
+      <div class="text-lg h-max">👨‍🦰</div>
+      <div class="text-xs ml-2 overflow-auto opacity-80">
+        {#if $DB.currentTutorialStep >= tutorialMessages.length}
+          No more goals!
+        {:else}
+          Milestone {$DB.currentTutorialStep + 1} : {tutorialMessages[
+            $DB.currentTutorialStep
+          ].message}
+          <span class="opacity-40"
+            >(💰{tutorialMessages[$DB.currentTutorialStep].goldReward})</span
+          >
+        {/if}
       </div>
     </div>
   </div>

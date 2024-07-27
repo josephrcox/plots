@@ -27,7 +27,7 @@ const config = {
         button: "#E2725B",
         buttonDisabled: "#35221E",
         textDisabled: "#7C7C7C",
-        accent: "#E2725B", // Maybe this one - 965306
+        accent: "#9D4C3B", // Maybe this one - 965306
         accentText: "#DFE1D1",
         border: "#5A6E63",
         popover: "#FFFFFF",

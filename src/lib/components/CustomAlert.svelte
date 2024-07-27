@@ -16,7 +16,7 @@
       style="max-height: 80%;">🛎️ {@html $showCustomAlert}</span
     >
     <AlertDialog.Action
-      class="bg-button hover:scale-105 min-w-[70%] transition-all duration-150 mt-2"
+      class="bg-accent hover:scale-105 min-w-[70%] transition-all duration-150 mt-2"
       on:click={() => {
         showCustomAlert.set("");
       }}>Got it</AlertDialog.Action

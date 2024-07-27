@@ -154,6 +154,7 @@ export type PlotOption = {
   type: string;
   description: string;
   revenue_per_week: number;
+  liege_on_plot_hint: null | string;
   requirements: {
     gold: number;
     plots: any[]; // TODO REMOVE THIS, IT'S NOT USED AT ALL.

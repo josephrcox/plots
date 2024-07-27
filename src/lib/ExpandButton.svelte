@@ -8,7 +8,7 @@
 <div class="w-48 h-max">
   {#if hasPlotOfType("city_hall", $DB).length > 0}
     <Button
-      class="bg-button h-max rounded-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:drop-shadow-2xl"
+      class="bg-accent h-max rounded-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:drop-shadow-2xl"
       on:click={() => {
         const attempt = expandTown($DB, direction);
         if (attempt) {

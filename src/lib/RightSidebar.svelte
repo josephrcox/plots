@@ -9,6 +9,13 @@
   import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
   import Separator from "./components/ui/separator/separator.svelte";
   import { options } from "./objects/PlotTypeOptions";
+  import { Vibe } from "./types";
+
+  let mute: string = localStorage.getItem("mute") || "false";
+
+  $: {
+    mute = localStorage.getItem("mute") || "false";
+  }
 
   type ResourceKey =
     | "food"
@@ -18,20 +25,6 @@
     | "power"
     | "knowledge"
     | "bureaucracy";
-
-  function setTaxRate(newRate: number[]) {
-    let z = $DB;
-    z.economyAndLaws.tax_rate = roundTo(newRate[0], 2);
-    DB.set(z);
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-  }
-
-  function setProductivity(newProductivity: number[]) {
-    let z = $DB;
-    z.townInfo.productivity = roundTo(newProductivity[0], 2);
-    DB.set(z);
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-  }
 
   let resources = [];
   $: resources = [
@@ -66,7 +59,7 @@
       rate: $DB.resource_rate.metal,
     },
     {
-      icon: "🔋 Surplus",
+      icon: "🔋",
       name: "power",
       value: $DB.resources.power,
       rate: null,
@@ -199,47 +192,73 @@
         </Tooltip.Root>
       {/each}
     </div>
+    <Separator />
+    <div class="flex flex-row gap-2 items-start justify-center">
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+      <h1
+        class="
+                text-xl
 
-    <div class="flex flex-col gap-6 rounded-xl text-center justify-center">
-      <div
-        class="flex flex-col justify-center w-full text-center items-center gap-2"
+                pb-2
+                
+                cursor-pointer
+            "
+        on:click={() => {
+          $DB.townLog = [];
+        }}
       >
-        <div>
-          <span class="text-xs">Productivity</span>
-          <span class="text-xs">({roundTo($DB.townInfo.productivity, 0)}%)</span
-          >
-        </div>
-        <Slider
-          value={[$DB.townInfo.productivity]}
-          onValueChange={setProductivity}
-          min={0}
-          max={200}
-          step={5}
-          class="cursor-pointer w-full"
-        />
-      </div>
-      <div
-        class="flex flex-col justify-center w-full text-center items-center gap-2
-        min-h-12 pb-2 rounded-xl {$DB.economyAndLaws.tax_rate === 0
-          ? 'bg-textDanger1 animate-pulse font-bold'
-          : ''}"
+        Alerts
+      </h1>
+      <button
+        on:click={() => {
+          localStorage.setItem(
+            "mute",
+            mute == "false" ? "true" : mute === "true" ? "false" : "true",
+          );
+          mute = localStorage.getItem("mute") || "false";
+        }}
       >
-        <div>
-          <span class="text-xs">Tax Rate</span>
-          <span class="text-xs"
-            >({roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%)</span
-          >
-        </div>
-        <Slider
-          value={[$DB.economyAndLaws.tax_rate]}
-          onValueChange={setTaxRate}
-          min={0}
-          max={1.0}
-          step={0.05}
-          class="cursor-pointer w-full"
-        />
-      </div>
+        {mute == "true" ? "🔇" : "🔊"}
+      </button>
     </div>
+    <div class="overflow-y-scroll h-[100%] w-[100%] px-1 pb-16 scroll-smooth">
+      {#if $DB.townLog.length == 0}
+        <p class="text-center text-xs opacity-50">No alerts</p>
+      {/if}
+      {#each $DB.townLog as log}
+        <div
+          class=" p-2 rounded-2xl fade-in
+        {log.vibe == Vibe.BAD
+            ? 'bg-red-600'
+            : log.vibe == Vibe.GOOD
+              ? 'bg-green-600'
+              : log.vibe == Vibe.NORMAL
+                ? 'bg-accent'
+                : 'bg-accent'}
+      
+      "
+        >
+          <p
+            class="font-mono text-[10px]
+          "
+          >
+            DAY {log.day}
+          </p>
+          <p class="text-xs pb-1">{log.message}</p>
+        </div>
+        <br />
+      {/each}
+    </div>
+
+    <ul
+      class="
+                list-disc
+                pl-5
+                gap-2
+                flex
+                flex-col text-xs
+            "
+    ></ul>
   </div>
 </div>
 

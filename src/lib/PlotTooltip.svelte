@@ -143,55 +143,7 @@
         <span>💰 {options[getOptionIndex(option.id)].revenue_per_week} </span>
       </div>
     {/if}
-    <!-- Modifiers -->
-    <!-- {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers).some((value) => value != 1)}
-    <div class="flex flex-col gap-1 text-xs">
-      <Separator class={"bg-secondary opacity-25 mt-2"} />
-      <span class="font-semibold">Effect modifiers</span>
-      {#each Object.keys(options[getOptionIndex(option.id)].effect_modifiers) as key, index}
-        {#if Object.values(options[getOptionIndex(option.id)].effect_modifiers)[index] != 1}
-          <span
-            class={Object.values(
-              options[getOptionIndex(option.id)].effect_modifiers,
-            )[index] > 1
-              ? "text-textHappyDark"
-              : "text-textDanger1"}
-            >{capitalizeFirstLetter(key)}
-            {formatModifier(
-              Object.values(
-                options[getOptionIndex(option.id)].effect_modifiers,
-              )[index],
-            )}
-          </span>
-        {/if}
-      {/each}
-    </div>
-  {/if} -->
-    <!-- Instant changes -->
-    <!-- {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes).some((value) => value != 0)}
-    <div class="flex flex-col gap-1 text-xs">
-      <Separator class={"bg-secondary opacity-25 mt-2"} />
-      <span class="font-semibold">Instant changes</span>
-      {#each Object.keys(options[getOptionIndex(option.id)].immediate_variable_changes) as key, index}
-        {#if Object.values(options[getOptionIndex(option.id)].immediate_variable_changes)[index] != 0}
-          <span
-            class={Object.values(
-              options[getOptionIndex(option.id)].immediate_variable_changes,
-            )[index] > 0
-              ? "text-textHappyDark"
-              : "text-textDanger1"}
-            >{capitalizeFirstLetter(key)}
-            {formatInstantChange(
-              Object.values(
-                options[getOptionIndex(option.id)].immediate_variable_changes,
-              )[index],
-              key != "population",
-            )}
-          </span>
-        {/if}
-      {/each}
-    </div>
-  {/if} -->
+
     {#if Object.values(options[getOptionIndex(option.id)].active_costs).some((value) => value != 0)}
       <div class="flex flex-col gap-1 text-xs">
         <Separator class={"bg-secondary opacity-25 mt-2"} />
@@ -210,6 +162,34 @@
                 Object.values(options[getOptionIndex(option.id)].active_costs)[
                   index
                 ]}
+            </span>
+          {/if}
+        {/each}
+      </div>
+    {/if}
+    {#if Object.values(options[getOptionIndex(option.id)].requirements.plots).length > 0}
+      <div class="flex flex-col gap-1 text-xs">
+        <Separator class={"bg-secondary opacity-25 mt-2"} />
+        <span class="font-semibold">Required Plots</span>
+        {#each Object.keys(options[getOptionIndex(option.id)].requirements.plots) as key, index}
+          {#if Object.values(options[getOptionIndex(option.id)].requirements.plots)[index] != 0}
+            <span
+              class="
+              {hasPlotOfType(
+                Object.values(
+                  options[getOptionIndex(option.id)].requirements.plots,
+                )[index],
+                $DB,
+              ).length == 0
+                ? 'text-textDanger1 border-2 border-red-400 px-2'
+                : 'text-textHappyDark'}
+            "
+            >
+              {capitalizeFirstLetter(
+                Object.values(
+                  options[getOptionIndex(option.id)].requirements.plots,
+                )[index],
+              )}
             </span>
           {/if}
         {/each}

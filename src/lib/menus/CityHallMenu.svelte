@@ -53,7 +53,7 @@
             <div>
               <!-- left minus, center text value, right plus -->
               <Button
-                class="bg-button rounded-2xl h-min select-none
+                class="bg-accent rounded-2xl h-min select-none
             {$DB.townInfo.guardians <= 0 ? 'opacity-50 cursor-not-allowed' : ''}
             "
                 on:click={() => {
@@ -69,7 +69,7 @@
                 {$DB.townInfo.guardians}
               </span>
               <Button
-                class="bg-button rounded-2xl h-min select-none
+                class="bg-accent rounded-2xl h-min select-none
             
               {$DB.townInfo.employees >= $DB.townInfo.population_count
                   ? 'opacity-50 cursor-not-allowed'
@@ -104,10 +104,10 @@
             >
               <span>{law.description}</span>
               <Button
-                class="bg-button rounded-2xl 
+                class="bg-accent rounded-2xl 
                 {$DB.economyAndLaws.enacted.includes(law.id)
                   ? 'bg-textDanger1'
-                  : 'bg-button'}
+                  : 'bg-accent'}
 
                 {!$DB.economyAndLaws.enacted.includes(law.id)
                   ? law.cost <= $DB.resources.bureaucracy

@@ -220,13 +220,13 @@
     let plotChosen = options[typeIndex];
 
     //// We may do this eventually but not now :)
-    if (checkIfAffordable(plotChosen, $DB) == false) {
-      return showCustomAlert.set(
-        `You can not afford this.
-        <br/><br/>
-        ${list}`,
-      );
-    }
+    // if (checkIfAffordable(plotChosen, $DB) == false) {
+    //   return showCustomAlert.set(
+    //     `You can not afford this.
+    //     <br/><br/>
+    //     ${list}`,
+    //   );
+    // }
 
     // check if the plot has required adjacent_plots
     if (plotChosen.requirements.adjacent_plots !== undefined) {
@@ -475,7 +475,7 @@
 
 {#if open}
   <div
-    class="w-[100vw] fixed bottom-0 h-[{BOTTOM_MENU_HEIGHT}]
+    class="w-[100vw] fixed bottom-[-10px] h-[{BOTTOM_MENU_HEIGHT}]
     p-1 z-50 flex flex-col justify-center text-center items-center"
   >
     <div
@@ -550,11 +550,12 @@
 
         <div
           class="flex flex-col {$modifyPlotMenuOptions.isMineralSource ||
-          searchQuery.length > 0
+          searchQuery.length > 0 ||
+          $showOnlyAffordable
             ? 'gap-0 pt-0'
             : 'gap-4'} w-full overflow-y-scroll h-72 pb-24"
         >
-          {#each $modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0 ? [1] : hasPlotOfType("tree_farm", $DB).length != 0 ? [1, 2, 3, 4] : [1] as level}
+          {#each $modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0 || $showOnlyAffordable ? [1] : hasPlotOfType("tree_farm", $DB).length != 0 ? [1, 2, 3, 4] : [1] as level}
             <div>
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource}
                 <div class="text-sm font-extralight pb-3">Level {level}</div>

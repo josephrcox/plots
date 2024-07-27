@@ -59,6 +59,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: "Listen to the townspeople.",
   },
   {
     id: "farm",
@@ -118,6 +119,8 @@ export const options: PlotOption[] = [
       food: 0,
     },
     check_for_variety: false,
+    liege_on_plot_hint:
+      "Your presence on the farm is encouraging the farmers to work harder!",
   },
   {
     id: "tree_farm",
@@ -177,12 +180,15 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint:
+      "Your presence on the farm is encouraging the farmers to work harder!",
   },
   {
     id: "quarry",
     title: "⛏️ Quarry",
     type: "quarry",
-    description: "Produces stone, small amounts of metal",
+    description:
+      "Produces stone, small amounts of metal. Isn't great for health. ",
     revenue_per_week: 0,
     requirements: {
       gold: 800,
@@ -236,6 +242,8 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint:
+      "The workers at the quarry are working harder with the presence of their liege.",
   },
   {
     id: "livestock_farm",
@@ -296,7 +304,10 @@ export const options: PlotOption[] = [
       food: 0,
     },
     check_for_variety: false,
+    liege_on_plot_hint:
+      "The cows are producing more milk and cheese when you are hanging out on the farm.",
   },
+
   {
     id: "bakery",
     title: "🥖 Bakery",
@@ -356,6 +367,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 15,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "stables",
@@ -415,6 +427,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "church",
@@ -474,13 +487,14 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "pub",
     title: "🍻 Pub",
     type: "recreation",
     description:
-      "Increases knowledge, happiness, community. Isn't great for health.",
+      "Generates knowledge, happiness, community. Isn't great for health.",
     revenue_per_week: 40,
     knowledge_points_per_month: 1,
     requirements: {
@@ -534,6 +548,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "village_market",
@@ -594,6 +609,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 35,
     },
+    liege_on_plot_hint: "Your presence is helping the market make more money.",
   },
   {
     id: "fishery",
@@ -654,65 +670,8 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
-  },
-  {
-    id: "neighborhood",
-    title: "🏘️ Neighborhood",
-    type: "residential",
-    description: "+64 people",
-    revenue_per_week: 0,
-    requirements: {
-      gold: 700,
-      plots: [],
-      employees: 0,
-      knowledge: 0,
-      size: 1,
-      xp: 0,
-      resources: {
-        food: 0,
-        wood: 250,
-        stone: 250,
-        metal: 0,
-        power: 0,
-        bureaucracy: 0,
-      },
-      adjacent_plots: [],
-    },
-    effect_modifiers: {
-      happiness: 1.1,
-      health: 1.0,
-      community: 1.1,
-    },
-    immediate_variable_changes: {
-      happiness: 0,
-      health: 0,
-      population: 64,
-      community: 0,
-      bureaucracy: 0,
-    },
-    styling: "",
-    affordable: null,
-    selected: null,
-    check_for_variety: false,
-    knowledge_points_per_month: 0,
-    generated_resources: {
-      food: 0,
-      wood: 0,
-      stone: 0,
-      metal: 0,
-      power: 0,
-      bureaucracy: 0,
-    },
-    level: 2,
-    active_costs: {
-      gold: 0,
-      power: 0,
-      wood: 0,
-      stone: 0,
-      metal: 0,
-      bureaucracy: 0,
-      food: 0,
-    },
+    liege_on_plot_hint:
+      "Your expertise in fishing is helping the town reel in far more fish!",
   },
   {
     id: "vineyard",
@@ -773,6 +732,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "water_wheel",
@@ -832,6 +792,8 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint:
+      "You are trying to improve the efficiency of the water wheel, but you aren't making a difference.",
   },
   {
     id: "adv_water_wheel",
@@ -841,7 +803,7 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     requirements: {
       gold: 1800,
-      plots: [],
+      plots: ["blacksmith"],
       employees: 16,
       knowledge: 0,
       size: 1,
@@ -891,6 +853,8 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint:
+      "You are trying to improve the efficiency of the water wheel, but you aren't making a difference.",
   },
   {
     id: "park",
@@ -951,6 +915,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "village_inn",
@@ -1011,6 +976,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "schoolhouse",
@@ -1021,7 +987,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 25,
     requirements: {
       gold: 2500,
-      plots: [],
+      plots: ["lumber_mill"],
       employees: 20,
       knowledge: 0,
       size: 1,
@@ -1070,6 +1036,8 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint:
+      "The children seem to be learning worse when you are around, maybe you are a distraction from the teachers.",
   },
   {
     id: "blacksmith",
@@ -1130,6 +1098,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "library",
@@ -1140,7 +1109,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 10,
     requirements: {
       gold: 2000,
-      plots: [],
+      plots: ["lumber_mill"],
       employees: 6,
       knowledge: 0,
       size: 1,
@@ -1189,6 +1158,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "lumber_mill",
@@ -1249,6 +1219,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "solar_farm",
@@ -1258,7 +1229,7 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     requirements: {
       gold: 5000,
-      plots: [],
+      plots: ["blacksmith"],
       employees: 4,
       knowledge: 0,
       size: 1,
@@ -1308,6 +1279,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "general_store",
@@ -1368,6 +1340,8 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 100,
     },
+    liege_on_plot_hint:
+      "Your experience managing towns is increasing the profits at the general store!",
   },
   {
     id: "healing_house",
@@ -1378,7 +1352,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 0,
     requirements: {
       gold: 20000,
-      plots: [],
+      plots: ["blacksmith"],
       employees: 18,
       knowledge: 0,
       size: 1,
@@ -1427,6 +1401,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "community_center",
@@ -1486,6 +1461,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "city_hall",
@@ -1546,6 +1522,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "mine",
@@ -1555,7 +1532,7 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     requirements: {
       gold: 50000,
-      plots: [],
+      plots: ["blacksmith"],
       employees: 64,
       knowledge: 0,
       size: 1,
@@ -1605,6 +1582,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "academy",
@@ -1615,7 +1593,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 90,
     requirements: {
       gold: 30000,
-      plots: [],
+      plots: ["lumber_mill"],
       employees: 32,
       knowledge: 1000,
       size: 1,
@@ -1664,6 +1642,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "bank",
@@ -1724,6 +1703,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
   {
     id: "lab",
@@ -1783,6 +1763,7 @@ export const options: PlotOption[] = [
       bureaucracy: 0,
       food: 0,
     },
+    liege_on_plot_hint: null,
   },
 ];
 export const typeColors: any = {

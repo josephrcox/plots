@@ -7,6 +7,7 @@
     paused,
     settingLiegeLocation,
     setLiegeLocation,
+    isLiegeOnPlot,
   } from "./store.ts";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import PlotTooltip from "./PlotTooltip.svelte";
@@ -177,9 +178,19 @@
         Water - Place farms nearby for more food & revenue!
       {/if}
       {#if isAdjacentToWater(data.x, data.y, $DB)}
-        <span class="text-xs bg-blue-500 text-white p-1"
+        <span class="text-xs bg-blue-500 text-white p-2 roudned-2xl"
           >Near water - Generating more food & revenue!</span
         >
+      {/if}
+      {#if isLiegeOnPlot(data.x, data.y, $DB)}
+        <span class="text-xs bg-yellow-300 text-black p-2 italic rounded-2xl">
+          {#if options[data.type].liege_on_plot_hint == null}
+            You are hanging out on the {options[data.type].title} plot, but nothing
+            seems to be changing except a revenue boost.
+          {:else}
+            {options[data.type].liege_on_plot_hint}
+          {/if}
+        </span>
       {/if}
 
       {#if data.active}

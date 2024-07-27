@@ -81,11 +81,11 @@
     db = _bringStatsBackToNormal(db);
     db = _unemployment(db);
     db = _listenToTownspeople(db);
+    //db = _boredom(db);
     return db;
   }
 
   function performQuarterlyTasks(db: Game) {
-    db = _boredom(db);
     db = _movePeopleInMovePeopleOut(db);
     db = _checkPlotCountForEffect(db);
 
@@ -804,27 +804,31 @@
   }
 
   function _checkPlotCountForEffect(z: Game) {
-    let totalPlotsPlaced = z.plotCounts.reduce((a, b) => a + b, 0);
-    let negativeEffect = false;
-    let plotCausingNegativeEffect = "";
+    ////
+    //// Temporarily removing this method until we decide to add it back.
+    ////
 
-    for (let i = 0; i < z.plotCounts.length; i++) {
-      if (z.plotCounts[i] == null || options[i].check_for_variety != true) {
-        continue;
-      }
+    // let totalPlotsPlaced = z.plotCounts.reduce((a, b) => a + b, 0);
+    // let negativeEffect = false;
+    // let plotCausingNegativeEffect = "";
 
-      const dif: number = z.difficulty;
+    // for (let i = 0; i < z.plotCounts.length; i++) {
+    //   if (z.plotCounts[i] == null || options[i].check_for_variety != true) {
+    //     continue;
+    //   }
 
-      if (z.plotCounts[i] / totalPlotsPlaced >= 0.25) {
-        plotCausingNegativeEffect = options[i].title;
+    //   const dif: number = z.difficulty;
 
-        negativeEffect = true;
-      }
-    }
-    if (negativeEffect) {
-      z = addToTownLog(messages.notEnoughVariety, z, Vibe.BAD);
-      z.modifiers.happiness * 0.95;
-    }
+    //   if (z.plotCounts[i] / totalPlotsPlaced >= 0.25) {
+    //     plotCausingNegativeEffect = options[i].title;
+
+    //     negativeEffect = true;
+    //   }
+    // }
+    // if (negativeEffect) {
+    //   z = addToTownLog(messages.notEnoughVariety, z, Vibe.BAD);
+    //   z.modifiers.happiness * 0.95;
+    // }
 
     return z;
   }
@@ -873,11 +877,19 @@
         return z;
       }
     }
+    // if z.lastChangeDay is over 180 days ago, then proceed.
     if (
-      z.lastChangeDay + (Math.random() * 500 + 365) < z.environment.day &&
+      z.lastChangeDay != null &&
+      z.environment.day - z.lastChangeDay < 180 &&
+      Math.random() < 0.5 &&
       z.townInfo.population_count > 0
     ) {
-      if (z.townInfo.population_count > 0) {
+      // log isn't already in the townLog
+      if (
+        z.townInfo.population_count > 0 &&
+        z.townLog.filter((log) => log.message.includes(messages.bored))
+          .length == 0
+      ) {
         z.townInfo.population_count -= 1;
         z.townInfo.employees -= 1;
         z.modifiers.happiness -= 0.01;
@@ -950,7 +962,6 @@
         if (z.townInfo.employees > z.townInfo.population_count) {
           z.townInfo.employees = z.townInfo.population_count;
         }
-        z = addToTownLog(newPeople + messages.new_people_num, z, Vibe.NORMAL);
       }
     }
     if (z.townInfo.happiness < 50 && z.townInfo.population_count > 0) {
@@ -964,8 +975,6 @@
       if (z.townInfo.employees > 0) {
         z.townInfo.employees -= unhappyPeople;
       }
-
-      z = addToTownLog(unhappyPeople + messages.leave_town_num, z, Vibe.BAD);
     } else {
       if (z.townInfo.population_count == z.townInfo.population_max) {
         // z = addToTownLog(messages.people_want_to_move_in, z);
@@ -1182,7 +1191,7 @@
           if (z.plots[i][j].disabled === true) {
             // Don't collect profits from this. Instead, cost the amount that it's meant to generate.
             const plotOptionForPlot = options[z.plots[i][j].type];
-            const profit =
+            const profit = Math.round(
               (getProfit(
                 plotOptionForPlot.revenue_per_week,
                 z,
@@ -1191,11 +1200,14 @@
                 j,
               ) *
                 (z.townInfo.productivity / 100)) /
-              7;
+                7,
+            );
 
             z.townInfo.gold -= profit;
+            z.townInfo.happiness -= 1;
+
             z = addToTownLog(
-              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week!`,
+              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week! It is also lowering overall happiness by 1.`,
               z,
               Vibe.BAD,
             );
@@ -1254,11 +1266,13 @@
       for (let j = 0; j < z.plots[i].length; j++) {
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           let plotOptionForPlot = options[z.plots[i][j].type];
+          let liegeBonus = isLiegeOnPlot(i, j, z) ? 0.75 : 1;
           if (plotOptionForPlot.knowledge_points_per_month != null) {
             z.townInfo.knowledge_points += Math.round(
-              plotOptionForPlot.knowledge_points_per_month / 4,
+              (plotOptionForPlot.knowledge_points_per_month * liegeBonus) / 4,
             );
-            starting += plotOptionForPlot.knowledge_points_per_month;
+            starting +=
+              (plotOptionForPlot.knowledge_points_per_month * liegeBonus) / 4;
           }
         }
       }
@@ -1270,6 +1284,10 @@
   function addToTownLog(message: string, z: Game, vibe: Vibe) {
     let log = z.townLog || [];
     // push to start of array
+    // if (message) is already in the log, then don't add it again.
+    if (log.filter((log) => log.message == message).length > 0) {
+      return z;
+    }
     log.unshift({
       message: message,
       day: z.environment.day,
@@ -1301,12 +1319,12 @@
     if (hasPlotOfType("village_inn", z).length > 0) {
       // Has village inn.
       if (type == "shop") {
-        profitModifiers *= 1.3;
+        profitModifiers *= 2;
       }
     }
 
     if (isLiegeOnPlot(x, y, z)) {
-      profitModifiers *= 2;
+      profitModifiers *= 1.5;
     }
 
     let profit = Math.round(
