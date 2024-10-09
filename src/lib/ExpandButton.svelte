@@ -17,7 +17,7 @@
       }}
     >
       <div>
-        spanMy liege, you can expand your <br />kingdom
+        My liege, you can expand your <br />kingdom
         <span class=" font-extrabold text-blue-200"
           >{direction.toUpperCase()}</span
         >
@@ -25,7 +25,7 @@
         <br />your
         <span class="text-blue-200 bold">City Hall</span>!<br /><br />
         <span class="opacity-75 text-xs"
-          >Requires {Math.round(Math.pow(1.5, $DB.kingdom_expansions + 5))} Guardians
+          >Requires {Math.round(Math.pow(1.7, $DB.kingdom_expansions + 5))} Guardians
           <br />to be employed. (see city mgmt menu)</span
         >
       </div>

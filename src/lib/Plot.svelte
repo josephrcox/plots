@@ -109,7 +109,7 @@
 	{data.disabled ? 'animate-spin' : ''}
 		"
       style="background-color: {data.water
-        ? 'bg-blue-900 opacity-100'
+        ? 'blue'
         : $modifyPlotMenuOptions.x == data.x &&
             $modifyPlotMenuOptions.y == data.y &&
             $modifyPlotMenuOptions.visible

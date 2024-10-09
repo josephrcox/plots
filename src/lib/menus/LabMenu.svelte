@@ -1,13 +1,17 @@
 <script lang="ts">
-  import { DB, hasPlotOfType, showLabMenu, reverseClear } from "../store.js";
+  import {
+    DB,
+    hasPlotOfType,
+    showLabMenu,
+    reverseClear,
+    showCustomAlert,
+  } from "../store.js";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
-  import { winScenarios } from "../objects/WinScenarios.js";
   import { experiments } from "$lib/objects/ExperimentsList.js";
   import { Experiment, Plot } from "$lib/types.js";
   import Separator from "$lib/components/ui/separator/separator.svelte";
-  const scenarios: any = winScenarios;
 
   let experimentOptions: Experiment[] = [];
   let dbInitialized = false;
@@ -35,6 +39,9 @@
       (ex) =>
         !$DB.lab.past_experiments.some((past: Experiment) => past.id === ex.id),
     );
+    if (filteredExperiments.length === 0) {
+      return [];
+    }
 
     for (let i = 0; i < 3; i++) {
       let ex =
@@ -69,48 +76,13 @@
   function completeExperiment() {
     $showLabMenu = false;
     showAlert = true;
-    switch ($DB.lab.active_experiment?.id) {
-      case "sunshine":
-        $DB.modifiers.happiness = 50;
-        break;
-      case "antibiotics":
-        $DB.modifiers.health = 50;
-        break;
-      case "goodbye_carrots":
-        removeAllPlotsOfType("carrot_farm");
-        break;
-      case "missing_treasure":
-        $DB.townInfo.gold += Math.floor(
-          Math.random() * $DB.lab.active_experiment.cost * 2,
-        );
-        break;
-      case "tax_relief":
-        $DB.economyAndLaws.max_tax_rate =
-          (Math.random() * 0.8 + 1.2) * $DB.economyAndLaws.max_tax_rate;
-        break;
-      case "bee_bonanza":
-        removeAllPlotsOfType("coffee_bean_farm");
-        break;
-      case "wheat_whirlwind":
-        removeAllPlotsOfType("wheat_farm");
-        $DB.townInfo.happiness *= 1.5;
-        $DB.modifiers.happiness += 3;
-        break;
-      case "educational_eclipse":
-        removeAllPlotsOfType("small_school");
-        removeAllPlotsOfType("large_school");
-        $DB.townInfo.knowledge_points *= 0.8;
-        break;
-      case "education_grant":
-        $DB.townInfo.knowledge_points *= 1.5;
-        $DB.townInfo.gold += 150000;
-        break;
-      case "mindfulness_meditation_classes":
-        $DB.modifiers.happiness * 1.5;
-        break;
-      default:
-        break;
-    }
+    // fire the experiment's effects
+    let experiment = experimentOptions.find(
+      (ex) => ex.id === $DB.lab.active_experiment.id,
+    );
+    let changedDB = experiment != null ? experiment.effect($DB) : $DB;
+    $DB = changedDB;
+
     // used to mark as already done so that the effects don't double
     $DB.lab.active_experiment.duration = -1;
   }
@@ -127,13 +99,6 @@
 
   function formatNumber(n: number) {
     return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
-  }
-
-  function removeAllPlotsOfType(typeId: string) {
-    let plotsOfType: any[] = hasPlotOfType(typeId, $DB);
-    for (let i = 0; i < plotsOfType.length; i++) {
-      reverseClear(plotsOfType[i].x, plotsOfType[i].y, $DB);
-    }
   }
 </script>
 

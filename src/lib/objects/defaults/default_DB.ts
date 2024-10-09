@@ -3,10 +3,10 @@ import { Game, UserDatabase } from "$lib/types";
 export const default_db: Game = {
   plots: [],
   timeSpent: 0,
-  devMode: false,
   lastChangeDay: 0,
   townLog: [],
   currentTutorialStep: 0,
+  gameSettings: [],
   townInfo: {
     name: "Your town",
     gold: 150,
@@ -23,7 +23,7 @@ export const default_db: Game = {
   },
   kingdom_expansions: 0,
   resources: {
-    food: 50,
+    food: 150,
     wood: 750,
     stone: 750,
     metal: 0,

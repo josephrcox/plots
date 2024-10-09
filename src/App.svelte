@@ -20,13 +20,13 @@
   import { runTests } from "./tests";
   import GameEndMenu from "./lib/menus/GameEndMenu.svelte";
   import StartGameMenu from "./lib/menus/StartGameMenu.svelte";
-  import Scoreboard from "$lib/menus/Scoreboard.svelte";
-  import KnowledgeMenu from "$lib/menus/KnowledgeMenu.svelte";
-  import LabMenu from "$lib/menus/LabMenu.svelte";
-  import Hud from "$lib/Hud.svelte";
-  import WelcomeScreen from "$lib/menus/WelcomeScreen.svelte";
-  import CityHallMenu from "$lib/menus/CityHallMenu.svelte";
-  import CustomAlert from "$lib/components/CustomAlert.svelte";
+  import Scoreboard from "./lib/menus/Scoreboard.svelte";
+  import KnowledgeMenu from "./lib/menus/KnowledgeMenu.svelte";
+  import LabMenu from "./lib/menus/LabMenu.svelte";
+  import Hud from "./lib/Hud.svelte";
+  import WelcomeScreen from "./lib/menus/WelcomeScreen.svelte";
+  import CityHallMenu from "./lib/menus/CityHallMenu.svelte";
+  import CustomAlert from "./lib/components/CustomAlert.svelte";
 
   let dbInitialized = false;
   let resetLiegeLocationSetting = true;
@@ -77,6 +77,10 @@
       case "p":
         if ($paused == true) {
           paused.set(false);
+          let z = $DB;
+          z.modifiers.happiness = 2;
+          z.modifiers.health = 2;
+          $DB = z;
         } else {
           paused.set(true);
           $modifyPlotMenuOptions.visible = false;

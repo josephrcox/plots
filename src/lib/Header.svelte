@@ -15,6 +15,7 @@
   import Separator from "./components/ui/separator/separator.svelte";
 
   onMount(() => {
+    $DB.gameSettings.includes("casual") ? ($speed = 375) : ($speed = 750);
     const interval = setInterval(() => {
       $DB.timeSpent += 1000;
     }, 1000);
@@ -35,6 +36,9 @@
   }
 
   function toggleSpeed(newSpeed: number) {
+    if ($DB.gameSettings.includes("casual")) {
+      newSpeed /= 2;
+    }
     $speed = newSpeed;
     // find all with .speedButton and remove the active class
     let buttons = document.querySelectorAll(".speedButton");
@@ -302,19 +306,19 @@
 					items-center"
         >
           <span
-            class="{$speed.toString() === '2000'
+            class="{$speed.toString() === '2000' || $speed.toString() === '1000'
               ? 'text-textPrimary font-semibold text-lg transition-all duration-100'
               : 'text-md'} text-accent cursor-pointer"
             on:click={() => toggleSpeed(2000)}>Slow</span
           >
           <span
-            class="{$speed.toString() === '750'
+            class="{$speed.toString() === '750' || $speed.toString() === '375'
               ? 'text-textPrimary font-semibold text-lg transition-all duration-100'
               : 'text-md'} text-accent cursor-pointer"
             on:click={() => toggleSpeed(750)}>Normal</span
           >
           <span
-            class="{$speed.toString() === '200'
+            class="{$speed.toString() === '200' || $speed.toString() === '100'
               ? 'text-textPrimary font-semibold text-lg transition-all duration-100'
               : 'text-md'} text-accent cursor-pointer"
             on:click={() => toggleSpeed(200)}>Fast</span
@@ -356,7 +360,10 @@
             $DB.currentTutorialStep
           ].message}
           <span class="opacity-40"
-            >(💰{tutorialMessages[$DB.currentTutorialStep].goldReward})</span
+            >(💰{formatNumber(
+              tutorialMessages[$DB.currentTutorialStep].goldReward,
+              false,
+            )})</span
           >
         {/if}
       </div>

@@ -14,9 +14,9 @@
     showCustomAlert,
     isLiegeOnPlot,
   } from "./store";
+  // @ts-ignore
   import { messages } from "./objects/TownLogMessages.js";
   import { options } from "./objects/PlotTypeOptions";
-  import { winScenarios } from "./objects/WinScenarios.js";
   import { achievements } from "./objects/AchievementList";
   import { tutorialMessages } from "./objects/tutorial_messages";
   import { getOptionIndex, isAdjacentToWater, randomizeNumber } from "./utils";
@@ -606,6 +606,8 @@
       // Extremely upset
       multiplier = 5;
     }
+    const casualGameModifier = z.gameSettings.includes("casual") ? 3 : 1;
+    multiplier *= casualGameModifier;
     multiplier = randomizeNumber(multiplier, 2);
     let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.25;
     if (hasLumberMillMultiplier === 0) hasLumberMillMultiplier = 1;
@@ -616,7 +618,7 @@
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           // check if the plot is adjacent to a water plot
           let nearWater = isAdjacentToWater(i, j, z);
-          let liegeBonus = isLiegeOnPlot(i, j, z) ? 1.5 : 1;
+          let liegeBonus = isLiegeOnPlot(i, j, z) ? 2 : 1;
 
           let plotOptionForPlot = options[z.plots[i][j].type];
           if (plotOptionForPlot.generated_resources != null) {
@@ -778,7 +780,7 @@
   }
 
   function _checkForAchievements(z: Game) {
-    if (z.devMode) {
+    if (z.gameSettings.includes("devMode")) {
       return z;
     }
     let user_db = $userDB;
@@ -809,7 +811,10 @@
   let doNotCheckTutorialStep = false;
 
   function _setTutorialStep(z: Game) {
-    if (doNotCheckTutorialStep) {
+    if (
+      doNotCheckTutorialStep ||
+      z.currentTutorialStep >= tutorialMessages.length
+    ) {
       return z;
     }
     // Goes through the tutorialMessages array, and finds the first one that is not yet completed.
@@ -833,6 +838,21 @@
   }
 
   function _checkGameLost(z: Game) {
+    if (
+      z.gameSettings.includes("tomPetty") &&
+      (z.townInfo.happiness <= 3 || z.townInfo.health <= 3)
+    ) {
+      z.townInfo.happiness = 300;
+      z.modifiers.happiness = 1;
+      z.townInfo.health = 300;
+      z.modifiers.health = 1;
+      z.townInfo.gold = roundTo(z.townInfo.gold * 0.1, 0);
+      alert(
+        "Since you are playing in Tom Petty mode, you have been given another chance. All it took was 90% of your gold. Good luck!",
+      );
+      return z;
+    }
+
     // GAME LOSS SCENARIOS
     if (z.townInfo.happiness <= 3) {
       z.townInfo.happiness = 0;
@@ -863,10 +883,16 @@
 
   function _unemployment(z: Game) {
     let unemployed = z.townInfo.population_count - z.townInfo.employees;
+    if (z.gameSettings.includes("casual")) {
+      // return without effect 75% of the time. casual has to be easier here.
+      if (Math.random() < 0.75) {
+        return z;
+      }
+    }
     if (unemployed > 0) {
       let toRemove = unemployed * 0.2;
-      if (toRemove < 15) {
-        toRemove = 15;
+      if (toRemove > 10) {
+        toRemove = 10;
       }
       z.townInfo.happiness -= toRemove;
       z = addToTownLog(unemployed + messages.unemployment_num, z, Vibe.BAD);
@@ -1190,11 +1216,21 @@
     if (z.modifiers.community < 0.5) {
       z.modifiers.community = 0.5;
     }
+
+    if (z.modifiers.happiness > 2) {
+      z.modifiers.happiness = 2;
+    }
+    if (z.modifiers.health > 2) {
+      z.modifiers.health = 2;
+    }
+    if (z.modifiers.community > 2) {
+      z.modifiers.community = 2;
+    }
     return z;
   }
 
   export function _bringModifiersBackToNormal(z: Game) {
-    const modifierVariable = 0.1;
+    const modifierVariable = 0.3;
     if (z.modifiers.happiness > 1.0) {
       // check % above 1.0 that z.modifiers.happiness is, and get it X% closer to 1.0
       let percentAboveOne = z.modifiers.happiness - 1.0;
@@ -1309,6 +1345,10 @@
               7;
 
             let nearWater = isAdjacentToWater(i, j, z);
+            const casualGameModifier = z.gameSettings.includes("casual")
+              ? 3
+              : 1;
+            profit *= casualGameModifier;
             profit *= nearWater ? 2 : 1;
             z.townInfo.gold += profit;
             z.economyAndLaws.weeklyProfit += profit * 7;
@@ -1327,10 +1367,15 @@
   }
 
   function _mineEffects(z: Game) {
+    if (z.gameSettings.includes("casual")) {
+      // return without effect 75% of the time. casual has to be easier here.
+      if (Math.random() < 0.75) {
+        return z;
+      }
+    }
     if (hasPlotOfType("mine", z).length > 0) {
       // When a mine is in the town, the health should be hurt.
-      // This is called monthly, and every month, the health modifier should drop by 0.01
-      z.modifiers.health -= 0.01;
+      z.townInfo.health -= 1;
       if (hasPlotOfType("healing_house", z).length == 0) {
         z = addToTownLog(
           "The mine is actively hurting the health of the town. Time to look into a healing house.",
@@ -1360,7 +1405,7 @@
         }
       }
     }
-    z.resource_rate.knowledge = roundTo(starting / 4, 0);
+    z.resource_rate.knowledge = roundTo(starting, 0);
     return z;
   }
 

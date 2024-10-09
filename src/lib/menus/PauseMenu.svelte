@@ -17,7 +17,14 @@
   import { Label } from "$lib/components/ui/label";
   // @ts-ignore
   import { winScenarios } from "../objects/WinScenarios.js";
-  import { difficulty_options } from "../objects/difficulty.js";
+
+  // @ts-ignore
+  import {
+    max_tax_rates_based_on_difficulty,
+    difficulty_options,
+    // @ts-ignore
+  } from "../objects/difficulty.js";
+
   import { achievements } from "$lib/objects/AchievementList.js";
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";

@@ -67,7 +67,7 @@ export const tutorialMessages: TutorialStep[] = [
   },
   {
     message:
-      "My liege, we need more metals. Find a good spot for a mine and build it. ",
+      "My liege, we need more metals. Find a good spot for a Mine 🧲 and build it. ",
     isComplete: (z: Game) => {
       return hasPlotOfType("mine", z).length > 0;
     },

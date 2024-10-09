@@ -9,7 +9,6 @@
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
-  import { winScenarios } from "../objects/WinScenarios.js";
   import { experiments } from "$lib/objects/ExperimentsList.js";
   import { Experiment, Plot } from "$lib/types.js";
   import Separator from "$lib/components/ui/separator/separator.svelte";

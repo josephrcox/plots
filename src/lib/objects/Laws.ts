@@ -2,6 +2,10 @@ import { Law, Game } from "$lib/types";
 import { hasPlotOfType, DB } from "$lib/store";
 import { options } from "./PlotTypeOptions";
 
+let casualModifier = function (game: Game) {
+  return game.gameSettings.includes("casual") ? 3 : 1;
+};
+
 export const laws: Law[] = [
   {
     id: "organic_farming",
@@ -9,9 +13,11 @@ export const laws: Law[] = [
       "Organic Farming. Make townspeople healthier and happier, while decreasing overall food production.",
     cost: 150,
     weekly_effect: (game: Game) => {
-      game.modifiers.happiness *= 1.1;
-      game.modifiers.health *= 1.1;
-      game.resources.food -= 2 * hasPlotOfType("farm", game).length;
+      game.modifiers.happiness *= 1.01;
+      game.modifiers.health *= 1.01;
+      game.resources.food -=
+        2 * casualModifier(game) * hasPlotOfType("farm", game).length;
+
       return game;
     },
   },
@@ -39,8 +45,8 @@ export const laws: Law[] = [
           (law) => law !== "tax_free",
         );
       } else {
-        game.modifiers.happiness *= 1.2;
-        game.modifiers.health *= 1.2;
+        game.modifiers.happiness *= 1.02;
+        game.modifiers.health *= 1.01;
       }
 
       return game;
@@ -54,9 +60,12 @@ export const laws: Law[] = [
     weekly_effect: (game: Game) => {
       const option = options.find((option) => option.id === "mine");
       game.modifiers.health *= 1.1;
-      game.resources.stone -= 5 * hasPlotOfType("quarry", game).length;
-      game.resources.stone -= 7 * hasPlotOfType("mine", game).length;
-      game.resources.metal -= 15 * hasPlotOfType("mine", game).length;
+      game.resources.stone -=
+        5 * casualModifier(game) * hasPlotOfType("quarry", game).length;
+      game.resources.stone -=
+        7 * casualModifier(game) * hasPlotOfType("mine", game).length;
+      game.resources.metal -=
+        15 * casualModifier(game) * hasPlotOfType("mine", game).length;
       return game;
     },
   },
@@ -79,7 +88,9 @@ export const laws: Law[] = [
       "Legalize it. You legalize a substance that makes people happy, but it also gives them 'the munchies'. Food consumption and happiness go up.",
     cost: 350,
     weekly_effect: (game: Game) => {
-      game.resources.food -= Math.round(0.2 * game.townInfo.population_count);
+      game.resources.food -= Math.round(
+        0.2 * casualModifier(game) * game.townInfo.population_count,
+      );
       game.modifiers.happiness *= 1.1;
       return game;
     },
@@ -100,6 +111,7 @@ export const laws: Law[] = [
       "Career Politician. You hire a career politician to help you with your town. They cost the town $100 per week, but they earn bureaucracy points faster.",
     cost: 200,
     weekly_effect: (game: Game) => {
+      game.townInfo.gold -= 100;
       game.resources.bureaucracy += 25;
       return game;
     },
@@ -141,22 +153,21 @@ export const laws: Law[] = [
   {
     id: "stone_statue",
     description:
-      "Stone Statue. You insist that we use ALL of our stone to build a massive statue. We lose all of our stone, but for some reason, the town has perfect health for a while.",
+      "Stone Statue. You insist that we use ALL of our stone to build a massive statue. We lose all of our stone, but for some reason, the town has perfect health for a while, I guess.",
     cost: 1000,
     weekly_effect: (game: Game) => {
       game.resources.stone = 0;
-      game.modifiers.health = 10; // out of 1, so this is crazy high.
+      game.modifiers.health = 3; // out of 1, so this is crazy high.
       return game;
     },
   },
   {
     id: "out_of_town",
     description:
-      "Out of town. Everyone needs a vacation, right? When this is enacted, EVERYONE must leave the town for 10 days. During this time, no resources are produced, no taxes are collected, and you must take ",
+      "Out of town. Everyone needs a vacation, right? When this is enacted, EVERYONE must leave the town for 10 days. During this time, no resources are produced, no taxes are collected, and you must take a break from the game.",
     cost: 1000,
     weekly_effect: (game: Game) => {
-      game.resources.stone = 0;
-      game.modifiers.health = 10; // out of 1, so this is crazy high.
+      alert("TODO: Implement out_of_town law");
       return game;
     },
   },

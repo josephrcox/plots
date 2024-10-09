@@ -14,7 +14,8 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { Difficulty, EndGoal, WinScenario } from "$lib/types";
-  import { winScenarios } from "$lib/objects/WinScenarios";
+  // @ts-ignore
+  import { winScenarios } from "../objects/WinScenarios";
 
   paused.set(false);
 
@@ -26,11 +27,16 @@
       .value;
     const townName = (document.getElementById("townName") as HTMLInputElement)
       .value;
-    const cheats =
-      (document.getElementById("cheats") as HTMLSelectElement).value == "true";
+
+    // GAME SETTINGS
+    const checkboxes = ["devMode", "tomPetty", "casual"];
+    const settings = checkboxes.filter(
+      (id) => (document.getElementById(id) as HTMLInputElement).checked,
+    );
+
     const dif = difficulty as Difficulty;
     const eg = endGoal as EndGoal;
-    startGame(dif, eg, townName, cheats);
+    startGame(dif, eg, townName, settings);
   }
 
   let selectedGameMode = "free_play";
@@ -78,9 +84,9 @@
               id="difficulty"
               class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             >
-              <option value="0">Easy (quick game)</option>
+              <!-- <option value="0">Easy (quick game)</option> -->
               <option value="1" selected>Normal</option>
-              <option value="2">Hard (longest game)</option>
+              <!-- <option value="2">Hard (longest game)</option> -->
             </select>
           </div>
 
@@ -118,14 +124,22 @@
             />
           </div>
           <div>
-            <Label for="cheats" class="mt-2">Cheats</Label>
-            <select
-              id="cheats"
-              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option value="false" selected>No cheats</option>
-              <option value="true">Dev mode</option>
-            </select>
+            <input type="checkbox" id="devMode" class="mt-1" />
+            <label for="devMode" class="mt-2">Dev mode</label>
+          </div>
+          <div>
+            <input type="checkbox" id="tomPetty" class="mt-1" />
+            <label for="tomPetty" class="mt-2">
+              The 'Tom Petty' mode. If your happiness or health reaches 0, you
+              lose 90% of your gold and continue the game. You won't back down.
+            </label>
+          </div>
+          <div>
+            <input type="checkbox" id="casual" class="mt-1" />
+            <label for="casual" class="mt-2">
+              Casual game. Faster and easier overall while exposing more of the
+              game mechanics.
+            </label>
           </div>
         </div>
       </Dialog.Description>
@@ -152,18 +166,12 @@
 </Dialog.Root>
 
 <style>
-  /* .dialog {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		display: flex;
-	}
-
-	.dialog-content {
-		background: rgb(56 72 108);
-		padding: 1em;
-		border-radius: 0.5em;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-	} */
+  label {
+    /* no select */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
 </style>

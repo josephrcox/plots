@@ -1,12 +1,15 @@
 <script lang="ts">
   // @ts-ignore
-  import { DB, showKnowledgeMenu, ACTIVE_GAME_DB_NAME } from "../store.js";
+  import {
+    DB,
+    showKnowledgeMenu,
+    ACTIVE_GAME_DB_NAME,
+    showCustomAlert,
+  } from "../store.js";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import { winScenarios } from "../objects/WinScenarios.js";
-  import { difficulty_options } from "../objects/difficulty.js";
+  // @ts-ignore
   import LineGraph from "$lib/components/LineGraph.svelte";
-  const scenarios: any = winScenarios;
   let graphData: number[];
   let marketRate = 0;
 

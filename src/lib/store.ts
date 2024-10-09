@@ -448,9 +448,10 @@ export function startGame(
   difficulty: Difficulty,
   endGoal: EndGoal,
   townName: string,
-  cheats: boolean,
+  gameSettings: string[],
 ) {
   let json: Game = { ...default_db }; // Use a copy of default_db
+  json.gameSettings = gameSettings;
   json.economyAndLaws.max_tax_rate =
     max_tax_rates_based_on_difficulty[difficulty];
   json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
@@ -460,8 +461,7 @@ export function startGame(
   json.townInfo.name = townName != "" ? townName : generateRandomTownName();
   json.difficulty = parseInt(difficulty);
 
-  if (cheats) {
-    json.devMode = true;
+  if (gameSettings.includes("devMode")) {
     json.townInfo.gold = 100000000;
     json.townInfo.happiness = 10000000;
     json.townInfo.health = 1000000;
@@ -554,18 +554,6 @@ export function reverseClear(x: number, y: number, z: any) {
       options[oldPlotType].immediate_variable_changes.population;
     z.townInfo.population_max -=
       options[oldPlotType].immediate_variable_changes.population;
-    z.townInfo.happiness -=
-      options[oldPlotType].immediate_variable_changes.happiness;
-    z.townInfo.health -= options[oldPlotType].immediate_variable_changes.health;
-    // Effect modifiers
-    z.modifiers.happiness = roundTo(
-      z.modifiers.happiness / options[oldPlotType].effect_modifiers.happiness,
-      2,
-    );
-    z.modifiers.health = roundTo(
-      z.modifiers.health / options[oldPlotType].effect_modifiers.health,
-      2,
-    );
     // Employeer modifications
     z.townInfo.employees -= options[oldPlotType].requirements.employees;
 

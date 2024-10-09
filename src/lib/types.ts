@@ -37,9 +37,9 @@ export type Game = {
   plots: Plot[][]; // 2d array of plot-like objects that mark what is in each plot.
   timeSpent: number; // in seconds
   currentTutorialStep: number; // Index
-  devMode: boolean;
   lastChangeDay: number; // when the last change in the town was made.
   townLog: TownLog[];
+  gameSettings: string[];
   townInfo: {
     name: string;
     gold: number; // you start with 1000, and generally profits go up slowly.
@@ -145,7 +145,7 @@ export type Experiment = {
   description: string;
   cost: number;
   duration: number; // days
-  effect: boolean; // whether it has an effect or not
+  effect: (game: Game) => Game;
 };
 
 export type PlotOption = {
