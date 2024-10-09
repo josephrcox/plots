@@ -609,7 +609,7 @@
     const casualGameModifier = z.gameSettings.includes("casual") ? 3 : 1;
     multiplier *= casualGameModifier;
     multiplier = randomizeNumber(multiplier, 2);
-    let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.25;
+    let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.5;
     if (hasLumberMillMultiplier === 0) hasLumberMillMultiplier = 1;
 
     // This iterates over each plot that is placed, and generates resources based on the plot type.

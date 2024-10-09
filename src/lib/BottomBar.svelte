@@ -563,7 +563,7 @@
             ? 'flex-row flex-wrap max'
             : 'w-full overflow-y-scroll flex-col'}"
         >
-          {#each $modifyPlotMenuOptions.isMineralSource ? [1] : [1, 2, 3, 4] as level}
+          {#each $modifyPlotMenuOptions.isMineralSource ? [1] : [1, 2, 3, 4, 5] as level}
             <div class="${!showOnlyAffordable ? 'px-2' : ''}">
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource && !$showOnlyAffordable}
                 <div class="text-sm font-extralight">Level {level}</div>
