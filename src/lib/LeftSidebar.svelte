@@ -8,9 +8,13 @@
     showCityHallMenu,
     showKnowledgeMenu,
     showLabMenu,
+    showTutorialStepConfetti,
   } from "./store";
   import Button from "./components/ui/button/button.svelte";
   import Slider from "./components/ui/slider/slider.svelte";
+  import { tutorialMessages } from "./objects/tutorial_messages";
+  import Separator from "./components/ui/separator/separator.svelte";
+  import { Confetti } from "svelte-confetti";
 
   function showTheLabMenu() {
     if ($DB.hasLab) showLabMenu.set(true);
@@ -29,25 +33,27 @@
     DB.set(z);
     localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
   }
+
+  //// Tester for confetti. Leave commented out unless testing.
+  document.addEventListener("keydown", function (e) {
+    switch (e.key) {
+      case "Escape":
+        $showTutorialStepConfetti = true;
+        setTimeout(() => {
+          $showTutorialStepConfetti = false;
+        }, 5000);
+        break;
+    }
+  });
 </script>
 
-<!-- fixed to left side and fill entire height -->
-<div class="flex flex-row text-foregroundText">
+<div class="flex flex-row text-foregroundText overflow-clip">
   <div
-    class="bg-foreground w-[160px] border-foregroundDark border-4
+    class="bg-foreground w-[160px] overflow-scroll border-foregroundDark border-4
 			{$modifyPlotMenuOptions.visible ? 'bottom-8  opacity-70' : 'bottom-2'}
-		z-10 fixed left-3 py-2 top-[190px] drop-shadow-xl rounded-xl transition-all duration-300 overflow-y-clip"
+		z-10 fixed left-3 py-2 top-[190px] drop-shadow-xl rounded-xl transition-all duration-300"
   >
-    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-    <!-- <h1
-      class="text-xl text-center cursor-pointer"
-      on:click={() => {
-        $DB.townLog = [];
-      }}
-    >
-      Settings
-    </h1> -->
-    <div class="flex flex-col justify-center mx-2">
+    <div class="flex flex-col justify-center mx-2 overflow-scroll">
       <div
         class="flex flex-col gap-2 rounded-xl text-center justify-center mb-2 mt-0"
       >
@@ -146,6 +152,43 @@
           </div>
         </Button>
       </div>
+      <Separator class="bg-background mt-4" />
+      <div class="mt-4">
+        <h1 class="text-lg w-full text-center pb-2">Milestones</h1>
+        <div
+          class="
+        "
+        >
+          {#each tutorialMessages as step, index}
+            <div
+              class="text-xs flex flex-row justify-center align-middle pb-2
+              text-textPrimary mb-2 transition-all duration-300 noselect
+            {$DB.currentTutorialStep == index ? 'opacity-100' : 'opacity-35'}
+          "
+            >
+              {#if $showTutorialStepConfetti && $DB.currentTutorialStep == index}
+                <Confetti cone x={[-0.5, 0.5]} />
+                <Confetti
+                  cone
+                  amount={10}
+                  x={[-1, -0.4]}
+                  y={[0.25, 0.75]}
+                  rounded
+                  size={15}
+                />
+                <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
+
+                <Confetti infinite amount={75} delay={[0, 200]} />
+              {/if}
+              {step.isComplete($DB) ||
+              ($showTutorialStepConfetti && $DB.currentTutorialStep == index)
+                ? "✅"
+                : "⬜️"}
+              {step.message}
+            </div>
+          {/each}
+        </div>
+      </div>
     </div>
     <br />
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -153,6 +196,12 @@
 </div>
 
 <style>
+  .noselect {
+    user-select: none;
+  }
+  * {
+    scrollbar-width: none;
+  }
   @keyframes fadeIn {
     from {
       opacity: 0;

@@ -9,14 +9,14 @@ type TutorialStep = {
 
 export const tutorialMessages: TutorialStep[] = [
   {
-    message: "My liege, we need places to live! Build the first homes.",
+    message: "Build homes to start growing our village.",
     isComplete: (z: Game) => {
       return z.townInfo.population_max > 0;
     },
     goldReward: 750,
   },
   {
-    message: "My liege, you need to start making food and wood.",
+    message: "Start producing food and wood to keep the town running.",
     isComplete: (z: Game) => {
       return (
         hasPlotOfType("farm", z).length >= 1 &&
@@ -26,67 +26,59 @@ export const tutorialMessages: TutorialStep[] = [
     goldReward: 300,
   },
   {
-    message:
-      "My liege, the village will need stone and metals to expand. Build a quarry. ",
+    message: "We need stone and metals. Build a quarry.",
     isComplete: (z: Game) => {
       return hasPlotOfType("quarry", z).length > 0;
     },
-    goldReward: 500,
+    goldReward: 700,
   },
   {
-    message:
-      "My liege, things are picking up but we will need far more money. Get weekly revenue to >=200 gold. ",
+    message: "Increase our weekly revenue to at least 200 gold.",
     isComplete: (z: Game) => {
       return z.economyAndLaws.weeklyProfit >= 200;
     },
-    goldReward: 2000,
+    goldReward: 5000,
   },
   {
-    message:
-      "My liege, as the town develops we will need the smartest and brightest. Build plots to get our Knowledge to 250.",
+    message: "Boost our Knowledge to 250 by building educational plots.",
     isComplete: (z: Game) => {
       return z.townInfo.knowledge_points >= 250;
     },
-    goldReward: 2000,
+    goldReward: 5000,
   },
   {
-    message:
-      "My liege, the village is growing - yay! But we need to have more workers. Get the population to 100.",
+    message: "Grow our population to 100.",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 100;
     },
-    goldReward: 1500,
+    goldReward: 8000,
   },
   {
-    message:
-      "My liege, some advanced buildings require power. Start generating power with a water wheel or a solar farm.",
+    message: "Start generating power. Build a water wheel or solar farm.",
     isComplete: (z: Game) => {
       return z.resources.power > 0;
     },
-    goldReward: 2000,
+    goldReward: 8000,
   },
   {
-    message:
-      "My liege, we need more metals. Find a good spot for a Mine 🧲 and build it. ",
+    message: "Build a mine to boost our metal supply.",
     isComplete: (z: Game) => {
       return hasPlotOfType("mine", z).length > 0;
     },
     goldReward: 10000,
   },
   {
-    message:
-      "My liege, mining resources has taken a toll on the towns health. Build a Healing House to lower the chance of sickness.",
+    message: "Mining has impacted health. Build a Healing House.",
     isComplete: (z: Game) => {
       return hasPlotOfType("healing_house", z).length > 0;
     },
-    goldReward: 15000,
+    goldReward: 10000,
   },
   {
-    message:
-      "My liege, now that we have metals, power, and people, your next goal is a big one. Build your town a City Hall.",
+    message: "Establish a City Hall to advance our town.",
     isComplete: (z: Game) => {
       return hasPlotOfType("city_hall", z).length > 0;
     },
-    goldReward: 10000,
+    goldReward: 25000,
   },
 ];

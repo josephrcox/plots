@@ -338,68 +338,6 @@
   </div>
 </div>
 
-<div
-  class=" {$showTutorialStepConfetti ? 'opacity-25 ' : ''}
-      transition-all duration-1000
-      {$DB.environment.day === 0 ? 'wiggle' : ''}
-      "
->
-  <div
-    class="flex flex-col justify-center w-full align-middle items-center fixed max-w-[50vw] z-10
-
-          {$DB.environment.day === 0 ? 'top-[160px]' : 'top-[130px]'}
-    left-0 right-0 mx-auto
-  "
-  >
-    {#if $showTutorialStepConfetti}
-      <Confetti y={[-0.5, 0.5]} x={[-0.5, 0.5]} duration={2000} />
-    {/if}
-
-    <div
-      class="gap flex-row items-center flex bg-white text-slate-800 py-1 px-2 rounded-xl w-full
-        
-      "
-    >
-      <div class="text-lg h-max">👨‍🦰</div>
-      <div class="text-xs ml-2 overflow-auto opacity-80">
-        {#if $DB.currentTutorialStep >= tutorialMessages.length}
-          No more goals!
-        {:else}
-          Milestone {$DB.currentTutorialStep + 1} : {tutorialMessages[
-            $DB.currentTutorialStep
-          ].message}
-          <span class="opacity-40"
-            >(💰{formatNumber(
-              tutorialMessages[$DB.currentTutorialStep].goldReward,
-              false,
-            )})</span
-          >
-        {/if}
-      </div>
-    </div>
-  </div>
-</div>
-
 <style>
-  .wiggle {
-    animation: wiggle 3s infinite;
-  }
-
-  @keyframes wiggle {
-    0% {
-      transform: rotate(0deg);
-    }
-    25% {
-      transform: rotate(5deg);
-    }
-    50% {
-      transform: rotate(0deg);
-    }
-    75% {
-      transform: rotate(-5deg);
-    }
-    100% {
-      transform: rotate(0deg);
-    }
-  }
+  /*  */
 </style>

@@ -130,7 +130,7 @@
     <Tooltip.Root openDelay={400} closeDelay={0}>
       <Tooltip.Trigger>
         <div class="flex flex-row items-center pb-2 gap-2">
-          <h1 class="text-xl w-full text-center">Resources ℹ️</h1>
+          <h1 class="text-lg w-full text-center">Resources ℹ️</h1>
         </div>
         <div
           class="text-xs w-full text-center mb-2 cursor-pointer italic
@@ -175,7 +175,7 @@
   </div>
   <div class="w-[full] flex flex-row justify-center"></div>
 
-  <Separator class="mb-4 bg-white" />
+  <Separator class="mb-4 bg-background" />
 
   <div
     class="flex flex-col justify-between gap-4 text-foregroundText h-full pb-12"
@@ -235,15 +235,12 @@
         </Tooltip.Root>
       {/each}
     </div>
-    <Separator class="bg-white" />
+    <Separator class="bg-background" />
     <div class="flex flex-row gap-2 items-start justify-center">
       <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
       <h3
         class="
                 text-md
-
-                
-                
                 cursor-pointer
             "
         on:click={() => {

@@ -863,7 +863,7 @@
           z.currentTutorialStep++; //
           z.townInfo.gold += tutorialMessages[i].goldReward;
           doNotCheckTutorialStep = false;
-        }, 1000);
+        }, 3000);
         break;
       }
     }
