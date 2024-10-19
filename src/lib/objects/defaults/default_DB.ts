@@ -7,6 +7,7 @@ export const default_db: Game = {
   townLog: [],
   currentTutorialStep: 0,
   gameSettings: [],
+  resource_capacity: 1000,
   townInfo: {
     name: "Your town",
     gold: 150,

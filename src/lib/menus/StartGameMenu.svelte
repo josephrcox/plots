@@ -29,7 +29,7 @@
       .value;
 
     // GAME SETTINGS
-    const checkboxes = ["devMode", "tomPetty", "casual"];
+    const checkboxes = ["devMode", "tomPetty", "casual", "bagOfHolding"];
     const settings = checkboxes.filter(
       (id) => (document.getElementById(id) as HTMLInputElement).checked,
     );
@@ -139,6 +139,12 @@
             <label for="casual" class="mt-2">
               Casual game. Faster and easier overall while exposing more of the
               game mechanics.
+            </label>
+          </div>
+          <div>
+            <input type="checkbox" id="bagOfHolding" class="mt-1" />
+            <label for="bagOfHolding" class="mt-2">
+              Bag of Holding. No resource cap or need to purchase stockpiles.
             </label>
           </div>
         </div>

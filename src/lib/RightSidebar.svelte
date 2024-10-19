@@ -2,7 +2,12 @@
   import Header from "./Header.svelte";
   import PlotController from "./PlotController.svelte";
   import { capitalizeFirstLetter, formatNumber, roundTo } from "./utils";
-  import { DB, ACTIVE_GAME_DB_NAME, modifyPlotMenuOptions } from "./store";
+  import {
+    DB,
+    ACTIVE_GAME_DB_NAME,
+    modifyPlotMenuOptions,
+    hasPlotOfType,
+  } from "./store";
   import LeftSidebar from "./LeftSidebar.svelte";
   import Slider from "./components/ui/slider/slider.svelte";
   import * as Tooltip from "$lib/components/ui/tooltip";
@@ -12,9 +17,15 @@
   import { Vibe } from "./types";
 
   let mute: string = localStorage.getItem("mute") || "false";
+  let atCapacity = false;
 
   $: {
     mute = localStorage.getItem("mute") || "false";
+    atCapacity =
+      $DB.resources.food >= $DB.resource_capacity ||
+      $DB.resources.wood >= $DB.resource_capacity ||
+      $DB.resources.stone >= $DB.resource_capacity ||
+      $DB.resources.metal >= $DB.resource_capacity;
   }
 
   type ResourceKey =
@@ -113,14 +124,25 @@
             			{$modifyPlotMenuOptions.visible
     ? 'bottom-8 opacity-70'
     : 'bottom-2'}
-	z-10 fixed right-3 top-[190px] rounded-xl p-2 transition-all duration-300"
+	z-10 fixed right-3 top-[190px] rounded-xl px-2 pt-2 transition-all duration-300"
 >
   <div class="flex flex-row justify-center">
     <Tooltip.Root openDelay={400} closeDelay={0}>
       <Tooltip.Trigger>
         <div class="flex flex-row items-center pb-2 gap-2">
-          <h1 class="text-xl w-full text-center">Resources</h1>
-          <button class="text-textPrimary text-sm">ℹ️</button>
+          <h1 class="text-xl w-full text-center">Resources ℹ️</h1>
+        </div>
+        <div
+          class="text-xs w-full text-center mb-2 cursor-pointer italic
+          {atCapacity == true
+            ? 'text-textDanger1 animate-pulse font-bold'
+            : 'text-textPrimary'} 
+            {$DB.gameSettings.includes('bagOfHolding') ? 'opacity-30' : ''}
+          "
+        >
+          {$DB.gameSettings.includes("bagOfHolding")
+            ? "No resource cap"
+            : `Capacity: ${formatNumber($DB.resource_capacity, false)}`}
         </div>
         <Tooltip.Content class="text-sm w-[200px]">
           <div class="text-sm">
@@ -130,11 +152,30 @@
             <br />
             <br />
             There is also a slight bit of randomness as townspeople aren't robots.
+            <br />
+            <br />
+            <span class="font-bold">Stockpile plots</span> increase the maximum
+            amount of resources you can store.
+            <br />
+            <br />
+            If the cap is 500, then you can store 500 of each resource before the
+            cap is reached.
+            <br />
+            Capacity is increased by 2,000 per Stockpile plot.
+            <br />
+            <span class="text-red-800 font-bold">
+              {$DB.gameSettings.includes("bagOfHolding")
+                ? "There is no resource cap in this game mode! (Bag of Holding)"
+                : ""}
+            </span>
           </div>
         </Tooltip.Content>
       </Tooltip.Trigger>
     </Tooltip.Root>
   </div>
+  <div class="w-[full] flex flex-row justify-center"></div>
+
+  <Separator class="mb-4 bg-white" />
 
   <div
     class="flex flex-col justify-between gap-4 text-foregroundText h-full pb-12"
@@ -152,7 +193,9 @@
             >
               {icon}
               {formatNumber(parseInt(value), false)}
-              {#if rate > 0}
+              {#if value >= $DB.resource_capacity}
+                <span class="text-textDanger1">⚠️ CAP</span>
+              {:else if rate > 0}
                 <span class="text-textHappy">+{rate}</span>
               {:else if rate < 0}
                 <span class="text-textDanger2">{rate}</span>
@@ -178,7 +221,7 @@
                 {/if}
 
                 {#if getRequiredPlots(name).length > 0}
-                  <Separator />
+                  <Separator class="bg-white" />
                   <span class="text-sm font-semibold">Required for</span>
                 {/if}
                 <div class="flex flex-col flex-wrap min-w-full">
@@ -192,14 +235,14 @@
         </Tooltip.Root>
       {/each}
     </div>
-    <Separator />
+    <Separator class="bg-white" />
     <div class="flex flex-row gap-2 items-start justify-center">
       <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <h1
+      <h3
         class="
-                text-xl
+                text-md
 
-                pb-2
+                
                 
                 cursor-pointer
             "
@@ -207,8 +250,8 @@
           $DB.townLog = [];
         }}
       >
-        Alerts
-      </h1>
+        Alerts {$DB.townLog.length > 0 ? `(clear)` : ""}
+      </h3>
       <button
         on:click={() => {
           localStorage.setItem(
@@ -221,13 +264,13 @@
         {mute == "true" ? "🔇" : "🔊"}
       </button>
     </div>
-    <div class="overflow-y-scroll h-[100%] w-[100%] px-1 pb-16 scroll-smooth">
+    <div class="overflow-y-scroll h-[100%] w-[100%] px-0 pb-16 scroll-smooth">
       {#if $DB.townLog.length == 0}
         <p class="text-center text-xs opacity-50">No alerts</p>
       {/if}
       {#each $DB.townLog as log}
         <div
-          class=" p-2 rounded-2xl fade-in
+          class=" px-2 py-2 rounded-2xl fade-in mb-4
         {log.vibe == Vibe.BAD
             ? 'bg-red-600'
             : log.vibe == Vibe.GOOD
@@ -244,9 +287,8 @@
           >
             DAY {log.day}
           </p>
-          <p class="text-xs pb-1">{log.message}</p>
+          <p class="text-xs">{log.message}</p>
         </div>
-        <br />
       {/each}
     </div>
 
@@ -263,5 +305,8 @@
 </div>
 
 <style>
-  /* Add any additional styling if needed */
+  .overflow-y-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 </style>

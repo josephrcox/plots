@@ -185,8 +185,8 @@
           >
         </div>
         <div>
-          <span class="text-xs"
-            ><span class="text-sm"
+          <span class="text-xs">
+            <span class="text-sm"
               >💰 {formatNumber($DB.townInfo.gold, false)}</span
             >
           </span>
@@ -244,25 +244,34 @@
       {#each attributes as { name, value, modifier, color, hover, description, max }}
         <div class="flex flex-col gap-2">
           <Tooltip.Root openDelay={400} closeDelay={0}>
-            <Tooltip.Trigger class="w-full mt-0 flex flex-col">
+            <Tooltip.Trigger
+              class="w-full mt-0 flex flex-col align-middle items-center"
+            >
               <span class="text-xs pb-2"
                 >{name}
                 {#if modifier != null}(x{roundTo(modifier, 2)})
                 {/if}</span
               >
-              <Progress {value} max={max ?? 300} class="w-full" {color} />
+              <Progress
+                {value}
+                max={max ?? 300}
+                class="min-w-[80px] max-w-[80px]"
+                {color}
+              />
             </Tooltip.Trigger>
             {#if hover}
               <Tooltip.Content
-                class="rounded-3xl {color ??
+                class="rounded-2xl {color ??
                   getColor(value)
                     // slightly lighter
                     .replace('500', '300')}"
               >
                 <div
-                  class="flex flex-col justify-between text-black p-0 m-0 max-w-32"
+                  class="flex flex-col justify-between text-black p-0 m-0 max-w-48"
                 >
-                  <span class="text-md font-bold">{name} - {value}</span>
+                  <span class="text-md"
+                    >{name}: {formatNumber(value, false)} out of 300</span
+                  >
                   <Separator class="mb-2 mt-1" />
                   <span>{@html description}</span>
                 </div>

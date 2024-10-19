@@ -98,6 +98,8 @@
     db = _fixVariables(db);
     db = _checkExperiment(db);
     db = _countRecreation(db);
+    db = _adjustForStockpile(db);
+    db = _cleanUpTownLog(db);
 
     if (db.overtime == false) {
       db = _checkGameLost(db);
@@ -164,6 +166,19 @@
       localStorage.setItem(USER_DB_NAME, JSON.stringify(currentDB));
     }
   });
+
+  function _cleanUpTownLog(z: Game) {
+    let unemployed = z.townInfo.population_count - z.townInfo.employees;
+    let unemployedAlertString = `${unemployed} people can't find jobs!`;
+    // remove all town logs with "people can't find jobs", and then just add it back if unemployed > 0
+    z.townLog = z.townLog.filter(
+      (log) => !log.message.includes("people can't find jobs"),
+    );
+    if (unemployed > 0) {
+      z = addToTownLog(unemployedAlertString, z, Vibe.BAD);
+    }
+    return z;
+  }
 
   function _checkSpecialPlots(z: Game) {
     // this function checks and updates if the city has a bank, hospital, and city hall
@@ -471,6 +486,25 @@
     "Star Gazer",
   ];
 
+  function _adjustForStockpile(z: Game) {
+    if (z.gameSettings.includes("bagOfHolding")) {
+      z.resource_capacity = 972024;
+      return z;
+    }
+    let stockpiles = hasPlotOfType("stockpile", z).length;
+    let advStockpiles = hasPlotOfType("adv_stockpile", z).length;
+    let maximum_per_resource = 1000 + stockpiles * 2000 + advStockpiles * 12000;
+    z.resource_capacity = maximum_per_resource;
+
+    // for object keys, check if the resource is over the maximum, and if so, set it to the maximum.
+    Object.keys(z.resources).forEach((resource) => {
+      if (z.resources[resource as ResourceKey] > maximum_per_resource) {
+        z.resources[resource as ResourceKey] = maximum_per_resource;
+      }
+    });
+    return z;
+  }
+
   function _listenToTownspeople(z: Game) {
     // If the liege is on a residential plot, they should recieve tips or general advice in the alerts.
     for (let i = 0; i < z.plots.length; i++) {
@@ -606,7 +640,7 @@
       // Extremely upset
       multiplier = 5;
     }
-    const casualGameModifier = z.gameSettings.includes("casual") ? 3 : 1;
+    const casualGameModifier = z.gameSettings.includes("casual") ? 2.2 : 1;
     multiplier *= casualGameModifier;
     multiplier = randomizeNumber(multiplier, 2);
     let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.5;
@@ -1266,7 +1300,8 @@
       }
     } else {
       if (hasPlotOfType("healing_house", z).length > 0) {
-        z.modifiers.health += 0.1;
+        z.modifiers.health += 0.8;
+        z.townInfo.health += Math.floor(Math.random() * 10) + 5;
       }
     }
     return z;
@@ -1326,7 +1361,9 @@
             z.townInfo.happiness -= 1;
 
             z = addToTownLog(
-              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week! It is also lowering overall happiness by 1. Look at available resources and fix the problem! `,
+              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week! 
+              
+              It is also lowering overall happiness by 1. Look at available resources and fix the problem! `,
               z,
               Vibe.BAD,
             );
@@ -1375,10 +1412,10 @@
     }
     if (hasPlotOfType("mine", z).length > 0) {
       // When a mine is in the town, the health should be hurt.
-      z.townInfo.health -= 1;
+      z.townInfo.health -= 7;
       if (hasPlotOfType("healing_house", z).length == 0) {
         z = addToTownLog(
-          "The mine is actively hurting the health of the town. Time to look into a healing house.",
+          "The mine is actively hurting the health of the town. A Healing House can counteract this.",
           z,
           Vibe.BAD,
         );
@@ -1421,10 +1458,11 @@
       day: z.environment.day,
       vibe: vibe,
     });
-    if (localStorage.mute != "true") {
-      const audio = new Audio("alert.mp3");
-      audio.play();
-    }
+    // Commenting out audio playback for now until we handle permissions.
+    // if (localStorage.mute != "true") {
+    //   const audio = new Audio("alert.mp3");
+    //   audio.play();
+    // }
     return z;
   }
 
@@ -1443,12 +1481,10 @@
     } else if (profitModifiers < 0.75) {
       profitModifiers = 0.75;
     }
+    let villageInnCount = hasPlotOfType("village_inn", z).length;
 
-    if (hasPlotOfType("village_inn", z).length > 0) {
-      // Has village inn.
-      if (type == "shop") {
-        profitModifiers *= 2;
-      }
+    if (type == "shop") {
+      profitModifiers *= 1.35 * villageInnCount;
     }
 
     if (isLiegeOnPlot(x, y, z)) {

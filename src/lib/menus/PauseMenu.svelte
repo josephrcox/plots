@@ -172,6 +172,13 @@
     if (latestAchievement == null) return;
     return achievements.find((a) => a.id == latestAchievement[0]);
   }
+
+  function restartGame() {
+    $paused = true;
+    localStorage.setItem("reset", "true");
+    location.reload();
+    clearDB();
+  }
 </script>
 
 <Dialog.Root bind:open={$paused}>
@@ -298,6 +305,13 @@
                 on:change={loadGame}
                 id="upload"
               />
+              <Button
+                class="
+					bg-blue-600 hover:bg-blue-700
+					"
+                id="newGame"
+                on:click={() => restartGame()}>New Game</Button
+              >
             </div>
           </div>
         </div>

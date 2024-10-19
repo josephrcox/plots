@@ -149,6 +149,26 @@
       });
     }
 
+    if (plotChosen.active_costs !== undefined) {
+      if (plotChosen.active_costs.gold > z.townInfo.gold) {
+        requirementsMet = false;
+      } else if (plotChosen.active_costs.power > z.resources.power) {
+        requirementsMet = false;
+      } else if (plotChosen.active_costs.wood > z.resources.wood) {
+        requirementsMet = false;
+      } else if (plotChosen.active_costs.stone > z.resources.stone) {
+        requirementsMet = false;
+      } else if (plotChosen.active_costs.metal > z.resources.metal) {
+        requirementsMet = false;
+      } else if (
+        plotChosen.active_costs.bureaucracy > z.resources.bureaucracy
+      ) {
+        requirementsMet = false;
+      } else if (plotChosen.active_costs.food > z.resources.food) {
+        requirementsMet = false;
+      }
+    }
+
     return requirementsMet;
   }
 
@@ -564,7 +584,7 @@
             : 'w-full overflow-y-scroll flex-col'}"
         >
           {#each $modifyPlotMenuOptions.isMineralSource ? [1] : [1, 2, 3, 4, 5] as level}
-            <div class="${!showOnlyAffordable ? 'px-2' : ''}">
+            <div class="${!showOnlyAffordable ? '' : ''}">
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource && !$showOnlyAffordable}
                 <div class="text-sm font-extralight">Level {level}</div>
               {/if}
@@ -582,7 +602,7 @@
                         class="plotOption cursor-pointer min-w-40
                       {$modifyPlotMenuOptions.isMineralSource ||
                         searchQuery.length > 0
-                          ? 'mx-1 my-2'
+                          ? 'mx-2 my-2'
                           : ''} relative h-[120px] rounded-xl flex flex-col align-middle transition-all duration-100
                       {option.affordable || option.selected
                           ? 'cursor-pointer'

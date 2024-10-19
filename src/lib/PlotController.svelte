@@ -1,6 +1,7 @@
 <script lang="ts">
   import BottomBar from "./BottomBar.svelte";
   import ExpandButton from "./ExpandButton.svelte";
+  // @ts-ignore
   import Plot from "./Plot.svelte";
   import { DB, expandTown, modifyPlotMenuOptions, unique } from "./store";
 

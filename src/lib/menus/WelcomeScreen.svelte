@@ -18,6 +18,7 @@
   import { Label } from "$lib/components/ui/label";
   // @ts-ignore
   import { winScenarios } from "../objects/WinScenarios.js";
+  // @ts-ignore
   import { difficulty_options } from "../objects/difficulty.js";
   import { achievements } from "$lib/objects/AchievementList.js";
   import Separator from "$lib/components/ui/separator/separator.svelte";
@@ -193,7 +194,10 @@
     <AlertDialog.Header>
       <AlertDialog.Description>
         <div class="flex flex-row gap-6">
-          <div class="flex flex-col gap-8 overflow-y-scroll">
+          <div
+            class="flex flex-col gap-8 overflow-y-scroll
+          "
+          >
             <div class="flex flex-col gap-4">
               <h1 class="text-3xl mt-4 text-white font-semibold">
                 The town of <span class="text-accent">{$DB.townInfo.name}</span>
@@ -261,5 +265,8 @@
 </AlertDialog.Root>
 
 <style>
-  /*  */
+  .overflow-y-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 </style>

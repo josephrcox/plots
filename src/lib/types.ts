@@ -40,6 +40,7 @@ export type Game = {
   lastChangeDay: number; // when the last change in the town was made.
   townLog: TownLog[];
   gameSettings: string[];
+  resource_capacity: number; // for each resource, the maximum amount that can be stored.
   townInfo: {
     name: string;
     gold: number; // you start with 1000, and generally profits go up slowly.
