@@ -23,7 +23,7 @@ export const tutorialMessages: TutorialStep[] = [
         hasPlotOfType("tree_farm", z).length >= 1
       );
     },
-    goldReward: 300,
+    goldReward: 500,
   },
   {
     message: "We need stone and metals. Build a quarry.",
@@ -37,7 +37,7 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.economyAndLaws.weeklyProfit >= 200;
     },
-    goldReward: 5000,
+    goldReward: 3000,
   },
   {
     message: "Boost our Knowledge to 250 by building educational plots.",
@@ -61,18 +61,25 @@ export const tutorialMessages: TutorialStep[] = [
     goldReward: 8000,
   },
   {
+    message: "Grow our population to 200.",
+    isComplete: (z: Game) => {
+      return z.townInfo.population_count >= 200;
+    },
+    goldReward: 15000,
+  },
+  {
     message: "Build a mine to boost our metal supply.",
     isComplete: (z: Game) => {
       return hasPlotOfType("mine", z).length > 0;
     },
-    goldReward: 10000,
+    goldReward: 15000,
   },
   {
     message: "Mining has impacted health. Build a Healing House.",
     isComplete: (z: Game) => {
       return hasPlotOfType("healing_house", z).length > 0;
     },
-    goldReward: 10000,
+    goldReward: 15000,
   },
   {
     message: "Establish a City Hall to advance our town.",

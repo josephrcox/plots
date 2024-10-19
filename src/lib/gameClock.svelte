@@ -857,11 +857,10 @@
       if (tutorialMessages[i].isComplete(z)) {
         $showTutorialStepConfetti = true;
         doNotCheckTutorialStep = true;
-        // wait 3 seconds to trigger again
+        z.townInfo.gold += tutorialMessages[i].goldReward;
         setTimeout(() => {
           $showTutorialStepConfetti = false;
           z.currentTutorialStep++; //
-          z.townInfo.gold += tutorialMessages[i].goldReward;
           doNotCheckTutorialStep = false;
         }, 3000);
         break;

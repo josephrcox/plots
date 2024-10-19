@@ -7,10 +7,8 @@
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
   } from "./store";
-  import { Confetti } from "svelte-confetti";
   import { formatDuration, formatNumber, roundTo } from "./utils";
   import { Progress } from "$lib/components/ui/progress/index.js";
-  import { tutorialMessages } from "./objects/tutorial_messages";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import Separator from "./components/ui/separator/separator.svelte";
 

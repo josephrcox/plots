@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { roundTo } from "./utils";
+  import { formatNumber, roundTo } from "./utils";
   import {
     DB,
     ACTIVE_GAME_DB_NAME,
@@ -35,16 +35,16 @@
   }
 
   //// Tester for confetti. Leave commented out unless testing.
-  document.addEventListener("keydown", function (e) {
-    switch (e.key) {
-      case "Escape":
-        $showTutorialStepConfetti = true;
-        setTimeout(() => {
-          $showTutorialStepConfetti = false;
-        }, 5000);
-        break;
-    }
-  });
+  // document.addEventListener("keydown", function (e) {
+  //   switch (e.key) {
+  //     case "Escape":
+  //       $showTutorialStepConfetti = true;
+  //       setTimeout(() => {
+  //         $showTutorialStepConfetti = false;
+  //       }, 5000);
+  //       break;
+  //   }
+  // });
 </script>
 
 <div class="flex flex-row text-foregroundText overflow-clip">
@@ -161,7 +161,7 @@
         >
           {#each tutorialMessages as step, index}
             <div
-              class="text-xs flex flex-row justify-center align-middle pb-2
+              class="text-xs flex flex-row justify-center align-middle pb-4
               text-textPrimary mb-2 transition-all duration-300 noselect
             {$DB.currentTutorialStep == index ? 'opacity-100' : 'opacity-35'}
           "
@@ -180,11 +180,19 @@
 
                 <Confetti infinite amount={75} delay={[0, 200]} />
               {/if}
-              {step.isComplete($DB) ||
-              ($showTutorialStepConfetti && $DB.currentTutorialStep == index)
-                ? "✅"
-                : "⬜️"}
-              {step.message}
+              <div class="flex flex-col gap-1">
+                <span>
+                  {step.isComplete($DB) ||
+                  ($showTutorialStepConfetti &&
+                    $DB.currentTutorialStep == index)
+                    ? "✅"
+                    : "⬜️"}
+                  {step.message}
+                </span>
+                <span class="text-xs opacity-60 italic"
+                  >Reward: 💰{formatNumber(step.goldReward, false)}</span
+                >
+              </div>
             </div>
           {/each}
         </div>
