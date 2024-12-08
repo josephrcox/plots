@@ -53,14 +53,56 @@
 
   let isOnReferencePlot = false;
 
-  // TODO: Make this a proper alert.
-  // window.addEventListener('resize', () => {
-  // 	if (window.innerWidth < 800) {
-  // 		showCustomAlert.set(
-  // 			'Your screen is too small to play this game. Please use a larger screen.',
-  // 		);
-  // 	}
-  // });
+  const colors = [
+    // { r: 60, g: 50, b: 100 }, // Subtle Ultra Violet
+    // { r: 30, g: 75, b: 110 }, // Subtle Lapis Lazuli
+    // { r: 12, g: 155, b: 105 }, // Subtle Emerald
+    // { r: 180, g: 145, b: 60 }, // Subtle Saffron
+
+    { r: 85, g: 60, b: 40 }, // Brown (Fall/Winter)
+    { r: 115, g: 85, b: 55 }, // Muted Orange (Autumn)
+    { r: 70, g: 100, b: 50 }, // Forest Green (Spring)
+    { r: 120, g: 65, b: 50 }, // Reddish-Brown (Summer/Fall)
+  ];
+
+  let currentIndex = 0;
+  let nextIndex = 1;
+  let transitionProgress = 0;
+  const transitionSpeed = 0.001; // Even slower transitions for seasonal effect
+
+  function blendColors(color1, color2, ratio) {
+    return {
+      r: Math.round(color1.r + (color2.r - color1.r) * ratio),
+      g: Math.round(color1.g + (color2.g - color1.g) * ratio),
+      b: Math.round(color1.b + (color2.b - color1.b) * ratio),
+    };
+  }
+
+  function updateBackgroundColor() {
+    // Calculate the blended color
+    const blendedColor = blendColors(
+      colors[currentIndex],
+      colors[nextIndex],
+      transitionProgress,
+    );
+
+    // Apply the color to the document body
+    document.body.style.backgroundColor = `rgb(${blendedColor.r}, ${blendedColor.g}, ${blendedColor.b})`;
+
+    // Update the transition progress
+    transitionProgress += transitionSpeed;
+    if (transitionProgress >= 1) {
+      transitionProgress = 0;
+      currentIndex = nextIndex;
+      nextIndex = (nextIndex + 1) % colors.length;
+    }
+
+    // Request the next frame
+    requestAnimationFrame(updateBackgroundColor);
+  }
+
+  // Start the color transition
+  updateBackgroundColor();
 
   // if key P is pressed, pause the game
   document.addEventListener("keydown", (e) => {
@@ -90,7 +132,7 @@
         if (e.shiftKey) {
           $paused = true;
           localStorage.setItem("reset", "true");
-          location.reload();
+          // location.reload();
           clearDB();
         } else {
           if ($modifyPlotMenuOptions.visible == true) {

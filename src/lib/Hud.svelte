@@ -6,13 +6,6 @@
   import LeftSidebar from "./LeftSidebar.svelte";
   import RightSidebar from "./RightSidebar.svelte";
   import BottomBar from "./BottomBar.svelte";
-
-  function setTaxRate(e: any) {
-    let z = $DB;
-    z.economyAndLaws.tax_rate = roundTo(e.target.value, 2);
-    DB.set(z);
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-  }
 </script>
 
 <!-- fixed to left side and fill entire height -->
@@ -20,7 +13,7 @@
   <div>
     <Header />
   </div>
-  <div class="flex flex-row text-foregroundText">
+  <div class="flex flex-row text-accentText">
     <LeftSidebar />
     <PlotController />
     <RightSidebar />

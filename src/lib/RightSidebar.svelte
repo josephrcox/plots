@@ -1,26 +1,21 @@
 <script lang="ts">
-  import Header from "./Header.svelte";
-  import PlotController from "./PlotController.svelte";
   import { capitalizeFirstLetter, formatNumber, roundTo } from "./utils";
-  import {
-    DB,
-    ACTIVE_GAME_DB_NAME,
-    modifyPlotMenuOptions,
-    hasPlotOfType,
-  } from "./store";
-  import LeftSidebar from "./LeftSidebar.svelte";
-  import Slider from "./components/ui/slider/slider.svelte";
+  import { DB, modifyPlotMenuOptions, showTutorialStepConfetti } from "./store";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
   import Separator from "./components/ui/separator/separator.svelte";
   import { options } from "./objects/PlotTypeOptions";
   import { Vibe } from "./types";
+  import { Progress } from "$lib/components/ui/progress/index.js";
+  import { tutorialMessages } from "./objects/tutorial_messages";
+  //@ts-ignore
+  import Milestone from "./Milestone.svelte";
+  import Confetti from "svelte-confetti";
 
-  let mute: string = localStorage.getItem("mute") || "false";
   let atCapacity = false;
+  let showCompleted = false;
 
   $: {
-    mute = localStorage.getItem("mute") || "false";
     atCapacity =
       $DB.resources.food >= $DB.resource_capacity ||
       $DB.resources.wood >= $DB.resource_capacity ||
@@ -39,6 +34,12 @@
 
   let resources = [];
   $: resources = [
+    {
+      icon: "💰",
+      name: "gold",
+      value: $DB.townInfo.gold,
+      rate: $DB.economyAndLaws.weeklyProfit,
+    },
     {
       icon: "🥕",
       name: "food",
@@ -117,33 +118,167 @@
     }
     return [];
   }
+
+  let attributes: any[];
+  $: {
+    attributes = [
+      {
+        name: "Happiness",
+        description:
+          "Happy townspeople spend more money and are less likely to leave.",
+        value: $DB.townInfo.happiness,
+        modifier: $DB.modifiers.happiness,
+        color: getColor($DB.townInfo.happiness),
+        hover: true,
+        max: 300,
+      },
+      {
+        name: "Health",
+        description:
+          "Healthy townspeople are less likely to die (and leave the town obviously).",
+        value: $DB.townInfo.health,
+        modifier: $DB.modifiers.health,
+        color: getColor($DB.townInfo.health),
+        hover: true,
+        max: 300,
+      },
+      {
+        name: "Community",
+        description:
+          "Townspeople that feel at home are less likely to leave, and less likely to get bored.",
+        value: $DB.townInfo.community,
+        modifier: $DB.modifiers.community,
+        color: getColor($DB.townInfo.community),
+        hover: true,
+        max: 300,
+      },
+      {
+        name: "Employment",
+        description:
+          "The number of people employed in your town. Unemployed people are more likely to leave.",
+        value: $DB.townInfo.employees,
+        modifier: null,
+        color: getEmploymentColor(
+          $DB.townInfo.employees / $DB.townInfo.population_count,
+        ),
+        hover: true,
+        max: $DB.townInfo.population_count,
+      },
+      {
+        name: `🛝 Recreation`,
+        description:
+          "Tracker for how many plots you have for recreation, which keeps townspeople happy. <br/><br/>Make sure as your town grows that you build enough 🛝 plots. ",
+        value: $DB.townInfo.recreation,
+        modifier: null,
+        color:
+          $DB.townInfo.recreation / getTotalPlotCount($DB) >= 0.2
+            ? "bg-green-500"
+            : "bg-orange-300",
+        hover: true,
+        max: getTotalPlotCount($DB),
+      },
+    ];
+  }
+
+  function getTotalPlotCount(z: any) {
+    let count = 0;
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  const getEmploymentColor = (value: number) => {
+    if (value === 1) {
+      return "bg-green-500";
+    } else if (value > 0.9) {
+      return "bg-yellow-500";
+    } else {
+      return "bg-red-500";
+    }
+  };
+
+  const getColor = (value: number) => {
+    if (value > 149) {
+      return "bg-green-500";
+    } else if (value > 99) {
+      return "bg-yellow-500";
+    } else {
+      return "bg-red-500";
+    }
+  };
 </script>
 
 <div
-  class="bg-foreground w-[160px] sidebar border-foregroundDark border-4
+  class="bg-sidebarBackground text-sidebarText w-[220px] sidebar border-foreground border-4
             			{$modifyPlotMenuOptions.visible
     ? 'bottom-8 opacity-70'
     : 'bottom-2'}
-	z-10 fixed right-3 top-[190px] rounded-xl px-2 pt-2 transition-all duration-300"
+	z-10 fixed right-3 top-[190px] rounded-xl px-2 pt-2 transition-all duration-300 overflow-y-scroll scroll"
 >
+  <div class="flex flex-row w-full pb-6">
+    <div class="flex flex-col rounded-xl gap-2 w-full">
+      <h1 class="text-xl w-full text-center pb-1">Stats</h1>
+      {#each attributes as { name, value, modifier, color, hover, description, max }}
+        <div class="flex flex-col gap-1">
+          <Tooltip.Root openDelay={400} closeDelay={0}>
+            <Tooltip.Trigger
+              class="w-full flex flex-row align-middle justify-between"
+            >
+              <span class="text-md pr-2">{name} </span>
+              <Progress
+                {value}
+                max={max ?? 300}
+                class="min-w-[80px] max-w-[80px]"
+                {color}
+              />
+            </Tooltip.Trigger>
+            {#if hover}
+              <Tooltip.Content
+                class="rounded-2xl {color ??
+                  getColor(value)
+                    // slightly lighter
+                    .replace('500', '300')}"
+              >
+                <div
+                  class="flex flex-col justify-between text-black p-0 m-0 max-w-48"
+                >
+                  <span class="text-md"
+                    >{name}: {formatNumber(value, false)}
+                    {max ? `out of ${max}` : ""}</span
+                  >
+                  <Separator class="mb-2 mt-1" />
+                  <span>{@html description}</span>
+                </div>
+              </Tooltip.Content>
+            {/if}
+          </Tooltip.Root>
+        </div>
+      {/each}
+    </div>
+  </div>
   <div class="flex flex-row justify-center">
     <Tooltip.Root openDelay={400} closeDelay={0}>
       <Tooltip.Trigger>
-        <div class="flex flex-row items-center pb-2 gap-2">
-          <h1 class="text-lg w-full text-center">Resources ℹ️</h1>
-        </div>
-        <div
-          class="text-xs w-full text-center mb-2 cursor-pointer italic
-          {atCapacity == true
-            ? 'text-textDanger1 animate-pulse font-bold'
-            : 'text-textPrimary'} 
+        <h1 class="text-xl w-full text-center pb-2">
+          Resources
+
+          <div
+            class="text-xs w-full text-center mb-2 cursor-pointer italic
+          {atCapacity == true ? 'text-textDanger animate-pulse font-bold' : ''} 
             {$DB.gameSettings.includes('bagOfHolding') ? 'opacity-30' : ''}
           "
-        >
-          {$DB.gameSettings.includes("bagOfHolding")
-            ? "No resource cap"
-            : `Capacity: ${formatNumber($DB.resource_capacity, false)}`}
-        </div>
+          >
+            {$DB.gameSettings.includes("bagOfHolding")
+              ? "No resource cap"
+              : `Capacity: ${formatNumber($DB.resource_capacity, false)}`}
+          </div>
+        </h1>
+
         <Tooltip.Content class="text-sm w-[200px]">
           <div class="text-sm">
             Resources are generated from plots. Generation rate can be increased
@@ -175,34 +310,28 @@
   </div>
   <div class="w-[full] flex flex-row justify-center"></div>
 
-  <Separator class="mb-4 bg-background" />
-
-  <div
-    class="flex flex-col justify-between gap-4 text-foregroundText h-full pb-12"
-  >
-    <div class="flex flex-col text-sm text-nowrap gap-2">
+  <div class="flex flex-col gap-8 h-full">
+    <div class="flex flex-col text-md text-nowrap gap-2">
       {#each resources as { icon, name, value, rate }}
         <Tooltip.Root openDelay={400} closeDelay={0}>
           <Tooltip.Trigger>
             <span
               class="flex flex-row justify-between
-              {value <= 0
-                ? 'text-textDanger1 font-semibold'
-                : 'text-textPrimary'}
+              {value <= 0 ? 'text-textDanger font-semibold' : ''}
             "
             >
               {icon}
               {formatNumber(parseInt(value), false)}
-              {#if value >= $DB.resource_capacity}
-                <span class="text-textDanger1">⚠️ CAP</span>
+              {#if value >= $DB.resource_capacity && name != "gold"}
+                <span class="text-textDanger">⚠️ CAP</span>
               {:else if rate > 0}
                 <span class="text-textHappy">+{rate}</span>
               {:else if rate < 0}
-                <span class="text-textDanger2">{rate}</span>
+                <span class="text-textDanger">{rate}</span>
               {:else if rate == null}
                 <span></span>
               {:else}
-                <span class="text-textPrimary">+{rate}</span>
+                <span class="">+{rate}</span>
               {/if}
             </span>
             <TooltipContent>
@@ -213,7 +342,7 @@
                 {#if rate > 0}
                   <span class="text-textHappy">+{rate} (weekly)</span>
                 {:else if rate < 0}
-                  <span class="text-textDanger2">{rate} (weekly)</span>
+                  <span class="text-textDanger">{rate} (weekly)</span>
                 {:else if rate != null}
                   <span class="">+{rate} (weekly)</span>
                 {:else}
@@ -235,75 +364,51 @@
         </Tooltip.Root>
       {/each}
     </div>
-    <Separator class="bg-background" />
-    <div class="flex flex-row gap-2 items-start justify-center">
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <h3
-        class="
-                text-md
-                cursor-pointer
-            "
-        on:click={() => {
-          $DB.townLog = [];
-        }}
-      >
-        Alerts {$DB.townLog.length > 0 ? `(clear)` : ""}
-      </h3>
-      <button
-        on:click={() => {
-          localStorage.setItem(
-            "mute",
-            mute == "false" ? "true" : mute === "true" ? "false" : "true",
-          );
-          mute = localStorage.getItem("mute") || "false";
-        }}
-      >
-        {mute == "true" ? "🔇" : "🔊"}
-      </button>
-    </div>
-    <div class="overflow-y-scroll h-[100%] w-[100%] px-0 pb-16 scroll-smooth">
-      {#if $DB.townLog.length == 0}
-        <p class="text-center text-xs opacity-50">No alerts</p>
-      {/if}
-      {#each $DB.townLog as log}
-        <div
-          class=" px-2 py-2 rounded-2xl fade-in mb-4
-        {log.vibe == Vibe.BAD
-            ? 'bg-red-600'
-            : log.vibe == Vibe.GOOD
-              ? 'bg-green-600'
-              : log.vibe == Vibe.NORMAL
-                ? 'bg-accent'
-                : 'bg-accent'}
-      
-      "
-        >
-          <p
-            class="font-mono text-[10px]
-          "
-          >
-            DAY {log.day}
-          </p>
-          <p class="text-xs">{log.message}</p>
-        </div>
-      {/each}
-    </div>
 
-    <ul
-      class="
-                list-disc
-                pl-5
-                gap-2
-                flex
-                flex-col text-xs
-            "
-    ></ul>
+    <div>
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+      <div
+        class="text-lg w-full text-center noselect flex flex-col no-select"
+        on:click={() => {
+          showCompleted = !showCompleted;
+        }}
+      >
+        {#if $showTutorialStepConfetti}
+          <Confetti cone x={[-0.5, 0.5]} />
+          <Confetti
+            cone
+            amount={10}
+            x={[-1, -0.4]}
+            y={[0.25, 0.75]}
+            rounded
+            size={15}
+          />
+          <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
+          <Confetti infinite amount={75} delay={[0, 200]} />
+        {/if}
+        <h1 class="text-xl w-full text-center pb-2">Milestones</h1>
+        {#if $DB.currentTutorialStep > 0}
+          <span class="text-xs opacity-65 cursor-pointer italic pb-2"
+            >{!showCompleted
+              ? `Show ${$DB.currentTutorialStep} completed`
+              : `Hide ${$DB.currentTutorialStep} completed`}</span
+          >
+        {/if}
+      </div>
+      <div class="scroll overflow-y-scroll">
+        {#each tutorialMessages as step, index}
+          {#if $DB.currentTutorialStep > index}
+            {#if showCompleted}
+              <Milestone {index} {step} />
+            {/if}
+          {:else}
+            <Milestone {index} {step} />
+          {/if}
+        {/each}
+      </div>
+    </div>
   </div>
 </div>
 
 <style>
-  .overflow-y-scroll {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
 </style>

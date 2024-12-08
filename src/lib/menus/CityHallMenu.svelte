@@ -24,7 +24,7 @@
 
 <Dialog.Root bind:open={$showCityHallMenu}>
   <Dialog.Content
-    class="bg-foreground text-foregroundText h-[80vh] overflow-scroll"
+    class="bg-foreground text-accentText h-[80vh] overflow-scroll"
   >
     <Dialog.Header>
       <Dialog.Title class="text-xl">
@@ -105,7 +105,7 @@
               <Button
                 class="bg-accent rounded-2xl 
                 {$DB.economyAndLaws.enacted.includes(law.id)
-                  ? 'bg-textDanger1'
+                  ? 'bg-textDanger'
                   : 'bg-accent'}
 
                 {!$DB.economyAndLaws.enacted.includes(law.id)
@@ -147,7 +147,7 @@
       </div>
     </Dialog.Header>
     <Dialog.Footer>
-      <!-- <span class="italic text-left text-textDanger1">
+      <!-- <span class="italic text-left text-textDanger">
         
         </span
       > -->

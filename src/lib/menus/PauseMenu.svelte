@@ -176,14 +176,14 @@
   function restartGame() {
     $paused = true;
     localStorage.setItem("reset", "true");
-    location.reload();
+    //location.reload();
     clearDB();
   }
 </script>
 
 <Dialog.Root bind:open={$paused}>
   <Dialog.Content
-    class=" max-w-[90vw] max-h-[90vh] bg-foregroundDark text-foregroundText"
+    class=" max-w-[90vw] max-h-[90vh] bg-foregroundDark text-accentText"
   >
     <Dialog.Header>
       <Dialog.Title>Pause Menu</Dialog.Title>

@@ -235,7 +235,7 @@
     background-color: rgb(204 218 209);
   }
   .plot_container[data-canBeUpgraded="false"] {
-    background-color: rgb(21 28 41);
+    background-color: rgb(41, 21, 21);
   }
   @keyframes sparkleAnimation {
     0%,

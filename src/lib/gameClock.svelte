@@ -127,6 +127,7 @@
         (currentDB.endGameDetails.msg !== "" && currentDB.overtime == false) ||
         currentDB.townInfo.population_count <= 0
       ) {
+        console.info("The game is over, or paused. Not running the game loop.");
         return currentDB;
       }
 
@@ -150,6 +151,10 @@
         currentDB = performDailyTasks(currentDB);
         return currentDB;
       } catch (error) {
+        // if localhost, alert
+        if (window.location.hostname === "localhost") {
+          alert("Error in game loop: " + error);
+        }
         console.error("Error in game loop:", error);
         return currentDB; // Returning the current state in case of an error
       }
@@ -718,7 +723,6 @@
               )[index];
               // Power is handled by _calculatePower function
               if (resource != "power") {
-                let currentInventoryForResource = z.townInfo.gold;
                 if (resource == "gold") {
                   if (z.townInfo.gold < requiredQuantity) {
                     toBeDisabled = true;
@@ -748,6 +752,8 @@
             z.townInfo.population_count -= 1;
             z.townInfo.employees -= 1;
           }
+        } else {
+          z.plots[i][j].disabled = false;
         }
       }
     }

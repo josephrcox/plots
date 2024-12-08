@@ -169,6 +169,15 @@
       }
     }
 
+    // check if the user has the required plots
+    if (plotChosen.requirements.plots.length > 0) {
+      plotChosen.requirements.plots.forEach((plot: string) => {
+        if (hasPlotOfType(plot, z).length === 0) {
+          requirementsMet = false;
+        }
+      });
+    }
+
     return requirementsMet;
   }
 
@@ -509,13 +518,15 @@
   >
     <div
       class="
-      text-xl
+      
       items-center justify-center
       w-[100%]
       align-bottom
-      bg-foregroundDark
-      shadow-3xl rounded-t-xl
-      py-2
+      bg-popupBackground
+      text-sidebarText
+      px-6
+      shadow-2xl rounded-t-2xl
+      py-6
     "
     >
       <!-- content -->
@@ -536,9 +547,10 @@
                   value={searchQuery}
                   on:input={handleInput}
                   bind:this={searchInput}
-                  class="border rounded w-auto bg-white placeholder-black text-black text-xs"
+                  class="border rounded w-auto bg-white  text-xs"
                 />
               </div>
+
               <!-- toggle to only show affordable ones -->
               <div class="flex items-center ml-4">
                 <input
@@ -563,33 +575,30 @@
                   >
                 {/if}
               </div>
+              <div
+                class="text-xs p-2 bg-white rounded-xl cursor-pointer"
+                on:click={() => ($modifyPlotMenuOptions.visible = false)}
+              >
+                Press escape or click to close
+              </div>
             </div>
           </div>
         {/if}
 
-        <!-- Close button -->
-        <div
-          class="absolute top-[-15px] right-3 text-xs text-black p-2 bg-white rounded-xl cursor-pointer"
-          on:click={() => ($modifyPlotMenuOptions.visible = false)}
-        >
-          Press escape or click to close
-        </div>
-
-        <!-- Plot Options -->
         <div
           class="flex gap-2 max-h-[{BOTTOM_MENU_HEIGHT}] pb-24 {$modifyPlotMenuOptions.isMineralSource ||
           searchQuery.length > 0 ||
           $showOnlyAffordable
             ? 'flex-row flex-wrap max'
-            : 'w-full overflow-y-scroll flex-col'}"
+            : 'w-full overflow-y-scroll scroll flex-col'}"
         >
           {#each $modifyPlotMenuOptions.isMineralSource ? [1] : [1, 2, 3, 4, 5] as level}
             <div class="${!showOnlyAffordable ? '' : ''}">
               {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource && !$showOnlyAffordable}
-                <div class="text-sm font-extralight">Level {level}</div>
+                <!-- <div class="text-sm font-extralight">Level {level}</div> -->
               {/if}
               <div
-                class="flex flex-row text-start justify-start items-start flex-wrap
+                class="flex flex-row text-start justify-start items-start flex-wrap py-4
               {$modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0
                   ? 'pt-0 gap-0'
                   : 'pt-2 gap-2'} w-full align-middle"
@@ -599,14 +608,14 @@
                   <Tooltip.Root openDelay={400} closeDelay={0}>
                     <Tooltip.Trigger>
                       <div
-                        class="plotOption cursor-pointer min-w-40
+                        class="plotOption cursor-pointer min-w-40 text-white
                       {$modifyPlotMenuOptions.isMineralSource ||
                         searchQuery.length > 0
                           ? 'mx-2 my-2'
-                          : ''} relative h-[120px] rounded-xl flex flex-col align-middle transition-all duration-100
+                          : ''} relative h-[110px] rounded-xl flex flex-col transition-all duration-100
                       {option.affordable || option.selected
                           ? 'cursor-pointer'
-                          : 'opacity-40 cursor-not-allowed '}
+                          : 'opacity-30 cursor-not-allowed '}
                       {option.selected
                           ? 'border-4 border-yellow-200 opacity-100 rounded-none'
                           : ''}"
@@ -620,25 +629,25 @@
                           <span class="text-md text-center">
                             {!option.selected ? firstEmoji(option.title) : "✅"}
                           </span>
-                          <span class="text-xs text-center font-bold mx-1">
+                          <span class="text-sm text-center">
                             {option.title.substring(2)}
                           </span>
                         </div>
                         {#if option.active_costs.power > 0}
                           <span
-                            class="bg-yellow-300 text-xs text-black px-1 py-0.5 rounded-2xl absolute top-[-8px] right-[-2px] border-2 border-green-700"
+                            class="bg-yellow-300 text-xs px-1 py-0.5 rounded-2xl absolute top-[-8px] right-[-1px] border-2 border-green-700"
                             >🔋{option.active_costs.power}</span
                           >
                         {/if}
                         {#if option.type == "recreation" || option.type == "shop"}
                           <span
-                            class="bg-blue-200 text-xs text-black px-1 py-0.5 rounded-2xl absolute bottom-[2px] left-[-2px] border-2 border-blue-600"
+                            class="bg-blue-200 text-xs px-1 py-0.5 rounded-2xl absolute bottom-[2px] left-[-1px] border-2 border-blue-600"
                             >🛝</span
                           >
                         {/if}
                         {#if hasPlotOfType(option.id, $DB).length > 0}
                           <span
-                            class="bg-black text-xs text-white px-1 py-0.5 rounded-2xl absolute top-[-5px] left-[-2px] border-2 border-white"
+                            class="bg-black text-xs text-white px-1 py-0.5 rounded-2xl absolute top-[-5px] left-[-1px] border-2 border-white"
                             >x{hasPlotOfType(option.id, $DB).length}</span
                           >
                         {/if}

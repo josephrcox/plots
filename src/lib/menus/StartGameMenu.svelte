@@ -18,11 +18,12 @@
   import { winScenarios } from "../objects/WinScenarios";
 
   paused.set(false);
+  const showDifficulty = false;
 
   function captureAndStart() {
-    const difficulty = (
-      document.getElementById("difficulty") as HTMLSelectElement
-    ).value;
+    const difficulty = showDifficulty
+      ? (document.getElementById("difficulty") as HTMLSelectElement).value
+      : "1";
     const endGoal = (document.getElementById("endGoal") as HTMLSelectElement)
       .value;
     const townName = (document.getElementById("townName") as HTMLInputElement)
@@ -62,7 +63,7 @@
 <Dialog.Root bind:open={$startGameMenu.visible}>
   <Dialog.Content
     transition={flyAndScale}
-    class="bg-foregroundDark text-foregroundText"
+    class="bg-foregroundDark text-accentText"
   >
     <Dialog.Header>
       <Dialog.Title>Welcome to Plots!</Dialog.Title>
@@ -74,21 +75,22 @@
         >
           GitHub / Learn how to play</a
         >
-
         <div class="flex flex-col justify-center gap-5 mt-4">
-          <div>
-            <Label for="difficulty" class="mt-2"
-              >Select a map size (difficulty)</Label
-            >
-            <select
-              id="difficulty"
-              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            >
-              <!-- <option value="0">Easy (quick game)</option> -->
-              <option value="1" selected>Normal</option>
-              <!-- <option value="2">Hard (longest game)</option> -->
-            </select>
-          </div>
+          {#if showDifficulty}
+            <div>
+              <Label for="difficulty" class="mt-2"
+                >Select a map size (difficulty)</Label
+              >
+              <select
+                id="difficulty"
+                class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              >
+                <!-- <option value="0">Easy (quick game)</option> -->
+                <option value="1" selected>Normal</option>
+                <!-- <option value="2">Hard (longest game)</option> -->
+              </select>
+            </div>
+          {/if}
 
           <div>
             <Label for="endGoal" class="mt-2">Select a game mode</Label>
@@ -123,7 +125,8 @@
               placeholder="Will be randomized if you leave blank"
             />
           </div>
-          <div>
+          <Label for="difficulty" class="mt-2">Other game settings</Label>
+          <div class="hidden">
             <input type="checkbox" id="devMode" class="mt-1" />
             <label for="devMode" class="mt-2">Dev mode</label>
           </div>

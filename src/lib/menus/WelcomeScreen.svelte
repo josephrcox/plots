@@ -189,7 +189,7 @@
 
 <AlertDialog.Root open={$showWelcome}>
   <AlertDialog.Content
-    class="bg-foregroundDark text-foregroundText min-w-[50vw] min-h-[50vh] flex flex-col justify-between "
+    class="bg-foregroundDark text-accentText min-w-[50vw] min-h-[50vh] flex flex-col justify-between "
   >
     <AlertDialog.Header>
       <AlertDialog.Description>
@@ -253,7 +253,7 @@
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel
-        class="bg-accent rounded-2xl text-foregroundText px-4 py-2 hover:scale-110 transition-all duration-300 "
+        class="bg-accent rounded-2xl text-accentText px-4 py-2 hover:scale-110 transition-all duration-300 "
         on:click={() => {
           showWelcome.set(false);
         }}

@@ -7,7 +7,7 @@
   let className: $$Props["class"] = undefined;
   export let max: $$Props["max"] = 100;
   export let value: $$Props["value"] = undefined;
-  export let color: $$Props["color"] = "bg-secondary";
+  export let color: $$Props["color"] = "bg-accent";
   export { className as class };
 </script>
 

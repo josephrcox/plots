@@ -456,12 +456,13 @@ export function startGame(
     max_tax_rates_based_on_difficulty[difficulty];
   json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
   let default_plots = [] as any[][];
-  // remove leading and trailing spaces, remove symbols other than nunbers and letters
+  // remove leading and trailing spaces, remove symbols other than numbers and letters
   townName = townName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
   json.townInfo.name = townName != "" ? townName : generateRandomTownName();
   json.difficulty = parseInt(difficulty);
+  let udb = JSON.parse(localStorage.getItem(USER_DB_NAME) || "null");
 
-  if (gameSettings.includes("devMode")) {
+  if (gameSettings.includes("devMode") || udb.username == "dev") {
     json.townInfo.gold = 100000000;
     json.townInfo.happiness = 10000000;
     json.townInfo.health = 1000000;
@@ -502,19 +503,20 @@ export function startGame(
   }
 
   json.plots = default_plots;
-  localStorage.reset = false;
+
   localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
   DB.set(json); // Update the store with the new value
+  localStorage.reset = false;
   location.reload();
 }
 
 function isWater(x: number, y: number, maxSize: number) {
-  let chance = 0.06; // default chance of being water.
+  let chance = 0.08; // default chance of being water.
   if (x > 0 && y > 0 && x < maxSize - 1 && y < maxSize - 1) {
     chance *= 2;
   }
   if (y == Math.round(maxSize / 2) || y == Math.round(maxSize / 2) - 1) {
-    chance *= 5;
+    chance *= 3;
   }
   if (x == 0 && y == 0) {
     chance = 0;
@@ -676,7 +678,7 @@ export function clearDB(overridenFile: File | null = null) {
     localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(overridenFile));
     DB.set(overridenFile);
   }
-  location.reload();
+  //location.reload();
 }
 
 export function toggleShowOnlyAffordable() {

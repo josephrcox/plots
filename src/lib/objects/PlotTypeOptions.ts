@@ -68,7 +68,7 @@ export const options: PlotOption[] = [
     description: "+32 people",
     revenue_per_week: 0,
     requirements: {
-      gold: 600,
+      gold: 1800,
       plots: [],
       employees: 0,
       knowledge: 0,
@@ -478,7 +478,7 @@ export const options: PlotOption[] = [
     },
     level: 1,
     active_costs: {
-      gold: 40,
+      gold: 30,
       power: 0,
       wood: 0,
       stone: 0,
@@ -2073,8 +2073,8 @@ export const options: PlotOption[] = [
   },
 ];
 export const typeColors: any = {
-  empty_unusable: "rgba(21, 40, 20, 0.70)",
-  empty_buildable: "#CBB827",
+  empty_unusable: "rgba(255,255,255,0.50)",
+  empty_buildable: "#EFEA5A",
   residential: "#de7633",
   farm: "#6b8f49",
   lumber: "#8E805C",
@@ -2106,6 +2106,7 @@ export function getColor(typeIndex: number, canBeUpgraded = false) {
     }
   }
   const plotOption = options[typeIndex];
+  let lighterVersion = typeColors[plotOption.type];
   return typeColors[plotOption.type];
 }
 export const plotTypeMaximums: any = {

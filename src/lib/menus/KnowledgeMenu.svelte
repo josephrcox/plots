@@ -45,7 +45,7 @@
 <Dialog.Root bind:open={$showKnowledgeMenu}>
   <Dialog.Content
     transitionConfig={{ duration: 0 }}
-    class="bg-foreground text-foregroundText"
+    class="bg-foreground text-accentText"
   >
     <Dialog.Header>
       <Dialog.Title

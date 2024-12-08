@@ -43,7 +43,7 @@
     let s = "";
     let classText = "";
     if (current < required && checkRequirements) {
-      classText = "text-textDanger1 border-2 border-red-400";
+      classText = "text-textDanger border-2 border-red-400";
     }
     s = `<span class='${classText}'>${icon} ${required}</span>`;
 
@@ -82,7 +82,7 @@
     </div>
 
     <div class="flex flex-col w-36 h-min gap-0 text-xs pb-2">
-      <Separator class={"bg-secondary opacity-25 mt-1 mb-1"} />
+      <Separator class={"bg-accent opacity-25 mt-1 mb-1"} />
       <span class="font-semibold">Requirements</span>
       <div class="flex flex-col gap-1">
         {@html getRequirementString(
@@ -130,7 +130,7 @@
             class={options[getOptionIndex(option.id)].requirements.employees >
               $DB.townInfo.population_count - $DB.townInfo.employees &&
             checkRequirements
-              ? "px-1 text-textDanger1 font-bold border-2 border-red-400"
+              ? "px-1 text-textDanger font-bold border-2 border-red-400"
               : ""}
             >👥 {options[getOptionIndex(option.id)].requirements.employees} employees
           </span>
@@ -139,7 +139,7 @@
     </div>
     {#if options[getOptionIndex(option.id)].revenue_per_week != 0}
       <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-secondary opacity-25 mt-0"} />
+        <Separator class={"bg-accent opacity-25 mt-0"} />
         <span class="font-semibold">Weekly revenue</span>
         <span>💰 {options[getOptionIndex(option.id)].revenue_per_week} </span>
       </div>
@@ -147,7 +147,7 @@
 
     {#if Object.values(options[getOptionIndex(option.id)].active_costs).some((value) => value != 0)}
       <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-secondary opacity-25 mt-2"} />
+        <Separator class={"bg-accent opacity-25 mt-2"} />
         <span class="font-semibold">Weekly Costs</span>
         {#each Object.keys(options[getOptionIndex(option.id)].active_costs) as key, index}
           {#if Object.values(options[getOptionIndex(option.id)].active_costs)[index] != 0}
@@ -155,8 +155,8 @@
               class={Object.values(
                 options[getOptionIndex(option.id)].active_costs,
               )[index] > 0
-                ? "text-textDanger1"
-                : "text-textHappyDark"}
+                ? "text-textDanger"
+                : "text-textHappy"}
               >{capitalizeFirstLetter(key)}
               {getEmojiForResource(key)}
               {-1 *
@@ -170,7 +170,7 @@
     {/if}
     {#if Object.values(options[getOptionIndex(option.id)].requirements.plots).length > 0}
       <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-secondary opacity-25 mt-2"} />
+        <Separator class={"bg-accent opacity-25 mt-2"} />
         <span class="font-semibold">Required Plots</span>
         {#each Object.keys(options[getOptionIndex(option.id)].requirements.plots) as key, index}
           {#if Object.values(options[getOptionIndex(option.id)].requirements.plots)[index] != 0}
@@ -182,8 +182,8 @@
                 )[index],
                 $DB,
               ).length == 0
-                ? 'text-textDanger1 border-2 border-red-400 font-semibold px-1'
-                : 'text-textHappyDark'}
+                ? 'text-textDanger border-2 border-red-400 font-semibold px-1'
+                : 'text-textHappy'}
             "
             >
               {getOptionFromId(
@@ -198,7 +198,7 @@
     {/if}
     {#if Object.values(options[getOptionIndex(option.id)].generated_resources).some((value) => value != 0) || options[getOptionIndex(option.id)].knowledge_points_per_month > 0}
       <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-secondary opacity-25 mt-2"} />
+        <Separator class={"bg-accent opacity-25 mt-2"} />
         <span class="font-semibold">Generated Resources</span>
         {#if options[getOptionIndex(option.id)].knowledge_points_per_month > 0}
           <span
@@ -213,8 +213,8 @@
               class={Object.values(
                 options[getOptionIndex(option.id)].generated_resources,
               )[index] > 0
-                ? "text-textHappyDark"
-                : "text-textDanger1"}
+                ? "text-textHappy"
+                : "text-textDanger"}
             >
               {getEmojiForResource(key)}
               {capitalizeFirstLetter(key)}

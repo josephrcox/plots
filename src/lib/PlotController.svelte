@@ -9,6 +9,24 @@
     checkForAvailablePlots();
   }
 
+  let styleString: string;
+  let styleIndex = 0;
+
+  let sizes = [
+    `margin-left: 300px; margin-top: 200px; scale: 1;`,
+    `margin-left: 650px; margin-top: 600px; scale: 1.5;`,
+  ];
+
+  $: {
+    styleString = sizes[styleIndex];
+  }
+
+  document.addEventListener("keypress", function (e) {
+    if (e.key === "*") {
+      styleIndex == sizes.length - 1 ? (styleIndex = 0) : styleIndex++;
+    }
+  });
+
   document.addEventListener("click", function (e) {
     const elem = e.target as HTMLDivElement;
     if (
@@ -78,8 +96,10 @@
 {#if $DB != null}
   <div class="flex flex-col">
     <div
+      style={styleString}
       id="plotContainerMain"
-      class="absolute left-[50px] items-center h-max flex flex-col top-[170px] pl-16 pt-16 pb-[250px] pr-80 bg-background"
+      class="items-center h-max flex flex-col pr-80 pb-80
+      "
     >
       <div class="flex flex-row items-center">
         <div class="grid plot_controller">
@@ -125,7 +145,10 @@
   /* CSS */
 
   #plotContainerMain {
-    scale: 0.85;
+    /* scale: 1; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .grid {
     display: inline-flex;
