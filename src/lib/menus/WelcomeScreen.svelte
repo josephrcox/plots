@@ -6,9 +6,7 @@
     paused,
     hasPlotOfType,
     userDB,
-    showCompletedAchievements,
     pauseMenuTab,
-    showAchievementPopup,
     showWelcome,
     showCustomAlert,
   } from "../store";
@@ -77,23 +75,6 @@
   let dbInitialized = false;
   $: if ($DB) {
     dbInitialized = true;
-
-    // check if $showCompletedAchievements is true
-    if ($showCompletedAchievements) {
-      reactiveAchievements = achievements;
-    } else {
-      reactiveAchievements = [];
-      // Show only those that are not in the userDB
-      // OR those that ARE in the userDB but have achievementPrizeCollected == false
-      for (let i = 0; i < achievements.length; i++) {
-        if (
-          !hasAchievement(achievements[i].id) ||
-          !achievementPrizeCollected(achievements[i].id)
-        ) {
-          reactiveAchievements.push(achievements[i]);
-        }
-      }
-    }
   } else {
     dbInitialized = false;
   }
@@ -143,16 +124,6 @@
     if ($userDB.achievements == null) return false;
     return (
       $userDB.achievements.find((a: [string, number]) => a[0] == id) != null
-    );
-  }
-
-  export function toggleShowCompleted() {
-    showCompletedAchievements.update((value) => !value);
-    localStorage.setItem(
-      "showCompletedAchievements",
-      localStorage.getItem("showCompletedAchievements") === "true"
-        ? "false"
-        : "true",
     );
   }
 

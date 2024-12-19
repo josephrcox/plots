@@ -6,8 +6,10 @@
     speed,
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
+    paused,
   } from "./store";
   import { formatDuration, formatNumber, roundTo } from "./utils";
+  import SimpleButton from "./components/SimpleButton.svelte";
 
   const speeds = $DB.gameSettings.includes("casual")
     ? [375, 200, 100]
@@ -57,13 +59,18 @@
 		{$modifyPlotMenuOptions.visible ? 'opacity-70' : ''}
 	"
 >
+  <SimpleButton
+    text="Pause game"
+    onOpen={() => ($paused = true)}
+    styling={"fixed top-2 right-2"}
+  />
   <div class="flex justify-between flex-col align-middle items-center w-full">
     <div class="rounded-xl">
       <div
         class="flex flex-col gap-2 justify-center w-full
         "
       >
-        <div class=" text-4xl">
+        <div class="text-4xl flex flex-row items-center justify-between">
           <div
             on:click={changeName}
             class="cursor-pointer flex flex-row justify-start"

@@ -241,14 +241,9 @@
             </Tooltip.Trigger>
             {#if hover}
               <Tooltip.Content
-                class="rounded-2xl {color ??
-                  getColor(value)
-                    // slightly lighter
-                    .replace('500', '300')}"
+                class="rounded-2xl text-white {color ?? getColor(value)}"
               >
-                <div
-                  class="flex flex-col justify-between text-black p-0 m-0 max-w-48"
-                >
+                <div class="flex flex-col justify-between max-w-48">
                   <span class="text-md"
                     >{name}: {formatNumber(value, false)}
                     {max ? `out of ${max}` : ""}</span
@@ -337,27 +332,31 @@
               {/if}
             </span>
             <TooltipContent>
-              <div class="flex flex-col gap-2 whitespace-nowrap min-w-fit">
+              <div
+                class="flex flex-col gap-2 whitespace-nowrap min-w-fit bg-gray-600/90 p-3 rounded-lg text-white"
+              >
                 <span class="text-md font-bold"
                   >{icon} {capitalizeFirstLetter(name)}</span
                 >
                 {#if rate > 0}
-                  <span class="text-textHappy">+{rate} (weekly)</span>
+                  <span class="text-green-200">+{rate} (weekly)</span>
                 {:else if rate < 0}
-                  <span class="text-textDanger">{rate} (weekly)</span>
+                  <span class="text-red-200">{rate} (weekly)</span>
                 {:else if rate != null}
-                  <span class="">+{rate} (weekly)</span>
+                  <span class="text-blue-200">+{rate} (weekly)</span>
                 {:else}
                   <span class="display-none" />
                 {/if}
 
                 {#if getRequiredPlots(name).length > 0}
-                  <Separator class="bg-white" />
-                  <span class="text-sm font-semibold">Required for</span>
+                  <Separator class="bg-gray-400" />
+                  <span class="text-sm font-semibold text-gray-100"
+                    >Required for</span
+                  >
                 {/if}
                 <div class="flex flex-col flex-wrap min-w-full">
                   {#each getRequiredPlots(name) as plot}
-                    <span class="text-xs mr-4">{plot}</span>
+                    <span class="text-xs mr-4 text-gray-100">{plot}</span>
                   {/each}
                 </div>
               </div>

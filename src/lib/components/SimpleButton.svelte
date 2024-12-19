@@ -4,7 +4,7 @@
 
   export let text: string;
   export let onOpen: () => void;
-  export let backgroundColor: string = "accent";
+  export let styling: string = "bg-accent text-accentText";
   export let opacity: number = 100;
   export let onHoverText: string = "";
 </script>
@@ -17,9 +17,8 @@
   >
   <Tooltip.Trigger class="flex flex-col ">
     <Button
-      class="text-sm flex flex-col  bg-accent cursor-pointer text-accentText py-1.5 rounded-xl
-  bg-{backgroundColor} cursor-pointer text-accentText opacity-{opacity} {opacity <
-      100
+      class="text-sm flex flex-col  cursor-pointer py-1.5 rounded-xl bg-accent text-accentText
+  {styling} cursor-pointer opacity-{opacity} {opacity < 100
         ? 'hover:opacity-40'
         : ''} transition-all duration-150 filter hover:brightness-110
   "
