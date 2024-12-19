@@ -3,7 +3,8 @@ export const options: PlotOption[] = [
   // Level 1 Plots
   {
     id: "small_homes",
-    title: "🏠 Homes",
+    emoji: "🏠",
+    title: "Homes",
     type: "residential",
     description: "+16 people",
     revenue_per_week: 0,
@@ -63,7 +64,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "large_homes",
-    title: "🏡 Large Homes",
+    emoji: "🏡",
+    title: "Large Homes",
     type: "residential",
     description: "+32 people",
     revenue_per_week: 0,
@@ -123,7 +125,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "farm",
-    title: "🥕 Farm",
+    emoji: "🥕",
+    title: "Farm",
     type: "farm",
     description: "Produces veggies, grains, fruit",
     revenue_per_week: 6,
@@ -185,7 +188,8 @@ export const options: PlotOption[] = [
 
   {
     id: "tree_farm",
-    title: "🌲 Tree Farm",
+    emoji: "🌲",
+    title: "Tree Farm",
     type: "lumber",
     description: "Produces some wood",
     revenue_per_week: 8,
@@ -246,7 +250,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "quarry",
-    title: "⛏️ Quarry",
+    emoji: "⛏️",
+    title: "Quarry",
     type: "quarry",
     description:
       "Produces stone, small amounts of metal. Isn't great for health. ",
@@ -308,7 +313,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "Apothecary",
-    title: "🌿 Apothecary",
+    emoji: "🌿",
+    title: "Apothecary",
     type: "medical",
     description:
       "Produces medicine from herbs and plants found in the forest. Increases health overall for a short bit. Fine until you can build a Healing House.",
@@ -369,7 +375,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "livestock_farm",
-    title: "🐄 Livestock",
+    emoji: "🐄",
+    title: "Livestock",
     type: "farm",
     description:
       "Makes more money and food than a regular farm, but doesn't bonus from water.",
@@ -431,7 +438,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "stockpile",
-    title: "📦 Stockpile",
+    emoji: "📦",
+    title: "Stockpile",
     type: "stockpile",
     description: "Enables you to store more resources. Costs gold weekly.",
     revenue_per_week: 0,
@@ -491,7 +499,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "adv_stockpile",
-    title: "📦 Adv. Stockpile",
+    emoji: "📦📦",
+    title: "Adv. Stockpile",
     type: "stockpile",
     description:
       "Stores more than a normal Stockpile. Costs more to build & operate.",
@@ -552,7 +561,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "bakery",
-    title: "🥖 Bakery",
+    emoji: "🥖",
+    title: "Bakery",
     type: "business",
     description:
       "Converts food into some extra cash. Make sure you have enough food.",
@@ -613,7 +623,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "stables",
-    title: "🐴 Stables",
+    emoji: "🐴",
+    title: "Stables",
     type: "recreation",
     description: "Improves the health of the town and provides recreation.",
     revenue_per_week: 24,
@@ -673,7 +684,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "church",
-    title: "⛪️ Church",
+    emoji: "⛪️",
+    title: "Church",
     type: "recreation",
     description: "Makes people VERY happy for a short period.",
     revenue_per_week: 0,
@@ -733,7 +745,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "pub",
-    title: "🍻 Pub",
+    emoji: "🍻",
+    title: "Pub",
     type: "recreation",
     description:
       "Generates knowledge, happiness, community. Isn't great for health.",
@@ -794,7 +807,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "village_market",
-    title: "🛒 Market",
+    emoji: "🛒",
+    title: "Market",
     type: "shop",
     description:
       "Turns food into money. Sells goods and employs many. Makes significantly more money from tourism if you have a Village Inn.",
@@ -855,7 +869,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "fishery",
-    title: "🐠 Fishery",
+    emoji: "🐠",
+    title: "Fishery",
     type: "business",
     description:
       "Requires metal but generates a lot of food. Must be near water.",
@@ -917,7 +932,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "vineyard",
-    title: "🍇 Vineyard",
+    emoji: "🍇",
+    title: "Vineyard",
     type: "recreation",
     description:
       "Makes fair money, lowers health. Generates knowledge too similar to a pub.",
@@ -978,7 +994,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "water_wheel",
-    title: "💧 Water Wheel",
+    emoji: "💧",
+    title: "Water Wheel",
     type: "industrial",
     description: "Produces small amount of power",
     revenue_per_week: 0,
@@ -1039,7 +1056,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "adv_water_wheel",
-    title: "💧 Adv. Water Wheel",
+    emoji: "💧💧",
+    title: "Adv. Water Wheel",
     type: "industrial",
     description: "Produces a large amount of power",
     revenue_per_week: 0,
@@ -1100,7 +1118,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "adv_farm",
-    title: "🌾 Adv. Farm",
+    emoji: "🌾",
+    title: "Adv. Farm",
     type: "farm",
     description:
       "Uses knowledge and technology to produce more food, with only 1 employee.",
@@ -1162,7 +1181,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "park",
-    title: "🎪 Park",
+    emoji: "🎪",
+    title: "Park",
     type: "recreation",
     description:
       "Makes people extremely happy & healthy for a period. Improves community.",
@@ -1223,7 +1243,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "village_inn",
-    title: "🛌 Village Inn",
+    emoji: "🛌",
+    title: "Village Inn",
     type: "tourism",
     description:
       "Each inn brings more visitors to your town, increasing profits for the Market and other stores.",
@@ -1284,7 +1305,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "schoolhouse",
-    title: "🏫 Schoolhouse",
+    emoji: "🏫",
+    title: "Schoolhouse",
     type: "education",
     description: "Produces knowledge, costs money to run.",
     revenue_per_week: 0,
@@ -1345,7 +1367,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "blacksmith",
-    title: "⚒️ Blacksmith",
+    emoji: "⚒️",
+    title: "Blacksmith",
     type: "business",
     description:
       "Converts metal into tools for money. Make sure you have enough metal!",
@@ -1406,7 +1429,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "library",
-    title: "📕 Library",
+    emoji: "📕",
+    title: "Library",
     type: "recreation",
     description: "Produces knowledge and happiness",
     revenue_per_week: 0,
@@ -1466,7 +1490,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "lumber_mill",
-    title: "🏭 Lumber Mill",
+    emoji: "🏭",
+    title: "Lumber Mill",
     type: "industrial",
     description:
       "Increases wood production by 50%, has to be next to a tree farm, but increases production at all.",
@@ -1527,7 +1552,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "solar_farm",
-    title: "☀️ Solar farm",
+    emoji: "☀️",
+    title: "Solar farm",
     type: "industrial",
     description:
       "Produces a lot of power without the need of water. Requires a lot of metal every week.",
@@ -1588,7 +1614,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "general_store",
-    title: "🛒 General Store",
+    emoji: "🛒",
+    title: "General Store",
     type: "shop",
     description:
       "Makes the most money of any plot, requires power. Makes significantly more from tourism if you have a Village Inn.",
@@ -1650,7 +1677,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "healing_house",
-    title: "🏥 Healing House",
+    emoji: "🏥",
+    title: "Healing House",
     type: "medical",
     description: "Treats the sick and continuously improves health.",
     revenue_per_week: 0,
@@ -1710,7 +1738,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "community_center",
-    title: "🫶 Community Center",
+    emoji: "🫶",
+    title: "Community Center",
     type: "recreation",
     description: "Improves community, makes people happier, costs money",
     revenue_per_week: 0,
@@ -1770,7 +1799,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "city_hall",
-    title: "🗳️ City Hall",
+    emoji: "🗳️",
+    title: "City Hall",
     type: "federal",
     description:
       "Generates bureaucracy that can be used to pass laws to impact the city and expand. Costs a LOT of gold every week.",
@@ -1831,7 +1861,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "mine",
-    title: "⛏️ Mine",
+    emoji: "⛏️",
+    title: "Mine",
     type: "mine",
     description: "Produces a significant amount of metal and stone.",
     revenue_per_week: 0,
@@ -1891,7 +1922,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "academy",
-    title: "🏫 Academy",
+    emoji: "🏫",
+    title: "Academy",
     type: "education",
     description:
       "Produces a lot of knowledge, more than a schoolhouse or library. But freakishly expensive.",
@@ -1952,7 +1984,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "bank",
-    title: "🏦 Bank",
+    emoji: "🏦",
+    title: "Bank",
     type: "bank",
     description:
       "Enables the conversion of knowledge to gold, and increases maximum tax rate so you can make more money.",
@@ -2013,7 +2046,8 @@ export const options: PlotOption[] = [
   },
   {
     id: "lab",
-    title: "🧪 Laboratory",
+    emoji: "🧪",
+    title: "Laboratory",
     type: "science",
     description: "Designs things to help the city grow",
     revenue_per_week: 0,

@@ -171,11 +171,11 @@
             data-y={data.y}
           >
             <span class="text-lg align-text-top select-none"
-              >{options[data.type].title.substring(0, 2)}</span
+              >{options[data.type].emoji}</span
             >
             <br />
             <span class="text-sm align-text-top text-black select-none"
-              >{options[data.type].title.substring(2)}
+              >{options[data.type].title}
             </span>
           </span>
         </div>

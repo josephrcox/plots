@@ -11,16 +11,12 @@
     showAchievementPopup,
     showCustomAlert,
   } from "../store";
-  import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
   // @ts-ignore
   import { winScenarios } from "../objects/WinScenarios.js";
 
   // @ts-ignore
   import {
-    max_tax_rates_based_on_difficulty,
     difficulty_options,
     // @ts-ignore
   } from "../objects/difficulty.js";
@@ -28,6 +24,7 @@
   import { achievements } from "$lib/objects/AchievementList.js";
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
+  import SimpleButton from "$lib/components/SimpleButton.svelte";
   const scenarios: any = winScenarios;
   const endGoal = scenarios[$DB.endGoal];
   const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -116,9 +113,8 @@
     URL.revokeObjectURL(url);
   }
 
-  function loadGame() {
-    const uploader = document.getElementById("upload") as HTMLInputElement;
-    const files = uploader.files;
+  function loadGame(e: any) {
+    const files = e.target.files;
     if (files == null) return;
     const file = files[0];
     const reader = new FileReader();
@@ -183,18 +179,22 @@
 
 <Dialog.Root bind:open={$paused}>
   <Dialog.Content
-    class=" max-w-[90vw] max-h-[90vh] bg-foregroundDark text-accentText"
+    class="max-w-[90vw] max-h-[90vh] bg-popupBackground text-accentText"
   >
     <Dialog.Header>
-      <Dialog.Title>Pause Menu</Dialog.Title>
-      <Dialog.Description>Unpause any time by pressing 'P'</Dialog.Description>
+      <Dialog.Title class="text-3xl font-semibold text-accentText"
+        >Pause Menu</Dialog.Title
+      >
+      <span>Unpause any time by pressing 'P'</span>
     </Dialog.Header>
     <div class="flex flex-row w-full gap-10">
       <div class="flex flex-col gap-6 justify-between">
         <div class="flex-col h-max">
-          <h4 class="underline underline-offset-4">This game</h4>
-          <span class="text-sm text-gray-400">{endGoal.description_title}</span>
-          <div class="mt-6 gap-0 py-0 text-gray-400 text-sm">
+          <h4 class="text-xl font-semibold mb-2">This game</h4>
+          <span class="text-sm text-accentText opacity-75"
+            >{endGoal.description_title}</span
+          >
+          <div class="mt-6 gap-0 py-0 text-accentText opacity-75 text-sm">
             {#if $DB.endGoal == "land"}
               <div class="leading-relaxed text-sm">
                 With your difficulty ({difficulty}), you must also have:
@@ -278,42 +278,25 @@
             {/if}
           </div>
         </div>
-        <div>
-          <div class="flex flex-col gap-3 h-max">
-            <div class="flex gap-10 justify-start min-w-[100%] w-[100%] items">
-              <Label
-                for="saveButton"
-                class="cursor-pointer bg-blue-600 rounded-md text-center p-2.5 hover:bg-blue-700 justify-center flex 
-					">Save game</Label
-              >
-              <Button
-                class="
-					bg-blue-600 hover:bg-blue-700 hidden
-					"
-                id="saveButton"
-                on:click={() => saveGame()}>Save</Button
-              >
+        <div class="flex flex-row gap-3">
+          <SimpleButton styling="w-min" text="💾 Save Game" onOpen={saveGame} />
 
-              <Label
-                for="upload"
-                class="cursor-pointer bg-blue-600 rounded-md text-center p-2.5 hover:bg-blue-700 justify-center flex 
-					">Upload game</Label
-              >
-              <Input
-                class="hidden"
-                type="file"
-                on:change={loadGame}
-                id="upload"
-              />
-              <Button
-                class="
-					bg-blue-600 hover:bg-blue-700
-					"
-                id="newGame"
-                on:click={() => restartGame()}>New Game</Button
-              >
-            </div>
-          </div>
+          <SimpleButton
+            styling="w-min"
+            text="📤 Load Game"
+            onOpen={() => {
+              const input = document.createElement("input");
+              input.type = "file";
+              input.onchange = (e) => loadGame(e);
+              input.click();
+            }}
+          />
+
+          <SimpleButton
+            styling="bg-black opacity-50 w-min"
+            text="🔄 New Game"
+            onOpen={restartGame}
+          />
         </div>
       </div>
       <Separator orientation="vertical" />
@@ -326,37 +309,14 @@
           >Track your progress through games & complete challenges!
         </span>
         <br />
-        <div class="flex items-center">
-          <input
-            type="checkbox"
-            id="toggle-show-completed"
-            class="rounded"
-            tabindex="-1"
-            on:change={() => {
-              toggleShowCompleted();
-            }}
-            on:keydown={(e) => {
-              if (e.key === "p") {
-                paused.set(false);
-              }
-            }}
-            checked={localStorage.getItem("showCompletedAchievements") ===
-              "true"}
-          />
-          <label
-            for="toggle-show-completed"
-            class="text-xs text-gray-400 select-none ml-2
-					no-select cursor-pointer
-				
-				">Show completed</label
-          >
-        </div>
-        <div class="overflow-scroll mt-2 h-[55vh]">
-          <div class="flex flex-col gap-4 overflow-scroll pb-20 scroll-smooth">
+        <div class="overflow-scroll mt-2 h-[60vh]">
+          <div class="flex flex-col gap-4 overflow-scroll pb-10 scroll-smooth">
             {#each reactiveAchievements as achievement}
               <div
-                class="flex flex-col gap-3 cursor-default rounded-md
-						{hasAchievement(achievement.id) ? 'bg-green-700' : 'bg-gray-500 opacity-35'}
+                class="flex flex-col gap-3 cursor-default rounded-xl
+						{hasAchievement(achievement.id)
+                  ? 'bg-green-700 text-accentText'
+                  : 'bg-gray-500 opacity-35'}
 						
 						"
               >
@@ -372,23 +332,23 @@
                           >{achievement.title}</span
                         >
 
-                        <div class="font-thin text-white opacity-75 text-xs">
+                        <div class="font-thin opacity-75 text-xs">
                           {achievement.requirements}
                         </div>
                       </div>
                       <div
-                        class="text-sm flex-grow pr-1 break-inside-avoid
+                        class="text-2xl pr-1 break-inside-avoid
 											"
                       >
                         {achievement.icon}
                       </div>
                     </span>
                   </div>
-                  <div class="text-white opacity-75 text-sm font-light">
+                  <div class=" opacity-85 text-xs font-light">
                     {achievement.description}
                   </div>
                   <div
-                    class="{hasAchievement(achievement.id)
+                    class="pb-2{hasAchievement(achievement.id)
                       ? ''
                       : 'hidden'} text-xs text-green-400"
                   >
@@ -398,10 +358,10 @@
                   </div>
 
                   {#if hasAchievement(achievement.id) && !achievementPrizeCollected(achievement.id)}
-                    <Button
-                      class="bg-blue-600 hover:bg-blue-700 mt-4"
-                      id="collectPrize-{achievement.id}"
-                      on:click={() => {
+                    <SimpleButton
+                      text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
+                      styling={"bg-yellow-300 text-black"}
+                      onOpen={() => {
                         collectPrize(achievement.id);
                         // hide this button
                         const button = document.getElementById(
@@ -411,9 +371,7 @@
                           button.style.display = "none";
                         }
                       }}
-                    >
-                      Collect Prize: ${formatNumber(achievement.prize)} gold
-                    </Button>
+                    />
                   {/if}
                 </div>
               </div>
