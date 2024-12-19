@@ -18,13 +18,13 @@
   {...$$restProps}
   let:thumbs
 >
-  <span class="relative h-2 w-full grow overflow-hidden rounded-full bg-black">
+  <span class="relative h-2 w-full grow overflow-hidden bg-black">
     <SliderPrimitive.Range class="absolute h-full bg-primary" />
   </span>
   {#each thumbs as thumb}
     <SliderPrimitive.Thumb
       {thumb}
-      class="block h-5 w-5 rounded-2xl bg-accent transition-colors focus-visible:outline-none  disabled:pointer-events-none disabled:opacity-50"
+      class="block h-4 w-4  bg-accent focus-visible:outline-none  disabled:pointer-events-none disabled:opacity-50"
     />
   {/each}
 </SliderPrimitive.Root>

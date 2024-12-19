@@ -8,7 +8,7 @@
 </script>
 
 <div
-  class="text-xs flex flex-row justify-start align-middle pb-2
+  class="text-sm flex flex-row justify-start align-middle pb-2
                mb-2 transition-all duration-300 noselect
             {$DB.currentTutorialStep == index ? 'opacity-100' : 'opacity-50'}
           "

@@ -9,16 +9,19 @@
   export let onHoverText: string = "";
 </script>
 
-<Tooltip.Root openDelay={onHoverText.length > 0 ? 400 : 10000} closeDelay={0}>
+<Tooltip.Root openDelay={onHoverText.length > 0 ? 200 : 10000} closeDelay={0}>
   <Tooltip.Content
     >{onHoverText.length > 0
       ? onHoverText
       : "Why are you hovering here?"}</Tooltip.Content
   >
-  <Tooltip.Trigger class="flex flex-col h-min">
+  <Tooltip.Trigger class="flex flex-col ">
     <Button
-      class="text-xs flex flex-col h-min bg-accent cursor-pointer text-accentText p-1.5 text-start
-  bg-{backgroundColor} cursor-pointer text-accentText opacity-{opacity}
+      class="text-sm flex flex-col  bg-accent cursor-pointer text-accentText py-1.5 rounded-xl
+  bg-{backgroundColor} cursor-pointer text-accentText opacity-{opacity} {opacity <
+      100
+        ? 'hover:opacity-40'
+        : ''} transition-all duration-150 filter hover:brightness-110
   "
       on:click={onOpen}><div>{text}</div></Button
     >

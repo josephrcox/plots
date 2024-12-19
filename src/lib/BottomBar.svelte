@@ -17,9 +17,8 @@
     modifyPlotMenuOptions,
     reverseClear,
     hasPlotOfType,
-    showOnlyAffordable,
-    toggleShowOnlyAffordable,
     showCustomAlert,
+    paused,
   } from "./store";
   import {
     getColor,
@@ -31,15 +30,15 @@
   import { onMount } from "svelte";
   import { Button } from "./components/ui/button";
   import PlotTooltip from "./PlotTooltip.svelte";
+  import RightSidebar from "./RightSidebar.svelte";
+  import PlotTile from "./components/PlotTile.svelte";
 
   export let x = 0;
   export let y = 0;
   export let open = false;
   export let tooltip = "";
-  let searchQuery = "";
   let PlotTypeOptions = options;
 
-  let searchInput: any;
   let totalAffordableOptionsCount: number;
 
   const BOTTOM_MENU_HEIGHT = "50vh";
@@ -73,13 +72,6 @@
         (option) => option.id === "mine",
       );
     }
-    if ($showOnlyAffordable) {
-      reactiveOptions = reactiveOptions.filter((option) => option.affordable);
-      // if $modifyPlotMenuOptions.isMineralSource is true, then only show the mine option
-      if ($modifyPlotMenuOptions.isMineralSource) {
-        reactiveOptions = options.filter((option) => option.id === "mine");
-      }
-    }
     // if a plot has selected: true then put it at index 0
     // iterate over plotTypeMaximums and remove any options that are at their maximum.
     // If 'lab': 1, then make sure that if hasPlotOfType('lab') > 0, then remove that option from the list.
@@ -101,14 +93,6 @@
         (option) => option.id !== "mine",
       );
     }
-  }
-
-  $: reactiveOptions = reactiveOptions.filter((option) =>
-    option.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  function handleInput(event: any) {
-    searchQuery = (event.target.value as string) || "";
   }
 
   function isSelected(option: PlotOption) {
@@ -243,7 +227,12 @@
     }
   }
 
-  function purchasePlot(x: number, y: number, typeID: string) {
+  function purchasePlot(
+    x: number,
+    y: number,
+    typeID: string,
+    override = false,
+  ) {
     let z = $DB;
     // get the index from the typeID
     const typeIndex = options.findIndex((option) => option.id === typeID);
@@ -257,16 +246,16 @@
     let plotChosen = options[typeIndex];
 
     //// We may do this eventually but not now :)
-    // if (checkIfAffordable(plotChosen, $DB) == false) {
-    //   return showCustomAlert.set(
-    //     `You can not afford this.
-    //     <br/><br/>
-    //     ${list}`,
-    //   );
-    // }
+    if (checkIfAffordable(plotChosen, $DB) == false) {
+      return showCustomAlert.set(
+        `You can not afford this.
+        <br/><br/>
+        ${list}`,
+      );
+    }
 
     // check if the plot has required adjacent_plots
-    if (plotChosen.requirements.adjacent_plots !== undefined) {
+    if (plotChosen.requirements.adjacent_plots !== undefined && !override) {
       let adjacentPlots = plotChosen.requirements.adjacent_plots;
       let adjacentPlotsMet = isAdjacentToPlots(
         x,
@@ -294,9 +283,10 @@
     }
 
     if (
-      plotChosen.requirements.size != null &&
-      plotChosen.requirements.size != 1 &&
-      requirementsMet
+      (plotChosen.requirements.size != null &&
+        plotChosen.requirements.size != 1 &&
+        requirementsMet) ||
+      !override
     ) {
       // Usually, plots only take up one plot. If they specify a size, then they take up at least a 2x2 square.
       // Check if there is room for the larger plot to be placed, and then set the plots around it in the square to be unusable.
@@ -398,7 +388,7 @@
       }
     }
 
-    if (requirementsMet === true) {
+    if (requirementsMet === true || override) {
       // Check if the plot is already set to a type. If so, reverse the effects of that type.
       if (z.plots[x][y].type !== -1) {
         reverseClear(x, y, z);
@@ -514,180 +504,43 @@
 {#if open}
   <div
     class="w-[100vw] fixed bottom-[-5px] max-h-[{BOTTOM_MENU_HEIGHT}]
-     z-50 flex flex-col justify-center text-center items-center"
-  >
-    <div
-      class="
-      
-      items-center justify-center
-      w-[100%]
+     z-50 flex flex-row justify-center text-center items-center bg-popupBackground text-sidebarText px-4
       align-bottom
-      bg-popupBackground
-      text-sidebarText
-      px-6
       shadow-2xl rounded-t-2xl
-      py-6
-    "
-    >
-      <!-- content -->
-      <div
-        class="flex flex-col gap-2 px-2 justify-end"
-        on:click={handlePlotOptionClick}
-      >
-        {#if !$modifyPlotMenuOptions.isMineralSource}
-          <!-- Show search bar and buildable checkbox only if not in Mineral Source mode -->
-          <div class="text-sm">
-            <div class="flex flex-row w-full">
-              <div class="flex items-end">
-                <Input
-                  type="text"
-                  autofocus
-                  id="search-bar"
-                  placeholder="Search Plot Options..."
-                  value={searchQuery}
-                  on:input={handleInput}
-                  bind:this={searchInput}
-                  class="border rounded w-auto bg-white  text-xs"
-                />
-              </div>
-
-              <!-- toggle to only show affordable ones -->
-              <div class="flex items-center ml-4">
-                <input
-                  type="checkbox"
-                  id="toggle-affordable"
-                  class="rounded"
-                  on:change={toggleShowOnlyAffordable}
-                  checked={$showOnlyAffordable}
-                />
-                <label
-                  for="toggle-affordable"
-                  class="ml-2 no-select cursor-pointer">Buildable</label
-                >
-              </div>
-              <div class="flex justify-end ml-6">
-                {#if $DB.plots[x][y].type !== -1 && canBulldoze(x, y)}
-                  <button
-                    on:click={clearPlot}
-                    id="bulldoze"
-                    class="px-2 py-2 bg-red-500 rounded hover:bg-red-600 transition duration-300 ease-in-out"
-                    >❌ Bulldoze</button
-                  >
-                {/if}
-              </div>
+      "
+  >
+    <div class=" h-max w-full flex-grow">
+      <div>
+        <div
+          class="flex flex-row gap-2 justify-start pt-8 flex-grow w-full"
+          on:click={handlePlotOptionClick}
+        >
+          <div
+            class="flex gap-1 pb-24 overflow-scroll max-h-[{BOTTOM_MENU_HEIGHT}]"
+          >
+            <div>
               <div
-                class="text-xs p-2 bg-white rounded-xl cursor-pointer"
-                on:click={() => ($modifyPlotMenuOptions.visible = false)}
+                class="flex flex-row text-start justify-start items-start flex-wrap py-8
+              {$modifyPlotMenuOptions.isMineralSource
+                  ? 'pt-6 gap-2'
+                  : 'pt-6 gap-2'} w-full align-middle"
               >
-                Press escape or click to close
+                <!-- Filter to show only the "mine" option if isMineralSource is true -->
+                {#each reactiveOptions.filter( (option) => ($modifyPlotMenuOptions.isMineralSource ? option.id === "mine" : true), ) as option (option.id)}
+                  <PlotTile
+                    {option}
+                    purchaseCallback={handlePlotOptionClick}
+                    canPurchase={option.affordable ?? false}
+                  />
+                {/each}
               </div>
             </div>
           </div>
-        {/if}
-
-        <div
-          class="flex gap-2 max-h-[{BOTTOM_MENU_HEIGHT}] pb-24 {$modifyPlotMenuOptions.isMineralSource ||
-          searchQuery.length > 0 ||
-          $showOnlyAffordable
-            ? 'flex-row flex-wrap max'
-            : 'w-full overflow-y-scroll scroll flex-col'}"
-        >
-          {#each $modifyPlotMenuOptions.isMineralSource ? [1] : [1, 2, 3, 4, 5] as level}
-            <div class="${!showOnlyAffordable ? '' : ''}">
-              {#if searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource && !$showOnlyAffordable}
-                <!-- <div class="text-sm font-extralight">Level {level}</div> -->
-              {/if}
-              <div
-                class="flex flex-row text-start justify-start items-start flex-wrap py-4
-              {$modifyPlotMenuOptions.isMineralSource || searchQuery.length > 0
-                  ? 'pt-0 gap-0'
-                  : 'pt-2 gap-2'} w-full align-middle"
-              >
-                <!-- Filter to show only the "mine" option if isMineralSource is true -->
-                {#each reactiveOptions.filter( (option) => ($modifyPlotMenuOptions.isMineralSource ? option.id === "mine" : option.level === level), ) as option (option.id)}
-                  <Tooltip.Root openDelay={400} closeDelay={0}>
-                    <Tooltip.Trigger>
-                      <div
-                        class="plotOption cursor-pointer min-w-40 text-white
-                      {$modifyPlotMenuOptions.isMineralSource ||
-                        searchQuery.length > 0
-                          ? 'mx-2 my-2'
-                          : ''} relative h-[110px] rounded-xl flex flex-col transition-all duration-100
-                      {option.affordable || option.selected
-                          ? 'cursor-pointer'
-                          : 'opacity-30 cursor-not-allowed '}
-                      {option.selected
-                          ? 'border-4 border-yellow-200 opacity-100 rounded-none'
-                          : ''}"
-                        data-plotoptionid={option.id}
-                        style="background-color: {getColor(
-                          getOptionIndex(option.id),
-                          true,
-                        )}"
-                      >
-                        <div class="pt-2">
-                          <span class="text-md text-center">
-                            {!option.selected ? firstEmoji(option.title) : "✅"}
-                          </span>
-                          <span class="text-sm text-center">
-                            {option.title.substring(2)}
-                          </span>
-                        </div>
-                        {#if option.active_costs.power > 0}
-                          <span
-                            class="bg-yellow-300 text-xs px-1 py-0.5 rounded-2xl absolute top-[-8px] right-[-1px] border-2 border-green-700"
-                            >🔋{option.active_costs.power}</span
-                          >
-                        {/if}
-                        {#if option.type == "recreation" || option.type == "shop"}
-                          <span
-                            class="bg-blue-200 text-xs px-1 py-0.5 rounded-2xl absolute bottom-[2px] left-[-1px] border-2 border-blue-600"
-                            >🛝</span
-                          >
-                        {/if}
-                        {#if hasPlotOfType(option.id, $DB).length > 0}
-                          <span
-                            class="bg-black text-xs text-white px-1 py-0.5 rounded-2xl absolute top-[-5px] left-[-1px] border-2 border-white"
-                            >x{hasPlotOfType(option.id, $DB).length}</span
-                          >
-                        {/if}
-                        <span
-                          style={option.styling}
-                          class="text-xs text-center pt-4"
-                        >
-                          Costs 💰 {formatNumber(
-                            option.requirements.gold,
-                            false,
-                          )}
-                          {#if option.revenue_per_week > 0}
-                            <br />Makes 💰 {formatNumber(
-                              option.revenue_per_week,
-                              false,
-                            )}/week
-                          {/if}
-                          {#if option.requirements.employees > 0}
-                            <br />Employs {formatNumber(
-                              option.requirements.employees,
-                              false,
-                            )}
-                          {/if}
-                        </span>
-                      </div>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content class="">
-                      <PlotTooltip {option} />
-                    </Tooltip.Content>
-                  </Tooltip.Root>
-                {/each}
-
-                {#if reactiveOptions.filter((option) => option.level === level).length === 0 && searchQuery.length == 0 && !$modifyPlotMenuOptions.isMineralSource}
-                  <span class="text-sm pt-2">No plots available!</span>
-                {/if}
-              </div>
-            </div>
-          {/each}
         </div>
       </div>
+    </div>
+    <div>
+      <RightSidebar mini={true} />
     </div>
   </div>
 {/if}

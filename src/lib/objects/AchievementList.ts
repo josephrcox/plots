@@ -198,4 +198,20 @@ export const achievements: Achievement[] = [
     check: (z: Game) => z.townInfo.gold >= 1000000,
     prize: 150000,
   },
+  {
+    id: "pub_knowledge",
+    title: "Street smartz",
+    description: "You get 250 knowledge without building a school or library.",
+    requirements: "Knowledge >= 250 without building a school or library",
+    icon: "🤓",
+    check: (z: Game) => {
+      return (
+        hasPlotOfType("small_school", z).length === 0 &&
+        hasPlotOfType("large_school", z).length === 0 &&
+        hasPlotOfType("library", z).length === 0 &&
+        z.townInfo.knowledge_points >= 250
+      );
+    },
+    prize: 50000,
+  },
 ];

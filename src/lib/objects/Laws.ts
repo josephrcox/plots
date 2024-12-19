@@ -119,13 +119,13 @@ export const laws: Law[] = [
   {
     id: "the_big_wood_deal",
     description:
-      "The Big Wood Deal. This law allows you to sell all of the wood in your town for $2/wood at once. This won't make the town happy, but may be necessary in a pinch. Can be enacted multiple times to sell to other buyers.",
-    cost: 200,
+      "The Big Wood Deal. This law allows you to sell all of the wood in your town for $5/wood at once. This won't make the town happy, but may be necessary in a pinch. Can be enacted multiple times to sell to other buyers.",
+    cost: 500,
     weekly_effect: (game: Game) => {
-      game.townInfo.gold += 2 * game.resources.wood;
+      game.townInfo.gold += 5 * game.resources.wood;
       game.resources.wood = 0;
       game.resource_rate.wood = 0;
-      game.townInfo.happiness *= 0.8;
+      game.townInfo.happiness *= 0.95;
       game.economyAndLaws.enacted = game.economyAndLaws.enacted.filter(
         (law) => law !== "the_big_wood_deal",
       );
@@ -157,17 +157,17 @@ export const laws: Law[] = [
     cost: 1000,
     weekly_effect: (game: Game) => {
       game.resources.stone = 0;
-      game.modifiers.health = 3; // out of 1, so this is crazy high.
+      game.modifiers.health = 5; // out of 1, so this is crazy high.
       return game;
     },
   },
   {
     id: "out_of_town",
     description:
-      "Out of town. Everyone needs a vacation, right? When this is enacted, EVERYONE must leave the town for 10 days. During this time, no resources are produced, no taxes are collected, and you must take a break from the game.",
+      "TODO: Out of town. Everyone needs a vacation, right? When this is enacted, EVERYONE must leave the town for 10 days. During this time, no resources are produced, no taxes are collected, and you must take a break from the game.",
     cost: 1000,
     weekly_effect: (game: Game) => {
-      alert("TODO: Implement out_of_town law");
+      // TODO
       return game;
     },
   },

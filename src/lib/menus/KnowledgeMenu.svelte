@@ -55,7 +55,7 @@
         <!--  -->
       </Dialog.Description>
     </Dialog.Header>
-    <span class="italic">Knowledge is power, unlock it!</span>
+    <span class="">Knowledge is power, unlock it!</span>
     <div class="py-0 flex flex-col gap-4 text-gray-400 overflow-x-auto">
       <div>
         Market Rate: <span

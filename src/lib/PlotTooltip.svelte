@@ -43,7 +43,7 @@
     let s = "";
     let classText = "";
     if (current < required && checkRequirements) {
-      classText = "text-textDanger border-2 border-red-400";
+      classText = "text-textDanger border-2 border-red-400 px-2";
     }
     s = `<span class='${classText}'>${icon} ${required}</span>`;
 
@@ -84,7 +84,7 @@
     <div class="flex flex-col w-36 h-min gap-0 text-xs pb-2">
       <Separator class={"bg-accent opacity-25 mt-1 mb-1"} />
       <span class="font-semibold">Requirements</span>
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-row gap-1 flex-wrap">
         {@html getRequirementString(
           "💰",
           options[getOptionIndex(option.id)].requirements.gold,

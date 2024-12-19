@@ -100,6 +100,7 @@
     db = _countRecreation(db);
     db = _adjustForStockpile(db);
     db = _cleanUpTownLog(db);
+    db = _fixEmployment(db);
 
     if (db.overtime == false) {
       db = _checkGameLost(db);
@@ -274,6 +275,27 @@
       }
     }
 
+    return z;
+  }
+
+  function _fixEmployment(z: Game) {
+    // iterate over plots that are active and correct the z.townInfo.employees count
+    let employees = 0;
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          let plotOptionForPlot = options[z.plots[i][j].type];
+          let addedEmployees = plotOptionForPlot.requirements.employees;
+          employees += addedEmployees;
+        }
+      }
+    }
+    if (employees != z.townInfo.employees) {
+      if (employees > z.townInfo.population_max) {
+        // alert("more openings than people");
+      }
+      z.townInfo.employees = employees;
+    }
     return z;
   }
 
@@ -1464,10 +1486,7 @@
       vibe: vibe,
     });
     // Commenting out audio playback for now until we handle permissions.
-    // if (localStorage.mute != "true") {
-    //   const audio = new Audio("alert.mp3");
-    //   audio.play();
-    // }
+
     return z;
   }
 

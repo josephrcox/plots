@@ -3,7 +3,7 @@
   import ExpandButton from "./ExpandButton.svelte";
   // @ts-ignore
   import Plot from "./Plot.svelte";
-  import { DB, expandTown, modifyPlotMenuOptions, unique } from "./store";
+  import { DB, modifyPlotMenuOptions, unique } from "./store";
 
   $: if ($DB) {
     checkForAvailablePlots();
@@ -14,6 +14,7 @@
 
   let sizes = [
     `margin-left: 300px; margin-top: 200px; scale: 1;`,
+    // `margin-left: 650px; margin-top: 600px; scale: 1.5;`,
     `margin-left: 650px; margin-top: 600px; scale: 1.5;`,
   ];
 

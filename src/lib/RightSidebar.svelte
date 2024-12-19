@@ -14,6 +14,7 @@
 
   let atCapacity = false;
   let showCompleted = false;
+  export let mini = false;
 
   $: {
     atCapacity =
@@ -214,26 +215,27 @@
 </script>
 
 <div
-  class="bg-sidebarBackground text-sidebarText w-[220px] sidebar border-foreground border-4
-            			{$modifyPlotMenuOptions.visible
-    ? 'bottom-8 opacity-70'
-    : 'bottom-2'}
-	z-10 fixed right-3 top-[190px] rounded-xl px-2 pt-2 transition-all duration-300 overflow-y-scroll scroll"
+  class="bg-sidebarBackground text-sidebarText border-foreground border-4 {$modifyPlotMenuOptions.visible &&
+  !mini
+    ? 'opacity-0'
+    : ''}
+	z-10 rounded-xl px-2 pt-2 transition-all duration-300 overflow-y-scroll scroll
+  {mini ? 'min-w-56' : 'fixed right-3 top-[190px] sidebar w-[220px] bottom-4'}"
 >
   <div class="flex flex-row w-full pb-6">
     <div class="flex flex-col rounded-xl gap-2 w-full">
-      <h1 class="text-xl w-full text-center pb-1">Stats</h1>
+      <h1 class="text-lg w-full text-center pb-1">Stats</h1>
       {#each attributes as { name, value, modifier, color, hover, description, max }}
         <div class="flex flex-col gap-1">
-          <Tooltip.Root openDelay={400} closeDelay={0}>
+          <Tooltip.Root openDelay={200} closeDelay={0}>
             <Tooltip.Trigger
-              class="w-full flex flex-row align-middle justify-between"
+              class="w-full flex flex-row align-middle justify-between text-sm filter hover:brightness-110"
             >
               <span class="text-md pr-2">{name} </span>
               <Progress
                 {value}
                 max={max ?? 300}
-                class="min-w-[80px] max-w-[80px]"
+                class="min-w-[80px] max-w-[80px] "
                 {color}
               />
             </Tooltip.Trigger>
@@ -262,13 +264,13 @@
     </div>
   </div>
   <div class="flex flex-row justify-center">
-    <Tooltip.Root openDelay={400} closeDelay={0}>
+    <Tooltip.Root openDelay={200} closeDelay={0}>
       <Tooltip.Trigger>
-        <h1 class="text-xl w-full text-center pb-2">
+        <h1 class="text-lg w-full text-center pb-2">
           Resources
 
           <div
-            class="text-xs w-full text-center mb-2 cursor-pointer italic
+            class="text-xs w-full text-center mb-2 cursor-pointer
           {atCapacity == true ? 'text-textDanger animate-pulse font-bold' : ''} 
             {$DB.gameSettings.includes('bagOfHolding') ? 'opacity-30' : ''}
           "
@@ -313,10 +315,10 @@
   <div class="flex flex-col gap-8 h-full">
     <div class="flex flex-col text-md text-nowrap gap-2">
       {#each resources as { icon, name, value, rate }}
-        <Tooltip.Root openDelay={400} closeDelay={0}>
+        <Tooltip.Root openDelay={200} closeDelay={0}>
           <Tooltip.Trigger>
             <span
-              class="flex flex-row justify-between
+              class="flex flex-row justify-between text-sm
               {value <= 0 ? 'text-textDanger font-semibold' : ''}
             "
             >
@@ -365,48 +367,52 @@
       {/each}
     </div>
 
-    <div>
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <div
-        class="text-lg w-full text-center noselect flex flex-col no-select"
-        on:click={() => {
-          showCompleted = !showCompleted;
-        }}
-      >
-        {#if $showTutorialStepConfetti}
-          <Confetti cone x={[-0.5, 0.5]} />
-          <Confetti
-            cone
-            amount={10}
-            x={[-1, -0.4]}
-            y={[0.25, 0.75]}
-            rounded
-            size={15}
-          />
-          <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
-          <Confetti infinite amount={75} delay={[0, 200]} />
-        {/if}
-        <h1 class="text-xl w-full text-center pb-2">Milestones</h1>
-        {#if $DB.currentTutorialStep > 0}
-          <span class="text-xs opacity-65 cursor-pointer italic pb-2"
-            >{!showCompleted
-              ? `Show ${$DB.currentTutorialStep} completed`
-              : `Hide ${$DB.currentTutorialStep} completed`}</span
-          >
-        {/if}
-      </div>
-      <div class="scroll overflow-y-scroll">
-        {#each tutorialMessages as step, index}
-          {#if $DB.currentTutorialStep > index}
-            {#if showCompleted}
+    {#if !mini}
+      <div>
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <div
+          class="text-lg w-full text-center noselect flex flex-col no-select"
+          on:click={() => {
+            showCompleted = !showCompleted;
+          }}
+        >
+          {#if $showTutorialStepConfetti}
+            <Confetti cone x={[-0.5, 0.5]} />
+            <Confetti
+              cone
+              amount={10}
+              x={[-1, -0.4]}
+              y={[0.25, 0.75]}
+              rounded
+              size={15}
+            />
+            <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
+            <Confetti infinite amount={75} delay={[0, 200]} />
+          {/if}
+          <h1 class="text-lg w-full text-center">Milestones</h1>
+          {#if $DB.currentTutorialStep > 0}
+            <span class="text-xs opacity-65 cursor-pointer pb-2"
+              >{!showCompleted
+                ? `Show ${$DB.currentTutorialStep} completed`
+                : `Hide ${$DB.currentTutorialStep} completed`}</span
+            >
+          {/if}
+        </div>
+        <div class="scroll overflow-y-scroll">
+          {#each tutorialMessages as step, index}
+            {#if $DB.currentTutorialStep > index}
+              {#if showCompleted}
+                <Milestone {index} {step} />
+              {/if}
+            {:else}
               <Milestone {index} {step} />
             {/if}
-          {:else}
-            <Milestone {index} {step} />
-          {/if}
-        {/each}
+          {/each}
+        </div>
       </div>
-    </div>
+    {:else}
+      <br />
+    {/if}
   </div>
 </div>
 

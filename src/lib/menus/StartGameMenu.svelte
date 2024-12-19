@@ -157,7 +157,7 @@
       <!-- Footer -->
       <div class="flex flex-row justify-between w-full px-1">
         <span
-          class="italic opacity-30 text-xs py-2 text-start rounded h-full flex flex-col justify-center mr-10"
+          class=" opacity-30 text-xs py-2 text-start rounded h-full flex flex-col justify-center mr-10"
           on:click={setUsername}>{$userDB.username}</span
         >
         <div>

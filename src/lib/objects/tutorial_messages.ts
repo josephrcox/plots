@@ -9,14 +9,14 @@ type TutorialStep = {
 
 export const tutorialMessages: TutorialStep[] = [
   {
-    message: "Build homes to start growing our village.",
+    message: "Build homes to start growing our village",
     isComplete: (z: Game) => {
       return z.townInfo.population_max > 0;
     },
     goldReward: 750,
   },
   {
-    message: "Start producing food and wood to keep the town running.",
+    message: "Start producing food and wood to keep the town running",
     isComplete: (z: Game) => {
       return (
         hasPlotOfType("farm", z).length >= 1 &&
@@ -26,25 +26,18 @@ export const tutorialMessages: TutorialStep[] = [
     goldReward: 500,
   },
   {
-    message: "We need stone and metals. Build a quarry.",
+    message: "We need stone and metals. Build a quarry",
     isComplete: (z: Game) => {
       return hasPlotOfType("quarry", z).length > 0;
     },
     goldReward: 700,
   },
   {
-    message: "Increase our weekly revenue to at least 200 gold.",
+    message: "Weekly revenue >= 200 gold",
     isComplete: (z: Game) => {
       return z.economyAndLaws.weeklyProfit >= 200;
     },
     goldReward: 3000,
-  },
-  {
-    message: "Boost our Knowledge to 250 by building educational plots.",
-    isComplete: (z: Game) => {
-      return z.townInfo.knowledge_points >= 250;
-    },
-    goldReward: 5000,
   },
   {
     message: "Grow our population to 100.",
@@ -54,38 +47,38 @@ export const tutorialMessages: TutorialStep[] = [
     goldReward: 8000,
   },
   {
-    message: "Start generating power. Build a water wheel or solar farm.",
+    message: "Start generating power. Build a water wheel or solar farm",
     isComplete: (z: Game) => {
       return z.resources.power > 0;
     },
-    goldReward: 8000,
+    goldReward: 10000,
   },
   {
-    message: "Grow our population to 200.",
+    message: "Knowledge >= 250",
+    isComplete: (z: Game) => {
+      return z.townInfo.knowledge_points >= 250;
+    },
+    goldReward: 5000,
+  },
+  {
+    message: "Population >= 200",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 200;
     },
-    goldReward: 15000,
+    goldReward: 20000,
   },
   {
-    message: "Build a mine to boost our metal supply.",
+    message: "Build a mine to boost our metal supply",
     isComplete: (z: Game) => {
       return hasPlotOfType("mine", z).length > 0;
     },
-    goldReward: 15000,
+    goldReward: 20000,
   },
   {
-    message: "Mining has impacted health. Build a Healing House.",
-    isComplete: (z: Game) => {
-      return hasPlotOfType("healing_house", z).length > 0;
-    },
-    goldReward: 15000,
-  },
-  {
-    message: "Establish a City Hall to advance our town.",
+    message: "Establish a City Hall to advance our town",
     isComplete: (z: Game) => {
       return hasPlotOfType("city_hall", z).length > 0;
     },
-    goldReward: 25000,
+    goldReward: 50000,
   },
 ];

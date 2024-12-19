@@ -43,10 +43,13 @@
   }
 </script>
 
-<div class="flex flex-row text-sidebarText bg-sidebarBackground overflow-clip">
+<div
+  class="flex flex-row text-sidebarText bg-sidebarBackground overflow-clip {$modifyPlotMenuOptions.visible
+    ? 'opacity-70'
+    : ''}"
+>
   <div
-    class="w-[220px] text-sidebarText bg-sidebarBackground overflow-scroll border-foregroundDark border-4
-			{$modifyPlotMenuOptions.visible ? 'bottom-8  opacity-70' : 'bottom-2'}
+    class="w-[220px] text-sidebarText bg-sidebarBackground overflow-scroll border-foregroundDark border-4 bottom-4
 		z-10 fixed left-3 py-2 top-[190px] drop-shadow-xl rounded-xl transition-all duration-300"
   >
     <div class="flex flex-col justify-center mx-2 gap-8">
@@ -58,7 +61,7 @@
         min-h-12 pb-2 rounded-xl"
         >
           <div class="mb-1">
-            <h1 class="text-xl w-full text-center pb-2">Laws</h1>
+            <h1 class="text-lg w-full text-center pb-2">Laws</h1>
             <span class="text-sm">Tax Rate</span>
             <span class="text-sm"
               >{roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%</span
@@ -92,7 +95,7 @@
         </div>
       </div>
       <div>
-        <h1 class="text-xl w-full text-center pb-2">Menus</h1>
+        <h1 class="text-lg w-full text-center pb-2">Menus</h1>
         <div class="flex flex-col gap-2">
           <SimpleButton
             text={!$settingLiegeLocation
@@ -120,7 +123,7 @@
               ? `${$DB.lab.active_experiment.duration}`
               : "🧪 Manage Lab"}
             onOpen={showTheLabMenu}
-            opacity={hasPlotOfType("lab", $DB).length >= 1 ? 100 : 50}
+            opacity={hasPlotOfType("lab", $DB).length >= 1 ? 100 : 30}
             onHoverText={hasPlotOfType("lab", $DB).length >= 1
               ? ""
               : "Build a Lab to perform experiments. Experiments can save lives, make money, or generally improve your town."}
@@ -139,7 +142,7 @@
               $DB.townLog = [];
             }}
           >
-            <h1 class="text-xl w-full text-center pb-2">Alerts</h1>
+            <h1 class="text-lg w-full text-center">Alerts</h1>
           </h3>
           <button
             on:click={() => {
@@ -163,7 +166,7 @@
         {log.vibe == Vibe.BAD
                 ? 'bg-white text-textDanger border '
                 : log.vibe == Vibe.GOOD
-                  ? 'bg-green-600'
+                  ? 'bg-green-300'
                   : log.vibe == Vibe.NORMAL
                     ? 'bg-accent'
                     : 'bg-accent'}

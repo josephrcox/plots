@@ -60,37 +60,37 @@
   <div class="flex justify-between flex-col align-middle items-center w-full">
     <div class="rounded-xl">
       <div
-        class="flex flex-col gap-4 justify-center w-full
+        class="flex flex-col gap-2 justify-center w-full
         "
       >
-        <div class=" text-md">
+        <div class=" text-4xl">
           <div
             on:click={changeName}
             class="cursor-pointer flex flex-row justify-start"
           >
-            <h1
-              class="font-bold cursor-pointer w-full text-center select-none text-3xl"
-            >
+            <h1 class="cursor-pointer w-full text-center select-none">
               {$DB.townInfo.name}
             </h1>
           </div>
         </div>
         <div>
           <div class="flex flex-col align-middle justify-center">
-            <!-- circle div that says the day number, with the day and year below (outside of circle) -->
             <div
               class="flex align-middle items-center text-accentText flex-row w-full justify-center gap-2 h-max"
             >
-              <div
-                class="rounded-xl flex-row text-accentText gap-4 w-18 flex items-center max-w-18"
+              <span class="text-xs px-4 min-w-24"
+                >👥 {$DB.townInfo.population_count}</span
               >
-                <span class="flex flex-col gap-1">
+              <div
+                class="rounded-xl flex-row text-accentText gap-4 w-20 flex items-center max-w-24"
+              >
+                <span class="flex flex-col">
                   <span class="text-xs">Year</span>
                   <span class="font-semibold text-xs">
                     {Math.floor($DB.environment.day / 365) + 1}
                   </span>
                 </span>
-                <span class="flex flex-col gap-1">
+                <span class="flex flex-col">
                   <span class="text-xs">Day</span>
                   <span class="font-semibold text-xs">
                     {($DB.environment.day % 365) + 1}
@@ -98,10 +98,13 @@
                 </span>
               </div>
               <span
-                class="font-mono cursor text-blue-500 text-nowrap noselect text-end w-36"
+                class="cursor text-blue-200 text-nowrap noselect text-end w-36"
                 on:click={() => {
                   nextSpeed();
                 }}
+                class:text-blue-200={speedIndex == 0}
+                class:text-yellow-200={speedIndex == 1}
+                class:text-red-200={speedIndex == 2}
                 >{speedIndex == 0
                   ? "Normal"
                   : speedIndex == 1

@@ -209,15 +209,15 @@
                 chance to build a thriving new community from the ground up.
               </p>
               <p>
-                As the town founder and <span class="italic">formal liege</span
-                >, you must <span class="text-blue-300">collect taxes</span>,
-                and use that funding to
+                As the town founder and <span class="">formal liege</span>, you
+                must <span class="text-blue-300">collect taxes</span>, and use
+                that funding to
                 <span class="text-blue-300">build plots</span>.
               </p>
             </div>
             <div class="flex flex-col gap-4">
               <div class="flex flex-row align-middle items-center">
-                <h3 class="text-xl underline underline-offset-8">
+                <h3 class="text-lg underline underline-offset-8">
                   Your Objectives
                 </h3>
               </div>

@@ -1533,8 +1533,8 @@ export const options: PlotOption[] = [
       "Produces a lot of power without the need of water. Requires a lot of metal every week.",
     revenue_per_week: 0,
     requirements: {
-      gold: 15000,
-      plots: ["blacksmith"],
+      gold: 30000,
+      plots: ["blacksmith", "library"],
       employees: 4,
       knowledge: 0,
       size: 1,
@@ -1571,7 +1571,7 @@ export const options: PlotOption[] = [
       wood: 0,
       stone: 0,
       metal: 0,
-      power: 1000,
+      power: 750,
       bureaucracy: 0,
     },
     level: 4,
@@ -1960,7 +1960,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 0,
     requirements: {
       gold: 100000,
-      plots: [],
+      plots: ["academy"],
       employees: 32,
       knowledge: 25000,
       size: 1,
@@ -2020,7 +2020,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 300,
     requirements: {
       gold: 100000,
-      plots: [],
+      plots: ["academy"],
       employees: 48,
       knowledge: 15000,
       size: 1,
@@ -2062,7 +2062,7 @@ export const options: PlotOption[] = [
     level: 5,
     active_costs: {
       gold: 0,
-      power: 300,
+      power: 700,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -2073,26 +2073,31 @@ export const options: PlotOption[] = [
   },
 ];
 export const typeColors: any = {
-  empty_unusable: "rgba(255,255,255,0.50)",
-  empty_buildable: "#EFEA5A",
-  residential: "#de7633",
-  farm: "#6b8f49",
-  lumber: "#8E805C",
-  business: "#9273a5",
-  recreation: "#5277b1",
-  shop: "#5277b1",
-  tourism: "#d896d8",
-  education: "#9997DF",
-  medical: "#4a5ba3",
-  bank: "#8477be",
-  federal: "#8477be",
-  science: "#4a5ba3",
-  mine: "#d9874a",
-  quarry: "#868685",
-  industrial: "#868615",
-  stockpile: "#868685",
+  empty_unusable: "rgba(255,255,255,0.50)", // Already in RGBA
+  empty_buildable: "rgba(239,234,90,1.0)", // #EFEA5A
+  residential: "rgba(222,118,51,1.0)", // #de7633
+  farm: "rgba(107,143,73,1.0)", // #6b8f49
+  lumber: "rgba(145,116,44,1.0)", // #91742C
+  business: "rgba(146,115,165,1.0)", // #9273a5
+  recreation: "rgba(82,119,177,1.0)", // #5277b1
+  shop: "rgba(82,119,177,1.0)", // #5277b1
+  tourism: "rgba(216,150,216,1.0)", // #d896d8
+  education: "rgba(153,151,223,1.0)", // #9997DF
+  medical: "rgba(74,91,163,1.0)", // #4a5ba3
+  bank: "rgba(132,119,190,1.0)", // #8477be
+  federal: "rgba(132,119,190,1.0)", // #8477be
+  science: "rgba(74,91,163,1.0)", // #4a5ba3
+  mine: "rgba(217,135,74,1.0)", // #d9874a
+  quarry: "rgba(134,134,133,1.0)", // #868685
+  industrial: "rgba(134,134,21,1.0)", // #868615
+  stockpile: "rgba(134,134,133,1.0)", // #868685
 };
-export function getColor(typeIndex: number, canBeUpgraded = false) {
+
+export function getColor(
+  typeIndex: number,
+  canBeUpgraded = false,
+  modifier: number = 22,
+) {
   if (typeIndex < 0) {
     if (typeIndex == -1) {
       if (canBeUpgraded) {
@@ -2106,8 +2111,8 @@ export function getColor(typeIndex: number, canBeUpgraded = false) {
     }
   }
   const plotOption = options[typeIndex];
-  let lighterVersion = typeColors[plotOption.type];
-  return typeColors[plotOption.type];
+  let lighterVersion = lightenColor(typeColors[plotOption.type], modifier);
+  return lighterVersion;
 }
 export const plotTypeMaximums: any = {
   lab: 1,
@@ -2115,4 +2120,70 @@ export const plotTypeMaximums: any = {
   bank: 1,
   community_center: 1,
   inn: 1,
+};
+
+export const lightenColor = (color: string, amount: number = 20): string => {
+  const rgbToHsl = (
+    r: number,
+    g: number,
+    b: number,
+  ): [number, number, number] => {
+    (r /= 255), (g /= 255), (b /= 255);
+    const max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    let h = 0,
+      s = 0,
+      l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
+    }
+    return [h * 360, s, l];
+  };
+
+  const lightenHSL = (
+    h: number,
+    s: number,
+    l: number,
+    amount: number,
+  ): string => {
+    const newL = Math.min(1, l + amount / 100); // Increase lightness
+    return `hsl(${h}, ${(s * 100).toFixed(1)}%, ${(newL * 100).toFixed(1)}%)`;
+  };
+
+  const parseRGBA = (color: string): [number, number, number] | null => {
+    const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    return match
+      ? [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
+      : null;
+  };
+
+  let rgb: [number, number, number] | null = null;
+  if (color.startsWith("#")) {
+    const hex = color.replace("#", "");
+    const bigint = parseInt(hex, 16);
+    rgb = [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  } else if (color.startsWith("rgba") || color.startsWith("rgb")) {
+    rgb = parseRGBA(color);
+  }
+
+  if (rgb) {
+    const [h, s, l] = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+    return lightenHSL(h, s, l, amount);
+  }
+
+  throw new Error("Invalid color format");
 };

@@ -23,24 +23,22 @@
 </script>
 
 <Dialog.Root bind:open={$showCityHallMenu}>
-  <Dialog.Content
-    class="bg-foreground text-accentText h-[80vh] overflow-scroll"
-  >
+  <Dialog.Content class="bg-foreground text-accentText h-[80vh] w-full scroll">
     <Dialog.Header>
-      <Dialog.Title class="text-xl">
+      <Dialog.Title class="text-lg">
         <div class="flex justify-between mr-10">
           <span>{$DB.townInfo.name}</span>
           <span>🧑‍⚖️ {$DB.resources.bureaucracy}</span>
         </div>
       </Dialog.Title>
 
-      <Dialog.Description class="w-3/4 overflow-scroll "></Dialog.Description>
+      <Dialog.Description class="w-full "></Dialog.Description>
       {#if hasPlotOfType("city_hall", $DB).length > 0}
         <Separator class="mb-4" />
         <div class="w-full">
           <span class="text-lg font-bold"> Hire Guardians ⚔️ </span>
           <br />
-          <span class="text-sm italic"
+          <span class="text-sm"
             >Guardians work for you and are required to expand your kingdom.
             They do not generate revenue, but still require housing & food.
           </span>
@@ -101,7 +99,7 @@
               class="flex justify-between align-middle items-center pt-2 pb-2 gap-2
             "
             >
-              <span>{law.description}</span>
+              <span class="text-sm">{law.description}</span>
               <Button
                 class="bg-accent rounded-2xl 
                 {$DB.economyAndLaws.enacted.includes(law.id)
@@ -147,7 +145,7 @@
       </div>
     </Dialog.Header>
     <Dialog.Footer>
-      <!-- <span class="italic text-left text-textDanger">
+      <!-- <span class=" text-left text-textDanger">
         
         </span
       > -->

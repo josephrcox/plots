@@ -462,7 +462,8 @@ export function startGame(
   json.difficulty = parseInt(difficulty);
   let udb = JSON.parse(localStorage.getItem(USER_DB_NAME) || "null");
 
-  if (gameSettings.includes("devMode") || udb.username == "dev") {
+  if (udb.username == "dev") gameSettings.push("devMode");
+  if (gameSettings.includes("devMode")) {
     json.townInfo.gold = 100000000;
     json.townInfo.happiness = 10000000;
     json.townInfo.health = 1000000;
@@ -625,7 +626,7 @@ export function expandTown(z: Game, direction: string) {
   const newCols = direction == "east" ? 5 : 0;
   const newRows = direction == "south" ? 5 : 0;
 
-  const requiredGuardians = Math.round(Math.pow(1.5, z.kingdom_expansions + 5));
+  const requiredGuardians = Math.round(Math.pow(1.7, z.kingdom_expansions + 5));
 
   if (z.townInfo.guardians < requiredGuardians) {
     return `You need ${requiredGuardians - z.townInfo.guardians} more Guardians to expand the kingdom. See the City mgmt menu.`;
@@ -642,7 +643,7 @@ export function expandTown(z: Game, direction: string) {
         type: -1,
         typeId: "",
         mineralSource: false,
-        water: false,
+        water: isWater(i, j, numRows + newRows),
         disabled: false,
       });
     }
@@ -660,7 +661,7 @@ export function expandTown(z: Game, direction: string) {
         type: -1,
         typeId: "",
         mineralSource: false,
-        water: false,
+        water: isWater(i, j, numRows + newRows),
       });
     }
     z.plots.push(newRow);

@@ -72,6 +72,25 @@
         $modifyPlotMenuOptions.isMineralSource = data.mineralSource;
         $modifyPlotMenuOptions.visible = true;
 
+        const element = document.querySelector(
+          `.plot_container[data-id="${data.id}"]`,
+        );
+        const container = document.documentElement || document.body;
+
+        const elementRect = element.getBoundingClientRect();
+        const containerHeight = window.innerHeight || container.clientHeight;
+        const containerWidth = window.innerWidth || container.clientWidth;
+
+        const scrollTop =
+          container.scrollTop + elementRect.top - containerHeight / 2 + 225;
+        const scrollLeft =
+          container.scrollLeft + elementRect.left - containerWidth / 2;
+        window.scrollTo({
+          top: scrollTop,
+          left: scrollLeft,
+          behavior: "smooth",
+        });
+
         plots.forEach((plot) => {
           plot.classList.remove("selected");
         });
@@ -97,7 +116,7 @@
   }
 </script>
 
-<Tooltip.Root openDelay={400} closeDelay={0}>
+<Tooltip.Root openDelay={200} closeDelay={0}>
   <Tooltip.Trigger>
     <button
       class="plot_container {classText}  overflow-visible {data.type == -1 &&
@@ -109,7 +128,7 @@
 	{data.disabled ? 'animate-spin' : ''}
 		"
       style="background-color: {data.water
-        ? 'blue'
+        ? 'rgba(66, 135, 245, 1)'
         : $modifyPlotMenuOptions.x == data.x &&
             $modifyPlotMenuOptions.y == data.y &&
             $modifyPlotMenuOptions.visible
@@ -155,8 +174,7 @@
               >{options[data.type].title.substring(0, 2)}</span
             >
             <br />
-            <span
-              class="text-xs align-text-top font-normal text-black from-stone-600 select-none"
+            <span class="text-sm align-text-top text-black select-none"
               >{options[data.type].title.substring(2)}
             </span>
           </span>
@@ -168,7 +186,7 @@
         <span class="text-lg">🧲</span>
       {/if}
       {#if isLiegeLocationPlot(data.x, data.y)}
-        <span class="text-xl absolute top-0">👑</span>
+        <span class="text-lg absolute top-0">👑</span>
       {/if}
     </button>
   </Tooltip.Trigger>
@@ -181,13 +199,13 @@
       {/if}
       {#if isAdjacentToWater(data.x, data.y, $DB)}
         <span
-          class="text-xs bg-blue-500 text-white px-2 py-3 italic rounded-2xl text-center"
+          class="text-xs bg-blue-500 text-white px-2 py-3 rounded-2xl text-center"
           >Near water - Generating more food & revenue!</span
         >
       {/if}
       {#if isLiegeOnPlot(data.x, data.y, $DB)}
         <span
-          class="text-xs bg-pink-700 text-white px-2 py-3 italic rounded-2xl text-center"
+          class="text-xs bg-pink-700 text-white px-2 py-3 rounded-2xl text-center"
         >
           {#if options[data.type].liege_on_plot_hint == null}
             You are hanging out on the {options[data.type].title} plot, but nothing
@@ -262,13 +280,13 @@
 
   @keyframes waterAnimation1 {
     0% {
-      background-color: rgb(0, 0, 180);
+      background-color: rgba(48, 128, 137, 1);
     }
     50% {
-      background-color: rgb(0, 0, 220);
+      background-color: rgba(64, 154, 184, 1);
     }
     100% {
-      background-color: rgb(0, 0, 180);
+      background-color: rgba(48, 128, 137, 1);
     }
   }
 
@@ -286,8 +304,8 @@
 
   .plot_container[data-water="true"] {
     animation:
-      waterAnimation1 3s infinite,
-      waterAnimation2 4s infinite;
+      waterAnimation1 10s infinite,
+      waterAnimation2 5s infinite;
   }
 
   .plot_container[data-type="-2"] {

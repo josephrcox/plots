@@ -145,7 +145,7 @@
       <Dialog.Description>
         <span
           >You have earned <span
-            class="italic
+            class="
 				{$DB.lab.xp < 0 ? 'text-textDanger' : 'text-primaryText'}
 					">{$DB.lab.xp} XP</span
           > from experiments. XP can be used to buy advanced plots and develop your
@@ -203,7 +203,7 @@
     {/if}
     <Separator class="mt-4" />
     <Dialog.Footer>
-      <span class="italic text-left text-textDanger">
+      <span class=" text-left text-textDanger">
         Keep in mind that not all experiments yield positive results.</span
       >
     </Dialog.Footer>

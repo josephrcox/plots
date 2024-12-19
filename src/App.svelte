@@ -68,7 +68,7 @@
   let currentIndex = 0;
   let nextIndex = 1;
   let transitionProgress = 0;
-  const transitionSpeed = 0.001; // Even slower transitions for seasonal effect
+  const transitionSpeed = 0.0001; // Even slower transitions for seasonal effect
 
   function blendColors(color1, color2, ratio) {
     return {
@@ -285,33 +285,30 @@
     {#if $DB.environment.day == 0 && $showWelcome}
       <WelcomeScreen />
     {/if}
-
-    <style>
-      body {
-        margin-bottom: 0;
-      }
-      /* no visible scrollbars */
-      #plot_grid::-webkit-scrollbar {
-        display: none;
-      }
-
-      ::-webkit-scrollbar {
-        width: 0px;
-        background: transparent; /* make scrollbar transparent */
-      }
-
-      /* no scrollbars on firefox either */
-      #plot_grid {
-        scrollbar-width: none;
-      }
-
-      /* no scrollbars for IE/Edge */
-      #plot_grid {
-        -ms-overflow-style: none;
-      }
-    </style>
   {/if}
 {/if}
 
 <style>
+  body {
+    margin-bottom: 0;
+  }
+  /* no visible scrollbars */
+  #plot_grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+  }
+
+  /* no scrollbars on firefox either */
+  #plot_grid {
+    scrollbar-width: none;
+  }
+
+  /* no scrollbars for IE/Edge */
+  #plot_grid {
+    -ms-overflow-style: none;
+  }
 </style>

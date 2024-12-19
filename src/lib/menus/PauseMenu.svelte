@@ -420,7 +420,7 @@
             {/each}
           </div>
         </div>
-        <span class="text-sm text-yellow-400 italic"
+        <span class="text-sm text-yellow-400"
           >Prizes apply to the current game you are in. You can wait to apply
           them until the right time.
         </span>
@@ -432,7 +432,7 @@
 <AlertDialog.Root open={$showAchievementPopup}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title class="text-center text-xl font-bold"
+      <AlertDialog.Title class="text-center text-lg font-bold"
         >{getLatestAchievementObject()?.title}</AlertDialog.Title
       >
       <AlertDialog.Description>
