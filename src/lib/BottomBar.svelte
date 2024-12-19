@@ -623,7 +623,7 @@
       }
 
       // Add analytics event for plot purchase
-      analyticsEvent(Events.BUILD_PLOT, {
+      analyticsEvent($DB, Events.BUILD_PLOT, {
         plot_type: plotChosen.id,
         x: x.toString(),
         y: y.toString(),
