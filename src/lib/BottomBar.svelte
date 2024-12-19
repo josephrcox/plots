@@ -26,6 +26,7 @@
     plotTypeMaximums,
   } from "./objects/PlotTypeOptions";
   import { Game, PlotOption } from "./types";
+  // @ts-ignore
   import RightSidebar from "./RightSidebar.svelte";
   import PlotTile from "./components/PlotTile.svelte";
 
