@@ -1,4 +1,5 @@
 <script lang="ts">
+  console.log("hello world");
   import { fade, slide } from "svelte/transition";
   import { onMount, onDestroy } from "svelte";
   import {
