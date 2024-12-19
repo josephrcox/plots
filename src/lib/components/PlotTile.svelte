@@ -13,14 +13,14 @@
   export let purchaseCallback: (option: PlotOption) => void;
   export let canPurchase: boolean;
 
-  let name = option.title.substring(2);
-  let emoji = option.title.substring(0, 2);
+  let name = option.title;
+  let emoji = option.emoji;
   let cost = option.requirements.gold;
-  let costStyle = z.townInfo.gold < cost ? "text-red-500 font-semibold" : "";
+  let costStyle = $DB.townInfo.gold < cost ? "text-red-500 font-semibold" : "";
   let revenue = option.revenue_per_week;
   let employees = option.requirements.employees;
   let employeeCountStyle =
-    z.townInfo.population_count - z.townInfo.employees < employees
+    $DB.townInfo.population_count - $DB.townInfo.employees < employees
       ? "text-red-500 font-semibold"
       : "";
   let requiredPower = option.active_costs.power;
@@ -48,6 +48,7 @@
         class="flex flex-col w-36 h-48 min-h-32 min-w-36 rounded-xl text-white drop-shadow-lg border-black border-2 hover:translate-y-[-8px] transition-transform duration-300 ease-in-out z-100
 
         {canPurchase ? 'cursor-pointer' : 'cursor-not-allowed opacity-30'}
+        {option.selected ? 'border-4 border-white scale-105' : ''}
             
         "
         style="background: {color};"

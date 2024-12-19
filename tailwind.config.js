@@ -31,7 +31,7 @@ const config = {
         foreground: "rgba(54, 43, 15, 1)", // Rich, deep brown for text areas
         sidebarBackground: "rgba(250, 243, 224, 1)", // Light cream (unchanged)
         sidebarText: "rgba(47, 65, 80, 1)", // Slate blue-gray for sidebar text
-        popupBackground: "rgba(45, 51, 39, 0.95)", // Deep forest green with slight transparency
+        popupBackground: "rgba(45, 51, 39, 0.98)", // Deep forest green with slight transparency
         accentText: "rgba(255, 255, 255, 1)", // Bright white (unchanged)
         foregroundDark: "rgba(39, 35, 22, 1)", // Very deep brown
         accent: "rgba(168, 115, 75, 1)", // Deeper, more muted terracotta that complements the greens and browns

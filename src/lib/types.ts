@@ -150,8 +150,9 @@ export type Experiment = {
 };
 
 export type PlotOption = {
-  level: number; // just for visual organization.
+  level: number;
   id: string;
+  emoji: string;
   title: string;
   type: string;
   description: string;

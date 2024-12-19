@@ -29,7 +29,6 @@
     const townName = (document.getElementById("townName") as HTMLInputElement)
       .value;
 
-    // GAME SETTINGS
     const checkboxes = ["devMode", "tomPetty", "casual", "bagOfHolding"];
     const settings = checkboxes.filter(
       (id) => (document.getElementById(id) as HTMLInputElement).checked,
@@ -63,123 +62,144 @@
 <Dialog.Root bind:open={$startGameMenu.visible}>
   <Dialog.Content
     transition={flyAndScale}
-    class="bg-foregroundDark text-accentText"
+    class="bg-sidebarBackground text-sidebarText max-w-xl rounded-md shadow-xl border border-accent"
   >
-    <Dialog.Header>
-      <Dialog.Title>Welcome to Plots!</Dialog.Title>
+    <Dialog.Header class="p-4 border-b border-accent/20">
+      <Dialog.Title class="text-2xl font-semibold"
+        >Welcome to Plots!</Dialog.Title
+      >
       <Dialog.Description>
         <a
           href="https://github.com/josephrcox/plots#how-to-play"
-          class="text-blue-500 text-sm mb-4 hover:underline"
+          class="text-accent hover:text-accent/80 text-sm mb-4 hover:underline inline-block"
           target="_blank"
         >
           GitHub / Learn how to play</a
         >
-        <div class="flex flex-col justify-center gap-5 mt-4">
-          {#if showDifficulty}
-            <div>
-              <Label for="difficulty" class="mt-2"
-                >Select a map size (difficulty)</Label
-              >
-              <select
-                id="difficulty"
-                class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              >
-                <!-- <option value="0">Easy (quick game)</option> -->
-                <option value="1" selected>Normal</option>
-                <!-- <option value="2">Hard (longest game)</option> -->
-              </select>
-            </div>
-          {/if}
-
-          <div>
-            <Label for="endGoal" class="mt-2">Select a game mode</Label>
-            {#if selectedGameMode === "land"}
-              <p class="text-gray-500 text-sm">
-                {winScenarios.land.description_title}
-              </p>
-            {:else}
-              <p class="text-gray-500 text-sm">
-                {winScenarios.free_play.description_title}
-              </p>
-            {/if}
-
-            <select
-              id="endGoal"
-              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value={selectedGameMode}
-              on:change={setSelectedGameMode}
-            >
-              <option value="land">{winScenarios.land.short_title}</option>
-              <option value="free_play"
-                >{winScenarios.free_play.short_title}</option
-              >
-            </select>
-          </div>
-
-          <div>
-            <Label for="townName" class="mt-2">Town Name</Label>
-            <Input
-              id="townName"
-              class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Will be randomized if you leave blank"
-            />
-          </div>
-          <Label for="difficulty" class="mt-2">Other game settings</Label>
-          <div class="hidden">
-            <input type="checkbox" id="devMode" class="mt-1" />
-            <label for="devMode" class="mt-2">Dev mode</label>
-          </div>
-          <div>
-            <input type="checkbox" id="tomPetty" class="mt-1" />
-            <label for="tomPetty" class="mt-2">
-              The 'Tom Petty' mode. If your happiness or health reaches 0, you
-              lose 90% of your gold and continue the game. You won't back down.
-            </label>
-          </div>
-          <div>
-            <input type="checkbox" id="casual" class="mt-1" />
-            <label for="casual" class="mt-2">
-              Casual game. Faster and easier overall while exposing more of the
-              game mechanics.
-            </label>
-          </div>
-          <div>
-            <input type="checkbox" id="bagOfHolding" class="mt-1" />
-            <label for="bagOfHolding" class="mt-2">
-              Bag of Holding. No resource cap or need to purchase stockpiles.
-            </label>
-          </div>
-        </div>
       </Dialog.Description>
     </Dialog.Header>
-    <Dialog.Footer>
-      <!-- Footer -->
-      <div class="flex flex-row justify-between w-full px-1">
-        <span
-          class=" opacity-30 text-xs py-2 text-start rounded h-full flex flex-col justify-center mr-10"
-          on:click={setUsername}>{$userDB.username}</span
-        >
-        <div>
-          <Button on:click={deleteAllData}>Reset user</Button>
-          <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
-            on:click={captureAndStart}
+
+    <div class="p-4 space-y-4">
+      {#if showDifficulty}
+        <div class="space-y-2">
+          <Label for="difficulty" class="text-sm font-medium">Map Size</Label>
+          <select
+            id="difficulty"
+            class="w-full p-2 rounded-md border border-accent/20 bg-sidebarBackground text-sidebarText focus:ring-2 focus:ring-accent/50"
           >
-            Start game
-          </button>
+            <option value="1" selected>Normal</option>
+          </select>
         </div>
+      {/if}
+
+      <div class="space-y-2">
+        <Label for="endGoal" class="text-sm font-medium">Game Mode</Label>
+        <select
+          id="endGoal"
+          class="w-full p-2 rounded-md border border-accent/20 bg-sidebarBackground text-sidebarText focus:ring-2 focus:ring-accent/50"
+          value={selectedGameMode}
+          on:change={setSelectedGameMode}
+        >
+          <option value="land">{winScenarios.land.short_title}</option>
+          <option value="free_play">{winScenarios.free_play.short_title}</option
+          >
+        </select>
+        <p class="text-sm text-sidebarText/80 mt-1">
+          {selectedGameMode === "land"
+            ? winScenarios.land.description_title
+            : winScenarios.free_play.description_title}
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <Label for="townName" class="text-sm font-medium">Town Name</Label>
+        <Input
+          id="townName"
+          class="w-full p-2 rounded-md border border-accent/20 bg-sidebarBackground text-sidebarText focus:ring-2 focus:ring-accent/50"
+          placeholder="Will be randomized if left blank"
+        />
+      </div>
+
+      <div class="space-y-4">
+        <Label class="text-sm font-medium">Game Settings</Label>
+        <div class="hidden">
+          <input type="checkbox" id="devMode" />
+        </div>
+        <div class="flex items-start space-x-2">
+          <input
+            type="checkbox"
+            id="tomPetty"
+            class="mt-1 rounded border-accent/20"
+          />
+          <label for="tomPetty" class="text-sm">
+            The 'Tom Petty' mode: If your happiness or health reaches 0, you
+            lose 90% of your gold and continue the game. You won't back down.
+          </label>
+        </div>
+        <div class="flex items-start space-x-2">
+          <input
+            type="checkbox"
+            id="casual"
+            class="mt-1 rounded border-accent/20"
+          />
+          <label for="casual" class="text-sm">
+            Casual game: Faster and easier overall while exposing more of the
+            game mechanics.
+          </label>
+        </div>
+        <div class="flex items-start space-x-2">
+          <input
+            type="checkbox"
+            id="bagOfHolding"
+            class="mt-1 rounded border-accent/20"
+          />
+          <label for="bagOfHolding" class="text-sm">
+            Bag of Holding: No resource cap or need to purchase stockpiles.
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <Dialog.Footer
+      class="p-4 border-t border-accent/20 flex justify-between items-center"
+    >
+      <span
+        class="text-xs text-sidebarText/50 hover:text-sidebarText cursor-pointer"
+        on:click={setUsername}
+      >
+        {$userDB.username}
+      </span>
+      <div class="space-x-2">
+        <Button
+          variant="outline"
+          class="border-accent/20 hover:bg-accent/10"
+          on:click={deleteAllData}
+        >
+          Reset user
+        </Button>
+        <Button
+          class="bg-accent hover:bg-accent/80 text-white"
+          on:click={captureAndStart}
+        >
+          Start game
+        </Button>
       </div>
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>
 
 <style>
-  label {
-    /* no select */
-    -webkit-touch-callout: none;
+  :global(.dialog-overlay) {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  input[type="checkbox"] {
+    accent-color: rgb(168, 115, 75);
+  }
+
+  :global(.text-sm) {
+    user-select: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
   }

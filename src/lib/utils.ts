@@ -255,3 +255,36 @@ export function randomizeNumber(n: number, round: number = 0) {
   let max = n * 1.05;
   return roundTo(Math.random() * (max - min) + min, round);
 }
+
+export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
+  let plot = {
+    x: x,
+    y: y,
+  };
+
+  // the only exception is plot 0,0, which can be upgraded from the start
+  if (plot.x === 0 && plot.y === 0) {
+    return true;
+  }
+  // you can only upgrade a plot if it is adjacent to a plot that already is {active:true}.
+
+  const adjacentPlots = [
+    { x: plot.x - 1, y: plot.y },
+    { x: plot.x + 1, y: plot.y },
+    { x: plot.x, y: plot.y - 1 },
+    { x: plot.x, y: plot.y + 1 },
+  ];
+  return adjacentPlots.some((adjacentPlot) => {
+    // check if adjacent plot is outside of the 25x25 grid
+    if (
+      adjacentPlot.x < 0 ||
+      adjacentPlot.x >= z.plots.length || // Changed from '>' to '>='
+      adjacentPlot.y < 0 ||
+      adjacentPlot.y >= z.plots[adjacentPlot.x].length // Assuming a square grid
+    ) {
+      return false;
+    }
+    const adjacentPlotData = z.plots[adjacentPlot.x][adjacentPlot.y];
+    return adjacentPlotData.active;
+  });
+}

@@ -70,10 +70,10 @@
         class="flex flex-col gap-2 justify-center w-full
         "
       >
-        <div class="text-4xl flex flex-row items-center justify-between">
+        <div class="text-4xl flex flex-row items-center">
           <div
             on:click={changeName}
-            class="cursor-pointer flex flex-row justify-start"
+            class="cursor-pointer flex flex-row justify-center text-center w-full"
           >
             <h1 class="cursor-pointer w-full text-center select-none">
               {$DB.townInfo.name}
