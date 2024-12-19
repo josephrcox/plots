@@ -26,10 +26,6 @@
     plotTypeMaximums,
   } from "./objects/PlotTypeOptions";
   import { Game, PlotOption } from "./types";
-  import { Input } from "$lib/components/ui/input";
-  import { onMount } from "svelte";
-  import { Button } from "./components/ui/button";
-  import PlotTooltip from "./PlotTooltip.svelte";
   import RightSidebar from "./RightSidebar.svelte";
   import PlotTile from "./components/PlotTile.svelte";
 
@@ -38,8 +34,6 @@
   export let open = false;
   export let tooltip = "";
   let PlotTypeOptions = options;
-
-  let totalAffordableOptionsCount: number;
 
   const BOTTOM_MENU_HEIGHT = "50vh";
 
