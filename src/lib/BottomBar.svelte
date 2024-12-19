@@ -7,6 +7,7 @@
     capitalizeFirstLetter,
     isAdjacentToPlots,
     checkIfPlotCanBeUpgraded,
+    analyticsEvent,
   } from "./utils";
   import {
     DB,
@@ -17,7 +18,7 @@
     showCustomAlert,
   } from "./store";
   import { options, plotTypeMaximums } from "./objects/PlotTypeOptions";
-  import { Game, PlotOption } from "./types";
+  import { Game, PlotOption, Events } from "./types";
   // @ts-ignore
   import RightSidebar from "./RightSidebar.svelte";
   import PlotTile from "./components/PlotTile.svelte";
@@ -620,6 +621,16 @@
         default:
           break;
       }
+
+      // Add analytics event for plot purchase
+      analyticsEvent(Events.BUILD_PLOT, {
+        plot_type: plotChosen.id,
+        x: x.toString(),
+        y: y.toString(),
+        difficulty: z.difficulty,
+        end_goal: z.endGoal,
+        settings: z.settings.join(","),
+      });
 
       DB.set(z);
       localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));

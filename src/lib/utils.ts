@@ -9,6 +9,27 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function analyticsEvent(
+  z: Game,
+  event: string,
+  params: Record<string, string>,
+) {
+  let globalParams = {
+    townName: z.townInfo.name,
+    population: z.townInfo.population_count,
+    gold: z.townInfo.gold,
+    day: z.environment.day * z.environment.year,
+    tick: z.tick,
+  };
+
+  const eventParams = params;
+  const allParams = { ...globalParams, ...eventParams };
+
+  // This works, even though it says it won't. It rolls up to index.html.
+  // @ts-ignore
+  gtag("event", event, allParams);
+}
+
 type FlyAndScaleParams = {
   y?: number;
   x?: number;

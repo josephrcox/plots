@@ -27,6 +27,11 @@ export enum Vibe {
   NORMAL,
 }
 
+export enum Events {
+  START_GAME = "start_game",
+  BUILD_PLOT = "build_plot",
+}
+
 export type TownLog = {
   message: string;
   vibe: Vibe | Vibe.NORMAL;

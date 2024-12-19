@@ -10,19 +10,12 @@
   } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import { flyAndScale } from "$lib/utils";
+  import { analyticsEvent, flyAndScale } from "$lib/utils";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import { Difficulty, EndGoal, WinScenario } from "$lib/types";
+  import { Difficulty, EndGoal, Events, WinScenario } from "$lib/types";
   // @ts-ignore
   import { winScenarios } from "../objects/WinScenarios";
-
-  // @ts-ignore
-  gtag("event", "start_game", {
-    difficulty: "1",
-    end_goal: "1",
-    game_settings: "1",
-  });
 
   paused.set(false);
   const showDifficulty = false;
@@ -43,6 +36,13 @@
 
     const dif = difficulty as Difficulty;
     const eg = endGoal as EndGoal;
+
+    analyticsEvent(Events.START_GAME, {
+      difficulty: dif,
+      end_goal: eg,
+      settings: settings.join(","),
+    });
+
     startGame(dif, eg, townName, settings);
   }
 
