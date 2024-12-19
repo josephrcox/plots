@@ -14,6 +14,8 @@
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-svelte": "^3.2.3",
     "svelte": "^4.2.7",
     "svelte-check": "^3.6.0",
     "tslib": "^2.4.1",
@@ -21,14 +23,18 @@
     "vite": "^5.0.3"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.13",
     "@types/d3": "^7.4.3",
     "autoprefixer": "^10.4.17",
-    "bits-ui": "^0.18.1",
-    "clsx": "^2.1.0",
+    "bits-ui": "^0.18.6",
+    "clsx": "^2.1.1",
     "d3": "^7.8.5",
     "lucide-svelte": "^0.378.0",
+    "svelte-confetti": "^2.0.1",
+    "svelte-language-server": "^0.16.9",
     "tailwind-merge": "^2.2.1",
-    "tailwind-variants": "^0.2.0"
+    "tailwind-variants": "^0.2.0",
+    "url": "^0.11.3"
   },
   "description": "Plots is a zoning management game with an emphasis on a basic plot grid system. You can build homes, businesses, and special plots to grow your city toward different objectives.",
   "main": "tailwind.config.js",
