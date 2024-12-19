@@ -2,11 +2,12 @@ import { writable } from "svelte/store";
 // @ts-ignore
 import { default_db, default_user_db } from "./objects/defaults/default_DB.js";
 // @ts-ignore
-import { Difficulty, EndGoal, Game, UserDatabase, Plot } from "./types";
+import { Difficulty, EndGoal, Game, UserDatabase, Plot, Events } from "./types";
 // @ts-ignore
 import { max_tax_rates_based_on_difficulty } from "./objects/difficulty.js";
 // @ts-ignore
 import { options } from "./objects/PlotTypeOptions";
+import { analyticsEvent } from "./utils.js";
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -508,6 +509,13 @@ export function startGame(
   localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
   DB.set(json); // Update the store with the new value
   localStorage.reset = false;
+
+  analyticsEvent(json, Events.START_GAME, {
+    difficulty: difficulty,
+    end_goal: endGoal,
+    settings: gameSettings.join(","),
+  });
+
   location.reload();
 }
 

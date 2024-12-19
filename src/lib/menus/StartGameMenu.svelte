@@ -37,12 +37,6 @@
     const dif = difficulty as Difficulty;
     const eg = endGoal as EndGoal;
 
-    analyticsEvent($DB, Events.START_GAME, {
-      difficulty: dif,
-      end_goal: eg,
-      settings: settings.join(","),
-    });
-
     startGame(dif, eg, townName, settings);
   }
 
