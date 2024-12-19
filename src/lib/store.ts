@@ -549,6 +549,7 @@ export function reverseClear(x: number, y: number, z: any) {
   // TODO: Use Game as type for z instead of any.
   let oldPlotType = z.plots[x][y].type;
   z.plots[x][y].type = -1;
+  z.plots[x][y].typeId = "";
   z.plots[x][y].active = false;
 
   if (oldPlotType > -1) {

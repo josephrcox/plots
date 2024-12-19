@@ -17,6 +17,13 @@
   // @ts-ignore
   import { winScenarios } from "../objects/WinScenarios";
 
+  // @ts-ignore
+  gtag("event", "start_game", {
+    difficulty: "1",
+    end_goal: "1",
+    game_settings: "1",
+  });
+
   paused.set(false);
   const showDifficulty = false;
 

@@ -269,6 +269,11 @@
 
     if (plotOption) {
       const plotOptionID = plotOption.dataset.plotoptionid;
+
+      if (plotOptionID === $DB.plots[x][y].typeId) {
+        clearPlot();
+        return;
+      }
       choosePlotOption(plotOptionID);
     }
   }
