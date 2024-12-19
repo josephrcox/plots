@@ -45,7 +45,7 @@
 
 <div
   class="flex flex-row text-sidebarText bg-sidebarBackground overflow-clip {$modifyPlotMenuOptions.visible
-    ? 'opacity-70'
+    ? 'opacity-10'
     : ''}"
 >
   <div
