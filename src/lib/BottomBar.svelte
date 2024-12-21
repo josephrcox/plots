@@ -835,7 +835,7 @@
           >
             <div>
               <div
-                class="flex flex-row text-start justify-start items-start flex-wrap py-8
+                class="flex flex-row text-start justify-start items-start flex-wrap py-8 px-8
               {$modifyPlotMenuOptions.isMineralSource
                   ? 'pt-6 gap-2'
                   : 'pt-6 gap-2'} w-full align-middle"

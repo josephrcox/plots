@@ -94,7 +94,8 @@
                 <span class="flex flex-col">
                   <span class="text-xs">Year</span>
                   <span class="font-semibold text-xs">
-                    {Math.floor($DB.environment.day / 365) + 1}
+                    {Math.floor($DB.environment.day / 365) + 1} ({$DB
+                      .environment.day})
                   </span>
                 </span>
                 <span class="flex flex-col">

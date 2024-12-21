@@ -10,6 +10,7 @@
     pauseMenuTab,
     showAchievementPopup,
     showCustomAlert,
+    ACTIVE_GAME_DB_NAME,
   } from "../store";
   import * as Dialog from "$lib/components/ui/dialog";
   // @ts-ignore
@@ -172,6 +173,8 @@
   function restartGame() {
     $paused = true;
     localStorage.setItem("reset", "true");
+    $DB = null;
+    localStorage.removeItem(ACTIVE_GAME_DB_NAME);
     //location.reload();
     clearDB();
   }

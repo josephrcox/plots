@@ -14,8 +14,8 @@
   let styleIndex = 0;
 
   let sizes = [
+    `margin-left: -50px; margin-top: -50px; scale: 0.6;`,
     `margin-left: 300px; margin-top: 200px; scale: 1;`,
-    // `margin-left: 650px; margin-top: 600px; scale: 1.5;`,
     `margin-left: 650px; margin-top: 600px; scale: 1.5;`,
   ];
 
@@ -24,7 +24,7 @@
   }
 
   document.addEventListener("keypress", function (e) {
-    if (e.key === "*") {
+    if (e.key === "z") {
       styleIndex == sizes.length - 1 ? (styleIndex = 0) : styleIndex++;
     }
   });

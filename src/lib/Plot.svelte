@@ -8,6 +8,8 @@
     settingLiegeLocation,
     setLiegeLocation,
     isLiegeOnPlot,
+    disabledPlotMenu,
+    reverseClear,
   } from "./store.ts";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import PlotTooltip from "./PlotTooltip.svelte";
@@ -31,6 +33,13 @@
   $: {
     if (data.type > -1) {
       currentPlotOption = options[data.type];
+    }
+    if (data.disabled == true && $disabledPlotMenu.visible == false) {
+      // The user closed the disabledplotmenu instead of snoozing or bulldozing.
+      // We need to bulldoze the plot.
+      reverseClear(data.x, data.y, $DB);
+      data.disabled = false;
+      $disabledPlotMenu.visible = false;
     }
   }
   export let classText = "";
@@ -125,7 +134,6 @@
         : ''} {data.mineralSource ? 'hidden' : ''} {canBeUpgraded
         ? 'cursor-pointer'
         : 'cursor-not-allowed'}
-	{data.disabled ? 'animate-spin' : ''}
 		"
       style="background-color: {data.water
         ? 'rgba(66, 135, 245, 1)'

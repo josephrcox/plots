@@ -47,7 +47,9 @@
       <div
         class="flex flex-col w-36 h-48 min-h-32 min-w-36 rounded-xl text-white drop-shadow-lg border-black border-2 hover:translate-y-[-8px] transition-transform duration-300 ease-in-out z-100
 
-        {canPurchase ? 'cursor-pointer' : 'cursor-not-allowed opacity-30'}
+        {canPurchase || option.selected
+          ? 'cursor-pointer'
+          : 'cursor-not-allowed opacity-30'}
         {option.selected ? 'border-4 border-white scale-105' : ''}
             
         "
@@ -61,7 +63,11 @@
           <span class="font-medium text-center text-md">
             {name}
           </span>
-          {#if subtitle}
+          {#if option.selected}
+            <span class="text-[11px] text-wrap text-yellow-300"
+              >Click to bulldoze
+            </span>
+          {:else if subtitle}
             <span class="text-[11px] text-wrap">{subtitle} </span>
           {/if}
         </div>

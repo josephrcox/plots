@@ -1,6 +1,7 @@
 export type Difficulty = "0" | "1" | "2" | "3";
 export type EndGoal = "land";
 export type Plot = {
+  referencePlot: any;
   id: string;
   active: boolean;
   x: number;
@@ -10,6 +11,7 @@ export type Plot = {
   typeId: string;
   mineralSource: boolean;
   water: boolean;
+  snoozedUntil?: number;
 };
 
 export type Law = {

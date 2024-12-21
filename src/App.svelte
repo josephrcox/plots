@@ -3,6 +3,7 @@
   import GameClock from "./lib/gameClock.svelte";
   import Header from "./lib/Header.svelte";
   import PauseMenu from "./lib/menus/PauseMenu.svelte";
+  import DisabledPlotMenu from "./lib/menus/DisabledPlotMenu.svelte";
 
   import {
     paused,
@@ -14,6 +15,11 @@
     showWelcome,
     settingLiegeLocation,
     setLiegeLocation,
+    disabledPlotMenu,
+    showKnowledgeMenu,
+    showCityHallMenu,
+    showLabMenu,
+    showScoreboard,
     // @ts-ignore
   } from "./lib/store.ts";
   // @ts-ignore
@@ -117,34 +123,51 @@
     let key = e.key.toLowerCase();
     switch (key) {
       case "p":
-        if ($paused == true) {
-          paused.set(false);
-          let z = $DB;
-          z.modifiers.happiness = 2;
-          z.modifiers.health = 2;
-          $DB = z;
-        } else {
-          paused.set(true);
-          $modifyPlotMenuOptions.visible = false;
-        }
-        break;
       case "escape":
-        if (e.shiftKey) {
-          $paused = true;
-          localStorage.setItem("reset", "true");
-          // location.reload();
-          clearDB();
-        } else {
-          if ($modifyPlotMenuOptions.visible == true) {
-            $modifyPlotMenuOptions.visible = false;
-          }
+        // Check for any open menus first
+        if ($showKnowledgeMenu) {
+          $showKnowledgeMenu = false;
+          break;
         }
-        if ($settingLiegeLocation == true) {
+        if ($showLabMenu) {
+          $showLabMenu = false;
+          break;
+        }
+        if ($showCityHallMenu) {
+          $showCityHallMenu = false;
+          break;
+        }
+        if ($showScoreboard) {
+          $showScoreboard = false;
+          break;
+        }
+        if ($modifyPlotMenuOptions.visible) {
+          $modifyPlotMenuOptions.visible = false;
+          break;
+        }
+        if ($disabledPlotMenu.visible) {
+          // If disabled plot menu is open, close it and bulldoze the plot
+          const plot = $DB.plots[$disabledPlotMenu.x][$disabledPlotMenu.y];
+          plot.active = false;
+          plot.type = -1;
+          plot.disabled = false;
+          $disabledPlotMenu.visible = false;
+          break;
+        }
+        if ($settingLiegeLocation) {
           settingLiegeLocation.set(false);
           const plots = document.querySelectorAll(".plot_container");
           plots.forEach((plot: any) => {
             plot.style.cursor = "";
           });
+          break;
+        }
+
+        // If no menus are open, toggle pause state
+        paused.set(!$paused);
+        // Ensure menus are closed when pausing
+        if ($paused) {
+          $modifyPlotMenuOptions.visible = false;
         }
         break;
 
@@ -282,6 +305,7 @@
     <LabMenu />
     <CityHallMenu />
     <CustomAlert />
+    <DisabledPlotMenu />
     {#if $DB.environment.day == 0 && $showWelcome}
       <WelcomeScreen />
     {/if}

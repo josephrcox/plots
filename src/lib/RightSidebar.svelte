@@ -276,11 +276,11 @@
           </div>
         </h1>
 
-        <Tooltip.Content class="text-sm w-[200px]">
+        <Tooltip.Content class="text-sm max-h-[200px] overflow-y-scroll">
           <div class="text-sm">
-            Resources are generated from plots. Generation rate can be increased
-            by raising the productivity of the town, at the cost of some
-            happiness.
+            ℹ️ Resources are generated from plots. Generation rate can be
+            increased by raising the productivity of the town, at the cost of
+            some happiness.
             <br />
             <br />
             There is also a slight bit of randomness as townspeople aren't robots.
@@ -333,32 +333,32 @@
             </span>
             <TooltipContent>
               <div
-                class="flex flex-col gap-2 whitespace-nowrap min-w-fit bg-gray-600/90 p-3 rounded-lg text-white"
+                class="flex flex-col gap-2 whitespace-nowrap min-w-fit rounded-lg text-black"
               >
-                <span class="text-md font-bold"
-                  >{icon} {capitalizeFirstLetter(name)}</span
-                >
-                {#if rate > 0}
-                  <span class="text-green-200">+{rate} (weekly)</span>
-                {:else if rate < 0}
-                  <span class="text-red-200">{rate} (weekly)</span>
-                {:else if rate != null}
-                  <span class="text-blue-200">+{rate} (weekly)</span>
-                {:else}
-                  <span class="display-none" />
-                {/if}
+                <div>
+                  <span class="text-md font-bold"
+                    >{icon} {capitalizeFirstLetter(name)}</span
+                  >
+                  {#if rate > 0}
+                    <span class="text-textHappy">+{rate} (weekly)</span>
+                  {:else if rate < 0}
+                    <span class="text-textDanger">{rate} (weekly)</span>
+                  {:else if rate != null}
+                    <span class="text-gray-600">+{rate} (weekly)</span>
+                  {:else}
+                    <span class="display-none" />
+                  {/if}
+                </div>
 
                 {#if getRequiredPlots(name).length > 0}
                   <Separator class="bg-gray-400" />
-                  <span class="text-sm font-semibold text-gray-100"
-                    >Required for</span
-                  >
+                  <span class="text-sm font-semibold">Required for</span>
+                  <div class="grid grid-cols-3 justify-between">
+                    {#each getRequiredPlots(name) as plot}
+                      <span class="text-xs pr-3">{plot}</span>
+                    {/each}
+                  </div>
                 {/if}
-                <div class="flex flex-col flex-wrap min-w-full">
-                  {#each getRequiredPlots(name) as plot}
-                    <span class="text-xs mr-4 text-gray-100">{plot}</span>
-                  {/each}
-                </div>
               </div>
             </TooltipContent>
           </Tooltip.Trigger>

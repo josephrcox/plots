@@ -13,6 +13,7 @@
     showTutorialStepConfetti,
     showCustomAlert,
     isLiegeOnPlot,
+    disabledPlotMenu,
   } from "./store";
   // @ts-ignore
   import { messages } from "./objects/TownLogMessages.js";
@@ -123,6 +124,7 @@
         return currentDB;
       }
       if (
+        $disabledPlotMenu.visible ||
         $paused ||
         !currentDB ||
         (currentDB.endGameDetails.msg !== "" && currentDB.overtime == false) ||
@@ -131,6 +133,8 @@
         console.info("The game is over, or paused. Not running the game loop.");
         return currentDB;
       }
+
+      console.log($disabledPlotMenu.visible);
 
       try {
         currentDB.environment.day += 1;
@@ -676,7 +680,11 @@
     // This iterates over each plot that is placed, and generates resources based on the plot type.
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
-        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+        if (
+          z.plots[i][j].active == true &&
+          z.plots[i][j].type > -1 &&
+          z.plots[i][j].disabled == false
+        ) {
           // check if the plot is adjacent to a water plot
           let nearWater = isAdjacentToWater(i, j, z);
           let liegeBonus = isLiegeOnPlot(i, j, z) ? 2 : 1;
@@ -730,52 +738,74 @@
   }
 
   function _handleActiveCosts(z: Game) {
-    // Some plots have active costs which can be found at let plotOptionForPlot = options[z.plots[i][j].type].active_costs with keys.
-    // This function reads the active costs, and checks if we have enough resources for each to cover.
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
-        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+        // Only check active plots that aren't already disabled
+        if (
+          z.plots[i][j].active &&
+          z.plots[i][j].type > -1 &&
+          !z.plots[i][j].disabled
+        ) {
           let plotOptionForPlot = options[z.plots[i][j].type];
-          // Iterate over the keys of active_costs
           let toBeDisabled = false;
+          let missingResources: string[] = [];
+
+          // Check if plot is snoozed first
+          const isSnoozed =
+            z.plots[i][j].snoozedUntil &&
+            z.environment.day <= (z.plots[i][j].snoozedUntil || 0);
+
+          // Check resources
           Object.keys(plotOptionForPlot.active_costs).forEach(
             (resource, index) => {
               const requiredQuantity = Object.values(
                 plotOptionForPlot.active_costs,
               )[index];
-              // Power is handled by _calculatePower function
               if (resource != "power") {
                 if (resource == "gold") {
                   if (z.townInfo.gold < requiredQuantity) {
                     toBeDisabled = true;
-                  } else {
+                    missingResources.push(
+                      `💰${requiredQuantity - z.townInfo.gold} gold`,
+                    );
+                  } else if (!isSnoozed) {
                     z.townInfo.gold -= requiredQuantity;
                   }
                 } else {
                   if (z.resources[resource as ResourceKey] < requiredQuantity) {
                     toBeDisabled = true;
-                  } else {
+                    missingResources.push(
+                      `${requiredQuantity - z.resources[resource as ResourceKey]} ${resource}`,
+                    );
+                  } else if (!isSnoozed) {
                     z.resources[resource as ResourceKey] -= requiredQuantity;
                   }
                 }
               }
             },
           );
-          // A plot is disabled if it can not afford the active costs.
-          z.plots[i][j].disabled = toBeDisabled;
-          if (z.plots[i][j].disabled) {
-            z.townInfo.happiness -= 1;
-          }
 
-          if (
-            toBeDisabled &&
-            options[z.plots[i][j].type].type == "residential"
-          ) {
-            z.townInfo.population_count -= 1;
-            z.townInfo.employees -= 1;
+          // Only show warning if plot will be disabled and isn't snoozed
+          if (toBeDisabled && !isSnoozed) {
+            disabledPlotMenu.set({
+              visible: true,
+              plotName: plotOptionForPlot.title,
+              location: `at (${j}, ${i})`,
+              missingResources,
+              plotCost: plotOptionForPlot.requirements.gold,
+              x: i,
+              y: j,
+            });
+            // Set disabled status
+            z.plots[i][j].disabled = true;
           }
+          // Set disabled status based on both snooze status and resource availability
+          z.plots[i][j].disabled = !isSnoozed && toBeDisabled;
         } else {
-          z.plots[i][j].disabled = false;
+          // Only clear disabled status if plot is not active
+          if (!z.plots[i][j].active) {
+            z.plots[i][j].disabled = false;
+          }
         }
       }
     }
@@ -1287,6 +1317,14 @@
     if (z.modifiers.community > 2) {
       z.modifiers.community = 2;
     }
+
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == false && z.plots[i][j].disabled == true) {
+          z.plots[i][j].disabled = false;
+        }
+      }
+    }
     return z;
   }
 
@@ -1369,54 +1407,25 @@
     for (let i = 0; i < z.plots.length; i++) {
       for (let j = 0; j < z.plots[i].length; j++) {
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
-          if (z.plots[i][j].disabled === true) {
-            // Don't collect profits from this. Instead, cost the amount that it's meant to generate.
-            const plotOptionForPlot = options[z.plots[i][j].type];
-            const profit = Math.round(
-              (getProfit(
-                plotOptionForPlot.revenue_per_week,
-                z,
-                plotOptionForPlot.type,
-                i,
-                j,
-              ) *
-                (z.townInfo.productivity / 100)) /
-                7,
-            );
-
-            z.townInfo.gold -= profit;
-            z.townInfo.happiness -= 1;
-
-            z = addToTownLog(
-              `🚨 ${plotOptionForPlot.title} at ${j}, ${i} is disabled and costing you $${profit} a week! 
-              
-              It is also lowering overall happiness by 1. Look at available resources and fix the problem! `,
+          // Iterate through all plots and do actions based on their conditions
+          const plotOptionForPlot = options[z.plots[i][j].type];
+          let profit =
+            (getProfit(
+              plotOptionForPlot.revenue_per_week,
               z,
-              Vibe.BAD,
-            );
-          } else {
-            // Iterate through all plots and do actions based on their conditions
-            const plotOptionForPlot = options[z.plots[i][j].type];
-            let profit =
-              (getProfit(
-                plotOptionForPlot.revenue_per_week,
-                z,
-                plotOptionForPlot.type,
-                i,
-                j,
-              ) *
-                (z.townInfo.productivity / 100)) /
-              7;
+              plotOptionForPlot.type,
+              i,
+              j,
+            ) *
+              (z.townInfo.productivity / 100)) /
+            7;
 
-            let nearWater = isAdjacentToWater(i, j, z);
-            const casualGameModifier = z.gameSettings.includes("casual")
-              ? 3
-              : 1;
-            profit *= casualGameModifier;
-            profit *= nearWater ? 2 : 1;
-            z.townInfo.gold += profit;
-            z.economyAndLaws.weeklyProfit += profit * 7;
-          }
+          let nearWater = isAdjacentToWater(i, j, z);
+          const casualGameModifier = z.gameSettings.includes("casual") ? 3 : 1;
+          profit *= casualGameModifier;
+          profit *= nearWater ? 2 : 1;
+          z.townInfo.gold += profit;
+          z.economyAndLaws.weeklyProfit += profit * 7;
         }
       }
     }
@@ -1515,12 +1524,16 @@
       profitModifiers *= 1.5;
     }
 
+    const option = options[z.plots[x][y].type];
+    let activeGoldCost = option.active_costs.gold;
+
     let profit = Math.round(
       revenue *
         z.economyAndLaws.tax_rate *
         (z.townInfo.population_count / z.townInfo.population_max) *
         profitModifiers *
-        (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1),
+        (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1) -
+        activeGoldCost,
     );
     return roundTo(profit, 2);
   }

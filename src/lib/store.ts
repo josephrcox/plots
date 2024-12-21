@@ -451,6 +451,10 @@ export function startGame(
   townName: string,
   gameSettings: string[],
 ) {
+  // clear DB
+  localStorage.removeItem(ACTIVE_GAME_DB_NAME);
+  DB.set(null);
+
   let json: Game = { ...default_db }; // Use a copy of default_db
   json.gameSettings = gameSettings;
   json.economyAndLaws.max_tax_rate =
@@ -553,7 +557,7 @@ function roundTo(n: number, digits: number) {
   return +test.toFixed(digits);
 }
 
-export function reverseClear(x: number, y: number, z: any) {
+export function reverseClear(x: number, y: number, z: Game) {
   // TODO: Use Game as type for z instead of any.
   let oldPlotType = z.plots[x][y].type;
   z.plots[x][y].type = -1;
@@ -654,6 +658,7 @@ export function expandTown(z: Game, direction: string) {
         mineralSource: false,
         water: isWater(i, j, numRows + newRows),
         disabled: false,
+        referencePlot: null,
       });
     }
   }
@@ -752,3 +757,12 @@ export let pauseMenuTab =
     : writable("achievements");
 export let headerHeight = writable(250);
 export let speed = writable(750);
+export let disabledPlotMenu = writable({
+  visible: false,
+  plotName: "",
+  location: "",
+  missingResources: [] as string[],
+  plotCost: 0,
+  x: 0,
+  y: 0,
+});
