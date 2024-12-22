@@ -301,13 +301,15 @@
             text="🔄 New Game"
             onOpen={restartGame}
           />
-          <SimpleButton
-            styling="bg-black opacity-50 w-min"
-            text="🔄 New mock town"
-            onOpen={() => {
-              createAMockTown($DB);
-            }}
-          />
+          {#if $DB.gameSettings.includes("devMode")}
+            <SimpleButton
+              styling="bg-black opacity-50 w-min"
+              text="🔄 New mock town"
+              onOpen={() => {
+                createAMockTown($DB);
+              }}
+            />
+          {/if}
         </div>
       </div>
       <Separator orientation="vertical" />
