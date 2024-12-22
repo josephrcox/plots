@@ -8,6 +8,7 @@
     isAdjacentToPlots,
     checkIfPlotCanBeUpgraded,
     analyticsEvent,
+    findClosestPlot,
   } from "./utils";
   import {
     DB,
@@ -123,42 +124,6 @@
   }
 
   // Optimized closest plot finder
-  function findClosestPlot(startX: number, startY: number, z: Game) {
-    // Early return if no valid plots possible
-    if (!z || !z.plots || !z.plots.length) return null;
-
-    const maxX = z.plots.length;
-    const maxY = z.plots[0].length;
-
-    // Search in expanding squares from the start position
-    for (let dist = 1; dist < maxX + maxY; dist++) {
-      // Check plots at current distance
-      for (let dx = -dist; dx <= dist; dx++) {
-        for (let dy = -dist; dy <= dist; dy++) {
-          // Only check plots at exactly distance 'dist'
-          if (Math.abs(dx) + Math.abs(dy) !== dist) continue;
-
-          const i = startX + dx;
-          const j = startY + dy;
-
-          // Skip if out of bounds
-          if (i < 0 || i >= maxX || j < 0 || j >= maxY) continue;
-
-          if (
-            !z.plots[i][j].active &&
-            !z.plots[i][j].mineralSource &&
-            !z.plots[i][j].water &&
-            !z.plots[i][j].disabled &&
-            checkIfPlotCanBeUpgraded(i, j, z)
-          ) {
-            return [i, j]; // Return first valid plot at this distance
-          }
-        }
-      }
-    }
-
-    return null;
-  }
 
   function isSelected(option: PlotOption) {
     return $DB.plots[x][y].type > -1

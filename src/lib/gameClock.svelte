@@ -42,7 +42,6 @@
     db = _checkSpecialPlots(db);
     db = _adjustKnowledgeGoldMarketRates(db);
     db = _bringModifiersBackToNormal(db);
-
     db = _warnUser(db);
     const startResources = {
       food: db.resources.food,
@@ -54,7 +53,6 @@
     };
     db = _generateResources(db);
     db = _lawEffects(db);
-    db = _handleActiveCosts(db);
     db = _calculatePower(db);
     db = _calculateKnowledge(db);
     db = _feedCitizens(db);
@@ -95,6 +93,7 @@
   }
 
   function performDailyTasks(db: Game) {
+    db = _handleActiveCosts(db);
     db = _calculateProfits(db);
     db = _fixVariables(db);
     db = _checkExperiment(db);
@@ -270,7 +269,7 @@
           Vibe.BAD,
         );
       } else {
-        z.modifiers.happiness * 1.01;
+        z.modifiers.happiness * 1.03;
         z = addToTownLog(
           "The city is growing and citizens are happy with the amount of recreation available.",
           z,
@@ -747,6 +746,11 @@
           !z.plots[i][j].disabled
         ) {
           let plotOptionForPlot = options[z.plots[i][j].type];
+          if (plotOptionForPlot.type == "residential") {
+            // TODO will add later. Far more complex because businesses can't operate without the people.
+            // So we have to decide whether or not to disable plots where the residents work. Oh jeez.
+            continue;
+          }
           let toBeDisabled = false;
           let missingResources: string[] = [];
 
@@ -758,9 +762,11 @@
           // Check resources
           Object.keys(plotOptionForPlot.active_costs).forEach(
             (resource, index) => {
-              const requiredQuantity = Object.values(
+              let requiredQuantity = Object.values(
                 plotOptionForPlot.active_costs,
               )[index];
+              // Adjust for daily cost from weekly cost.
+              requiredQuantity = requiredQuantity / 7;
               if (resource != "power") {
                 if (resource == "gold") {
                   if (z.townInfo.gold < requiredQuantity) {
@@ -848,19 +854,19 @@
     endResources: resourceObject,
   ) {
     // This function calculates the rate of resource generation per week
-    z.resource_rate.food = roundTo(endResources.food - startResources.food, 2);
-    z.resource_rate.wood = roundTo(endResources.wood - startResources.wood, 2);
+    z.resource_rate.food = roundTo(endResources.food - startResources.food, 0);
+    z.resource_rate.wood = roundTo(endResources.wood - startResources.wood, 0);
     z.resource_rate.stone = roundTo(
       endResources.stone - startResources.stone,
-      2,
+      0,
     );
     z.resource_rate.metal = roundTo(
       endResources.metal - startResources.metal,
-      2,
+      0,
     );
     z.resource_rate.bureaucracy = roundTo(
       endResources.bureaucracy - startResources.bureaucracy,
-      2,
+      0,
     );
     return z;
   }
@@ -1535,7 +1541,7 @@
         (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1) -
         activeGoldCost,
     );
-    return roundTo(profit, 2);
+    return roundTo(profit, 0);
   }
 
   function roundTo(n: number, digits: number) {

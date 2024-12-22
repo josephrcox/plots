@@ -486,7 +486,7 @@ export const options: PlotOption[] = [
     },
     level: 1,
     active_costs: {
-      gold: 30,
+      gold: 15,
       power: 0,
       wood: 0,
       stone: 0,
@@ -1313,7 +1313,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 75,
     requirements: {
       gold: 15000,
-      plots: ["lumber_mill"],
+      plots: ["library"],
       employees: 16,
       knowledge: 0,
       size: 1,
@@ -1437,7 +1437,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 10,
     requirements: {
       gold: 2000,
-      plots: ["lumber_mill"],
+      plots: ["village_market"],
       employees: 6,
       knowledge: 0,
       size: 1,
@@ -2123,7 +2123,7 @@ export const typeColors: any = {
   science: "rgba(74,91,163,1.0)", // #4a5ba3
   mine: "rgba(217,135,74,1.0)", // #d9874a
   quarry: "rgba(134,134,133,1.0)", // #868685
-  industrial: "rgba(134,134,21,1.0)", // #868615
+  industrial: "rgba(22, 80, 135,0.8)", // #868615
   stockpile: "rgba(134,134,133,1.0)", // #868685
 };
 

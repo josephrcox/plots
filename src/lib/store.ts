@@ -523,7 +523,7 @@ export function startGame(
   location.reload();
 }
 
-function isWater(x: number, y: number, maxSize: number) {
+export function isWater(x: number, y: number, maxSize: number) {
   let chance = 0.08; // default chance of being water.
   if (x > 0 && y > 0 && x < maxSize - 1 && y < maxSize - 1) {
     chance *= 2;
