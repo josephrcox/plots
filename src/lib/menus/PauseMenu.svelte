@@ -26,6 +26,7 @@
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import SimpleButton from "$lib/components/SimpleButton.svelte";
+  import { createAMockTown } from "$lib/utils";
   const scenarios: any = winScenarios;
   const endGoal = scenarios[$DB.endGoal];
   const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -299,6 +300,13 @@
             styling="bg-black opacity-50 w-min"
             text="🔄 New Game"
             onOpen={restartGame}
+          />
+          <SimpleButton
+            styling="bg-black opacity-50 w-min"
+            text="🔄 New mock town"
+            onOpen={() => {
+              createAMockTown($DB);
+            }}
           />
         </div>
       </div>

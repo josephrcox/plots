@@ -4,6 +4,14 @@ import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
 import { options } from "./objects/PlotTypeOptions";
 import { Game } from "./types";
+import {
+  hasPlotOfType,
+  reverseClear,
+  ACTIVE_GAME_DB_NAME,
+  isWater,
+  DB,
+} from "./store";
+import { default_db } from "./objects/defaults/default_DB";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -308,4 +316,227 @@ export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
     const adjacentPlotData = z.plots[adjacentPlot.x][adjacentPlot.y];
     return adjacentPlotData.active;
   });
+}
+
+export function checkIfAffordable(plotChosen: any, z: Game) {
+  let requirementsMet = true;
+  let onlyEmploymentFailing = true;
+
+  // Check all non-employment requirements first
+  if (plotChosen.requirements.gold > z.townInfo.gold) {
+    requirementsMet = false;
+    onlyEmploymentFailing = false;
+  }
+
+  if (plotChosen.requirements.knowledge !== undefined) {
+    if (plotChosen.requirements.knowledge > z.townInfo.knowledge_points) {
+      requirementsMet = false;
+      onlyEmploymentFailing = false;
+    }
+  }
+
+  // check if the user has the required plots
+  if (plotChosen.requirements.plots.length > 0) {
+    plotChosen.requirements.plots.forEach((plot: string) => {
+      if (hasPlotOfType(plot, z).length === 0) {
+        requirementsMet = false;
+        onlyEmploymentFailing = false;
+      }
+    });
+  }
+
+  return requirementsMet;
+}
+
+function getTypeIndex(typeId: string): number {
+  return options.findIndex((option) => option.id === typeId);
+}
+
+function choosePlotOption(
+  plotOptionID: string,
+  x: number,
+  y: number,
+  z: Game,
+  resourceOverride: boolean = false,
+) {
+  const typeIndex = getTypeIndex(plotOptionID);
+  const plotChosen = options[typeIndex];
+
+  if (resourceOverride || checkIfAffordable(plotChosen, z)) {
+    if (z.plots[x][y].type !== -1) {
+      reverseClear(x, y, z);
+    }
+
+    z.plots[x][y].type = typeIndex;
+    z.plots[x][y].active = true;
+    z.plots[x][y].referencePlot = [];
+    z.plots[x][y].typeId = plotChosen.id;
+    z.townInfo.gold -= plotChosen.requirements.gold;
+    z.townInfo.gold = roundTo(z.townInfo.gold, 2);
+    // Immediate variable changes
+    z.townInfo.population_count +=
+      plotChosen.immediate_variable_changes.population;
+    z.townInfo.population_max +=
+      plotChosen.immediate_variable_changes.population;
+    z.townInfo.happiness += plotChosen.immediate_variable_changes.happiness;
+    z.townInfo.health += plotChosen.immediate_variable_changes.health;
+    // Effect modifiers
+    z.modifiers.happiness = roundTo(
+      z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
+      2,
+    );
+    z.modifiers.health = roundTo(
+      z.modifiers.health * plotChosen.effect_modifiers.health,
+      2,
+    );
+    z.modifiers.community = roundTo(
+      z.modifiers.community * plotChosen.effect_modifiers.community,
+      2,
+    );
+    // Employer modifications
+    z.townInfo.employees += plotChosen.requirements.employees;
+
+    // Plot count
+    if (
+      z.plotCounts[typeIndex] === undefined ||
+      z.plotCounts[typeIndex] === null
+    ) {
+      z.plotCounts[typeIndex] = 0;
+    }
+    z.plotCounts[typeIndex]++;
+    z.lastChangeDay = z.environment.day;
+
+    if (plotChosen.requirements.resources !== undefined) {
+      const resourcesForPlot = plotChosen.requirements.resources;
+      z.resources.food -= resourcesForPlot.food;
+      z.resources.wood -= resourcesForPlot.wood;
+      z.resources.stone -= resourcesForPlot.stone;
+      z.resources.metal -= resourcesForPlot.metal;
+    }
+
+    switch (plotChosen.id) {
+      case "city_hall":
+        z.hasCityHall = true;
+        break;
+      case "bank":
+        z.hasBank = true;
+        break;
+      default:
+        break;
+    }
+
+    return z;
+  }
+  return z;
+}
+
+export function findClosestPlot(startX: number, startY: number, z: Game) {
+  // Early return if no valid plots possible
+  if (!z || !z.plots || !z.plots.length) return null;
+
+  const maxX = z.plots.length;
+  const maxY = z.plots[0].length;
+
+  // Search in expanding squares from the start position
+  for (let dist = 1; dist < maxX + maxY; dist++) {
+    // Check plots at current distance
+    for (let dx = -dist; dx <= dist; dx++) {
+      for (let dy = -dist; dy <= dist; dy++) {
+        // Only check plots at exactly distance 'dist'
+        if (Math.abs(dx) + Math.abs(dy) !== dist) continue;
+
+        const i = startX + dx;
+        const j = startY + dy;
+
+        // Skip if out of bounds
+        if (i < 0 || i >= maxX || j < 0 || j >= maxY) continue;
+
+        if (
+          !z.plots[i][j].active &&
+          !z.plots[i][j].mineralSource &&
+          !z.plots[i][j].water &&
+          !z.plots[i][j].disabled &&
+          checkIfPlotCanBeUpgraded(i, j, z)
+        ) {
+          return [i, j]; // Return first valid plot at this distance
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+export function createAMockTown(z: Game) {
+  let json = { ...default_db };
+  json.difficulty = 1;
+  json.endGoal = "land";
+  json.townInfo.name = "Mock Town";
+  json.townInfo.gold = Math.random() * 50000 + 20000;
+  json.townInfo.happiness = 300;
+  json.townInfo.health = 300;
+  json.townInfo.knowledge_points = Math.random() * 1000 + 100;
+  json.modifiers.happiness = 10000;
+  json.modifiers.health = 10000;
+  json.resources.food = Math.random() * 10000 + 1000;
+  json.resources.wood = Math.random() * 10000 + 1000;
+  json.resources.stone = Math.random() * 10000 + 1000;
+  json.resources.metal = Math.random() * 10000 + 1000;
+
+  let default_plots = [] as any[][];
+
+  const randomSize = 25;
+  const mineX = Math.floor((Math.random() * randomSize) / 2) + 1;
+  const mineY = Math.floor((Math.random() * randomSize) / 2) + 1;
+
+  for (let i = 0; i < randomSize; i++) {
+    default_plots.push([]);
+    for (let j = 0; j < randomSize; j++) {
+      const water =
+        i == mineX && j == mineY ? false : isWater(i, j, randomSize);
+
+      default_plots[i][j] = {
+        id: Math.random().toString(36).substring(2, 9),
+        active: false,
+        x: i,
+        y: j,
+        type: water ? -9 : -1,
+        typeId: "",
+        mineralSource: water
+          ? false
+          : mineX === i && mineY === j
+            ? true
+            : false,
+        water: mineX === i && mineY === j ? false : water,
+      };
+    }
+  }
+
+  json.plots = default_plots;
+  DB.set(json);
+  localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
+  localStorage.reset = false;
+
+  // Always place a small home first, then place 3 farms and a tree_farm.
+  json = choosePlotOption("small_homes", 0, 0, json, true);
+  json = choosePlotOption("farm", 1, 0, json, true);
+  json = choosePlotOption("farm", 2, 0, json, true);
+  json = choosePlotOption("farm", 3, 0, json, true);
+  json = choosePlotOption("tree_farm", 4, 0, json, true);
+
+  // Then, randomly pick plots from options to place until you run out of gold.
+  for (let i = 1; i < (z.plots.length * z.plots[0].length) / 2; i++) {
+    for (let j = 0; j < options.length / 2; j++) {
+      let randomPlotOption =
+        options[Math.floor(Math.random() * options.length)];
+      z = choosePlotOption(randomPlotOption.id, i, j, json, false);
+    }
+  }
+
+  // Sync to DB
+  DB.set(json);
+  localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
+  localStorage.reset = false;
+
+  location.reload();
 }
