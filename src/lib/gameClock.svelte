@@ -38,7 +38,7 @@
 
   function performWeeklyTasks(db: Game) {
     db = _taxRateEffects(db);
-    db = _healthEffects(db); //////////
+    db = _healthEffects(db);
     db = _checkSpecialPlots(db);
     db = _adjustKnowledgeGoldMarketRates(db);
     db = _bringModifiersBackToNormal(db);
@@ -671,6 +671,8 @@
     const casualGameModifier = z.gameSettings.includes("casual") ? 2.2 : 1;
     multiplier *= casualGameModifier;
     multiplier = randomizeNumber(multiplier, 2);
+    multiplier *=
+      z.townInfo.community > 150 ? 1.2 : z.townInfo.community < 100 ? 0.85 : 1;
     let hasLumberMillMultiplier = hasPlotOfType("lumber_mill", z).length * 1.5;
     if (hasLumberMillMultiplier === 0) hasLumberMillMultiplier = 1;
 
@@ -1072,39 +1074,6 @@
     return z;
   }
 
-  function _boredom(z: Game) {
-    // check if to proceed based on z.townInfo.community. Pick a random number and if it's under 100, then proceed.
-    if (z.townInfo.community < 100) {
-      if (Math.random() * 100 < z.townInfo.community) {
-        return z;
-      }
-    }
-    // if z.lastChangeDay is over 180 days ago, then proceed.
-    if (
-      z.lastChangeDay != null &&
-      z.environment.day - z.lastChangeDay < 180 &&
-      Math.random() < 0.5 &&
-      z.townInfo.population_count > 0
-    ) {
-      // log isn't already in the townLog
-      if (
-        z.townInfo.population_count > 0 &&
-        z.townLog.filter((log) => log.message.includes(messages.bored))
-          .length == 0
-      ) {
-        z.townInfo.population_count -= 1;
-        z.townInfo.employees -= 1;
-        z.modifiers.happiness -= 0.01;
-        z = addToTownLog(messages.bored, z, Vibe.BAD);
-      }
-    } else {
-      z.townLog = z.townLog.filter(
-        (log) => !log.message.includes(messages.bored),
-      );
-    }
-    return z;
-  }
-
   function _adjustKnowledgeGoldMarketRates(z: Game) {
     let currentRate =
       z.economyAndLaws.knowledge_gold_market_rates[
@@ -1440,6 +1409,20 @@
   }
 
   function _applyModifiers(z: Game) {
+    for (let i = 0; i < z.plots.length; i++) {
+      for (let j = 0; j < z.plots[i].length; j++) {
+        if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
+          const plotOptionForPlot = options[z.plots[i][j].type];
+          z.townInfo.happiness *=
+            plotOptionForPlot.purchase_effect_modifiers.happiness;
+          z.townInfo.health *=
+            plotOptionForPlot.purchase_effect_modifiers.health;
+          z.townInfo.community *=
+            plotOptionForPlot.purchase_effect_modifiers.community;
+        }
+      }
+    }
+
     z.townInfo.happiness *= z.modifiers.happiness;
     z.townInfo.health *= z.modifiers.health;
     z.townInfo.community *= z.modifiers.community;
@@ -1521,6 +1504,13 @@
     } else if (profitModifiers < 0.75) {
       profitModifiers = 0.75;
     }
+
+    if (z.townInfo.community > 150) {
+      profitModifiers *= 1.1;
+    } else if (z.townInfo.community < 100) {
+      profitModifiers *= 0.8;
+    }
+
     let villageInnCount = hasPlotOfType("village_inn", z).length;
 
     if (type == "shop" && villageInnCount > 0) {

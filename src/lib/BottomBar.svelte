@@ -264,15 +264,15 @@
       z.townInfo.health += plotChosen.immediate_variable_changes.health;
       // Effect modifiers
       z.modifiers.happiness = roundTo(
-        z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
+        z.modifiers.happiness * plotChosen.purchase_effect_modifiers.happiness,
         2,
       );
       z.modifiers.health = roundTo(
-        z.modifiers.health * plotChosen.effect_modifiers.health,
+        z.modifiers.health * plotChosen.purchase_effect_modifiers.health,
         2,
       );
       z.modifiers.community = roundTo(
-        z.modifiers.community * plotChosen.effect_modifiers.community,
+        z.modifiers.community * plotChosen.purchase_effect_modifiers.community,
         2,
       );
       // Employer modifications
@@ -538,15 +538,15 @@
       z.townInfo.health += plotChosen.immediate_variable_changes.health;
       // Effect modifiers
       z.modifiers.happiness = roundTo(
-        z.modifiers.happiness * plotChosen.effect_modifiers.happiness,
+        z.modifiers.happiness * plotChosen.purchase_effect_modifiers.happiness,
         2,
       );
       z.modifiers.health = roundTo(
-        z.modifiers.health * plotChosen.effect_modifiers.health,
+        z.modifiers.health * plotChosen.purchase_effect_modifiers.health,
         2,
       );
       z.modifiers.community = roundTo(
-        z.modifiers.community * plotChosen.effect_modifiers.community,
+        z.modifiers.community * plotChosen.purchase_effect_modifiers.community,
         2,
       );
       // Employer modifications

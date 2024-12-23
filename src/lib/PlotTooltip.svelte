@@ -45,7 +45,7 @@
     if (current < required && checkRequirements) {
       classText = "text-textDanger border-2 border-red-400 px-2";
     }
-    s = `<span class='${classText}'>${icon} ${required}</span>`;
+    s = `<span class='${classText}'>${icon} ${formatNumber(required, false)}</span>`;
 
     return s;
   }

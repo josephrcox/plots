@@ -200,7 +200,12 @@ export type PlotOption = {
     bureaucracy: number;
   };
   knowledge_points_per_month: number;
-  effect_modifiers: {
+  purchase_effect_modifiers: {
+    happiness: number;
+    health: number;
+    community: number;
+  };
+  weekly_effect_modifiers: {
     happiness: number;
     health: number;
     community: number;
