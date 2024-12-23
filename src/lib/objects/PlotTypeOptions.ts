@@ -814,7 +814,7 @@ export const options: PlotOption[] = [
       "Turns food into money. Sells goods and employs many. Makes significantly more money from tourism if you have a Village Inn.",
     revenue_per_week: 150,
     requirements: {
-      gold: 3000,
+      gold: 6000,
       plots: [],
       employees: 16,
       knowledge: 0,
@@ -858,8 +858,8 @@ export const options: PlotOption[] = [
     level: 2,
     active_costs: {
       gold: 0,
-      power: 0,
-      wood: 0,
+      power: 15,
+      wood: 35,
       stone: 0,
       metal: 0,
       bureaucracy: 0,

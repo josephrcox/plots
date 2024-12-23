@@ -1,5 +1,4 @@
 <script lang="ts">
-  console.log("hello world");
   import { fade, slide } from "svelte/transition";
   import { onMount, onDestroy } from "svelte";
   import {
@@ -44,11 +43,6 @@
     }
     return plotTypeCache.get(typeId)!;
   }
-
-  // Optimized reactive options
-  $: filteredOptions = $DB
-    ? PlotTypeOptions.filter((option) => option.id === "mine")
-    : [];
 
   $: baseOptions = $DB
     ? PlotTypeOptions.map((option: PlotOption | any) => ({
@@ -806,22 +800,19 @@
                   : 'pt-6 gap-2'} w-full align-middle"
               >
                 <!-- Filter to show only the "mine" option if isMineralSource is true -->
-                {#if checkIfPlotCanBeUpgraded($modifyPlotMenuOptions.x, $modifyPlotMenuOptions.y, $DB)}
-                  {#each reactiveOptions.filter( (option) => ($modifyPlotMenuOptions.isMineralSource ? option.id === "mine" : true), ) as option (option.id)}
-                    <PlotTile
-                      {option}
-                      purchaseCallback={() => {}}
-                      canPurchase={option.affordable ?? false}
-                    />
-                  {/each}
-                {:else}
-                  <div class="text-white font-semibold">
-                    You can only expand your kingdom through adjacent plots.
-                    Select one of the <span class="text-yellow-500 bold"
-                      >yellow</span
-                    > plots.
-                  </div>
-                {/if}
+                {#each reactiveOptions.filter((option) => {
+                  if ($modifyPlotMenuOptions.isMineralSource) {
+                    return option.id === "mine";
+                  } else {
+                    return option.id !== "mine";
+                  }
+                }) as option (option.id)}
+                  <PlotTile
+                    {option}
+                    purchaseCallback={() => {}}
+                    canPurchase={option.affordable ?? false}
+                  />
+                {/each}
               </div>
             </div>
           </div>

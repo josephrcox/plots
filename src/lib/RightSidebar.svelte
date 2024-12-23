@@ -237,6 +237,7 @@
                 max={max ?? 300}
                 class="min-w-[80px] max-w-[80px] "
                 {color}
+                text={`${roundTo(value, 0)} / ${roundTo(max, 0)}`}
               />
             </Tooltip.Trigger>
             {#if hover}

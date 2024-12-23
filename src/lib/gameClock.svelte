@@ -133,8 +133,6 @@
         return currentDB;
       }
 
-      console.log($disabledPlotMenu.visible);
-
       try {
         currentDB.environment.day += 1;
 
@@ -774,8 +772,6 @@
                     missingResources.push(
                       `💰${requiredQuantity - z.townInfo.gold} gold`,
                     );
-                  } else if (!isSnoozed) {
-                    z.townInfo.gold -= requiredQuantity;
                   }
                 } else {
                   if (z.resources[resource as ResourceKey] < requiredQuantity) {
@@ -1415,6 +1411,7 @@
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           // Iterate through all plots and do actions based on their conditions
           const plotOptionForPlot = options[z.plots[i][j].type];
+          console.log(plotOptionForPlot.id);
           let profit =
             (getProfit(
               plotOptionForPlot.revenue_per_week,
@@ -1425,13 +1422,17 @@
             ) *
               (z.townInfo.productivity / 100)) /
             7;
+          console.log("Profit: " + profit);
 
           let nearWater = isAdjacentToWater(i, j, z);
-          const casualGameModifier = z.gameSettings.includes("casual") ? 3 : 1;
+          const casualGameModifier =
+            z.gameSettings.includes("casual") && profit > 0 ? 3 : 1;
           profit *= casualGameModifier;
           profit *= nearWater ? 2 : 1;
+          console.log("Profit: " + profit);
           z.townInfo.gold += profit;
           z.economyAndLaws.weeklyProfit += profit * 7;
+          console.log("Weekly profit: " + z.economyAndLaws.weeklyProfit);
         }
       }
     }
@@ -1522,7 +1523,7 @@
     }
     let villageInnCount = hasPlotOfType("village_inn", z).length;
 
-    if (type == "shop") {
+    if (type == "shop" && villageInnCount > 0) {
       profitModifiers *= 1.35 * villageInnCount;
     }
 
@@ -1541,6 +1542,7 @@
         (z.economyAndLaws.enacted.includes("tax_free") ? -1 : 1) -
         activeGoldCost,
     );
+
     return roundTo(profit, 0);
   }
 
