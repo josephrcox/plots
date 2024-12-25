@@ -1,6 +1,11 @@
 <script lang="ts">
   import { capitalizeFirstLetter, formatNumber, roundTo } from "./utils";
-  import { DB, modifyPlotMenuOptions, showTutorialStepConfetti } from "./store";
+  import {
+    DB,
+    hasPlotOfType,
+    modifyPlotMenuOptions,
+    showTutorialStepConfetti,
+  } from "./store";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
   import Separator from "./components/ui/separator/separator.svelte";
@@ -77,13 +82,16 @@
       value: $DB.resources.power,
       rate: null,
     },
-    {
+  ];
+
+  if (hasPlotOfType("city_hall", $DB).length > 0) {
+    resources.push({
       icon: "🧑‍⚖️",
       name: "bureaucracy",
       value: $DB.resources.bureaucracy,
       rate: $DB.resource_rate.bureaucracy,
-    },
-  ];
+    });
+  }
 
   function plotsThatNeed(resourceIndex: ResourceKey): string[] {
     let plotsThatNeed: string[] = [];
@@ -219,15 +227,17 @@
   !mini
     ? 'opacity-0'
     : ''}
-	z-10 rounded-xl px-2 pt-2 transition-all duration-300 overflow-y-scroll scroll
-  {mini ? 'min-w-56' : 'fixed right-3 top-[190px] sidebar w-[220px] bottom-4'}"
+	z-10 rounded-xl px-2 pt-2 transition-all ease-in-out duration-150 overflow-y-scroll scroll
+  {mini
+    ? 'min-w-56 bottom-4 pb-48'
+    : 'fixed right-3 top-16 sidebar w-[220px] bottom-4'}"
 >
   <div class="flex flex-row w-full pb-6">
     <div class="flex flex-col rounded-xl gap-2 w-full">
       <h1 class="text-lg w-full text-center pb-1">Stats</h1>
       {#each attributes as { name, value, modifier, color, hover, description, max }}
         <div class="flex flex-col gap-1">
-          <Tooltip.Root openDelay={200} closeDelay={0}>
+          <Tooltip.Root openDelay={400} closeDelay={0}>
             <Tooltip.Trigger
               class="w-full flex flex-row align-middle justify-between text-sm filter hover:brightness-110"
             >
@@ -260,7 +270,7 @@
     </div>
   </div>
   <div class="flex flex-row justify-center">
-    <Tooltip.Root openDelay={200} closeDelay={0}>
+    <Tooltip.Root openDelay={400} closeDelay={0}>
       <Tooltip.Trigger>
         <h1 class="text-lg w-full text-center pb-2">
           Resources
@@ -308,10 +318,10 @@
   </div>
   <div class="w-[full] flex flex-row justify-center"></div>
 
-  <div class="flex flex-col gap-8 h-full">
+  <div class="flex flex-col gap-4 h-full">
     <div class="flex flex-col text-md text-nowrap gap-2">
       {#each resources as { icon, name, value, rate }}
-        <Tooltip.Root openDelay={200} closeDelay={0}>
+        <Tooltip.Root openDelay={400} closeDelay={0}>
           <Tooltip.Trigger>
             <span
               class="flex flex-row justify-between text-sm

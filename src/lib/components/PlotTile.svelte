@@ -37,7 +37,7 @@
   }
 </script>
 
-<Tooltip.Root openDelay={200} closeDelay={0}>
+<Tooltip.Root openDelay={400} closeDelay={0}>
   <Tooltip.Trigger>
     <div
       on:click={canPurchase ? () => purchaseCallback(option) : () => {}}

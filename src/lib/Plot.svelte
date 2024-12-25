@@ -125,7 +125,7 @@
   }
 </script>
 
-<Tooltip.Root openDelay={200} closeDelay={0}>
+<Tooltip.Root openDelay={400} closeDelay={0}>
   <Tooltip.Trigger>
     <button
       class="plot_container {classText}  overflow-visible {data.type == -1 &&
@@ -188,7 +188,13 @@
           </span>
         </div>
       {:else if data.type == -1 && data.x == 0 && data.y == 0}
-        <!--  -->
+        <span
+          class="text-md text-black select-none transition-all duration-500
+          animate-pulse
+          "
+        >
+          Start here!
+        </span>
       {/if}
       {#if data.mineralSource && data.type == -1}
         <span class="text-lg">🧲</span>

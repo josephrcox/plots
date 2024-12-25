@@ -50,9 +50,9 @@
 >
   <div
     class="w-[220px] text-sidebarText bg-sidebarBackground overflow-scroll border-foregroundDark border-4 bottom-4
-		z-10 fixed left-3 py-2 top-[190px] drop-shadow-xl rounded-xl transition-all duration-300"
+		z-10 fixed left-3 py-2 top-16 drop-shadow-xl rounded-xl transition-all duration-300"
   >
-    <div class="flex flex-col justify-center mx-2 gap-8">
+    <div class="flex flex-col justify-center mx-2 gap-4">
       <div
         class="flex flex-col gap-2 rounded-xl text-center justify-center mb-2 mt-0 pt-2"
       >
@@ -61,7 +61,6 @@
         min-h-12 pb-2 rounded-xl"
         >
           <div class="mb-1">
-            <h1 class="text-lg w-full text-center pb-2">Laws</h1>
             <span class="text-sm">Tax Rate</span>
             <span class="text-sm"
               >{roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%</span
@@ -95,7 +94,6 @@
         </div>
       </div>
       <div>
-        <h1 class="text-lg w-full text-center pb-2">Menus</h1>
         <div class="flex flex-col gap-2">
           <SimpleButton
             text={!$settingLiegeLocation
@@ -141,25 +139,9 @@
             on:click={() => {
               $DB.townLog = [];
             }}
-          >
-            <h1 class="text-lg w-full text-center">Alerts</h1>
-          </h3>
-          <button
-            on:click={() => {
-              localStorage.setItem(
-                "mute",
-                mute == "false" ? "true" : mute === "true" ? "false" : "true",
-              );
-              mute = localStorage.getItem("mute") || "false";
-            }}
-          >
-            {mute == "true" ? "🔇" : "🔊"}
-          </button>
+          ></h3>
         </div>
         <div class="overflow-y-scroll h-[100%] w-[100%] pb-4 scroll-smooth">
-          {#if $DB.townLog.length == 0}
-            <p class="text-center text-xs opacity-50">No alerts</p>
-          {/if}
           {#each $DB.townLog as log}
             <div
               class=" px-2 py-2 rounded-2xl fade-in mb-4

@@ -540,7 +540,7 @@ export function isWater(x: number, y: number, maxSize: number) {
 function setUserDBIfNull() {
   if (localStorage.getItem(USER_DB_NAME) === null) {
     let def = default_user_db;
-    def.username = "my_username_click_to_change";
+    def.username = "click_to_set_username";
     localStorage.setItem(USER_DB_NAME, JSON.stringify(def));
     userDB.set(def);
   }

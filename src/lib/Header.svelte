@@ -10,10 +10,11 @@
   } from "./store";
   import { formatDuration, formatNumber, roundTo } from "./utils";
   import SimpleButton from "./components/SimpleButton.svelte";
+  import { Separator } from "$lib/components/ui/separator";
 
   const speeds = $DB.gameSettings.includes("casual")
-    ? [375, 200, 100]
-    : [550, 375, 100];
+    ? [150, 75, 35]
+    : [300, 150, 70];
   let speedIndex = 0;
 
   onMount(() => {
@@ -53,44 +54,52 @@
 
 <div
   id="header"
-  class="flex px-6 gap-6 justify-center flex-row fixed top-0 left-0 right-0 cursor-default z-10 bg-black text-[white] py-3 align-middle
+  class="flex px-6 gap-6 justify-center flex-row fixed top-0 left-0 right-0 cursor-default z-10 bg-black text-[white] py-1 align-middle
      border-b-4 border-sidebarBackground
 
 		{$modifyPlotMenuOptions.visible ? 'opacity-70' : ''}
 	"
 >
   <SimpleButton
-    text="Pause game"
+    text="Pause"
     onOpen={() => ($paused = true)}
-    styling={"fixed top-2 right-2"}
+    styling={"fixed top-2 right-4 opacity-70 bg-gray-600"}
   />
   <div class="flex justify-between flex-col align-middle items-center w-full">
-    <div class="rounded-xl">
+    <div class="rounded-xl w-full">
       <div
         class="flex flex-col gap-2 justify-center w-full
         "
       >
-        <div class="text-4xl flex flex-row items-center">
+        <div class="text-2xl flex flex-row items-center w-full text-center">
           <div
-            on:click={changeName}
             class="cursor-pointer flex flex-row justify-center text-center w-full"
           >
-            <h1 class="cursor-pointer w-full text-center select-none">
+            <div
+              on:click={changeName}
+              class="cursor-pointer w-min whitespace-nowrap text-center select-none font-serif opacity-80"
+            >
               {$DB.townInfo.name}
-            </h1>
+            </div>
           </div>
         </div>
         <div>
-          <div class="flex flex-col align-middle justify-center">
+          <div
+            class="flex flex-col align-middle w-full justify-center items-center"
+          >
             <div
-              class="flex align-middle items-center text-accentText flex-row w-full justify-center gap-2 h-max"
+              class="flex align-middle items-center text-accentText flex-row justify-between h-max
+              "
             >
-              <span class="text-xs px-4 min-w-24"
+              <span
+                class="text-sm text-left items-start justify-start w-min flex-nowrap text-nowrap"
                 >👥 {$DB.townInfo.population_count}</span
               >
-              <div
-                class="rounded-xl flex-row text-accentText gap-4 w-20 flex items-center max-w-24"
-              >
+              <Separator
+                orientation="vertical"
+                class="h-12 bg-gray-600 opacity-50 mx-4"
+              />
+              <div class="flex flex-row justify-start gap-6 align-middle">
                 <span class="flex flex-col">
                   <span class="text-xs">Year</span>
                   <span class="font-semibold text-xs">
@@ -98,14 +107,19 @@
                   </span>
                 </span>
                 <span class="flex flex-col">
-                  <span class="text-xs">Day</span>
+                  <span class="text-xs">Week</span>
                   <span class="font-semibold text-xs">
-                    {($DB.environment.day % 365) + 1}
+                    {(Math.floor($DB.environment.day / 7) % 52) + 1}
                   </span>
                 </span>
               </div>
+
+              <Separator
+                orientation="vertical"
+                class="h-12 bg-gray-600 opacity-50 mx-4"
+              />
               <span
-                class="cursor text-blue-200 text-nowrap noselect text-end w-36"
+                class="cursor-pointer text-blue-200 noselect"
                 on:click={() => {
                   nextSpeed();
                 }}
@@ -113,10 +127,10 @@
                 class:text-yellow-200={speedIndex == 1}
                 class:text-red-200={speedIndex == 2}
                 >{speedIndex == 0
-                  ? "Normal"
+                  ? "⏩ x1"
                   : speedIndex == 1
-                    ? "Fast"
-                    : "Superfast"} Speed</span
+                    ? "⏩ x2"
+                    : "⏩ x3"}</span
               >
             </div>
           </div>

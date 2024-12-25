@@ -939,11 +939,12 @@
     ) {
       z.townInfo.happiness = 300;
       z.modifiers.happiness = 1;
+
       z.townInfo.health = 300;
       z.modifiers.health = 1;
-      z.townInfo.gold = roundTo(z.townInfo.gold * 0.1, 0);
+      z.townInfo.gold = roundTo(z.townInfo.gold * 0.5, 0);
       alert(
-        "Since you are playing in Tom Petty mode, you have been given another chance. All it took was 90% of your gold. Good luck!",
+        "Since you are playing in Tom Petty mode, you have been given another chance. All it took was 50% of your gold. Good luck!",
       );
       return z;
     }
@@ -1380,7 +1381,6 @@
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           // Iterate through all plots and do actions based on their conditions
           const plotOptionForPlot = options[z.plots[i][j].type];
-          console.log(plotOptionForPlot.id);
           let profit =
             (getProfit(
               plotOptionForPlot.revenue_per_week,
@@ -1391,17 +1391,14 @@
             ) *
               (z.townInfo.productivity / 100)) /
             7;
-          console.log("Profit: " + profit);
 
           let nearWater = isAdjacentToWater(i, j, z);
           const casualGameModifier =
             z.gameSettings.includes("casual") && profit > 0 ? 3 : 1;
           profit *= casualGameModifier;
           profit *= nearWater ? 2 : 1;
-          console.log("Profit: " + profit);
           z.townInfo.gold += profit;
           z.economyAndLaws.weeklyProfit += profit * 7;
-          console.log("Weekly profit: " + z.economyAndLaws.weeklyProfit);
         }
       }
     }

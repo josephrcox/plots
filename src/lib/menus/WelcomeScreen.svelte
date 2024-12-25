@@ -21,7 +21,11 @@
           founded!
         </span>
         <span>
-          Start by building some homes, some farms, and a tree farm.
+          Your goal is to build a great town and keep your people happy. Use the
+          milestones on the right side as a guide.
+        </span>
+        <span>
+          Start by building a set of homes, some farms, and a tree farm.
         </span>
       </Dialog.Description>
     </Dialog.Header>

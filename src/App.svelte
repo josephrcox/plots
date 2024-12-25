@@ -313,26 +313,4 @@
 {/if}
 
 <style>
-  body {
-    margin-bottom: 0;
-  }
-  /* no visible scrollbars */
-  #plot_grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  ::-webkit-scrollbar {
-    width: 0px;
-    background: transparent; /* make scrollbar transparent */
-  }
-
-  /* no scrollbars on firefox either */
-  #plot_grid {
-    scrollbar-width: none;
-  }
-
-  /* no scrollbars for IE/Edge */
-  #plot_grid {
-    -ms-overflow-style: none;
-  }
 </style>

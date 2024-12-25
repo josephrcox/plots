@@ -54,9 +54,11 @@
 
   function setUsername() {
     const newName = prompt("Enter new username");
-    let z = $userDB;
-    z.username = newName;
-    setUserDB(z);
+    if (newName) {
+      let z = $userDB;
+      z.username = newName;
+      setUserDB(z);
+    }
   }
 </script>
 
@@ -134,13 +136,14 @@
           />
           <label for="tomPetty" class="text-sm">
             The 'Tom Petty' mode: If your happiness or health reaches 0, you
-            lose 90% of your gold and continue the game. You won't back down.
+            lose 50% of your gold and continue the game. You won't back down.
           </label>
         </div>
         <div class="flex items-start space-x-2">
           <input
             type="checkbox"
             id="casual"
+            checked
             class="mt-1 rounded border-accent/20"
           />
           <label for="casual" class="text-sm">
