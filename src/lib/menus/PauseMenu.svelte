@@ -27,6 +27,8 @@
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import SimpleButton from "$lib/components/SimpleButton.svelte";
   import { createAMockTown } from "$lib/utils";
+  // @ts-ignore
+  import { compressMyGame } from "$lib/gameShare";
   const scenarios: any = winScenarios;
   const endGoal = scenarios[$DB.endGoal];
   const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -282,7 +284,7 @@
             {/if}
           </div>
         </div>
-        <div class="flex flex-row gap-3">
+        <div class="flex flex-row flex-wrap flex-wrap gap-3">
           <SimpleButton styling="w-min" text="💾 Save Game" onOpen={saveGame} />
 
           <SimpleButton
@@ -300,6 +302,15 @@
             styling="bg-black opacity-50 w-min"
             text="🔄 New Game"
             onOpen={restartGame}
+          />
+          <SimpleButton
+            styling="bg-black opacity-50 w-min"
+            text="📲 Share game"
+            onOpen={async () => {
+              const url = await compressMyGame();
+              navigator.clipboard.writeText(url);
+              alert("Copied to clipboard");
+            }}
           />
           {#if $DB.gameSettings.includes("devMode")}
             <SimpleButton

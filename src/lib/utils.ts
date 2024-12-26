@@ -33,6 +33,8 @@ export function analyticsEvent(
   const eventParams = params;
   const allParams = { ...globalParams, ...eventParams };
 
+  console.log("event", event, allParams);
+
   // This works, even though it says it won't. It rolls up to index.html.
   // @ts-ignore
   gtag("event", event, allParams);
