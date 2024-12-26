@@ -223,14 +223,14 @@
 </script>
 
 <div
-  class="bg-sidebarBackground text-sidebarText border-foreground border-4 {$modifyPlotMenuOptions.visible &&
+  class="bg-sidebarBackground w-[220px] text-sidebarText border-foreground border-4 {$modifyPlotMenuOptions.visible &&
   !mini
     ? 'opacity-0'
     : ''}
 	z-10 rounded-xl px-2 pt-2 transition-all ease-in-out duration-150 overflow-y-scroll scroll
   {mini
-    ? 'min-w-56 bottom-4 pb-48'
-    : 'fixed right-3 top-16 sidebar w-[220px] bottom-4'}"
+    ? 'bottom-4 pb-48 fixed right-3 h-2/3'
+    : 'fixed right-3 top-16 sidebar bottom-4'}"
 >
   <div class="flex flex-row w-full pb-6">
     <div class="flex flex-col rounded-xl gap-2 w-full">
@@ -377,7 +377,7 @@
       {/each}
     </div>
 
-    {#if !mini}
+    {#if !mini || true}
       <div>
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
         <div

@@ -826,5 +826,13 @@
 {/if}
 
 <style>
-  /*  */
+  /* Hide scrollbars across all platforms while maintaining scroll functionality */
+  :global(*) {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  :global(*::-webkit-scrollbar) {
+    display: none; /* Chrome, Safari and Opera */
+  }
 </style>
