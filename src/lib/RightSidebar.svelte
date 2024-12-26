@@ -19,14 +19,15 @@
 
   let atCapacity = false;
   let showCompleted = false;
+  let completedCount = 0;
+  let lastAlertTime = 0;
+  let previousCapacityState = false;
   export let mini = false;
 
   $: {
-    atCapacity =
-      $DB.resources.food >= $DB.resource_capacity ||
-      $DB.resources.wood >= $DB.resource_capacity ||
-      $DB.resources.stone >= $DB.resource_capacity ||
-      $DB.resources.metal >= $DB.resource_capacity;
+    completedCount = tutorialMessages.filter((step) =>
+      step.isComplete($DB),
+    ).length;
   }
 
   type ResourceKey =
@@ -220,6 +221,35 @@
       return "bg-red-500";
     }
   };
+
+  function playAtCapacityAlertSound() {
+    const audio = new Audio("/alert.mp3");
+    audio.volume = 0.5;
+    audio.play().catch((err) => console.log("Error playing sound:", err));
+  }
+
+  $: {
+    const newCapacityState =
+      $DB.resources.food >= $DB.resource_capacity ||
+      $DB.resources.wood >= $DB.resource_capacity ||
+      $DB.resources.stone >= $DB.resource_capacity ||
+      $DB.resources.metal >= $DB.resource_capacity;
+
+    const now = Date.now();
+    if (
+      newCapacityState &&
+      !previousCapacityState &&
+      now - lastAlertTime > 30000 &&
+      !mini &&
+      !$DB.gameSettings.includes("bagOfHolding")
+    ) {
+      playAtCapacityAlertSound();
+      lastAlertTime = now;
+    }
+
+    previousCapacityState = newCapacityState;
+    atCapacity = newCapacityState;
+  }
 </script>
 
 <div
@@ -277,7 +307,9 @@
 
           <div
             class="text-xs w-full text-center mb-2 cursor-pointer
-          {atCapacity == true ? 'text-textDanger animate-pulse font-bold' : ''} 
+          {atCapacity == true
+              ? 'text-textDanger animate-[wiggle_0.5s_ease-in-out_infinite] font-bold'
+              : ''} 
             {$DB.gameSettings.includes('bagOfHolding') ? 'opacity-30' : ''}
           "
           >
@@ -377,52 +409,46 @@
       {/each}
     </div>
 
-    {#if !mini || true}
-      <div>
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <div
-          class="text-lg w-full text-center noselect flex flex-col no-select"
-          on:click={() => {
-            showCompleted = !showCompleted;
-          }}
-        >
-          {#if $showTutorialStepConfetti}
-            <Confetti cone x={[-0.5, 0.5]} />
-            <Confetti
-              cone
-              amount={10}
-              x={[-1, -0.4]}
-              y={[0.25, 0.75]}
-              rounded
-              size={15}
-            />
-            <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
-            <Confetti infinite amount={75} delay={[0, 200]} />
-          {/if}
-          <h1 class="text-lg w-full text-center">Milestones</h1>
-          {#if $DB.currentTutorialStep > 0}
-            <span class="text-xs opacity-65 cursor-pointer pb-2"
-              >{!showCompleted
-                ? `Show ${$DB.currentTutorialStep} completed`
-                : `Hide ${$DB.currentTutorialStep} completed`}</span
-            >
-          {/if}
-        </div>
-        <div class="scroll overflow-y-scroll">
-          {#each tutorialMessages as step, index}
-            {#if $DB.currentTutorialStep > index}
-              {#if showCompleted}
-                <Milestone {index} {step} />
-              {/if}
-            {:else}
-              <Milestone {index} {step} />
-            {/if}
-          {/each}
-        </div>
+    <div>
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+      <div
+        class="text-lg w-full text-center noselect flex flex-col no-select"
+        on:click={() => {
+          showCompleted = !showCompleted;
+        }}
+      >
+        {#if $showTutorialStepConfetti}
+          <Confetti cone x={[-0.5, 0.5]} />
+          <Confetti
+            cone
+            amount={50}
+            x={[-1, -0.4]}
+            y={[0.25, 0.75]}
+            rounded
+            size={15}
+          />
+          <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
+          <Confetti infinite amount={75} delay={[0, 200]} />
+        {/if}
+        <h1 class="text-lg w-full text-center">Milestones</h1>
+        {#if $DB.currentTutorialStep > 0}
+          <span class="text-xs opacity-65 cursor-pointer pb-2"
+            >{!showCompleted
+              ? `Show ${completedCount} completed`
+              : `Hide ${completedCount} completed`}</span
+          >
+        {/if}
       </div>
-    {:else}
-      <br />
-    {/if}
+      <div class="scroll overflow-y-scroll">
+        {#each tutorialMessages as step, index}
+          {#if showCompleted || index == $DB.currentTutorialStep}
+            <Milestone {index} {step} />
+          {:else if !step.isComplete($DB)}
+            <Milestone {index} {step} />
+          {/if}
+        {/each}
+      </div>
+    </div>
   </div>
 </div>
 

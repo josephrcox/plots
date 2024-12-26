@@ -924,7 +924,7 @@
           $showTutorialStepConfetti = false;
           z.currentTutorialStep++; //
           doNotCheckTutorialStep = false;
-        }, 3000);
+        }, 6000);
         break;
       }
     }

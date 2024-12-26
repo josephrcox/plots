@@ -3,55 +3,71 @@ import { hasPlotOfType } from "$lib/store";
 
 export const achievements: Achievement[] = [
   {
-    id: "happiness_at_300",
-    title: "Happy Town",
-    description: "One of your towns wins Happiest Town Award!",
-    requirements: "Happiness reaches 300",
-    icon: "😍",
-    check: (z: Game) => z.townInfo.happiness >= 300,
-    prize: 1000,
-  },
-  {
-    id: "get_educated",
-    title: "Get Educated",
-    description: "The kids are finally able to learn!",
-    requirements: "Build a school or library",
-    icon: "📌",
+    id: "happy_town",
+    title: "Happy & Healthy Town",
+    description: "",
+    requirements: "Happiness and Health at the max in one of your towns",
+    icon: "😀",
     check: (z: Game) => {
-      return (
-        hasPlotOfType("small_school", z).length !== 0 ||
-        hasPlotOfType("large_school", z).length !== 0 ||
-        hasPlotOfType("library", z).length !== 0
-      );
+      return z.townInfo.happiness >= 300 && z.townInfo.health >= 300;
     },
-    prize: 1850,
+    prize: 15000,
   },
   {
     id: "10k",
-    title: "$10,000",
+    title: "💰 10,000",
     description: "",
-    requirements: "Gold reaches $10,000",
-    icon: "﹩",
+    requirements: "10,000 gold in the bank in one of your towns",
+    icon: "💸",
     check: (z: Game) => z.townInfo.gold >= 10000,
     prize: 2500,
   },
   {
-    id: "25k",
-    title: "$25,000",
+    id: "50k",
+    title: "💰 50,000",
     description: "",
-    requirements: "Gold reaches $25,000",
-    icon: "💵",
-    check: (z: Game) => z.townInfo.gold >= 25000,
-    prize: 7500,
+    requirements: "50,000 gold in the bank in one of your towns",
+    icon: "💸",
+    check: (z: Game) => z.townInfo.gold >= 50000,
+    prize: 10000,
+  },
+  {
+    id: "250k",
+    title: "💰 250,000",
+    description: "",
+    requirements: "250,000 gold in the bank in one of your towns",
+    icon: "💸",
+    check: (z: Game) => z.townInfo.gold >= 250000,
+    prize: 50000,
+  },
+  // same as above but with a million
+
+  {
+    id: "1m",
+    title: "💰 1,000,000",
+    description: "",
+    requirements: "1,000,000 gold in the bank in one of your towns",
+    icon: "💸",
+    check: (z: Game) => z.townInfo.gold >= 1000000,
+    prize: 150000,
+  },
+  {
+    id: "10m",
+    title: "💰 10,000,000",
+    description: "",
+    requirements: "10,000,000 gold in the bank in one of your towns",
+    icon: "💸",
+    check: (z: Game) => z.townInfo.gold >= 10000000,
+    prize: 500000,
   },
   {
     id: "stayin_frugal",
     title: "Stayin' Frugal!",
     description: "",
-    requirements: "Gold under $50 with >=300 population",
+    requirements: "Gold under 50 with >=200 population in one of your towns",
     icon: "🚲",
     check: (z: Game) => {
-      return z.townInfo.gold <= 50 && z.townInfo.population_count >= 300;
+      return z.townInfo.gold <= 50 && z.townInfo.population_count >= 200;
     },
     prize: 10000,
   },
@@ -59,10 +75,10 @@ export const achievements: Achievement[] = [
     id: "profits_to_the_moon",
     title: "Profits to the moon!",
     description: "Now you're making dough!",
-    requirements: "Last month profit is over $10,000",
+    requirements: "Reach a monthly profit of $10,000",
     icon: "🌛",
     check: (z: Game) => {
-      return z.economyAndLaws.weeklyProfit >= 10000;
+      return z.economyAndLaws.weeklyProfit * 4 >= 10000;
     },
     prize: 15000,
   },
@@ -75,22 +91,7 @@ export const achievements: Achievement[] = [
     check: (z: Game) => {
       return z.townInfo.happiness > 275 && z.townInfo.health < 25;
     },
-    prize: 20000,
-  },
-  {
-    id: "long_game",
-    title: "The Long Game",
-    description: "So are you gonna win anytime soon?",
-    requirements: "Still playing after 10,000 days, without winning. ",
-    icon: "🐌",
-    check: (z: Game) => {
-      return (
-        z.endGameDetails.win === false &&
-        z.environment.day > 10000 &&
-        z.endGameDetails.msg === ""
-      );
-    },
-    prize: 25000,
+    prize: 10000,
   },
   {
     id: "tax_man",
@@ -105,99 +106,55 @@ export const achievements: Achievement[] = [
       let cleanMax = Math.floor(z.economyAndLaws.max_tax_rate * 20) / 20;
       return z.economyAndLaws.tax_rate === cleanMax;
     },
-    prize: 1500,
+    prize: 750,
   },
   {
     id: "good_job",
-    title: "Good job",
-    description:
-      "Beat 'Fill the grid' with Normal difficulty in under 3,000 days.",
+    title: "Beat 'Fill the grid' game mode",
+    description: "while not in casual mode",
     requirements: "",
     icon: "👍",
     check: (z: Game) => {
       return (
         z.endGameDetails.win === true &&
-        z.environment.day <= 3000 &&
-        z.difficulty === 1 &&
-        z.endGoal === "land"
+        z.endGoal === "land" &&
+        !z.gameSettings.includes("casual")
       );
     },
     prize: 10000,
   },
   {
     id: "great_job",
-    title: "Great job",
-    description:
-      "Beat 'Fill the grid' with Normal difficulty in under 2,000 days.",
+    title: "Beat 'Fill the grid' game mode (faster)",
+    description: "in under 5 years, while not in casual mode",
     requirements: "",
     icon: "👏",
     check: (z: Game) => {
       return (
         z.endGameDetails.win === true &&
-        z.environment.day <= 2000 &&
-        z.difficulty === 1 &&
-        z.endGoal === "land"
+        z.environment.day <= 1825 &&
+        z.endGoal === "land" &&
+        !z.gameSettings.includes("casual")
       );
     },
-    prize: 45000,
+    prize: 30000,
   },
   {
     id: "superb_job",
-    title: "SUPERB job",
-    description:
-      "Beat 'Fill the grid' with Normal difficulty in under 500 days.",
+    title: "Beat 'Fill the grid' game mode",
+    description: "while in casual mode",
     requirements: "",
     icon: "👌",
     check: (z: Game) => {
       return (
         z.endGameDetails.win === true &&
-        z.environment.day <= 500 &&
-        z.difficulty === 1 &&
-        z.endGoal === "land"
+        z.endGoal === "land" &&
+        z.gameSettings.includes("casual")
       );
     },
-    prize: 100000,
+    prize: 15000,
   },
-  {
-    id: "250k",
-    title: "$250,000",
-    description: "",
-    requirements: "Gold reaches $250,000",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 250000,
-    prize: 50000,
-  },
-  {
-    id: "banker",
-    title: "Banker",
-    description: "",
-    requirements: "Build your first bank. ",
-    icon: "🏦",
-    check: (z: Game) => {
-      return hasPlotOfType("bank", z).length !== 0;
-    },
-    prize: 5000,
-  },
-  {
-    id: "community",
-    title: "Community Center",
-    description: "",
-    requirements: "Build your first community center. ",
-    icon: "❤️",
-    check: (z: Game) => {
-      return hasPlotOfType("community_center", z).length !== 0;
-    },
-    prize: 10000,
-  },
-  {
-    id: "1m",
-    title: "MILLIONAIRE!",
-    description: "",
-    requirements: "Gold reaches $1,000,000",
-    icon: "💰",
-    check: (z: Game) => z.townInfo.gold >= 1000000,
-    prize: 150000,
-  },
+
   {
     id: "pub_knowledge",
     title: "Street smartz",

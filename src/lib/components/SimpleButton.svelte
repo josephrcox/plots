@@ -9,7 +9,7 @@
   export let onHoverText: string = "";
 </script>
 
-<Tooltip.Root openDelay={onHoverText.length > 0 ? 200 : 10000} closeDelay={0}>
+<Tooltip.Root openDelay={onHoverText.length > 0 ? 200 : 999999} closeDelay={0}>
   <Tooltip.Content
     >{onHoverText.length > 0
       ? onHoverText

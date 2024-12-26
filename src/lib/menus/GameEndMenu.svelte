@@ -40,7 +40,7 @@
 
     <Dialog.Footer>
       <span class="text-gray-500 text-sm"
-        >Reset the game by pressing SHIFT+ESC</span
+        >Reset the game by pressing P and clicking New Game</span
       >
     </Dialog.Footer>
   </Dialog.Content>

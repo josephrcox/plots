@@ -183,7 +183,7 @@
 
 <Dialog.Root bind:open={$paused}>
   <Dialog.Content
-    class="max-w-[90vw] max-h-[90vh] bg-popupBackground text-accentText"
+    class="max-w-[50%] flex flex-col justify-between bg-popupBackground text-accentText"
   >
     <Dialog.Header>
       <Dialog.Title class="text-3xl font-semibold text-accentText"
@@ -191,9 +191,9 @@
       >
       <span>Unpause any time by pressing 'P'</span>
     </Dialog.Header>
-    <div class="flex flex-row w-full gap-10">
+    <div class="flex flex-row w-full gap-10justify-between">
       <div class="flex flex-col gap-6 justify-between">
-        <div class="flex-col h-max">
+        <div class="flex-col h-max max-w-[80%]">
           <h4 class="text-xl font-semibold mb-2">This game</h4>
           <span class="text-sm text-accentText opacity-75"
             >{endGoal.description_title}</span
@@ -312,8 +312,8 @@
           {/if}
         </div>
       </div>
-      <Separator orientation="vertical" />
-      <div>
+
+      <div class="flex-grow">
         <h4 class="underline underline-offset-4">
           Your achievement ({completedAchievements.length}
           / {achievements.length})
@@ -407,14 +407,15 @@
         >{getLatestAchievementObject()?.title}</AlertDialog.Title
       >
       <AlertDialog.Description>
-        <div class="flex flex-row align-middle justify-evenly px-6 py-4">
-          <div class="text-center w-[30%] align-middle flex flex-col text-8xl">
+        <div class="flex flex-row align-middle justify-evenly px-6 py-2">
+          <div class=" absolute top-4 left-4 text-5xl">
             {getLatestAchievementObject()?.icon}
           </div>
           <div
             class="pl-8 w-[80%] align-middle flex flex-col justify-center text-lg"
           >
             {getLatestAchievementObject()?.description}
+            {getLatestAchievementObject()?.requirements}
           </div>
         </div>
       </AlertDialog.Description>

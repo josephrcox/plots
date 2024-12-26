@@ -20,6 +20,7 @@
     showCityHallMenu,
     showLabMenu,
     showScoreboard,
+    userDB,
     // @ts-ignore
   } from "./lib/store.ts";
   // @ts-ignore
@@ -35,7 +36,6 @@
   import CustomAlert from "./lib/components/CustomAlert.svelte";
 
   let dbInitialized = false;
-  let resetLiegeLocationSetting = true;
   runTests();
 
   $: if ($DB) {
