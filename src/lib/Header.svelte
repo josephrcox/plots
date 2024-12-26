@@ -7,6 +7,7 @@
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
     paused,
+    TEMP_GAME_DB_NAME,
   } from "./store";
   import { formatDuration, formatNumber, roundTo } from "./utils";
   import SimpleButton from "./components/SimpleButton.svelte";
@@ -121,6 +122,9 @@
               <span
                 class="cursor-pointer text-blue-200 noselect"
                 on:click={() => {
+                  if (localStorage.getItem(TEMP_GAME_DB_NAME) != null) {
+                    return;
+                  }
                   nextSpeed();
                 }}
                 class:text-blue-200={speedIndex == 0}

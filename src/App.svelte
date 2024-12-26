@@ -21,6 +21,7 @@
     showLabMenu,
     showScoreboard,
     userDB,
+    TEMP_GAME_DB_NAME,
     // @ts-ignore
   } from "./lib/store.ts";
   // @ts-ignore
@@ -213,7 +214,10 @@
       }
     });
     if ($paused == false) {
-      if (plot.dataset.canBeUpgraded === "true") {
+      if (
+        plot.dataset.canBeUpgraded === "true" &&
+        localStorage.getItem(TEMP_GAME_DB_NAME) == null
+      ) {
         $modifyPlotMenuOptions.visible = true;
       } else {
         $modifyPlotMenuOptions.visible = false;

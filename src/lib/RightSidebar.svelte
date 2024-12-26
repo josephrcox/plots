@@ -5,6 +5,7 @@
     hasPlotOfType,
     modifyPlotMenuOptions,
     showTutorialStepConfetti,
+    TEMP_GAME_DB_NAME,
   } from "./store";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
@@ -241,7 +242,8 @@
       !previousCapacityState &&
       now - lastAlertTime > 30000 &&
       !mini &&
-      !$DB.gameSettings.includes("bagOfHolding")
+      !$DB.gameSettings.includes("bagOfHolding") &&
+      localStorage.getItem(TEMP_GAME_DB_NAME) == null
     ) {
       playAtCapacityAlertSound();
       lastAlertTime = now;

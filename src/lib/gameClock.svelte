@@ -14,6 +14,7 @@
     showCustomAlert,
     isLiegeOnPlot,
     disabledPlotMenu,
+    TEMP_GAME_DB_NAME,
   } from "./store";
   // @ts-ignore
   import { messages } from "./objects/TownLogMessages.js";
@@ -127,7 +128,8 @@
         $paused ||
         !currentDB ||
         (currentDB.endGameDetails.msg !== "" && currentDB.overtime == false) ||
-        currentDB.townInfo.population_count <= 0
+        currentDB.townInfo.population_count <= 0 ||
+        localStorage.getItem(TEMP_GAME_DB_NAME) != null
       ) {
         console.info("The game is over, or paused. Not running the game loop.");
         return currentDB;
@@ -876,7 +878,10 @@
   }
 
   function _checkForAchievements(z: Game) {
-    if (z.gameSettings.includes("devMode")) {
+    if (
+      z.gameSettings.includes("devMode") ||
+      localStorage.getItem(TEMP_GAME_DB_NAME) != null
+    ) {
       return z;
     }
     let user_db = $userDB;

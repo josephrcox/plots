@@ -15,7 +15,7 @@ export const ACTIVE_GAME_DB_NAME = "plots_active_game_db";
 // The user DB keeps track of progress, achievements,
 //// challenge history, and such.
 export const USER_DB_NAME = "plots_user_db";
-
+export const TEMP_GAME_DB_NAME = "plots_temp_game_db";
 function generateRandomTownName(): string {
   const baseNames = [
     "York",
@@ -437,7 +437,11 @@ function generateRandomTownName(): string {
 
 // Define your DB store at the top
 export let DB = writable(
-  JSON.parse(localStorage.getItem(ACTIVE_GAME_DB_NAME) || "null"),
+  JSON.parse(
+    localStorage.getItem(TEMP_GAME_DB_NAME) ||
+      localStorage.getItem(ACTIVE_GAME_DB_NAME) ||
+      "null",
+  ),
 );
 
 export let userDB = writable(

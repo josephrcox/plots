@@ -16,6 +16,7 @@
     reverseClear,
     hasPlotOfType,
     showCustomAlert,
+    TEMP_GAME_DB_NAME,
   } from "./store";
   import { options, plotTypeMaximums } from "./objects/PlotTypeOptions";
   import { Game, PlotOption, Events } from "./types";
@@ -515,7 +516,7 @@
   });
 </script>
 
-{#if open}
+{#if open && localStorage.getItem(TEMP_GAME_DB_NAME) == null}
   <!-- Add overlay with fade transition -->
   <div
     class="fixed inset-0 bg-black/20 z-[998]"

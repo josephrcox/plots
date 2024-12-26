@@ -23,8 +23,13 @@ function decodeAndDecompress(urlSafeData) {
 export async function compressMyGame() {
   let json = localStorage.getItem("plots_active_game_db");
   const compressedData = await compressAndEncode(json);
-  console.log("http://plots.jsph.cx/?shareId=" + compressedData);
-  return "http://plots.jsph.cx/?shareId=" + compressedData;
+
+  const isLocal = window.location.hostname == "localhost";
+  if (isLocal) {
+    return "http://localhost:5173/?shareId=" + compressedData;
+  } else {
+    return "http://plots.jsph.cx/?shareId=" + compressedData;
+  }
 }
 
 const windowParams = window.location.search
@@ -39,11 +44,11 @@ const windowParams = window.location.search
 if (windowParams.shareId != undefined || windowParams.shareId != null) {
   console.log("DECRYPING FROM shareId");
   const sharedData = JSON.parse(decodeAndDecompress(windowParams.shareId));
-  let currentDB = localStorage.getItem("plots_active_game_db");
-  if (currentDB == "" || currentDB == null) {
-    localStorage.setItem("plots_active_game_db", JSON.stringify(sharedData));
-  }
+  localStorage.setItem("plots_temp_game_db", JSON.stringify(sharedData));
+  console.log("DECRYPED DATA", sharedData);
 } else {
+  localStorage.removeItem("plots_temp_game_db");
   console.log("COMPRESSING GAME TO SHARE");
+  //   delete temp db
   compressMyGame();
 }

@@ -11,6 +11,7 @@
     showAchievementPopup,
     showCustomAlert,
     ACTIVE_GAME_DB_NAME,
+    TEMP_GAME_DB_NAME,
   } from "../store";
   import * as Dialog from "$lib/components/ui/dialog";
   // @ts-ignore
@@ -29,6 +30,7 @@
   import { createAMockTown } from "$lib/utils";
   // @ts-ignore
   import { compressMyGame } from "$lib/gameShare";
+  import { local } from "d3-selection";
   const scenarios: any = winScenarios;
   const endGoal = scenarios[$DB.endGoal];
   const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -174,6 +176,11 @@
   }
 
   function restartGame() {
+    const confirmPrompt = prompt(
+      "Are you sure you want to restart the game? This will delete all your progress. Type 'yes' to confirm.",
+    );
+    if (confirmPrompt?.toLowerCase() != "yes") return;
+
     $paused = true;
     localStorage.setItem("reset", "true");
     $DB = null;
@@ -197,9 +204,15 @@
       <div class="flex flex-col gap-6 justify-between">
         <div class="flex-col h-max max-w-[80%]">
           <h4 class="text-xl font-semibold mb-2">This game</h4>
-          <span class="text-sm text-accentText opacity-75"
-            >{endGoal.description_title}</span
-          >
+          <span class="text-sm text-accentText opacity-75">
+            {#if localStorage.getItem(TEMP_GAME_DB_NAME) != null}
+              This is a game that was shared with you. You can't interact with
+              it or save. Click <a href="/" class="underline">here</a> to go back
+              to your town.
+            {:else}
+              {endGoal.description_title}
+            {/if}
+          </span>
           <div class="mt-6 gap-0 py-0 text-accentText opacity-75 text-sm">
             {#if $DB.endGoal == "land"}
               <div class="leading-relaxed text-sm">
@@ -323,90 +336,93 @@
           {/if}
         </div>
       </div>
-
-      <div class="flex-grow">
-        <h4 class="underline underline-offset-4">
-          Your achievement ({completedAchievements.length}
-          / {achievements.length})
-        </h4>
-        <span class="text-sm text-gray-400"
-          >Track your progress through games & complete challenges!
-        </span>
-        <br />
-        <div class="overflow-scroll mt-2 h-[60vh]">
-          <div class="flex flex-col gap-4 overflow-scroll pb-10 scroll-smooth">
-            {#each reactiveAchievements as achievement}
-              <div
-                class="flex flex-col gap-3 cursor-default rounded-xl
+      {#if localStorage.getItem(TEMP_GAME_DB_NAME) == null}
+        <div class="flex-grow">
+          <h4 class="underline underline-offset-4">
+            Your achievement ({completedAchievements.length}
+            / {achievements.length})
+          </h4>
+          <span class="text-sm text-gray-400"
+            >Track your progress through games & complete challenges!
+          </span>
+          <br />
+          <div class="overflow-scroll mt-2 h-[60vh]">
+            <div
+              class="flex flex-col gap-4 overflow-scroll pb-10 scroll-smooth"
+            >
+              {#each reactiveAchievements as achievement}
+                <div
+                  class="flex flex-col gap-3 cursor-default rounded-xl
 						{hasAchievement(achievement.id)
-                  ? 'bg-green-700 text-accentText'
-                  : 'bg-gray-500 opacity-35'}
+                    ? 'bg-green-700 text-accentText'
+                    : 'bg-gray-500 opacity-35'}
 						
 						"
-              >
-                <div class="flex-col flex px-3 py-2 gap-0">
-                  <div class="min-w-32 flex">
-                    <span class="flex flex-row justify-between w-[100%]">
-                      <div
-                        class="flex flex-row gap-3 w-[100%] text- items-center
+                >
+                  <div class="flex-col flex px-3 py-2 gap-0">
+                    <div class="min-w-32 flex">
+                      <span class="flex flex-row justify-between w-[100%]">
+                        <div
+                          class="flex flex-row gap-3 w-[100%] text- items-center
 
 										"
-                      >
-                        <span class="font-semibold text-lg"
-                          >{achievement.title}</span
                         >
+                          <span class="font-semibold text-lg"
+                            >{achievement.title}</span
+                          >
 
-                        <div class="font-thin opacity-75 text-xs">
-                          {achievement.requirements}
+                          <div class="font-thin opacity-75 text-xs">
+                            {achievement.requirements}
+                          </div>
                         </div>
-                      </div>
-                      <div
-                        class="text-2xl pr-1 break-inside-avoid
+                        <div
+                          class="text-2xl pr-1 break-inside-avoid
 											"
-                      >
-                        {achievement.icon}
-                      </div>
-                    </span>
-                  </div>
-                  <div class=" opacity-85 text-xs font-light">
-                    {achievement.description}
-                  </div>
-                  <div
-                    class="pb-2 {hasAchievement(achievement.id)
-                      ? ''
-                      : 'hidden'} text-xs text-green-400"
-                  >
-                    ✅ Completed on Day {getAchievementCompletionDayAndTown(
-                      achievement.id,
-                    )}
-                  </div>
+                        >
+                          {achievement.icon}
+                        </div>
+                      </span>
+                    </div>
+                    <div class=" opacity-85 text-xs font-light">
+                      {achievement.description}
+                    </div>
+                    <div
+                      class="pb-2 {hasAchievement(achievement.id)
+                        ? ''
+                        : 'hidden'} text-xs text-green-400"
+                    >
+                      ✅ Completed on Day {getAchievementCompletionDayAndTown(
+                        achievement.id,
+                      )}
+                    </div>
 
-                  {#if hasAchievement(achievement.id) && !achievementPrizeCollected(achievement.id)}
-                    <SimpleButton
-                      text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
-                      styling={"bg-yellow-300 text-black"}
-                      onOpen={() => {
-                        collectPrize(achievement.id);
-                        // hide this button
-                        const button = document.getElementById(
-                          `collectPrize-${achievement.id}`,
-                        );
-                        if (button) {
-                          button.style.display = "none";
-                        }
-                      }}
-                    />
-                  {/if}
+                    {#if hasAchievement(achievement.id) && !achievementPrizeCollected(achievement.id)}
+                      <SimpleButton
+                        text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
+                        styling={"bg-yellow-300 text-black"}
+                        onOpen={() => {
+                          collectPrize(achievement.id);
+                          // hide this button
+                          const button = document.getElementById(
+                            `collectPrize-${achievement.id}`,
+                          );
+                          if (button) {
+                            button.style.display = "none";
+                          }
+                        }}
+                      />
+                    {/if}
+                  </div>
                 </div>
-              </div>
-            {/each}
+              {/each}
+            </div>
           </div>
+          <span class="text-sm text-yellow-400"
+            >Prizes apply to the current game you are in. You can wait to apply
+            them until the right time.
+          </span>
         </div>
-        <span class="text-sm text-yellow-400"
-          >Prizes apply to the current game you are in. You can wait to apply
-          them until the right time.
-        </span>
-      </div>
+      {/if}
     </div>
   </Dialog.Content>
 </Dialog.Root>

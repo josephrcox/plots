@@ -10,6 +10,7 @@
     isLiegeOnPlot,
     disabledPlotMenu,
     reverseClear,
+    TEMP_GAME_DB_NAME,
   } from "./store.ts";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import PlotTooltip from "./PlotTooltip.svelte";
@@ -54,6 +55,9 @@
   };
 
   function openMenu(e, a, b) {
+    if (localStorage.getItem(TEMP_GAME_DB_NAME) != null) {
+      return;
+    }
     let plots = document.querySelectorAll(".plot_container");
     if ($paused == false) {
       if (

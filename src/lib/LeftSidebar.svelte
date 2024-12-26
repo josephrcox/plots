@@ -12,6 +12,7 @@
     showLabMenu,
     showTutorialStepConfetti,
     hasPlotOfType,
+    TEMP_GAME_DB_NAME,
   } from "./store";
   import Button from "./components/ui/button/button.svelte";
   import Slider from "./components/ui/slider/slider.svelte";
@@ -72,6 +73,7 @@
             min={0}
             max={0.5}
             step={0.05}
+            disabled={localStorage.getItem(TEMP_GAME_DB_NAME) != null}
             class="cursor-pointer w-[75%]"
           />
         </div>
@@ -89,6 +91,7 @@
             min={0}
             max={200}
             step={5}
+            disabled={localStorage.getItem(TEMP_GAME_DB_NAME) != null}
             class="cursor-pointer w-[75%]"
           />
         </div>
