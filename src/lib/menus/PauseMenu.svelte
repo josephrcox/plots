@@ -361,7 +361,7 @@
                     {achievement.description}
                   </div>
                   <div
-                    class="pb-2{hasAchievement(achievement.id)
+                    class="pb-2 {hasAchievement(achievement.id)
                       ? ''
                       : 'hidden'} text-xs text-green-400"
                   >
