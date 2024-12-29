@@ -11,7 +11,17 @@
   $: z = $DB;
 
   export let purchaseCallback: (option: PlotOption) => void;
-  export let canPurchase: boolean;
+
+  export let isAffordable: {
+    affordable: boolean;
+    gold: boolean;
+    knowledge: boolean;
+    resources: boolean;
+    employees: boolean;
+    activeCosts: boolean;
+    adjacent: boolean;
+    requiredPlots: boolean;
+  };
 
   let name = option.title;
   let emoji = option.emoji;
@@ -35,24 +45,32 @@
   if (resources.length > 0) {
     subtitle = `Produces: ${resources.join(", ")}`;
   }
+
+  function getFailureReasons(): string[] {
+    const reasons: string[] = [];
+    if (!isAffordable.gold) reasons.push("Not enough gold");
+    if (!isAffordable.knowledge) reasons.push("Not enough knowledge");
+    if (!isAffordable.resources) reasons.push("Missing resources");
+    if (!isAffordable.employees) reasons.push("Not enough workers");
+    if (!isAffordable.activeCosts) reasons.push("Can't support upkeep");
+    if (!isAffordable.adjacent) reasons.push("Wrong location");
+    if (!isAffordable.requiredPlots) reasons.push("Missing required buildings");
+    return reasons;
+  }
 </script>
 
 <Tooltip.Root openDelay={400} closeDelay={0}>
   <Tooltip.Trigger>
     <div
-      on:click={canPurchase ? () => purchaseCallback(option) : () => {}}
-      class="plotOption"
+      on:click={isAffordable.affordable
+        ? () => purchaseCallback(option)
+        : () => {}}
+      class="plotOption relative"
       data-plotOptionId={option.id}
     >
       <div
         class="flex flex-col w-36 h-48 min-h-32 min-w-36 rounded-xl text-white drop-shadow-lg border-black border-2 hover:translate-y-[-8px] transition-transform duration-300 ease-in-out z-100
-
-        {canPurchase || option.selected
-          ? 'cursor-pointer'
-          : 'cursor-not-allowed opacity-30'}
-        {option.selected ? 'border-4 border-white scale-105' : ''}
-            
-        "
+        {option.selected ? 'border-4 border-white scale-105' : ''}"
         style="background: {color};"
       >
         <!-- first div should take up most of the height -->
@@ -96,6 +114,23 @@
           </div>
         </div>
       </div>
+
+      {#if !isAffordable.affordable && !option.selected}
+        <div
+          class="absolute inset-0 flex items-start justify-center rounded-xl bg-black/80"
+        >
+          <div class="p-2 text-center mt-4">
+            <div class="text-white font-bold text-lg mb-2">
+              {name}
+            </div>
+            {#each getFailureReasons() as reason}
+              <div class="text-red-400 font-semibold text-xs mb-1">
+                {reason}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
     </div>
   </Tooltip.Trigger>
   <Tooltip.Content>
@@ -104,5 +139,7 @@
 </Tooltip.Root>
 
 <style>
-  /* your styles go here */
+  .plotOption {
+    position: relative;
+  }
 </style>

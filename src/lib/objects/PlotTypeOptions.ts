@@ -196,8 +196,8 @@ export const options: PlotOption[] = [
       "Your presence on the farm is encouraging the farmers to work harder!",
     weekly_effect_modifiers: {
       happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      health: 1.002,
+      community: 1.002,
     },
   },
 
@@ -277,7 +277,7 @@ export const options: PlotOption[] = [
       "Produces stone, small amounts of metal. Isn't great for health. ",
     revenue_per_week: 0,
     requirements: {
-      gold: 800,
+      gold: 2000,
       plots: [],
       employees: 6,
       knowledge: 0,
@@ -285,7 +285,7 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 50,
+        wood: 150,
         stone: 0,
         metal: 0,
         power: 0,
@@ -313,7 +313,7 @@ export const options: PlotOption[] = [
     generated_resources: {
       food: 0,
       wood: 0,
-      stone: 18,
+      stone: 16,
       metal: 1,
       power: 0,
       bureaucracy: 0,
@@ -332,8 +332,8 @@ export const options: PlotOption[] = [
       "The workers at the quarry are working harder with the presence of their liege.",
     weekly_effect_modifiers: {
       happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      health: 0.998,
+      community: 0.9998,
     },
   },
   {
@@ -362,13 +362,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.01,
-      health: 1.06,
+      happiness: 1.15,
+      health: 1.15,
       community: 1,
     },
     immediate_variable_changes: {
       happiness: 25,
-      health: 70,
+      health: 30,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -399,7 +399,7 @@ export const options: PlotOption[] = [
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
       happiness: 1.0,
-      health: 1.0,
+      health: 1.03,
       community: 1.0,
     },
   },
@@ -742,10 +742,11 @@ export const options: PlotOption[] = [
     emoji: "⛪️",
     title: "Church",
     type: "recreation",
-    description: "Makes people VERY happy for a short period.",
+    description:
+      "Great place to pray, make people happy, and build community. Also, generates a tiny bit of knowledge. ",
     revenue_per_week: 0,
     requirements: {
-      gold: 900,
+      gold: 1000,
       plots: [],
       employees: 1,
       knowledge: 0,
@@ -762,18 +763,18 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 2.0,
+      happiness: 1.1,
       health: 1.0,
-      community: 1.3,
+      community: 1.2,
     },
     immediate_variable_changes: {
       happiness: 25,
       health: 0,
       population: 0,
-      community: 0,
+      community: 25,
       bureaucracy: 0,
     },
-    knowledge_points_per_month: 0,
+    knowledge_points_per_month: 5,
     styling: "",
     affordable: null,
     selected: null,
@@ -798,7 +799,7 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
+      happiness: 1.002,
       health: 1.0,
       community: 1.0,
     },
@@ -811,7 +812,7 @@ export const options: PlotOption[] = [
     description:
       "Generates knowledge, happiness, community. Isn't great for health.",
     revenue_per_week: 100,
-    knowledge_points_per_month: 1,
+    knowledge_points_per_month: 5,
     requirements: {
       gold: 2000,
       plots: [],
@@ -865,9 +866,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.05,
+      happiness: 1.001,
+      health: 0.998,
+      community: 1.0,
     },
   },
   {
@@ -946,7 +947,7 @@ export const options: PlotOption[] = [
       "Requires metal but generates a lot of food. Must be near water.",
     revenue_per_week: 35,
     requirements: {
-      gold: 3500,
+      gold: 7500,
       plots: [],
       employees: 16,
       knowledge: 0,
@@ -954,7 +955,7 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 2500,
+        wood: 3000,
         stone: 0,
         metal: 100,
         power: 0,
@@ -968,7 +969,7 @@ export const options: PlotOption[] = [
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 15,
+      happiness: 5,
       health: 8,
       population: 0,
       community: 0,
@@ -980,7 +981,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 130,
+      food: 85,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -1067,8 +1068,8 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1.001,
+      health: 0.998,
       community: 1.0,
     },
   },
@@ -1337,8 +1338,8 @@ export const options: PlotOption[] = [
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
       happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      health: 1.002,
+      community: 1.002,
     },
   },
   {
@@ -1471,6 +1472,73 @@ export const options: PlotOption[] = [
       "The children seem to be learning worse when you are around, maybe you are a distraction from the teachers.",
     weekly_effect_modifiers: {
       happiness: 1.0,
+      health: 1.002,
+      community: 1.002,
+    },
+  },
+  {
+    id: "academy",
+    emoji: "🎓",
+    title: "Academy",
+    type: "education",
+    description:
+      "Produces a lot of knowledge, more than a schoolhouse or library, but costs gold every week.",
+    revenue_per_week: 0,
+    knowledge_points_per_month: 200,
+    requirements: {
+      gold: 50000,
+      plots: [],
+      employees: 32,
+      knowledge: 1000,
+      size: 1,
+      xp: 0,
+      resources: {
+        food: 0,
+        wood: 4500,
+        stone: 4500,
+        metal: 0,
+        power: 0,
+        bureaucracy: 0,
+      },
+      adjacent_plots: [],
+    },
+    purchase_effect_modifiers: {
+      happiness: 1.1,
+      health: 1.0,
+      community: 1,
+    },
+    immediate_variable_changes: {
+      happiness: 0,
+      health: 0,
+      population: 0,
+      community: 50,
+      bureaucracy: 0,
+    },
+    styling: "",
+    affordable: null,
+    selected: null,
+    check_for_variety: false,
+    generated_resources: {
+      food: 0,
+      wood: 0,
+      stone: 0,
+      metal: 0,
+      power: 0,
+      bureaucracy: 0,
+    },
+    level: 5,
+    active_costs: {
+      gold: 150,
+      power: 0,
+      wood: 0,
+      stone: 0,
+      metal: 0,
+      bureaucracy: 0,
+      food: 0,
+    },
+    liege_on_plot_hint: null,
+    weekly_effect_modifiers: {
+      happiness: 1.0,
       health: 1.0,
       community: 1.0,
     },
@@ -1482,19 +1550,19 @@ export const options: PlotOption[] = [
     type: "business",
     description:
       "Converts metal into tools for money. Make sure you have enough metal!",
-    revenue_per_week: 300,
+    revenue_per_week: 150,
     requirements: {
-      gold: 12500,
+      gold: 18000,
       plots: [],
-      employees: 24,
+      employees: 6,
       knowledge: 0,
       size: 1,
       xp: 0,
       resources: {
         food: 0,
         wood: 250,
-        stone: 4000,
-        metal: 500,
+        stone: 10000,
+        metal: 1000,
         power: 0,
         bureaucracy: 0,
       },
@@ -1503,7 +1571,7 @@ export const options: PlotOption[] = [
     purchase_effect_modifiers: {
       happiness: 1.0,
       health: 1.0,
-      community: 0.95,
+      community: 1.0,
     },
     immediate_variable_changes: {
       happiness: 0,
@@ -1531,7 +1599,7 @@ export const options: PlotOption[] = [
       power: 30,
       wood: 0,
       stone: 0,
-      metal: 5,
+      metal: 50,
       bureaucracy: 0,
       food: 0,
     },
@@ -1549,10 +1617,10 @@ export const options: PlotOption[] = [
     type: "recreation",
     description: "Produces knowledge and happiness",
     revenue_per_week: 0,
-    knowledge_points_per_month: 10,
+    knowledge_points_per_month: 20,
     requirements: {
       gold: 2000,
-      plots: ["village_market"],
+      plots: [],
       employees: 6,
       knowledge: 0,
       size: 1,
@@ -1625,8 +1693,8 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 100,
-        stone: 100,
+        wood: 1500,
+        stone: 1500,
         metal: 300,
         power: 0,
         bureaucracy: 0,
@@ -1672,7 +1740,7 @@ export const options: PlotOption[] = [
     weekly_effect_modifiers: {
       happiness: 1.0,
       health: 1.0,
-      community: 0.96,
+      community: 0.9998,
     },
   },
   {
@@ -1684,7 +1752,7 @@ export const options: PlotOption[] = [
       "Produces a lot of power without the need of water. Requires a lot of metal every week.",
     revenue_per_week: 0,
     requirements: {
-      gold: 30000,
+      gold: 50000,
       plots: ["blacksmith", "library"],
       employees: 4,
       knowledge: 0,
@@ -1694,7 +1762,7 @@ export const options: PlotOption[] = [
         food: 0,
         wood: 0,
         stone: 0,
-        metal: 500,
+        metal: 1000,
         power: 0,
         bureaucracy: 0,
       },
@@ -1876,72 +1944,7 @@ export const options: PlotOption[] = [
       community: 1.0,
     },
   },
-  {
-    id: "community_center",
-    emoji: "🫶",
-    title: "Community Center",
-    type: "recreation",
-    description: "Improves community, makes people happier, costs money",
-    revenue_per_week: 0,
-    requirements: {
-      gold: 16000,
-      plots: [],
-      employees: 12,
-      knowledge: 0,
-      size: 1,
-      xp: 0,
-      resources: {
-        food: 0,
-        wood: 7500,
-        stone: 700,
-        metal: 0,
-        power: 0,
-        bureaucracy: 0,
-      },
-      adjacent_plots: [],
-    },
-    purchase_effect_modifiers: {
-      happiness: 1.09,
-      health: 1.0,
-      community: 2,
-    },
-    immediate_variable_changes: {
-      happiness: 50,
-      health: 15,
-      population: 0,
-      community: 0,
-      bureaucracy: 0,
-    },
-    knowledge_points_per_month: 0,
-    styling: "",
-    affordable: null,
-    selected: null,
-    check_for_variety: false,
-    generated_resources: {
-      food: 0,
-      wood: 0,
-      stone: 0,
-      metal: 0,
-      power: 0,
-      bureaucracy: 0,
-    },
-    level: 4,
-    active_costs: {
-      gold: 0,
-      power: 10,
-      wood: 0,
-      stone: 0,
-      metal: 0,
-      bureaucracy: 0,
-      food: 0,
-    },
-    liege_on_plot_hint: null,
-    weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.05,
-    },
-  },
+
   {
     id: "city_hall",
     emoji: "🗳️",
@@ -2018,7 +2021,7 @@ export const options: PlotOption[] = [
     revenue_per_week: 0,
     requirements: {
       gold: 30000,
-      plots: ["blacksmith"],
+      plots: ["library", "quarry"],
       employees: 48,
       knowledge: 0,
       size: 1,
@@ -2071,30 +2074,30 @@ export const options: PlotOption[] = [
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
       happiness: 1.0,
-      health: 1.0,
-      community: 0.95,
+      health: 0.998,
+      community: 0.9998,
     },
   },
   {
-    id: "academy",
+    id: "university",
     emoji: "🏫",
-    title: "Academy",
+    title: "University",
     type: "education",
     description:
-      "Produces a lot of knowledge, more than a schoolhouse or library. But freakishly expensive.",
+      "Produces the most knowledge, but costs a lot of gold every week.",
     revenue_per_week: 0,
-    knowledge_points_per_month: 400,
+    knowledge_points_per_month: 500,
     requirements: {
-      gold: 99000,
-      plots: ["lumber_mill", "schoolhouse"],
-      employees: 24,
-      knowledge: 3000,
+      gold: 50000,
+      plots: [],
+      employees: 32,
+      knowledge: 5000,
       size: 1,
       xp: 0,
       resources: {
         food: 0,
-        wood: 3000,
-        stone: 1600,
+        wood: 4500,
+        stone: 4500,
         metal: 0,
         power: 0,
         bureaucracy: 0,
@@ -2102,7 +2105,7 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
+      happiness: 1.1,
       health: 1.0,
       community: 1,
     },
@@ -2110,7 +2113,7 @@ export const options: PlotOption[] = [
       happiness: 0,
       health: 0,
       population: 0,
-      community: 0,
+      community: 50,
       bureaucracy: 0,
     },
     styling: "",
@@ -2127,9 +2130,9 @@ export const options: PlotOption[] = [
     },
     level: 5,
     active_costs: {
-      gold: 300,
-      power: 0,
-      wood: 0,
+      gold: 500,
+      power: 100,
+      wood: 100,
       stone: 0,
       metal: 0,
       bureaucracy: 0,
@@ -2153,7 +2156,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 0,
     requirements: {
       gold: 100000,
-      plots: ["academy"],
+      plots: [],
       employees: 32,
       knowledge: 25000,
       size: 1,
@@ -2219,7 +2222,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 300,
     requirements: {
       gold: 100000,
-      plots: ["academy"],
+      plots: [],
       employees: 48,
       knowledge: 15000,
       size: 1,
@@ -2260,8 +2263,8 @@ export const options: PlotOption[] = [
     },
     level: 5,
     active_costs: {
-      gold: 0,
-      power: 700,
+      gold: 5000,
+      power: 1000,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -2293,7 +2296,7 @@ export const typeColors: any = {
   science: "rgba(74,91,163,1.0)", // #4a5ba3
   mine: "rgba(217,135,74,1.0)", // #d9874a
   quarry: "rgba(134,134,133,1.0)", // #868685
-  industrial: "rgba(22, 80, 135,0.8)", // #868615
+  industrial: "rgba(22, 50, 255,0.8)", // #868615
   stockpile: "rgba(134,134,133,1.0)", // #868685
 };
 
@@ -2323,7 +2326,7 @@ export const plotTypeMaximums: any = {
   city_hall: 1,
   bank: 1,
   community_center: 1,
-  inn: 1,
+  lumber_mill: 1,
 };
 
 export const lightenColor = (color: string, amount: number = 20): string => {

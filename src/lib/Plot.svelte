@@ -23,7 +23,6 @@
     y: 0,
     type: -1,
     styling: "",
-    referencePlot: [],
     mineralSource: false,
     disabled: false,
     water: false,
@@ -60,15 +59,7 @@
     }
     let plots = document.querySelectorAll(".plot_container");
     if ($paused == false) {
-      if (
-        data.referencePlot != undefined &&
-        data.referencePlot[0] !== null &&
-        a == undefined &&
-        b == undefined &&
-        data.referencePlot[1] !== undefined
-      ) {
-        return openMenu(e, data.referencePlot[0], data.referencePlot[1]);
-      } else if (!data.active && !canBeUpgraded) {
+      if (!data.active && !canBeUpgraded) {
         $unique = {};
         $modifyPlotMenuOptions.visible = false;
         plots.forEach((plot) => {
@@ -163,12 +154,6 @@
       data-canBeUpgraded={canBeUpgraded}
       data-type={data.type}
       data-type-id={data.typeId}
-      data-refPlotX={data.referencePlot !== undefined
-        ? data.referencePlot[1]
-        : null}
-      data-refPlotY={data.referencePlot !== undefined
-        ? data.referencePlot[0]
-        : null}
       data-size={data.type > -1 ? options[data.type].requirements.size : null}
       data-mineralSource={data.mineralSource}
       data-water={data.water}
@@ -186,7 +171,10 @@
               >{options[data.type].emoji}</span
             >
             <br />
-            <span class="text-sm align-text-top text-black select-none"
+            <span
+              class="text-sm align-text-top {options[data.type].id == 'mine'
+                ? 'text-white'
+                : 'text-black'} select-none"
               >{options[data.type].title}
             </span>
           </span>

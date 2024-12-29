@@ -8,6 +8,8 @@
     checkIfPlotCanBeUpgraded,
     analyticsEvent,
     findClosestPlot,
+    isAdjacentToWater,
+    checkIfAffordable,
   } from "./utils";
   import {
     DB,
@@ -48,7 +50,7 @@
   $: baseOptions = $DB
     ? PlotTypeOptions.map((option: PlotOption | any) => ({
         ...option,
-        affordable: checkIfAffordable(option, $DB),
+        affordable: checkIfAffordable(option, $DB, x, y).affordable,
         selected: isSelected(option),
       }))
     : [];
@@ -126,104 +128,137 @@
       : false;
   }
 
-  function checkIfAffordable(plotChosen: any, z: Game) {
-    let requirementsMet = true;
-    let onlyEmploymentFailing = true;
+  // function checkIfAffordable(plotChosen: PlotOption, z: Game): boolean {
+  //   let requirementsMet = true;
+  //   let onlyEmploymentFailing = true;
+  //   let failureReasons: string[] = [];
 
-    // Check all non-employment requirements first
-    if (plotChosen.requirements.gold > z.townInfo.gold) {
-      requirementsMet = false;
-      onlyEmploymentFailing = false;
-    }
+  //   // Check gold requirement
+  //   if (plotChosen.requirements.gold > z.townInfo.gold) {
+  //     requirementsMet = false;
+  //     onlyEmploymentFailing = false;
+  //     failureReasons.push(
+  //       `Need ${plotChosen.requirements.gold} gold, have ${roundTo(z.townInfo.gold, 2)}`,
+  //     );
+  //   }
 
-    if (plotChosen.requirements.knowledge !== undefined) {
-      if (plotChosen.requirements.knowledge > z.townInfo.knowledge_points) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      }
-    }
+  //   // Check knowledge requirement
+  //   if (plotChosen.requirements.knowledge !== undefined) {
+  //     if (plotChosen.requirements.knowledge > z.townInfo.knowledge_points) {
+  //       requirementsMet = false;
+  //       onlyEmploymentFailing = false;
+  //       failureReasons.push(
+  //         `Need ${plotChosen.requirements.knowledge} knowledge, have ${z.townInfo.knowledge_points}`,
+  //       );
+  //     }
+  //   }
 
-    // Check resources
-    if (plotChosen.requirements.resources !== undefined) {
-      Object.keys(plotChosen.requirements.resources).forEach((resource) => {
-        if (
-          plotChosen.requirements.resources[resource] != 0 &&
-          $DB.resources[resource] < plotChosen.requirements.resources[resource]
-        ) {
-          requirementsMet = false;
-          onlyEmploymentFailing = false;
-        }
-      });
-    }
+  //   // Check resources
+  //   if (plotChosen.requirements.resources) {
+  //     type ResourceKey = keyof typeof plotChosen.requirements.resources;
+  //     Object.entries(plotChosen.requirements.resources).forEach(
+  //       ([resource, amount]) => {
+  //         const resourceKey = resource as ResourceKey;
+  //         if (amount !== 0 && z.resources[resourceKey] < amount) {
+  //           requirementsMet = false;
+  //           onlyEmploymentFailing = false;
+  //           failureReasons.push(
+  //             `Need ${amount} ${resource}, have ${z.resources[resourceKey]}`,
+  //           );
+  //         }
+  //       },
+  //     );
+  //   }
 
-    // Now check employment separately
-    let availableEmployees = z.townInfo.population_count - z.townInfo.employees;
-    if (
-      plotChosen.requirements.employees !== undefined &&
-      plotChosen.requirements.employees > 0
-    ) {
-      const existingPlot = z.plots[x][y];
-      if (existingPlot.type !== -1) {
-        const existingPlotType = PlotTypeOptions[existingPlot.type];
-        const existingEmployees = existingPlotType.requirements.employees || 0;
+  //   // Check employment
+  //   let availableEmployees = z.townInfo.population_count - z.townInfo.employees;
+  //   if (
+  //     plotChosen.requirements.employees !== undefined &&
+  //     plotChosen.requirements.employees > 0
+  //   ) {
+  //     const existingPlot = z.plots[x][y];
+  //     if (existingPlot.type !== -1) {
+  //       const existingPlotType = PlotTypeOptions[existingPlot.type];
+  //       const existingEmployees = existingPlotType.requirements.employees || 0;
 
-        // If this is the only failing requirement and the employment matches
-        if (
-          onlyEmploymentFailing &&
-          plotChosen.requirements.employees <= existingEmployees
-        ) {
-          requirementsMet = true;
-        } else if (
-          plotChosen.requirements.employees >
-          availableEmployees + existingEmployees
-        ) {
-          requirementsMet = false;
-        }
-      } else if (plotChosen.requirements.employees > availableEmployees) {
-        requirementsMet = false;
-      }
-    }
+  //       if (
+  //         onlyEmploymentFailing &&
+  //         plotChosen.requirements.employees <= existingEmployees
+  //       ) {
+  //         requirementsMet = true;
+  //       } else if (
+  //         plotChosen.requirements.employees >
+  //         availableEmployees + existingEmployees
+  //       ) {
+  //         requirementsMet = false;
+  //         failureReasons.push(
+  //           `Need ${plotChosen.requirements.employees} workers, have ${availableEmployees + existingEmployees} available`,
+  //         );
+  //       }
+  //     } else if (plotChosen.requirements.employees > availableEmployees) {
+  //       requirementsMet = false;
+  //       failureReasons.push(
+  //         `Need ${plotChosen.requirements.employees} workers, have ${availableEmployees} available`,
+  //       );
+  //     }
+  //   }
 
-    // Check active costs
-    if (plotChosen.active_costs !== undefined) {
-      if (plotChosen.active_costs.gold > z.townInfo.gold) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      } else if (plotChosen.active_costs.power > z.resources.power) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      } else if (plotChosen.active_costs.wood > z.resources.wood) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      } else if (plotChosen.active_costs.stone > z.resources.stone) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      } else if (plotChosen.active_costs.metal > z.resources.metal) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      } else if (
-        plotChosen.active_costs.bureaucracy > z.resources.bureaucracy
-      ) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      } else if (plotChosen.active_costs.food > z.resources.food) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      }
-    }
+  //   // Check active costs
+  //   if (plotChosen.active_costs) {
+  //     type ResourceKey = keyof typeof plotChosen.active_costs;
+  //     Object.entries(plotChosen.active_costs).forEach(([resource, amount]) => {
+  //       const resourceKey = resource as ResourceKey;
+  //       if (resourceKey === "gold") {
+  //         return;
+  //       }
+  //       if (amount !== undefined && amount > z.resources[resourceKey]) {
+  //         requirementsMet = false;
+  //         onlyEmploymentFailing = false;
+  //         failureReasons.push(
+  //           `Need ${amount} ${resource} for upkeep, have ${z.resources[resourceKey]}`,
+  //         );
+  //       }
+  //     });
+  //   }
 
-    // check if the user has the required plots
-    if (plotChosen.requirements.plots.length > 0) {
-      plotChosen.requirements.plots.forEach((plot: string) => {
-        if (hasPlotOfType(plot, z).length === 0) {
-          requirementsMet = false;
-          onlyEmploymentFailing = false;
-        }
-      });
-    }
+  //   // Check adjacent plot requirements
+  //   if (plotChosen.requirements.adjacent_plots.length > 0) {
+  //     if (plotChosen.requirements.adjacent_plots.includes("water")) {
+  //       if (!isAdjacentToWater(x, y, z, true)) {
+  //         requirementsMet = false;
+  //         onlyEmploymentFailing = false;
+  //         failureReasons.push("Must be adjacent to water");
+  //       }
+  //     }
+  //     for (const plot of plotChosen.requirements.adjacent_plots) {
+  //       if (plot !== "water" && !isAdjacentToPlots(x, y, z, [plot])) {
+  //         requirementsMet = false;
+  //         onlyEmploymentFailing = false;
+  //         failureReasons.push(`Must be adjacent to ${plot}`);
+  //       }
+  //     }
+  //   }
 
-    return requirementsMet;
-  }
+  //   // Check required plots
+  //   if (plotChosen.requirements.plots.length > 0) {
+  //     plotChosen.requirements.plots.forEach((plot: string) => {
+  //       if (hasPlotOfType(plot, z).length === 0) {
+  //         requirementsMet = false;
+  //         onlyEmploymentFailing = false;
+  //         failureReasons.push(`Requires a ${plot} to be built first`);
+  //       }
+  //     });
+  //   }
+
+  //   if (!requirementsMet) {
+  //     console.log(
+  //       `Cannot build ${plotChosen.title}:`,
+  //       failureReasons.join(", "),
+  //     );
+  //   }
+
+  //   return requirementsMet;
+  // }
 
   function handlePlotOptionClick(event: any) {
     const plotOption = event.target.closest(".plotOption");
@@ -244,7 +279,7 @@
     const plotChosen = PlotTypeOptions[typeIndex];
     let z = $DB;
 
-    if (checkIfAffordable(plotChosen, z)) {
+    if (checkIfAffordable(plotChosen, z, x, y).affordable) {
       if (z.plots[x][y].type !== -1) {
         reverseClear(x, y, z);
       }
@@ -252,7 +287,6 @@
       tooltip = "";
       z.plots[x][y].type = typeIndex;
       z.plots[x][y].active = true;
-      z.plots[x][y].referencePlot = [];
       z.plots[x][y].typeId = plotChosen.id;
       z.townInfo.gold -= plotChosen.requirements.gold;
       z.townInfo.gold = roundTo(z.townInfo.gold, 2);
@@ -542,7 +576,7 @@
           >
             <div>
               <div
-                class="flex flex-row text-start justify-start items-start flex-wrap py-8 px-8
+                class="flex flex-row text-start justify-start items-start flex-wrap py-8 px-8 max-w-[75vw]
               {$modifyPlotMenuOptions.isMineralSource
                   ? 'pt-6 gap-2'
                   : 'pt-6 gap-2'} w-full align-middle"
@@ -558,7 +592,7 @@
                   <PlotTile
                     {option}
                     purchaseCallback={() => {}}
-                    canPurchase={option.affordable ?? false}
+                    isAffordable={checkIfAffordable(option, $DB, x, y)}
                   />
                 {/each}
               </div>

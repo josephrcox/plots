@@ -260,9 +260,7 @@
     ? 'opacity-0'
     : ''}
 	z-10 rounded-xl px-2 pt-2 transition-all ease-in-out duration-150 overflow-y-scroll scroll
-  {mini
-    ? 'bottom-4 pb-48 fixed right-3 h-2/3'
-    : 'fixed right-3 top-16 sidebar bottom-4'}"
+fixed right-3 top-16 sidebar bottom-4"
 >
   <div class="flex flex-row w-full pb-6">
     <div class="flex flex-col rounded-xl gap-2 w-full">
@@ -427,7 +425,7 @@
             x={[-1, -0.4]}
             y={[0.25, 0.75]}
             rounded
-            size={15}
+            size={8}
           />
           <Confetti cone amount={10} x={[0.4, 1]} y={[0.25, 0.75]} />
           <Confetti infinite amount={75} delay={[0, 200]} />

@@ -538,6 +538,12 @@ export function isWater(x: number, y: number, maxSize: number) {
   if (x == 0 && y == 0) {
     chance = 0;
   }
+
+  const middleRow = Math.floor(maxSize / 2);
+
+  if (y === middleRow) {
+    return false;
+  }
   return Math.random() < chance;
 }
 
@@ -584,20 +590,6 @@ export function reverseClear(x: number, y: number, z: Game) {
       z.plotCounts[oldPlotType] = 0;
     }
     z.plotCounts[oldPlotType]--;
-    let size = options[oldPlotType].requirements.size ?? 1;
-    if (size > 1) {
-      for (let a = 0; a < z.plots.length; a++) {
-        for (let b = 0; b < z.plots[x].length; b++) {
-          if (
-            z.plots[a][b].referencePlot != undefined &&
-            z.plots[a][b].referencePlot[0] === x &&
-            z.plots[a][b].referencePlot[1] === y
-          ) {
-            reverseClear(a, b, z);
-          }
-        }
-      }
-    }
   }
 
   z.lastChangeDay = z.environment.day;
@@ -662,7 +654,6 @@ export function expandTown(z: Game, direction: string) {
         mineralSource: false,
         water: isWater(i, j, numRows + newRows),
         disabled: false,
-        referencePlot: null,
       });
     }
   }

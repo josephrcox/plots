@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
 import { options } from "./objects/PlotTypeOptions";
-import { Game } from "./types";
+import type { Game, PlotOption } from "./types";
 import {
   hasPlotOfType,
   reverseClear,
@@ -248,11 +248,11 @@ export function isAdjacentToPlots(
   let allAreAdjacent = true;
   for (let i = 0; i < requiredPlots.length; i++) {
     let found = false;
-    if (requiredPlots[i] == "water") {
-      if (isAdjacentToWater(x, y, z, true)) {
-        found = true;
-        break;
-      }
+    let currentPlot = requiredPlots[i];
+
+    // Skip this iteration if it's a water check
+    if (currentPlot === "water") {
+      continue;
     }
 
     for (let j = 0; j < adjacent.length; j++) {
@@ -266,7 +266,7 @@ export function isAdjacentToPlots(
         adjY < z.plots[0].length &&
         z.plots[adjX][adjY].active == true &&
         z.plots[adjX][adjY].type > 0 &&
-        options[z.plots[adjX][adjY].type].id == requiredPlots[i]
+        options[z.plots[adjX][adjY].type].id == currentPlot
       ) {
         found = true;
         break;
@@ -320,34 +320,143 @@ export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
   });
 }
 
-export function checkIfAffordable(plotChosen: any, z: Game) {
-  let requirementsMet = true;
-  let onlyEmploymentFailing = true;
+// Check if player has enough gold for the plot
+export function hasEnoughGold(plotChosen: PlotOption, z: Game): boolean {
+  return plotChosen.requirements.gold <= z.townInfo.gold;
+}
 
-  // Check all non-employment requirements first
-  if (plotChosen.requirements.gold > z.townInfo.gold) {
-    requirementsMet = false;
-    onlyEmploymentFailing = false;
+// Check if player has enough knowledge points
+export function hasEnoughKnowledge(plotChosen: PlotOption, z: Game): boolean {
+  if (!plotChosen.requirements.knowledge) return true;
+  return plotChosen.requirements.knowledge <= z.townInfo.knowledge_points;
+}
+
+// Check if player has enough resources
+export function hasEnoughResources(plotChosen: PlotOption, z: Game): boolean {
+  if (!plotChosen.requirements.resources) return true;
+
+  return Object.entries(plotChosen.requirements.resources).every(
+    ([resource, amount]) => {
+      const resourceKey = resource as keyof typeof z.resources;
+      const required: number = z.resources[resourceKey];
+      return amount === 0 || required >= amount;
+    },
+  );
+}
+
+// Check if player has enough employees
+export function hasEnoughEmployees(
+  plotChosen: PlotOption,
+  z: Game,
+  x: number,
+  y: number,
+): boolean {
+  if (
+    !plotChosen.requirements.employees ||
+    plotChosen.requirements.employees <= 0
+  )
+    return true;
+
+  const availableEmployees = z.townInfo.population_count - z.townInfo.employees;
+  const existingPlot = z.plots[x][y];
+
+  if (existingPlot.type !== -1) {
+    const existingPlotType = options[existingPlot.type];
+    const existingEmployees = existingPlotType.requirements.employees || 0;
+    return (
+      plotChosen.requirements.employees <=
+      availableEmployees + existingEmployees
+    );
   }
 
-  if (plotChosen.requirements.knowledge !== undefined) {
-    if (plotChosen.requirements.knowledge > z.townInfo.knowledge_points) {
-      requirementsMet = false;
-      onlyEmploymentFailing = false;
+  return plotChosen.requirements.employees <= availableEmployees;
+}
+
+// Check if player has enough resources for active costs
+export function canSupportActiveCosts(
+  plotChosen: PlotOption,
+  z: Game,
+): boolean {
+  if (!plotChosen.active_costs) return true;
+
+  return Object.entries(plotChosen.active_costs).every(([resource, amount]) => {
+    if (resource === "gold") return true; // Skip gold check
+    const resourceKey = resource as keyof typeof plotChosen.active_costs;
+    if (resourceKey === "gold") return true;
+    return !amount || z.resources[resourceKey] >= amount;
+  });
+}
+
+// Check if plot meets adjacent plot requirements
+export function meetsAdjacentRequirements(
+  plotChosen: PlotOption,
+  x: number,
+  y: number,
+  z: Game,
+): boolean {
+  if (!plotChosen.requirements.adjacent_plots.length) return true;
+
+  for (const plot of plotChosen.requirements.adjacent_plots) {
+    if (plot === "water") {
+      if (!isAdjacentToWater(x, y, z, true)) return false;
+    } else if (!isAdjacentToPlots(x, y, z, [plot])) {
+      return false;
     }
   }
+  return true;
+}
 
-  // check if the user has the required plots
-  if (plotChosen.requirements.plots.length > 0) {
-    plotChosen.requirements.plots.forEach((plot: string) => {
-      if (hasPlotOfType(plot, z).length === 0) {
-        requirementsMet = false;
-        onlyEmploymentFailing = false;
-      }
-    });
-  }
+// Check if required plots are built
+export function hasRequiredPlots(plotChosen: PlotOption, z: Game): boolean {
+  if (!plotChosen.requirements.plots.length) return true;
 
-  return requirementsMet;
+  return plotChosen.requirements.plots.every(
+    (plot) => hasPlotOfType(plot, z).length > 0,
+  );
+}
+
+// Main function that combines all checks
+export function checkIfAffordable(
+  plotChosen: PlotOption,
+  z: Game,
+  x: number,
+  y: number,
+): {
+  affordable: boolean;
+  gold: boolean;
+  knowledge: boolean;
+  resources: boolean;
+  employees: boolean;
+  activeCosts: boolean;
+  adjacent: boolean;
+  requiredPlots: boolean;
+} {
+  const goldCheck = hasEnoughGold(plotChosen, z);
+  const knowledgeCheck = hasEnoughKnowledge(plotChosen, z);
+  const resourcesCheck = hasEnoughResources(plotChosen, z);
+  const employeesCheck = hasEnoughEmployees(plotChosen, z, x, y);
+  const activeCostsCheck = canSupportActiveCosts(plotChosen, z);
+  const adjacentCheck = meetsAdjacentRequirements(plotChosen, x, y, z);
+  const requiredPlotsCheck = hasRequiredPlots(plotChosen, z);
+
+  return {
+    affordable: [
+      goldCheck,
+      knowledgeCheck,
+      resourcesCheck,
+      employeesCheck,
+      activeCostsCheck,
+      adjacentCheck,
+      requiredPlotsCheck,
+    ].every((check) => check === true),
+    gold: goldCheck,
+    knowledge: knowledgeCheck,
+    resources: resourcesCheck,
+    employees: employeesCheck,
+    activeCosts: activeCostsCheck,
+    adjacent: adjacentCheck,
+    requiredPlots: requiredPlotsCheck,
+  };
 }
 
 function getTypeIndex(typeId: string): number {
@@ -364,14 +473,13 @@ function choosePlotOption(
   const typeIndex = getTypeIndex(plotOptionID);
   const plotChosen = options[typeIndex];
 
-  if (resourceOverride || checkIfAffordable(plotChosen, z)) {
+  if (resourceOverride || checkIfAffordable(plotChosen, z, x, y).affordable) {
     if (z.plots[x][y].type !== -1) {
       reverseClear(x, y, z);
     }
 
     z.plots[x][y].type = typeIndex;
     z.plots[x][y].active = true;
-    z.plots[x][y].referencePlot = [];
     z.plots[x][y].typeId = plotChosen.id;
     z.townInfo.gold -= plotChosen.requirements.gold;
     z.townInfo.gold = roundTo(z.townInfo.gold, 2);

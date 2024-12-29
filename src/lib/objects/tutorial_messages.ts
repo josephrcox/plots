@@ -70,13 +70,6 @@ export const tutorialMessages: TutorialStep[] = [
     goldReward: 6400,
   },
   {
-    message: "Increase our weekly revenue to 200 gold",
-    isComplete: (z: Game) => {
-      return z.economyAndLaws.weeklyProfit >= 200;
-    },
-    goldReward: 6400,
-  },
-  {
     message: "Complete Year 2",
     isComplete: (z: Game) => {
       return z.environment.day >= 365 * 2;
@@ -93,7 +86,12 @@ export const tutorialMessages: TutorialStep[] = [
   {
     message: "Start generating power. Build a Water Wheel or Solar Farm",
     isComplete: (z: Game) => {
-      return z.resources.power > 0;
+      return (
+        z.resources.power > 0 ||
+        hasPlotOfType("water_wheel", z).length > 0 ||
+        hasPlotOfType("solar_farm", z).length > 0 ||
+        hasPlotOfType("adv_water_wheel", z).length > 0
+      );
     },
     goldReward: 8000,
   },
@@ -121,6 +119,13 @@ export const tutorialMessages: TutorialStep[] = [
     goldReward: 16000,
   },
   {
+    message: "Complete Year 5",
+    isComplete: (z: Game) => {
+      return z.environment.day >= 365 * 5;
+    },
+    goldReward: 10000,
+  },
+  {
     message: "Town: Grow our population to 500",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 500;
@@ -140,5 +145,12 @@ export const tutorialMessages: TutorialStep[] = [
       return hasPlotOfType("city_hall", z).length > 0;
     },
     goldReward: 40000,
+  },
+  {
+    message: "Complete Year 10",
+    isComplete: (z: Game) => {
+      return z.environment.day >= 365 * 10;
+    },
+    goldReward: 50000,
   },
 ];

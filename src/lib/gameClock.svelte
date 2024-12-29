@@ -15,6 +15,7 @@
     isLiegeOnPlot,
     disabledPlotMenu,
     TEMP_GAME_DB_NAME,
+    showCityHallMenu,
   } from "./store";
   // @ts-ignore
   import { messages } from "./objects/TownLogMessages.js";
@@ -56,6 +57,7 @@
     db = _lawEffects(db);
     db = _calculatePower(db);
     db = _calculateKnowledge(db);
+    db = _bringStatsBackToNormal(db);
     db = _feedCitizens(db);
     const endResources = {
       food: db.resources.food,
@@ -78,7 +80,6 @@
     db = _banksEffect(db);
     db = _reactToProductivity(db);
     db = _mineEffects(db);
-    db = _bringStatsBackToNormal(db);
     db = _unemployment(db);
     db = _listenToTownspeople(db);
     db = _recreationImpact(db);
@@ -126,6 +127,7 @@
       if (
         $disabledPlotMenu.visible ||
         $paused ||
+        $showCityHallMenu ||
         !currentDB ||
         (currentDB.endGameDetails.msg !== "" && currentDB.overtime == false) ||
         currentDB.townInfo.population_count <= 0 ||
@@ -261,20 +263,20 @@
       // Optimal % of recreation plots is 20% of all plots. Calculate the percentage.
       const optimalRecreationPercentage = 0.2;
       const currentRecreationPercentage = recreationCount / activeCount;
+      const demandingString =
+        "The city is growing and citizens are demanding more recreation, look for plots with 🛝 icons.";
+      const happyString =
+        "The city is growing and citizens are happy with the amount of recreation available.";
       if (currentRecreationPercentage < optimalRecreationPercentage) {
         z.modifiers.happiness * 0.95;
-        z = addToTownLog(
-          "The city is growing and citizens are demanding more recreation, look for plots with 🛝 icons.",
-          z,
-          Vibe.BAD,
-        );
+        z.townLog = z.townLog.filter((log) => log.message !== happyString);
+        z = addToTownLog(demandingString, z, Vibe.BAD);
+        // remove the happy log if it exists
       } else {
         z.modifiers.happiness * 1.03;
-        z = addToTownLog(
-          "The city is growing and citizens are happy with the amount of recreation available.",
-          z,
-          Vibe.GOOD,
-        );
+        z.townLog = z.townLog.filter((log) => log.message !== demandingString);
+        z = addToTownLog(happyString, z, Vibe.GOOD);
+        // remove the demanding log if it exists
       }
     }
 
@@ -670,7 +672,7 @@
       // Extremely upset
       multiplier = 5;
     }
-    const casualGameModifier = z.gameSettings.includes("casual") ? 2.2 : 1;
+    const casualGameModifier = z.gameSettings.includes("casual") ? 1.5 : 1;
     multiplier *= casualGameModifier;
     multiplier = randomizeNumber(multiplier, 2);
     multiplier *=
@@ -843,6 +845,13 @@
         z,
         Vibe.BAD,
       );
+    } else {
+      z.townLog = z.townLog.filter(
+        (log) =>
+          !log.message.includes(
+            "🔋 POWER SHORTAGE. HAPPINESS DROPPING THROUGH BLACKOUTS.",
+          ),
+      );
     }
 
     return z;
@@ -929,7 +938,7 @@
           $showTutorialStepConfetti = false;
           z.currentTutorialStep++; //
           doNotCheckTutorialStep = false;
-        }, 6000);
+        }, 2000);
         break;
       }
     }
@@ -1351,10 +1360,11 @@
 
   export function _bringStatsBackToNormal(z: Game) {
     const midpoint = 150;
+    const modifierVariable = 0.09;
     if (z.townInfo.happiness > midpoint) {
       // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
       let percentAboveOne = z.townInfo.happiness - midpoint;
-      z.townInfo.happiness -= percentAboveOne * 0.08;
+      z.townInfo.happiness -= percentAboveOne * modifierVariable;
       if (z.townInfo.happiness < midpoint) {
         z.townInfo.happiness = midpoint;
       }
@@ -1362,7 +1372,7 @@
     if (z.townInfo.health > midpoint) {
       // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
       let percentAboveOne = z.townInfo.health - midpoint;
-      z.townInfo.health -= percentAboveOne * 0.08;
+      z.townInfo.health -= percentAboveOne * modifierVariable;
       if (z.townInfo.health < midpoint) {
         z.townInfo.health = midpoint;
       }
@@ -1370,10 +1380,24 @@
     if (z.townInfo.community > midpoint) {
       // check % above 1.0 that z.modifiers.happiness is, and get it 8% closer to 1.0
       let percentAboveOne = z.townInfo.community - midpoint;
-      z.townInfo.community -= percentAboveOne * 0.08;
+      z.townInfo.community -= percentAboveOne * modifierVariable;
       if (z.townInfo.community < midpoint) {
         z.townInfo.community = midpoint;
       }
+    }
+
+    // If the levels are below the midpoint, then bring them back up, but a bit slower.
+    if (z.townInfo.happiness < midpoint) {
+      let percentBelowMidpoint = midpoint - z.townInfo.happiness;
+      z.townInfo.happiness += percentBelowMidpoint * (modifierVariable * 0.5);
+    }
+    if (z.townInfo.health < midpoint) {
+      let percentBelowMidpoint = midpoint - z.townInfo.health;
+      z.townInfo.health += percentBelowMidpoint * (modifierVariable * 0.5);
+    }
+    if (z.townInfo.community < midpoint) {
+      let percentBelowMidpoint = midpoint - z.townInfo.community;
+      z.townInfo.community += percentBelowMidpoint * (modifierVariable * 0.5);
     }
     return z;
   }
@@ -1416,11 +1440,10 @@
         if (z.plots[i][j].active == true && z.plots[i][j].type > -1) {
           const plotOptionForPlot = options[z.plots[i][j].type];
           z.townInfo.happiness *=
-            plotOptionForPlot.purchase_effect_modifiers.happiness;
-          z.townInfo.health *=
-            plotOptionForPlot.purchase_effect_modifiers.health;
+            plotOptionForPlot.weekly_effect_modifiers.happiness;
+          z.townInfo.health *= plotOptionForPlot.weekly_effect_modifiers.health;
           z.townInfo.community *=
-            plotOptionForPlot.purchase_effect_modifiers.community;
+            plotOptionForPlot.weekly_effect_modifiers.community;
         }
       }
     }
