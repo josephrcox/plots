@@ -158,6 +158,12 @@
         const userDB: UserDatabase = JSON.parse(
           localStorage.getItem(USER_DB_NAME) || "{}",
         );
+        if (userDB.games == undefined) {
+          userDB.games = [];
+          userDB.selectedGame = 0;
+          userDB.games.push(JSON.stringify(currentDB));
+          localStorage.setItem(USER_DB_NAME, JSON.stringify(userDB));
+        }
         if (userDB.selectedGame > userDB.games.length) {
           userDB.selectedGame = 0;
         }
