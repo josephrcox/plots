@@ -52,9 +52,9 @@
     if (!isAffordable.knowledge) reasons.push("Not enough knowledge");
     if (!isAffordable.resources) reasons.push("Missing resources");
     if (!isAffordable.employees) reasons.push("Not enough workers");
-    if (!isAffordable.activeCosts) reasons.push("Can't support upkeep");
-    if (!isAffordable.adjacent) reasons.push("Wrong location");
-    if (!isAffordable.requiredPlots) reasons.push("Missing required buildings");
+    if (!isAffordable.activeCosts) reasons.push("Can't support active costs");
+    if (!isAffordable.adjacent) reasons.push("Missing adjacent plots");
+    if (!isAffordable.requiredPlots) reasons.push("Missing required plots");
     return reasons;
   }
 </script>
@@ -124,7 +124,7 @@
               {name}
             </div>
             {#each getFailureReasons() as reason}
-              <div class="text-red-400 font-semibold text-xs mb-1">
+              <div class="text-red-400 font-semibold text-[10px] mb-1">
                 {reason}
               </div>
             {/each}
