@@ -517,6 +517,11 @@ export function startGame(
   localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
   DB.set(json); // Update the store with the new value
   localStorage.reset = false;
+  if (udb.games == undefined) {
+    udb.games = [];
+    udb.selectedGame = 0;
+    localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
+  }
   udb.games.push(JSON.stringify(json));
   udb.selectedGame = udb.games.length - 1;
   localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
