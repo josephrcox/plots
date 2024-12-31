@@ -12,6 +12,8 @@
     showCustomAlert,
     ACTIVE_GAME_DB_NAME,
     TEMP_GAME_DB_NAME,
+    setSelectedGame,
+    USER_DB_NAME,
   } from "../store";
   import * as Dialog from "$lib/components/ui/dialog";
   // @ts-ignore
@@ -27,10 +29,11 @@
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import SimpleButton from "$lib/components/SimpleButton.svelte";
-  import { createAMockTown } from "$lib/utils";
+  import { createAMockTown, formatNumber } from "$lib/utils";
   // @ts-ignore
   import { compressMyGame } from "$lib/gameShare";
   import { local } from "d3-selection";
+  import { Game } from "$lib/types";
   const scenarios: any = winScenarios;
   const endGoal = scenarios[$DB.endGoal];
   const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
@@ -77,10 +80,6 @@
   }
 
   let reactiveAchievements = achievements;
-
-  function formatNumber(n: number) {
-    return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
-  }
 
   let dbInitialized = false;
   $: if ($DB) {
@@ -176,133 +175,81 @@
   }
 
   function restartGame() {
-    const confirmPrompt = prompt(
-      "Are you sure you want to restart the game? This will delete all your progress. Type 'yes' to confirm.",
-    );
-    if (confirmPrompt?.toLowerCase() != "yes") return;
-
     $paused = true;
     localStorage.setItem("reset", "true");
     $DB = null;
     localStorage.removeItem(ACTIVE_GAME_DB_NAME);
-    //location.reload();
     clearDB();
+  }
+
+  let games: Game[] = [];
+  $: {
+    // parse each individual game and then add to the games array
+    games = [];
+    for (let i = 0; i < $userDB.games.length; i++) {
+      games.push(JSON.parse($userDB.games[i]));
+    }
   }
 </script>
 
 <Dialog.Root bind:open={$paused}>
   <Dialog.Content
-    class="max-w-[50%] flex flex-col justify-between bg-popupBackground text-accentText"
+    class="max-w-[75%] max-h-[100%] flex flex-col justify-between bg-popupBackground text-accentText overflow-scroll"
   >
     <Dialog.Header>
       <Dialog.Title class="text-3xl font-semibold text-accentText"
-        >Pause Menu</Dialog.Title
+        >Pause</Dialog.Title
       >
-      <span>Unpause any time by pressing 'P'</span>
     </Dialog.Header>
-    <div class="flex flex-row w-full gap-10justify-between">
-      <div class="flex flex-col gap-6 justify-between">
-        <div class="flex-col h-max max-w-[80%]">
-          <h4 class="text-xl font-semibold mb-2">This game</h4>
-          <span class="text-sm text-accentText opacity-75">
-            {#if localStorage.getItem(TEMP_GAME_DB_NAME) != null}
-              This is a game that was shared with you. You can't interact with
-              it or save. Click <a href="/" class="underline">here</a> to go back
-              to your town.
-            {:else}
-              {endGoal.description_title}
-            {/if}
-          </span>
-          <div class="mt-6 gap-0 py-0 text-accentText opacity-75 text-sm">
-            {#if $DB.endGoal == "land"}
-              <div class="leading-relaxed text-sm">
-                With your difficulty ({difficulty}), you must also have:
-              </div>
-              <ul class="list-inside list-disc leading-relaxedmt-0 text-sm">
-                <li>
-                  {#if $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].population_count}
-                    ✅
-                  {:else}
-                    ❌
-                  {/if}
-                  Population: {JSON.stringify(
-                    endGoal.requirements[$DB.difficulty].population_count,
-                  )} - Currently at {JSON.stringify(
-                    $DB.townInfo.population_count,
-                  )}
-                </li>
-                <li>
-                  {#if $DB.townInfo.happiness >= endGoal.requirements[$DB.difficulty].happiness}
-                    ✅
-                  {:else}
-                    ❌
-                  {/if}
-                  Happiness: {JSON.stringify(
-                    endGoal.requirements[$DB.difficulty].happiness,
-                  )} - Currently at {JSON.stringify($DB.townInfo.happiness)}
-                </li>
-                <li>
-                  {#if $DB.townInfo.employees / $DB.townInfo.population_count >= endGoal.requirements[$DB.difficulty].employment}
-                    ✅
-                  {:else}
-                    ❌
-                  {/if}
-                  Employment: {JSON.stringify(
-                    endGoal.requirements[$DB.difficulty].employment * 100,
-                  )}% - Currently at {JSON.stringify(
-                    ($DB.townInfo.employees / $DB.townInfo.population_count ||
-                      0) * 100,
-                  )}%
-                </li>
-                <li>
-                  {#if $DB.townInfo.health >= endGoal.requirements[$DB.difficulty].health}
-                    ✅
-                  {:else}
-                    ❌
-                  {/if}
-                  Health: {JSON.stringify(
-                    endGoal.requirements[$DB.difficulty].health,
-                  )} - Currently at {JSON.stringify($DB.townInfo.health)}
-                </li>
-
-                <li>
-                  {#if $DB.townInfo.knowledge_points >= endGoal.requirements[$DB.difficulty].knowledge}
-                    ✅
-                  {:else}
-                    ❌
-                  {/if}
-                  Knowledge: {JSON.stringify(
-                    endGoal.requirements[$DB.difficulty].knowledge,
-                  )} - Currently at {JSON.stringify(
-                    $DB.townInfo.knowledge_points,
-                  )}
-                </li>
-              </ul>
-              {#if endGoal.requirements[$DB.difficulty].required_plots != null && endGoal.requirements[$DB.difficulty].required_plots.length > 0}
-                <br />
-                You also need to have these plots:
-                {#each endGoal.requirements[$DB.difficulty].required_plots as plot}
-                  <div class="text-sm">
-                    <li>
-                      {#if hasPlotOfType(plot, $DB).length > 0}
-                        ✅
-                      {:else}
-                        ❌
-                      {/if}
-                      {plot}
-                    </li>
-                  </div>
-                {/each}
-              {/if}
-            {/if}
+    <div class="flex flex-row w-full gap-10 justify-between">
+      <div class="flex flex-col flex-grow max-h-[80%] justify-between">
+        <div class="flex flex-col bg-accent rounded-md p-2 pt-3">
+          <div class="text-sm pb-2">Switch towns</div>
+          <ul class="flex flex-col gap-0">
+            {#each games as game, index}
+              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+              <li
+                class="text-sm rounded-sm p-2
+                 flex flex-col
+                 {index == $userDB.selectedGame
+                  ? 'bg-darkerAccent text-accentText cursor-not-allowed'
+                  : 'hover:bg-white hover:text-black cursor-pointer '}
+                "
+                on:click={() => {
+                  setSelectedGame(index);
+                }}
+              >
+                <span class="before:content-['🏠'] before:mr-2"
+                  >{game.townInfo.name}</span
+                >
+                <span class="text-xs opacity-70 font-mono"
+                  >{game.environment.day} days, {formatNumber(
+                    game.townInfo.gold,
+                    false,
+                  )} gold, {formatNumber(game.townInfo.population_count, false)}
+                  population
+                </span>
+              </li>
+            {/each}
+          </ul>
+          <div class="flex flex-row justify-end pt-2">
+            <SimpleButton
+              styling="font-bold hover:brightness-110 hover:bg-sidebarBackground hover:text-black w-min"
+              text="+ Build new town"
+              onOpen={restartGame}
+            />
           </div>
         </div>
-        <div class="flex flex-row flex-wrap flex-wrap gap-3">
-          <SimpleButton styling="w-min" text="💾 Save Game" onOpen={saveGame} />
+        <div class="flex flex-row flex-wrap gap-3">
+          <SimpleButton
+            styling="bg-gray-500"
+            text="💾 Save town file"
+            onOpen={saveGame}
+          />
 
           <SimpleButton
-            styling="w-min"
-            text="📤 Load Game"
+            text="📤 Load town file"
+            styling="bg-gray-500"
             onOpen={() => {
               const input = document.createElement("input");
               input.type = "file";
@@ -310,19 +257,24 @@
               input.click();
             }}
           />
-
           <SimpleButton
-            styling="bg-black opacity-50 w-min"
-            text="🔄 New Game"
-            onOpen={restartGame}
-          />
-          <SimpleButton
-            styling="bg-black opacity-50 w-min"
-            text="📲 Share game"
+            text="📲 Share town"
+            styling="bg-gray-500"
             onOpen={async () => {
               const url = await compressMyGame();
               navigator.clipboard.writeText(url);
               alert("Copied to clipboard");
+            }}
+          />
+          <SimpleButton
+            text="❌ Delete current town"
+            styling="bg-red-800"
+            onOpen={async () => {
+              // clear the current selected game from the userDB, and then switch to the next game
+              let newUserDB = { ...$userDB };
+              newUserDB.games.splice($userDB.selectedGame, 1);
+              localStorage.setItem(USER_DB_NAME, JSON.stringify(newUserDB));
+              setSelectedGame(0);
             }}
           />
           {#if $DB.gameSettings.includes("devMode")}
@@ -336,95 +288,90 @@
           {/if}
         </div>
       </div>
-      {#if localStorage.getItem(TEMP_GAME_DB_NAME) == null}
-        <div class="flex-grow">
-          <h4 class="underline underline-offset-4">
-            Your achievement ({completedAchievements.length}
-            / {achievements.length})
-          </h4>
-          <span class="text-sm text-gray-400"
-            >Track your progress through games & complete challenges!
-          </span>
-          <br />
-          <div class="overflow-scroll mt-2 h-[60vh]">
-            <div
-              class="flex flex-col gap-4 overflow-scroll pb-10 scroll-smooth"
-            >
-              {#each reactiveAchievements as achievement}
-                <div
-                  class="flex flex-col gap-3 cursor-default rounded-xl
+      <div class="flex flex-col gap-6 justify-between">
+        {#if localStorage.getItem(TEMP_GAME_DB_NAME) == null}
+          <div class="flex-grow">
+            <h4 class="underline underline-offset-4">
+              Achievements ({completedAchievements.length}
+              / {achievements.length})
+            </h4>
+            <span class="text-sm text-gray-400"
+              >Track your progress through towns & complete challenges! Rewards
+              for completing achievements can be applied to the current town.
+            </span>
+            <br />
+            <div class="overflow-scroll mt-2 h-[60vh]">
+              <div
+                class="flex flex-col gap-4 overflow-scroll pb-10 scroll-smooth"
+              >
+                {#each reactiveAchievements as achievement}
+                  <div
+                    class="flex flex-col gap-3 cursor-default rounded-xl
 						{hasAchievement(achievement.id)
-                    ? 'bg-green-700 text-accentText'
-                    : 'bg-gray-500 opacity-35'}
+                      ? 'bg-green-700 text-accentText'
+                      : 'bg-gray-500 opacity-35'}
 						
 						"
-                >
-                  <div class="flex-col flex px-3 py-2 gap-0">
-                    <div class="min-w-32 flex">
-                      <span class="flex flex-row justify-between w-[100%]">
-                        <div
-                          class="flex flex-row gap-3 w-[100%] text- items-center
+                  >
+                    <div class="flex-col flex px-3 py-2 gap-1">
+                      <div class="min-w-32 flex">
+                        <span class="flex flex-row w-[100%]">
+                          <div
+                            class="flex flex-row w-[100%] justify-between gap-6
 
 										"
-                        >
-                          <span class="font-semibold text-lg"
-                            >{achievement.title}</span
                           >
+                            <span class="font-semibold text-sm text-nowrap">
+                              {achievement.icon} {achievement.title}</span
+                            >
 
-                          <div class="font-thin opacity-75 text-xs">
-                            {achievement.requirements}
+                            <div
+                              class="font-thin opacity-75 text-xs text-wrap max-w-[50%]"
+                            >
+                              {achievement.requirements}
+                            </div>
                           </div>
-                        </div>
-                        <div
-                          class="text-2xl pr-1 break-inside-avoid
-											"
-                        >
-                          {achievement.icon}
-                        </div>
-                      </span>
-                    </div>
-                    <div class=" opacity-85 text-xs font-light">
-                      {achievement.description}
-                    </div>
-                    <div
-                      class="pb-2 {hasAchievement(achievement.id)
-                        ? ''
-                        : 'hidden'} text-xs text-green-400"
-                    >
-                      ✅ Completed on Day {getAchievementCompletionDayAndTown(
-                        achievement.id,
-                      )}
-                    </div>
+                        </span>
+                      </div>
+                      <div class=" opacity-85 text-xs font-light">
+                        {achievement.description}
+                      </div>
+                      <div
+                        class="pb-2 {hasAchievement(achievement.id)
+                          ? ''
+                          : 'hidden'} text-xs text-green-400"
+                      >
+                        ✅ Completed on Day {getAchievementCompletionDayAndTown(
+                          achievement.id,
+                        )}
+                      </div>
 
-                    {#if hasAchievement(achievement.id) && !achievementPrizeCollected(achievement.id)}
-                      <SimpleButton
-                        text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
-                        styling={"bg-yellow-300 text-black"}
-                        onOpen={() => {
-                          collectPrize(achievement.id);
-                          // hide this button
-                          const button = document.getElementById(
-                            `collectPrize-${achievement.id}`,
-                          );
-                          if (button) {
-                            button.style.display = "none";
-                          }
-                        }}
-                      />
-                    {/if}
+                      {#if hasAchievement(achievement.id) && !achievementPrizeCollected(achievement.id)}
+                        <SimpleButton
+                          text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
+                          styling={"bg-yellow-300 text-black"}
+                          onOpen={() => {
+                            collectPrize(achievement.id);
+                            // hide this button
+                            const button = document.getElementById(
+                              `collectPrize-${achievement.id}`,
+                            );
+                            if (button) {
+                              button.style.display = "none";
+                            }
+                          }}
+                        />
+                      {/if}
+                    </div>
                   </div>
-                </div>
-              {/each}
+                {/each}
+              </div>
             </div>
           </div>
-          <span class="text-sm text-yellow-400"
-            >Prizes apply to the current game you are in. You can wait to apply
-            them until the right time.
-          </span>
-        </div>
-      {/if}
-    </div>
-  </Dialog.Content>
+        {/if}
+      </div>
+    </div></Dialog.Content
+  >
 </Dialog.Root>
 
 <AlertDialog.Root open={$showAchievementPopup}>

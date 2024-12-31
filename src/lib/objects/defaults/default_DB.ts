@@ -1,6 +1,7 @@
 import { Game, UserDatabase } from "$lib/types";
 
 export const default_db: Game = {
+  gameId: Math.floor(Math.random() * 10000000000),
   plots: [],
   timeSpent: 0,
   lastChangeDay: 0,
@@ -92,4 +93,6 @@ export const default_user_db: UserDatabase = {
     losses: 0,
   },
   achievements: [],
+  selectedGame: 0,
+  games: [],
 };

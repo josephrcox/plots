@@ -15,13 +15,13 @@
       ? onHoverText
       : "Why are you hovering here?"}</Tooltip.Content
   >
-  <Tooltip.Trigger class="flex flex-col ">
+  <Tooltip.Trigger class="flex flex-col">
     <Button
-      class="text-sm flex flex-col  cursor-pointer py-1.5 rounded-xl bg-accent text-accentText
-  {styling} cursor-pointer opacity-{opacity} {opacity < 100
-        ? 'hover:opacity-40'
-        : ''} transition-all duration-150 filter hover:brightness-110
-  "
+      class="text-sm flex flex-col py-1.5 
+        opacity-{opacity} {opacity < 100 ? 'hover:opacity-40' : ''} 
+        rounded-xl cursor-pointer transition-all duration-150 
+        filter hover:brightness-110
+        {styling}"
       on:click={onOpen}><div>{text}</div></Button
     >
   </Tooltip.Trigger>

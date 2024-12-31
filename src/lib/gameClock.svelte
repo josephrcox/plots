@@ -24,7 +24,7 @@
   import { tutorialMessages } from "./objects/tutorial_messages";
   import { getOptionIndex, isAdjacentToWater, randomizeNumber } from "./utils";
   import { laws } from "./objects/Laws";
-  import { Achievement, Game, TownLog, Vibe } from "./types.js";
+  import { Achievement, Game, TownLog, UserDatabase, Vibe } from "./types.js";
 
   let z = $DB;
   const GAME_TICK_SPEED = 30;
@@ -155,6 +155,14 @@
         }
 
         currentDB = performDailyTasks(currentDB);
+        const userDB: UserDatabase = JSON.parse(
+          localStorage.getItem(USER_DB_NAME) || "{}",
+        );
+        if (userDB.selectedGame > userDB.games.length) {
+          userDB.selectedGame = 0;
+        }
+        userDB.games[userDB.selectedGame] = JSON.stringify(currentDB);
+        localStorage.setItem(USER_DB_NAME, JSON.stringify(userDB));
         return currentDB;
       } catch (error) {
         // if localhost, alert
@@ -170,11 +178,15 @@
   DB.subscribe((currentDB) => {
     if (currentDB) {
       localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(currentDB));
-    }
-  });
-  userDB.subscribe((currentDB) => {
-    if (currentDB) {
-      localStorage.setItem(USER_DB_NAME, JSON.stringify(currentDB));
+      // find the game in the userDB and update it
+      const userDB: UserDatabase = JSON.parse(
+        localStorage.getItem(USER_DB_NAME) || "{}",
+      );
+      if (userDB.selectedGame > userDB.games.length) {
+        userDB.selectedGame = 0;
+      }
+      userDB.games[userDB.selectedGame] = JSON.stringify(currentDB);
+      localStorage.setItem(USER_DB_NAME, JSON.stringify(userDB));
     }
   });
 
@@ -1570,6 +1582,28 @@
     n = parseFloat((n * m).toFixed(11));
     let test = Math.round(n) / m;
     return +test.toFixed(digits);
+  }
+
+  export function syncGameState(currentDB: Game) {
+    if (!currentDB) return;
+
+    // Update active game DB
+    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(currentDB));
+
+    // Update game in userDB
+    const userDB: UserDatabase = JSON.parse(
+      localStorage.getItem(USER_DB_NAME) || "{}",
+    );
+
+    if (userDB.selectedGame > userDB.games.length) {
+      userDB.selectedGame = 0;
+    }
+
+    // Update the specific game in the games array
+    userDB.games[userDB.selectedGame] = JSON.stringify(currentDB);
+
+    // Save updated userDB
+    localStorage.setItem(USER_DB_NAME, JSON.stringify(userDB));
   }
 
   onMount(async () => {

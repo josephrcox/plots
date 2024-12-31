@@ -35,6 +35,7 @@ const config = {
         accentText: "rgba(255, 255, 255, 1)", // Bright white (unchanged)
         foregroundDark: "rgba(39, 35, 22, 1)", // Very deep brown
         accent: "rgba(168, 115, 75, 1)", // Deeper, more muted terracotta that complements the greens and browns
+        darkerAccent: "rgba(130, 80, 50, 1)", // Darker version of accent
         border: "rgba(106, 126, 115, 1)", // Lighter green-gray for borders
         textHappy: "rgba(20, 152, 102, 1)", // Brighter green for success
         textDanger: "rgba(230, 90, 100, 1)", // Slightly softened red

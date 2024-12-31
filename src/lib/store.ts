@@ -517,6 +517,9 @@ export function startGame(
   localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
   DB.set(json); // Update the store with the new value
   localStorage.reset = false;
+  udb.games.push(JSON.stringify(json));
+  udb.selectedGame = udb.games.length - 1;
+  localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
 
   analyticsEvent(json, Events.START_GAME, {
     difficulty: difficulty,
@@ -710,6 +713,26 @@ export function setLiegeLocation(x: number, y: number, z: Game) {
   DB.set(z);
 }
 
+export function setSelectedGame(index: number) {
+  syncActiveGameToUserDB();
+
+  userDB.update((udb) => {
+    udb.selectedGame = index;
+
+    if (udb.games[index] == undefined || udb.games[index] == null) {
+      localStorage.setItem(ACTIVE_GAME_DB_NAME, "");
+      DB.set(null);
+      return udb;
+    }
+
+    const activeGameDB = JSON.parse(udb.games[index]);
+    DB.set(activeGameDB);
+    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(activeGameDB));
+    localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
+    return udb;
+  });
+}
+
 export let modifyPlotMenuOptions = writable({
   visible: false,
   x: 0,
@@ -761,3 +784,18 @@ export let disabledPlotMenu = writable({
   x: 0,
   y: 0,
 });
+
+export function syncActiveGameToUserDB() {
+  const currentGame = JSON.parse(
+    localStorage.getItem(ACTIVE_GAME_DB_NAME) ?? "",
+  );
+  if (!currentGame) return;
+
+  const userDBData = JSON.parse(localStorage.getItem(USER_DB_NAME) ?? "");
+  if (!userDBData || userDBData.selectedGame === undefined) return;
+
+  userDBData.games[userDBData.selectedGame] = JSON.stringify(currentGame);
+
+  localStorage.setItem(USER_DB_NAME, JSON.stringify(userDBData));
+  userDB.set(userDBData);
+}

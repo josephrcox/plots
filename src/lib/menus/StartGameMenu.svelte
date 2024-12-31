@@ -174,13 +174,14 @@
         {$userDB.username}
       </span>
       <div class="space-x-2">
-        <Button
+        <!-- Hiding reset user button for now, experimental -->
+        <!-- <Button
           variant="outline"
           class="border-accent/20 hover:bg-accent/10"
           on:click={deleteAllData}
         >
           Reset user
-        </Button>
+        </Button> -->
         <Button
           class="bg-accent hover:bg-accent/80 text-white"
           on:click={captureAndStart}

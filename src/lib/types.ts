@@ -40,6 +40,7 @@ export type TownLog = {
 };
 
 export type Game = {
+  gameId: number;
   plots: Plot[][]; // 2d array of plot-like objects that mark what is in each plot.
   timeSpent: number; // in seconds
   currentTutorialStep: number; // Index
@@ -134,6 +135,8 @@ export type UserDatabase = {
   };
   // id, day, town name, prize collected.
   achievements: [string, number, string, boolean][];
+  selectedGame: number;
+  games: string[];
 };
 
 export type Achievement = {
