@@ -58,10 +58,10 @@
 
   function achievementPrizeCollected(id: string) {
     const achievement = $userDB.achievements.find(
-      (a: [string, number]) => a[0] == id,
+      (a: [string, number, string]) => a[0] == id,
     );
     if (achievement == null) return false;
-    return achievement[3];
+    return achievement[3] != null;
   }
 
   function collectPrize(id: string) {

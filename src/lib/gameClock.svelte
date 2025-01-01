@@ -116,6 +116,11 @@
   }
 
   export function mainGameThreadLoop() {
+    if (window.location.search.includes("debug=true")) {
+      localStorage.clear();
+      DB.set(null);
+      userDB.set(null);
+    }
     DB.update((currentDB) => {
       if (currentDB == null) {
         return currentDB;
