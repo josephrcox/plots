@@ -1,5 +1,5 @@
 export type Difficulty = "0" | "1" | "2" | "3";
-export type EndGoal = "land";
+export type EndGoal = "land" | "free_play";
 export type Plot = {
   id: string;
   active: boolean;
