@@ -718,8 +718,11 @@ export function setLiegeLocation(x: number, y: number, z: Game) {
   DB.set(z);
 }
 
-export function setSelectedGame(index: number) {
+export function setSelectedGame(index: number, newUserDB: UserDatabase) {
   syncActiveGameToUserDB();
+
+  userDB.set(newUserDB);
+  localStorage.setItem(USER_DB_NAME, JSON.stringify(newUserDB));
 
   userDB.update((udb) => {
     udb.selectedGame = index;

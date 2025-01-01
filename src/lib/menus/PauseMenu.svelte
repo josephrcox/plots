@@ -216,7 +216,7 @@
                   : 'hover:bg-white hover:text-black cursor-pointer '}
                 "
                 on:click={() => {
-                  setSelectedGame(index);
+                  setSelectedGame(index, $userDB);
                 }}
               >
                 <span class="before:content-['🏠'] before:mr-2"
@@ -270,11 +270,12 @@
             text="❌ Delete current town"
             styling="bg-red-800"
             onOpen={async () => {
-              // clear the current selected game from the userDB, and then switch to the next game
               let newUserDB = { ...$userDB };
               newUserDB.games.splice($userDB.selectedGame, 1);
+              console.log(newUserDB);
               localStorage.setItem(USER_DB_NAME, JSON.stringify(newUserDB));
-              setSelectedGame(0);
+              userDB.set(newUserDB);
+              setSelectedGame(0, newUserDB);
             }}
           />
           {#if $DB.gameSettings.includes("devMode")}
