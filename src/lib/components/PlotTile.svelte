@@ -69,7 +69,7 @@
       data-plotOptionId={option.id}
     >
       <div
-        class="flex flex-col w-36 h-48 min-h-32 min-w-36 rounded-xl text-white drop-shadow-lg border-black border-2 hover:translate-y-[-8px] transition-transform duration-300 ease-in-out z-100
+        class="flex flex-col w-36 h-48 min-h-32 min-w-36 rounded-xl text-white z-10 drop-shadow-lg border-black border-2 hover:translate-y-[-8px] transition-transform duration-300 ease-in-out z-100
         {option.selected ? 'border-4 border-white scale-105' : ''}"
         style="background: {color};"
       >
@@ -89,7 +89,7 @@
             <span class="text-[11px] text-wrap">{subtitle} </span>
           {/if}
         </div>
-        <div class="bg-sidebarBackground text-black rounded-t-lg py-1">
+        <div class="bg-sidebarBackground text-black rounded-b-lg z-50 py-1">
           {#if employees}
             <span class="text-[11px] opacity-80"
               >Hires
