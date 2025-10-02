@@ -4,6 +4,7 @@
     DB,
     hasPlotOfType,
     modifyPlotMenuOptions,
+    showCustomAlert,
     showTutorialStepConfetti,
     TEMP_GAME_DB_NAME,
   } from "./store";
@@ -17,6 +18,7 @@
   //@ts-ignore
   import Milestone from "./Milestone.svelte";
   import Confetti from "svelte-confetti";
+  import { CustomAlerts } from "./objects/CustomAlerts";
 
   let atCapacity = false;
   let showCompleted = false;
@@ -227,6 +229,7 @@
     const audio = new Audio("/alert.mp3");
     audio.volume = 0.5;
     audio.play().catch((err) => console.log("Error playing sound:", err));
+    showCustomAlert(CustomAlerts.CAPACITY);
   }
 
   $: {

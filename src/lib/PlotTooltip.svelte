@@ -74,14 +74,16 @@
 
 {#if option != null}
   <div class="p-2 max-w-64">
-    <div class="flex flex-col gap-2">
-      <span class="text-md">{options[getOptionIndex(option.id)].title}</span>
+    <div class="flex flex-col gap-1 mb-1">
+      <span class="text-md font-semibold"
+        >{options[getOptionIndex(option.id)].title}</span
+      >
       <span class="text-xs"
         >{options[getOptionIndex(option.id)].description}</span
       >
     </div>
 
-    <div class="flex flex-col w-36 h-min gap-0 text-xs pb-2">
+    <div class="flex flex-col w-36 h-min text-xs pb-1">
       <Separator class={"bg-accent opacity-25 mt-1 mb-1"} />
       <span class="font-semibold">Requirements</span>
       <div class="flex flex-row gap-1 flex-wrap">

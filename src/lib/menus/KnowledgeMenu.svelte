@@ -32,8 +32,6 @@
       z.townInfo.knowledge_points = 0;
       DB.set(z);
       localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-    } else {
-      showCustomAlert.set("You need a bank to convert knowledge to gold.");
     }
   }
 

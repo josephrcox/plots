@@ -46,7 +46,7 @@
     subtitle = `Produces: ${resources.join(", ")}`;
   }
 
-  function getFailureReasons(): string[] {
+  $: failureReasons = (() => {
     const reasons: string[] = [];
     if (!isAffordable.gold) reasons.push("Not enough gold");
     if (!isAffordable.knowledge) reasons.push("Not enough knowledge");
@@ -56,7 +56,7 @@
     if (!isAffordable.adjacent) reasons.push("Missing adjacent plots");
     if (!isAffordable.requiredPlots) reasons.push("Missing required plots");
     return reasons;
-  }
+  })();
 </script>
 
 <Tooltip.Root openDelay={400} closeDelay={0}>
@@ -123,7 +123,7 @@
             <div class="text-white font-bold text-lg mb-2">
               {name}
             </div>
-            {#each getFailureReasons() as reason}
+            {#each failureReasons as reason}
               <div class="text-red-400 font-semibold text-[10px] mb-1">
                 {reason}
               </div>

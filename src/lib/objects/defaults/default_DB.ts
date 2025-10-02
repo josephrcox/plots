@@ -95,4 +95,5 @@ export const default_user_db: UserDatabase = {
   achievements: [],
   selectedGame: 0,
   games: [],
+  customAlertsShown: [],
 };

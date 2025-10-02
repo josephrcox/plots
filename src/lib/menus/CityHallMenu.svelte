@@ -58,7 +58,7 @@
                     $DB.townInfo.guardians -= 1;
                     $DB.townInfo.employees -= 1;
                   } else {
-                    showCustomAlert.set("No guardians to fire.");
+                    showCustomAlert("No guardians to fire.");
                   }
                 }}>-</Button
               >
@@ -78,7 +78,7 @@
                     $DB.townInfo.guardians += 1;
                     $DB.townInfo.employees += 1;
                   } else {
-                    showCustomAlert.set("Not enough people.");
+                    showCustomAlert("Not enough people.");
                   }
                 }}>+</Button
               >
@@ -125,7 +125,7 @@
                       $DB.resources.bureaucracy -= law.cost;
                       $DB.economyAndLaws.enacted.push(law.id);
                     } else {
-                      showCustomAlert.set("Not enough bureaucracy!");
+                      showCustomAlert("Not enough bureaucracy!");
                     }
                   }
                 }}

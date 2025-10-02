@@ -63,7 +63,7 @@
 
   function purchaseExperiment(chosen: Experiment) {
     if ($DB.townInfo.gold < chosen.cost) {
-      showCustomAlert.set(
+      showCustomAlert(
         "You do not have enough gold to purchase this experiment.",
       );
       return;

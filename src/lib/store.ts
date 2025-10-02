@@ -8,6 +8,7 @@ import { max_tax_rates_based_on_difficulty } from "./objects/difficulty.js";
 // @ts-ignore
 import { options } from "./objects/PlotTypeOptions";
 import { analyticsEvent } from "./utils.js";
+import { CustomAlerts } from "./objects/CustomAlerts.js";
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -768,7 +769,17 @@ export let showAchievementPopup = writable(false);
 export let showLabMenu = writable(false);
 export let settingLiegeLocation = writable(false);
 export let showCityHallMenu = writable(false);
-export let showCustomAlert = writable("");
+
+export let customAlertText = writable("");
+
+export function showCustomAlert(alert: CustomAlerts | string) {
+  let userDB = JSON.parse(localStorage.getItem(USER_DB_NAME) ?? "");
+  if (userDB.customAlertsShown.includes(alert)) return;
+  userDB.customAlertsShown.push(alert);
+  localStorage.setItem(USER_DB_NAME, JSON.stringify(userDB));
+  customAlertText.set(alert);
+}
+
 export let showCompletedAchievements =
   localStorage.getItem("showCompletedAchievements") === "true"
     ? writable(true)

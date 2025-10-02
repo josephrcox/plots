@@ -139,18 +139,18 @@ export const options: PlotOption[] = [
     title: "Farm",
     type: "farm",
     description: "Produces veggies, grains, fruit",
-    revenue_per_week: 6,
+    revenue_per_week: 10,
     requirements: {
-      gold: 80,
+      gold: 150,
       plots: [],
-      employees: 4,
+      employees: 6,
       knowledge: 0,
       size: 1,
       xp: 0,
       resources: {
         food: 0,
-        wood: 10,
-        stone: 10,
+        wood: 15,
+        stone: 15,
         metal: 0,
         power: 0,
         bureaucracy: 0,
@@ -174,7 +174,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 5,
+      food: 10,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -197,7 +197,7 @@ export const options: PlotOption[] = [
     weekly_effect_modifiers: {
       happiness: 1.0,
       health: 1.002,
-      community: 1.002,
+      community: 1.0,
     },
   },
 

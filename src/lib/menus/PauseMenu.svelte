@@ -128,12 +128,12 @@
       const contents = e.target.result;
       if (typeof contents === "string") {
         if (!isValidFile(contents)) {
-          showCustomAlert.set("Invalid game file");
+          showCustomAlert("Invalid game file");
           return;
         }
         clearDB(JSON.parse(contents));
       } else {
-        showCustomAlert.set("Invalid game file: is not String.");
+        showCustomAlert("Invalid game file: is not String.");
       }
     };
     reader.readAsText(file);

@@ -12,7 +12,7 @@
       on:click={() => {
         const attempt = expandTown($DB, direction);
         if (attempt) {
-          showCustomAlert.set(attempt);
+          showCustomAlert(attempt);
         }
       }}
     >

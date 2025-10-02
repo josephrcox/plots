@@ -1,3 +1,5 @@
+import { CustomAlerts } from "./objects/CustomAlerts";
+
 export type Difficulty = "0" | "1" | "2" | "3";
 export type EndGoal = "land" | "free_play";
 export type Plot = {
@@ -137,6 +139,7 @@ export type UserDatabase = {
   achievements: [string, number, string, boolean][];
   selectedGame: number;
   games: string[];
+  customAlertsShown: CustomAlerts[];
 };
 
 export type Achievement = {

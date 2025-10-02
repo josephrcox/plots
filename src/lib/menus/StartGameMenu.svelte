@@ -43,7 +43,7 @@
   };
 
   function deleteAllData() {
-    showCustomAlert.set("Deleted :)");
+    showCustomAlert("Deleted :)");
     localStorage.clear();
     window.location.href = "";
   }
