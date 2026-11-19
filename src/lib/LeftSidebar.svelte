@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { roundTo } from "./utils";
-
+  // Left panel: town policies (tax, productivity) with what they do right
+  // now, the town's special actions, and the town log.
   import { fly } from "svelte/transition";
+  import { roundTo, formatAmount } from "./utils";
   import { leftPanelOpen, HUD } from "./ui";
   import {
     DB,
@@ -12,163 +13,228 @@
     hasPlotOfType,
     isReadOnly,
   } from "./store";
+  import {
+    productivityResourceMultiplier,
+    productivityHappinessMultiplier,
+  } from "./simulation";
   import Slider from "./components/ui/slider/slider.svelte";
   import { Vibe } from "./types";
-  import SimpleButton from "./components/SimpleButton.svelte";
 
   $: hasLab = hasPlotOfType("lab", $DB!).length >= 1;
+  $: hasCityHall = hasPlotOfType("city_hall", $DB!).length >= 1;
+  $: taxTooHigh =
+    $DB!.economyAndLaws.tax_rate > $DB!.economyAndLaws.max_tax_rate;
+  $: productivity = $DB!.townInfo.productivity;
+  $: output = productivityResourceMultiplier(productivity);
+  $: mood = productivityHappinessMultiplier(productivity);
 
-  function showTheLabMenu() {
-    if (hasLab) showLabMenu.set(true);
+  function setProductivity(v: number[]) {
+    $DB!.townInfo.productivity = roundTo(v[0], 2);
+  }
+  function setTaxRate(v: number[]) {
+    $DB!.economyAndLaws.tax_rate = roundTo(v[0], 2);
   }
 
-  function setProductivity(newProductivity: number[]) {
-    $DB!.townInfo.productivity = roundTo(newProductivity[0], 2);
-  }
-
-  function setTaxRate(newRate: number[]) {
-    $DB!.economyAndLaws.tax_rate = roundTo(newRate[0], 2);
-  }
+  $: actions = [
+    {
+      icon: "👑",
+      label: $settingLiegeLocation ? "Pick a building…" : "Visit a building",
+      hint: "Boosts the building you stand on",
+      enabled: true,
+      active: $settingLiegeLocation,
+      run: () => ($settingLiegeLocation = !$settingLiegeLocation),
+    },
+    {
+      icon: "🧠",
+      label: "Sell knowledge",
+      hint: $DB!.hasBank ? "Trade knowledge for gold" : "Needs a Bank",
+      enabled: true,
+      active: false,
+      run: () => ($showKnowledgeMenu = true),
+    },
+    {
+      icon: "🏛️",
+      label: "City Hall",
+      hint: hasCityHall ? "Laws, guardians, expansion" : "Build a City Hall",
+      enabled: true,
+      active: false,
+      run: () => ($showCityHallMenu = true),
+    },
+    {
+      icon: "🧪",
+      label:
+        $DB!.lab.active_experiment !== null
+          ? `${$DB!.lab.active_experiment.duration} days left`
+          : "Lab",
+      hint: hasLab ? "Run experiments" : "Build a Laboratory",
+      enabled: hasLab,
+      active: false,
+      run: () => hasLab && ($showLabMenu = true),
+    },
+  ];
 </script>
 
 {#if !$leftPanelOpen}
   <button
-    class="fixed left-3 z-20 bg-sidebarBackground text-sidebarText rounded-lg shadow-lg px-3 py-2 text-sm"
+    class="fixed left-3 z-20 bg-popupBackground text-white rounded-lg shadow-lg px-3 py-2 text-sm"
     style="top:{HUD.top + 8}px;"
     title="Show town panel"
     on:click={() => ($leftPanelOpen = true)}>🏛️ Town ›</button
   >
-{:else}
-<div class="text-sidebarText" transition:fly={{ x: -40, duration: 150 }}>
+{:else if $DB}
   <div
-    class="text-sidebarText bg-sidebarBackground overflow-y-auto no-scrollbar border-foregroundDark border-4
-		z-20 fixed left-3 py-2 bottom-3 drop-shadow-xl rounded-xl"
+    class="panel fixed left-3 bottom-3 z-20 flex flex-col gap-3 overflow-hidden"
     style="top:{HUD.top + 8}px; width:{HUD.panel - 16}px;"
+    transition:fly={{ x: -40, duration: 150 }}
   >
-    <button
-      class="absolute top-1 right-2 text-sm opacity-50 hover:opacity-100"
-      title="Hide panel"
-      on:click={() => ($leftPanelOpen = false)}>‹</button
-    >
-    <div class="flex flex-col justify-center mx-2 gap-4">
-      <div
-        class="flex flex-col gap-2 rounded-xl text-center justify-center mb-2 mt-0 pt-2"
+    <div class="flex flex-row items-center justify-between">
+      <span class="heading">Policies</span>
+      <button
+        class="opacity-50 hover:opacity-100 text-sm px-1"
+        title="Hide panel"
+        on:click={() => ($leftPanelOpen = false)}>‹</button
       >
-        <div
-          class="flex flex-col justify-center w-full text-center items-center gap-1
-        min-h-12 pb-2 rounded-xl"
-        >
-          <div class="mb-1">
-            <span class="text-sm">Tax Rate</span>
-            <span class="text-sm"
-              >{roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%</span
-            >
-          </div>
-          <Slider
-            value={[$DB.economyAndLaws.tax_rate]}
-            onValueChange={setTaxRate}
-            min={0}
-            max={0.5}
-            step={0.05}
-            disabled={isReadOnly}
-            class="cursor-pointer w-[75%]"
-          />
-        </div>
-        <div
-          class="flex flex-col justify-center w-full text-center items-center gap-2"
-        >
-          <div class="mb-1">
-            <span class="text-sm">Productivity</span>
-            <span class="text-sm">{roundTo($DB.townInfo.productivity, 0)}%</span
-            >
-          </div>
-          <Slider
-            value={[$DB.townInfo.productivity]}
-            onValueChange={setProductivity}
-            min={0}
-            max={200}
-            step={5}
-            disabled={isReadOnly}
-            class="cursor-pointer w-[75%]"
-          />
-        </div>
-      </div>
-      <div>
-        <div class="flex flex-col gap-2">
-          <SimpleButton
-            text={!$settingLiegeLocation
-              ? "👑 Set your location (boost)"
-              : "Select an active plot!"}
-            onOpen={function () {
-              $settingLiegeLocation = !$settingLiegeLocation;
-            }}
-          />
+    </div>
 
-          <SimpleButton
-            text="🧠 Sell Knowledge"
-            onOpen={function () {
-              $showKnowledgeMenu = !$showKnowledgeMenu;
-            }}
-          />
-          <SimpleButton
-            text="🏢 Manage City"
-            onOpen={function () {
-              $showCityHallMenu = !$showCityHallMenu;
-            }}
-          />
-          <SimpleButton
-            text={$DB.lab.active_experiment !== null
-              ? `🧪 ${$DB.lab.active_experiment.duration} days left`
-              : "🧪 Manage Lab"}
-            onOpen={showTheLabMenu}
-            opacity={hasLab ? 100 : 30}
-            onHoverText={hasLab
-              ? ""
-              : "Build a Lab to perform experiments. Experiments can save lives, make money, or generally improve your town."}
-          />
-        </div>
+    <!-- Tax -->
+    <div class="policy">
+      <div class="flex flex-row justify-between text-sm">
+        <span>💰 Tax rate</span>
+        <span class="font-mono">{roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%</span>
       </div>
-      <div>
-        <div class="overflow-y-scroll h-[100%] w-[100%] pb-4 scroll-smooth">
-          {#each $DB.townLog as log}
-            <div
-              class=" px-2 py-2 rounded-2xl fade-in mb-4
-        {log.vibe == Vibe.BAD
-                ? 'bg-white text-textDanger border '
-                : log.vibe == Vibe.GOOD
-                  ? 'bg-green-300'
-                  : log.vibe == Vibe.NORMAL
-                    ? 'bg-accent'
-                    : 'bg-accent'}
-      
-      "
-            >
-              <p
-                class="font-mono text-[10px]
-          "
-              >
-                DAY {log.day}
-              </p>
-              <p class="text-xs">{log.message}</p>
-            </div>
-          {/each}
-        </div>
+      <Slider
+        value={[$DB.economyAndLaws.tax_rate]}
+        onValueChange={setTaxRate}
+        min={0}
+        max={0.5}
+        step={0.05}
+        disabled={isReadOnly}
+        class="cursor-pointer"
+      />
+      <span class="text-[11px]" class:text-red-300={taxTooHigh} class:opacity-70={!taxTooHigh}>
+        {taxTooHigh
+          ? "Too high: people are unhappy about taxes"
+          : "People accept this rate"} · 💰{formatAmount(
+          $DB.economyAndLaws.weeklyProfit,
+        )}/wk
+      </span>
+    </div>
+
+    <!-- Productivity -->
+    <div class="policy">
+      <div class="flex flex-row justify-between text-sm">
+        <span>⚒️ Productivity</span>
+        <span class="font-mono">{Math.round(productivity)}%</span>
       </div>
+      <Slider
+        value={[productivity]}
+        onValueChange={setProductivity}
+        min={0}
+        max={200}
+        step={5}
+        disabled={isReadOnly}
+        class="cursor-pointer"
+      />
+      <span class="text-[11px] opacity-80">
+        Output ×{output}
+        {#if mood !== 1}
+          · <span class={mood > 1 ? "text-green-300" : "text-red-300"}
+            >mood {mood > 1 ? "+" : "−"}{Math.round(Math.abs(mood - 1) * 100)}%/month</span
+          >
+        {/if}
+      </span>
+    </div>
+
+    <!-- Actions -->
+    <div class="grid grid-cols-2 gap-1.5">
+      {#each actions as a}
+        <button
+          class="action"
+          class:active={a.active}
+          class:disabled={!a.enabled}
+          title={a.hint}
+          on:click={a.run}
+        >
+          <span class="text-lg leading-none">{a.icon}</span>
+          <span class="text-[11px] leading-tight">{a.label}</span>
+          <span class="text-[9px] leading-tight opacity-60">{a.hint}</span>
+        </button>
+      {/each}
+    </div>
+
+    <!-- Town log -->
+    <span class="heading">Town log</span>
+    <div class="flex flex-col gap-1.5 overflow-y-auto no-scrollbar flex-1 min-h-0 -mt-1">
+      {#each $DB.townLog as log (log.day + log.message)}
+        <div
+          class="log"
+          class:bad={log.vibe == Vibe.BAD}
+          class:good={log.vibe == Vibe.GOOD}
+        >
+          <span class="text-[9px] font-mono opacity-60">DAY {log.day}</span>
+          <span class="text-[11px] leading-snug">{log.message}</span>
+        </div>
+      {:else}
+        <span class="text-[11px] opacity-50">Nothing has happened yet.</span>
+      {/each}
     </div>
   </div>
-</div>
 {/if}
 
 <style>
-  * {
-    scrollbar-width: none;
+  .panel {
+    background: rgb(45, 51, 39);
+    color: white;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
   }
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  .heading {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+  }
+  .policy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.07);
+    text-align: center;
+  }
+  .action:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+  .action.active {
+    background: rgb(168, 115, 75);
+  }
+  .action.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .log {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 8px;
+    border-radius: 8px;
+    border-left: 3px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .log.bad {
+    border-left-color: rgb(248, 113, 113);
+  }
+  .log.good {
+    border-left-color: rgb(74, 222, 128);
   }
 </style>

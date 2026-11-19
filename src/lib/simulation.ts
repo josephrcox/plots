@@ -176,7 +176,7 @@ function finiteOr(n: number, fallback: number) {
 }
 
 /** Slider productivity → resource generation multiplier. */
-function productivityResourceMultiplier(productivity: number) {
+export function productivityResourceMultiplier(productivity: number) {
   if (productivity < 50) return 0.5;
   if (productivity < 100) return 0.75;
   if (productivity === 100) return 1;
@@ -187,7 +187,7 @@ function productivityResourceMultiplier(productivity: number) {
 }
 
 /** Slider productivity → monthly happiness multiplier. */
-function productivityHappinessMultiplier(productivity: number) {
+export function productivityHappinessMultiplier(productivity: number) {
   if (productivity < 50) return 1.3;
   if (productivity < 100) return 1.05; // Happy citizens
   if (productivity === 100) return 1;

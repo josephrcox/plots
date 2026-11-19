@@ -114,7 +114,7 @@
 </script>
 
 <div
-  class="fixed top-0 left-0 right-0 z-30 bg-black/85 text-white flex flex-row items-center gap-3 px-3 shadow-lg"
+  class="fixed top-0 left-0 right-0 z-30 bg-black text-white flex flex-row items-center gap-3 px-3 shadow-lg"
   style="height:{HUD.top}px;"
 >
   <!-- Town -->
