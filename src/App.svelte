@@ -7,25 +7,19 @@
 
   import {
     paused,
-    unique,
     DB,
-    clearDB,
     modifyPlotMenuOptions,
     startGameMenu,
     showWelcome,
     settingLiegeLocation,
-    setLiegeLocation,
     disabledPlotMenu,
+    resolveDisabledPlot,
     showKnowledgeMenu,
     showCityHallMenu,
     showLabMenu,
     showScoreboard,
-    userDB,
-    TEMP_GAME_DB_NAME,
-    // @ts-ignore
-  } from "./lib/store.ts";
-  // @ts-ignore
-  import { runTests } from "./tests";
+    showAchievementPopup,
+  } from "./lib/store";
   import GameEndMenu from "./lib/menus/GameEndMenu.svelte";
   import StartGameMenu from "./lib/menus/StartGameMenu.svelte";
   import Scoreboard from "./lib/menus/Scoreboard.svelte";
@@ -35,28 +29,11 @@
   import WelcomeScreen from "./lib/menus/WelcomeScreen.svelte";
   import CityHallMenu from "./lib/menus/CityHallMenu.svelte";
   import CustomAlert from "./lib/components/CustomAlert.svelte";
+  import { runTests } from "./tests";
 
-  let dbInitialized = false;
   runTests();
 
-  $: if ($DB) {
-    $startGameMenu.visible = false;
-    dbInitialized = true;
-    if ($settingLiegeLocation == true) {
-      // where data-active=="true"
-      const plots = document.querySelectorAll(".plot_container");
-      plots.forEach((plot: any) => {
-        if (plot.dataset.canbeupgraded == "true") {
-          plot.style.cursor = "pointer";
-          plot.style.cursor =
-            "url('https://github.com/josephrcox/plots/raw/main/public/liege_place.cur'), auto";
-        }
-      });
-    }
-  } else {
-    $startGameMenu.visible = true;
-    dbInitialized = false;
-  }
+  $: $startGameMenu.visible = $DB == null;
 
   const colors = [
     // { r: 60, g: 50, b: 100 }, // Subtle Ultra Violet
@@ -75,7 +52,8 @@
   let transitionProgress = 0;
   const transitionSpeed = 0.0001; // Even slower transitions for seasonal effect
 
-  function blendColors(color1, color2, ratio) {
+  type RGB = { r: number; g: number; b: number };
+  function blendColors(color1: RGB, color2: RGB, ratio: number): RGB {
     return {
       r: Math.round(color1.r + (color2.r - color1.r) * ratio),
       g: Math.round(color1.g + (color2.g - color1.g) * ratio),
@@ -109,81 +87,53 @@
   // Start the color transition
   updateBackgroundColor();
 
-  // if key P is pressed, pause the game
-  document.addEventListener("keydown", (e) => {
-    if (
-      ((document.activeElement != null &&
-        document.activeElement.nodeName === "INPUT") ||
-        (document.activeElement != null &&
-          document.activeElement.nodeName == "TEXTAREA")) &&
-      e.key !== "Escape"
-    )
+  // P / Escape closes the top-most menu, or toggles pause if none is open.
+  function handleKeydown(e: KeyboardEvent) {
+    const active = document.activeElement?.nodeName;
+    if ((active === "INPUT" || active === "TEXTAREA") && e.key !== "Escape") {
       return;
-    let key = e.key.toLowerCase();
-    switch (key) {
-      case "p":
-      case "escape":
-        // Check for any open menus first
-        if ($showKnowledgeMenu) {
-          $showKnowledgeMenu = false;
-          break;
-        }
-        if ($showLabMenu) {
-          $showLabMenu = false;
-          break;
-        }
-        if ($showCityHallMenu) {
-          $showCityHallMenu = false;
-          break;
-        }
-        if ($showScoreboard) {
-          $showScoreboard = false;
-          break;
-        }
-        if ($modifyPlotMenuOptions.visible) {
-          $modifyPlotMenuOptions.visible = false;
-          break;
-        }
-        if ($disabledPlotMenu.visible) {
-          // If disabled plot menu is open, close it and bulldoze the plot
-          const plot = $DB.plots[$disabledPlotMenu.x][$disabledPlotMenu.y];
-          plot.active = false;
-          plot.type = -1;
-          plot.disabled = false;
-          $disabledPlotMenu.visible = false;
-          break;
-        }
-        if ($settingLiegeLocation) {
-          settingLiegeLocation.set(false);
-          const plots = document.querySelectorAll(".plot_container");
-          plots.forEach((plot: any) => {
-            plot.style.cursor = "";
-          });
-          break;
-        }
-
-        // If no menus are open, toggle pause state
-        paused.set(!$paused);
-        // Ensure menus are closed when pausing
-        if ($paused) {
-          $modifyPlotMenuOptions.visible = false;
-        }
-        break;
-
-      default:
-        break;
     }
-  });
+    const key = e.key.toLowerCase();
+    if (key !== "p" && key !== "escape") return;
+
+    // The achievement popup lives inside the pause menu; close it first so it
+    // doesn't linger and reappear the next time the game is paused.
+    if ($showAchievementPopup) return ($showAchievementPopup = false);
+    if ($showKnowledgeMenu) return ($showKnowledgeMenu = false);
+    if ($showLabMenu) return ($showLabMenu = false);
+    if ($showCityHallMenu) return ($showCityHallMenu = false);
+    if ($showScoreboard) return ($showScoreboard = false);
+    if ($modifyPlotMenuOptions.visible) {
+      return ($modifyPlotMenuOptions.visible = false);
+    }
+    if ($disabledPlotMenu.visible) {
+      // Escape dismisses the warning, which bulldozes the plot. P does nothing
+      // here: pausing should never destroy a building.
+      if (key === "escape") resolveDisabledPlot("bulldoze");
+      return;
+    }
+    if ($settingLiegeLocation) return ($settingLiegeLocation = false);
+
+    $paused = !$paused;
+    if ($paused) $modifyPlotMenuOptions.visible = false;
+  }
 </script>
 
-{#if dbInitialized || $DB == null}
-  {#if $DB == null}
-    <StartGameMenu />
-  {:else}
-    {#if $paused == true}
-      <PauseMenu />
-    {/if}
+<!-- Registered on document (not window) so it runs before bits-ui's own
+     Escape handling closes a dialog. -->
+<svelte:document on:keydown={handleKeydown} />
+<CustomAlert />
 
+{#if $DB == null}
+  <StartGameMenu />
+{:else}
+  {#if $paused == true}
+    <PauseMenu />
+  {/if}
+
+  <!-- Remount per town so component state (speeds, lab offers...) resets
+       when switching towns. -->
+  {#key $DB.gameId}
     <Hud />
     <GameClock />
     <GameEndMenu />
@@ -191,13 +141,9 @@
     <KnowledgeMenu />
     <LabMenu />
     <CityHallMenu />
-    <CustomAlert />
     <DisabledPlotMenu />
     {#if $DB.environment.day == 0 && $showWelcome}
       <WelcomeScreen />
     {/if}
-  {/if}
+  {/key}
 {/if}
-
-<style>
-</style>

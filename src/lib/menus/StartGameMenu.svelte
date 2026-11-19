@@ -1,25 +1,12 @@
 <script lang="ts">
-  import {
-    startGame,
-    DB,
-    startGameMenu,
-    userDB,
-    setUserDB,
-    paused,
-    showCustomAlert,
-  } from "../store";
+  import { startGame, startGameMenu, userDB, paused } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import { analyticsEvent, flyAndScale } from "$lib/utils";
+  import { flyAndScale } from "$lib/utils";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import { Difficulty, EndGoal, Events, WinScenario } from "$lib/types";
-  // @ts-ignore
-  import { winScenarios } from "../objects/WinScenarios";
-  import { FormInput } from "lucide-svelte";
 
   paused.set(false);
-  const showDifficulty = false;
 
   function captureAndStart() {
     const townName = (document.getElementById("townName") as HTMLInputElement)
@@ -36,25 +23,9 @@
     startGame(dif, eg, townName, settings);
   }
 
-  let selectedGameMode = "free_play";
-
-  const setSelectedGameMode = (e: Event) => {
-    selectedGameMode = (e.target as HTMLSelectElement).value;
-  };
-
-  function deleteAllData() {
-    showCustomAlert("Deleted :)");
-    localStorage.clear();
-    window.location.href = "";
-  }
-
   function setUsername() {
-    const newName = prompt("Enter new username");
-    if (newName) {
-      let z = $userDB;
-      z.username = newName;
-      setUserDB(z);
-    }
+    const newName = prompt("Enter new username")?.trim();
+    if (newName) $userDB.username = newName;
   }
 
   function keyPressed(e: KeyboardEvent) {

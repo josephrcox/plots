@@ -1,6 +1,5 @@
-import { Law, Game } from "$lib/types";
-import { hasPlotOfType, DB } from "$lib/store";
-import { options } from "./PlotTypeOptions";
+import type { Law, Game } from "$lib/types";
+import { hasPlotOfType } from "$lib/store";
 
 let casualModifier = function (game: Game) {
   return game.gameSettings.includes("casual") ? 3 : 1;
@@ -27,24 +26,15 @@ export const laws: Law[] = [
       "Tax-Free Month. For 1 month, the town loses all revenue from taxes, but happiness and health increase quite a lot. Automatically ends after 4 weeks.",
     cost: 250,
     weekly_effect: (game: Game) => {
-      if (localStorage.getItem("tax_free") === null) {
-        localStorage.setItem("tax_free", "0");
-        game.economyAndLaws.weeklyProfit =
-          -1 * game.economyAndLaws.weeklyProfit;
-      } else {
-        localStorage.setItem(
-          "tax_free",
-          (parseInt(localStorage.getItem("tax_free") as string) + 1).toString(),
-        );
-      }
-      if (parseInt(localStorage.getItem("tax_free") as string) >= 4) {
-        game.modifiers.happiness *= 1;
-        game.modifiers.health *= 1;
-        localStorage.removeItem("tax_free");
+      // Tax revenue is suspended in getProfit while this law is enacted.
+      const weeks = (game.economyAndLaws.tax_free_weeks ?? 0) + 1;
+      if (weeks > 4) {
+        game.economyAndLaws.tax_free_weeks = 0;
         game.economyAndLaws.enacted = game.economyAndLaws.enacted.filter(
           (law) => law !== "tax_free",
         );
       } else {
+        game.economyAndLaws.tax_free_weeks = weeks;
         game.modifiers.happiness *= 1.02;
         game.modifiers.health *= 1.01;
       }
@@ -58,7 +48,6 @@ export const laws: Law[] = [
       "Healthy mining. Miners must mine with proper ventilation, but they move like molasses.",
     cost: 250,
     weekly_effect: (game: Game) => {
-      const option = options.find((option) => option.id === "mine");
       game.modifiers.health *= 1.1;
       game.resources.stone -=
         5 * casualModifier(game) * hasPlotOfType("quarry", game).length;

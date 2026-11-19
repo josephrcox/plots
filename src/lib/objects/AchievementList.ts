@@ -1,4 +1,4 @@
-import { Achievement, Game } from "$lib/types";
+import type { Achievement, Game } from "$lib/types";
 import { hasPlotOfType } from "$lib/store";
 
 export const achievements: Achievement[] = [

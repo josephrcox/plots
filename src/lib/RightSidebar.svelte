@@ -6,16 +6,14 @@
     modifyPlotMenuOptions,
     showCustomAlert,
     showTutorialStepConfetti,
-    TEMP_GAME_DB_NAME,
+    isReadOnly,
   } from "./store";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import TooltipContent from "./components/ui/tooltip/tooltip-content.svelte";
   import Separator from "./components/ui/separator/separator.svelte";
   import { options } from "./objects/PlotTypeOptions";
-  import { Vibe } from "./types";
   import { Progress } from "$lib/components/ui/progress/index.js";
   import { tutorialMessages } from "./objects/tutorial_messages";
-  //@ts-ignore
   import Milestone from "./Milestone.svelte";
   import Confetti from "svelte-confetti";
   import { CustomAlerts } from "./objects/CustomAlerts";
@@ -42,7 +40,13 @@
     | "knowledge"
     | "bureaucracy";
 
-  let resources = [];
+  type ResourceRow = {
+    icon: string;
+    name: string;
+    value: number;
+    rate: number | null;
+  };
+  let resources: ResourceRow[] = [];
   $: resources = [
     {
       icon: "💰",
@@ -86,16 +90,18 @@
       value: $DB.resources.power,
       rate: null,
     },
+    // Bureaucracy only matters once there's a City Hall.
+    ...(hasPlotOfType("city_hall", $DB).length > 0
+      ? [
+          {
+            icon: "🧑‍⚖️",
+            name: "bureaucracy",
+            value: $DB.resources.bureaucracy,
+            rate: $DB.resource_rate.bureaucracy,
+          },
+        ]
+      : []),
   ];
-
-  if (hasPlotOfType("city_hall", $DB).length > 0) {
-    resources.push({
-      icon: "🧑‍⚖️",
-      name: "bureaucracy",
-      value: $DB.resources.bureaucracy,
-      rate: $DB.resource_rate.bureaucracy,
-    });
-  }
 
   function plotsThatNeed(resourceIndex: ResourceKey): string[] {
     let plotsThatNeed: string[] = [];
@@ -120,9 +126,15 @@
   }
 
   function isValidResourceKey(key: string): key is ResourceKey {
-    return ["food", "wood", "stone", "metal", "power", "knowledge"].includes(
-      key,
-    );
+    return [
+      "food",
+      "wood",
+      "stone",
+      "metal",
+      "power",
+      "knowledge",
+      "bureaucracy",
+    ].includes(key);
   }
 
   function getRequiredPlots(resourceName: string): string[] {
@@ -172,7 +184,9 @@
         value: $DB.townInfo.employees,
         modifier: null,
         color: getEmploymentColor(
-          $DB.townInfo.employees / $DB.townInfo.population_count,
+          $DB.townInfo.population_count > 0
+            ? $DB.townInfo.employees / $DB.townInfo.population_count
+            : 1,
         ),
         hover: true,
         max: $DB.townInfo.population_count,
@@ -184,7 +198,7 @@
         value: $DB.townInfo.recreation,
         modifier: null,
         color:
-          $DB.townInfo.recreation / getTotalPlotCount($DB) >= 0.2
+          $DB.townInfo.recreation / Math.max(1, getTotalPlotCount($DB)) >= 0.2
             ? "bg-green-500"
             : "bg-orange-300",
         hover: true,
@@ -246,7 +260,7 @@
       now - lastAlertTime > 30000 &&
       !mini &&
       !$DB.gameSettings.includes("bagOfHolding") &&
-      localStorage.getItem(TEMP_GAME_DB_NAME) == null
+      !isReadOnly
     ) {
       playAtCapacityAlertSound();
       lastAlertTime = now;
@@ -364,12 +378,12 @@ fixed right-3 top-16 sidebar bottom-4"
             "
             >
               {icon}
-              {formatNumber(parseInt(value), false)}
+              {formatNumber(Math.trunc(value), false)}
               {#if value >= $DB.resource_capacity && name != "gold"}
                 <span class="text-textDanger">⚠️ CAP</span>
-              {:else if rate > 0}
+              {:else if rate != null && rate > 0}
                 <span class="text-textHappy">+{rate}</span>
-              {:else if rate < 0}
+              {:else if rate != null && rate < 0}
                 <span class="text-textDanger">{rate}</span>
               {:else if rate == null}
                 <span></span>
@@ -385,9 +399,9 @@ fixed right-3 top-16 sidebar bottom-4"
                   <span class="text-md font-bold"
                     >{icon} {capitalizeFirstLetter(name)}</span
                   >
-                  {#if rate > 0}
+                  {#if rate != null && rate > 0}
                     <span class="text-textHappy">+{rate} (weekly)</span>
-                  {:else if rate < 0}
+                  {:else if rate != null && rate < 0}
                     <span class="text-textDanger">{rate} (weekly)</span>
                   {:else if rate != null}
                     <span class="text-gray-600">+{rate} (weekly)</span>

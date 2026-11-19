@@ -2,55 +2,44 @@
   import { onMount } from "svelte";
   import {
     DB,
-    ACTIVE_GAME_DB_NAME,
     speed,
     modifyPlotMenuOptions,
-    showTutorialStepConfetti,
     paused,
-    TEMP_GAME_DB_NAME,
+    isReadOnly,
   } from "./store";
-  import { formatDuration, formatNumber, roundTo } from "./utils";
+  import { formatDuration } from "./utils";
   import SimpleButton from "./components/SimpleButton.svelte";
   import { Separator } from "$lib/components/ui/separator";
 
-  const speeds = $DB.gameSettings.includes("casual")
-    ? [150, 75, 35]
-    : [300, 150, 70];
+  // Milliseconds per game day for x1 / x2 / x3.
+  const speeds = $DB!.gameSettings.includes("casual")
+    ? [375, 75, 35]
+    : [550, 150, 70];
   let speedIndex = 0;
+  $speed = speeds[0];
 
   onMount(() => {
-    $DB.gameSettings.includes("casual") ? ($speed = 375) : ($speed = 550);
     const interval = setInterval(() => {
-      $DB.timeSpent += 1000;
+      if (!$paused && $DB) $DB.timeSpent += 1000;
     }, 1000);
-
-    return () => {
-      clearInterval(interval); // Clear the interval when the component is destroyed
-    };
+    return () => clearInterval(interval);
   });
 
   function changeName() {
-    let newName = prompt("Enter a new name for your town (under 200 chars)");
-    if (newName && newName.length < 200 && newName.length >= 1) {
-      let z = $DB;
-      z.townInfo.name = newName;
-      DB.set(z);
-      localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
+    if (isReadOnly) return;
+    const newName = prompt("Enter a new name for your town (under 200 chars)");
+    if (newName && newName.trim().length >= 1 && newName.length < 200) {
+      $DB!.townInfo.name = newName.trim();
     }
   }
 
   function nextSpeed() {
-    speedIndex == speeds.length - 1 ? (speedIndex = 0) : speedIndex++;
+    if (isReadOnly) return;
+    speedIndex = (speedIndex + 1) % speeds.length;
     $speed = speeds[speedIndex];
   }
 
-  let formattedTime = "00:00:00";
-
-  $: if ($DB.timeSpent > 0) {
-    formattedTime = formatDuration($DB.timeSpent);
-  } else {
-    formattedTime = "00:00:00";
-  }
+  $: formattedTime = formatDuration($DB?.timeSpent ?? 0);
 </script>
 
 <div
@@ -121,12 +110,7 @@
               />
               <span
                 class="cursor-pointer text-blue-200 noselect"
-                on:click={() => {
-                  if (localStorage.getItem(TEMP_GAME_DB_NAME) != null) {
-                    return;
-                  }
-                  nextSpeed();
-                }}
+                on:click={nextSpeed}
                 class:text-blue-200={speedIndex == 0}
                 class:text-yellow-200={speedIndex == 1}
                 class:text-red-200={speedIndex == 2}

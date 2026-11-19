@@ -1,66 +1,55 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import BottomBar from "./BottomBar.svelte";
   import ExpandButton from "./ExpandButton.svelte";
-  // @ts-ignore
   import Plot from "./Plot.svelte";
   import { DB, modifyPlotMenuOptions, unique } from "./store";
   import { checkIfPlotCanBeUpgraded } from "./utils";
 
-  const sizeKey = "plotsSize";
-
-  $: if ($DB) {
-    checkForAvailablePlots();
-  }
-
-  let styleString: string;
-  let styleIndex = localStorage.getItem(sizeKey)
-    ? parseInt(localStorage.getItem(sizeKey)!)
-    : 0;
-
-  let sizes = [
+  const SIZE_KEY = "plotsSize";
+  // Zoom levels, cycled with the "z" key.
+  const sizes = [
     `margin-left: 300px; margin-top: 200px; scale: 1;`,
     `margin-left: 650px; margin-top: 600px; scale: 1.5;`,
     `margin-left: -50px; margin-top: -50px; scale: 0.6;`,
   ];
 
-  $: {
-    styleString = sizes[styleIndex];
+  let styleIndex = parseInt(localStorage.getItem(SIZE_KEY) ?? "0") || 0;
+  if (styleIndex < 0 || styleIndex >= sizes.length) styleIndex = 0;
+  $: styleString = sizes[styleIndex];
+
+  function handleKeypress(e: KeyboardEvent) {
+    const active = document.activeElement?.nodeName;
+    if (active === "INPUT" || active === "TEXTAREA") return;
+    if (e.key === "z") {
+      styleIndex = (styleIndex + 1) % sizes.length;
+      localStorage.setItem(SIZE_KEY, styleIndex.toString());
+    }
   }
 
-  document.addEventListener("keypress", function (e) {
-    if (e.key === "z") {
-      styleIndex == sizes.length - 1 ? (styleIndex = 0) : styleIndex++;
-      localStorage.setItem(sizeKey, styleIndex.toString());
-    }
-  });
-
-  document.addEventListener("click", function (e) {
-    const elem = e.target as HTMLDivElement;
+  // Clicking empty space around the grid closes the build menu.
+  function handleDocumentClick(e: MouseEvent) {
+    const elem = e.target as HTMLElement;
     if (
-      (elem.dataset.x == undefined &&
-        elem.dataset.type != "-1" &&
-        elem.dataset.size != undefined) ||
+      (elem.dataset?.x == undefined &&
+        elem.dataset?.type != "-1" &&
+        elem.dataset?.size != undefined) ||
       elem.id == "plotContainerMain" ||
-      elem.classList.contains("row") ||
-      elem.classList.contains("grid")
+      elem.classList?.contains("row") ||
+      elem.classList?.contains("grid")
     ) {
       $modifyPlotMenuOptions.visible = false;
     }
-  });
-
-  function checkForAvailablePlots() {
-    let available = [];
-    for (let x = 0; x < $DB.plots.length; x++) {
-      for (let y = 0; y < $DB.plots.length; y++) {
-        const canBeUpgraded = checkIfPlotCanBeUpgraded(x, y, $DB);
-        if (canBeUpgraded) {
-          if ($DB.plots[x][y].active == false) {
-            available.push($DB.plots[x][y]);
-          }
-        }
-      }
-    }
   }
+
+  onMount(() => {
+    document.addEventListener("keypress", handleKeypress);
+    document.addEventListener("click", handleDocumentClick);
+    return () => {
+      document.removeEventListener("keypress", handleKeypress);
+      document.removeEventListener("click", handleDocumentClick);
+    };
+  });
 
   export function restartModifyPlotMenu() {
     $unique = {};

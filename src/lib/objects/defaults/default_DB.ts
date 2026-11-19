@@ -1,4 +1,4 @@
-import { Game, UserDatabase } from "$lib/types";
+import type { Game, UserDatabase } from "$lib/types";
 
 export const default_db: Game = {
   gameId: Math.floor(Math.random() * 10000000000),

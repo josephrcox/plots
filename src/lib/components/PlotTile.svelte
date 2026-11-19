@@ -2,16 +2,13 @@
   import * as Tooltip from "$lib/components/ui/tooltip";
   import { getColor } from "$lib/objects/PlotTypeOptions";
   import PlotTooltip from "$lib/PlotTooltip.svelte";
-  import { DB } from "$lib/store";
-  import { Game, PlotOption } from "$lib/types";
+  import { DB, freeWorkers } from "$lib/store";
+  import type { PlotOption } from "$lib/types";
+  import type { EffectLine } from "$lib/neighbours";
   import { formatNumber, getOptionIndex } from "$lib/utils";
 
+  // Clicks are handled by the parent (BottomBar) via `data-plotOptionId`.
   export let option: PlotOption;
-  let z: Game = $DB;
-  $: z = $DB;
-
-  export let purchaseCallback: (option: PlotOption) => void;
-
   export let isAffordable: {
     affordable: boolean;
     gold: boolean;
@@ -22,52 +19,46 @@
     adjacent: boolean;
     requiredPlots: boolean;
   };
+  /** What building here would do to/with its neighbours. */
+  export let neighbourEffects: EffectLine[] = [];
 
-  let name = option.title;
-  let emoji = option.emoji;
-  let cost = option.requirements.gold;
-  let costStyle = $DB.townInfo.gold < cost ? "text-red-500 font-semibold" : "";
-  let revenue = option.revenue_per_week;
-  let employees = option.requirements.employees;
-  let employeeCountStyle =
-    $DB.townInfo.population_count - $DB.townInfo.employees < employees
+  $: name = option.title;
+  $: emoji = option.emoji;
+  $: cost = option.requirements.gold;
+  $: revenue = option.revenue_per_week;
+  $: employees = option.requirements.employees;
+  $: requiredPower = option.active_costs.power;
+  $: color = getColor(getOptionIndex(option.id), false, 5);
+  $: costStyle = $DB!.townInfo.gold < cost ? "text-red-500 font-semibold" : "";
+  $: employeeCountStyle =
+    freeWorkers($DB!) < employees
       ? "text-red-500 font-semibold"
       : "";
-  let requiredPower = option.active_costs.power;
-  let color = getColor(getOptionIndex(option.id), false, 5);
-  export let count = 0;
 
-  let subtitle = "";
-  const resources = Object.entries(option.generated_resources)
+  $: producedResources = Object.entries(option.generated_resources)
     .filter(([_, value]) => value > 0)
     .map(([key, value]) => `${value} ${key}`);
+  $: subtitle =
+    producedResources.length > 0
+      ? `Produces: ${producedResources.join(", ")}`
+      : "";
 
-  if (resources.length > 0) {
-    subtitle = `Produces: ${resources.join(", ")}`;
-  }
-
-  $: failureReasons = (() => {
-    const reasons: string[] = [];
-    if (!isAffordable.gold) reasons.push("Not enough gold");
-    if (!isAffordable.knowledge) reasons.push("Not enough knowledge");
-    if (!isAffordable.resources) reasons.push("Missing resources");
-    if (!isAffordable.employees) reasons.push("Not enough workers");
-    if (!isAffordable.activeCosts) reasons.push("Can't support active costs");
-    if (!isAffordable.adjacent) reasons.push("Missing adjacent plots");
-    if (!isAffordable.requiredPlots) reasons.push("Missing required plots");
-    return reasons;
-  })();
+  $: failureReasons = [
+    [isAffordable.gold, "Not enough gold"],
+    [isAffordable.knowledge, "Not enough knowledge"],
+    [isAffordable.resources, "Missing resources"],
+    [isAffordable.employees, "Not enough workers"],
+    [isAffordable.activeCosts, "Can't support active costs"],
+    [isAffordable.adjacent, "Missing adjacent plots"],
+    [isAffordable.requiredPlots, "Missing required plots"],
+  ]
+    .filter(([ok]) => !ok)
+    .map(([, reason]) => reason as string);
 </script>
 
 <Tooltip.Root openDelay={400} closeDelay={0}>
   <Tooltip.Trigger>
-    <div
-      on:click={isAffordable.affordable
-        ? () => purchaseCallback(option)
-        : () => {}}
-      class="plotOption relative"
-      data-plotOptionId={option.id}
-    >
+    <div class="plotOption relative" data-plotOptionId={option.id}>
       <div
         class="flex flex-col w-36 h-48 min-h-32 min-w-36 rounded-xl text-white z-10 drop-shadow-lg border-black border-2 hover:translate-y-[-8px] transition-transform duration-300 ease-in-out z-100
         {option.selected ? 'border-4 border-white scale-105' : ''}"
@@ -88,6 +79,13 @@
           {:else if subtitle}
             <span class="text-[11px] text-wrap">{subtitle} </span>
           {/if}
+          {#each neighbourEffects as effect}
+            <span
+              class="text-[10px] leading-tight text-wrap mt-0.5 px-1 rounded {effect.good
+                ? 'bg-green-900/60 text-green-200'
+                : 'bg-red-900/60 text-red-200'}">{effect.text}</span
+            >
+          {/each}
         </div>
         <div class="bg-sidebarBackground text-black rounded-b-lg z-50 py-1">
           {#if employees}

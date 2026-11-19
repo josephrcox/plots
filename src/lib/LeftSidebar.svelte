@@ -1,46 +1,32 @@
 <script lang="ts">
-  import { formatNumber, roundTo } from "./utils";
-  //@ts-ignore
+  import { roundTo } from "./utils";
 
   import {
     DB,
-    ACTIVE_GAME_DB_NAME,
     modifyPlotMenuOptions,
     settingLiegeLocation,
     showCityHallMenu,
     showKnowledgeMenu,
     showLabMenu,
-    showTutorialStepConfetti,
     hasPlotOfType,
-    TEMP_GAME_DB_NAME,
+    isReadOnly,
   } from "./store";
-  import Button from "./components/ui/button/button.svelte";
   import Slider from "./components/ui/slider/slider.svelte";
   import { Vibe } from "./types";
   import SimpleButton from "./components/SimpleButton.svelte";
 
-  let mute: string = localStorage.getItem("mute") || "false";
-
-  $: {
-    mute = localStorage.getItem("mute") || "false";
-  }
+  $: hasLab = hasPlotOfType("lab", $DB!).length >= 1;
 
   function showTheLabMenu() {
-    if ($DB.hasLab) showLabMenu.set(true);
+    if (hasLab) showLabMenu.set(true);
   }
 
   function setProductivity(newProductivity: number[]) {
-    let z = $DB;
-    z.townInfo.productivity = roundTo(newProductivity[0], 2);
-    DB.set(z);
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
+    $DB!.townInfo.productivity = roundTo(newProductivity[0], 2);
   }
 
   function setTaxRate(newRate: number[]) {
-    let z = $DB;
-    z.economyAndLaws.tax_rate = roundTo(newRate[0], 2);
-    DB.set(z);
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
+    $DB!.economyAndLaws.tax_rate = roundTo(newRate[0], 2);
   }
 </script>
 
@@ -73,7 +59,7 @@
             min={0}
             max={0.5}
             step={0.05}
-            disabled={localStorage.getItem(TEMP_GAME_DB_NAME) != null}
+            disabled={isReadOnly}
             class="cursor-pointer w-[75%]"
           />
         </div>
@@ -91,7 +77,7 @@
             min={0}
             max={200}
             step={5}
-            disabled={localStorage.getItem(TEMP_GAME_DB_NAME) != null}
+            disabled={isReadOnly}
             class="cursor-pointer w-[75%]"
           />
         </div>
@@ -121,29 +107,17 @@
           />
           <SimpleButton
             text={$DB.lab.active_experiment !== null
-              ? `${$DB.lab.active_experiment.duration}`
+              ? `🧪 ${$DB.lab.active_experiment.duration} days left`
               : "🧪 Manage Lab"}
             onOpen={showTheLabMenu}
-            opacity={hasPlotOfType("lab", $DB).length >= 1 ? 100 : 30}
-            onHoverText={hasPlotOfType("lab", $DB).length >= 1
+            opacity={hasLab ? 100 : 30}
+            onHoverText={hasLab
               ? ""
               : "Build a Lab to perform experiments. Experiments can save lives, make money, or generally improve your town."}
           />
         </div>
       </div>
       <div>
-        <div class="flex flex-row gap-2 items-start justify-center pb-2">
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <h3
-            class="
-                text-md
-                cursor-pointer
-            "
-            on:click={() => {
-              $DB.townLog = [];
-            }}
-          ></h3>
-        </div>
         <div class="overflow-y-scroll h-[100%] w-[100%] pb-4 scroll-smooth">
           {#each $DB.townLog as log}
             <div

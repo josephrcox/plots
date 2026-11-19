@@ -1,5 +1,5 @@
-import { DB, hasPlotOfType } from "$lib/store";
-import { Game } from "$lib/types";
+import { hasPlotOfType } from "$lib/store";
+import type { Game } from "$lib/types";
 
 type TutorialStep = {
   message: string;

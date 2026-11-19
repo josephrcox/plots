@@ -1,113 +1,79 @@
 <script lang="ts">
-  import {
-    DB,
-    hasPlotOfType,
-    showLabMenu,
-    reverseClear,
-    showCustomAlert,
-  } from "../store.js";
+  import { DB, showLabMenu, showAlert } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
-  import { experiments } from "$lib/objects/ExperimentsList.js";
-  import { Experiment, Plot } from "$lib/types.js";
+  import { experiments } from "$lib/objects/ExperimentsList";
+  import type { Experiment } from "$lib/types";
   import Separator from "$lib/components/ui/separator/separator.svelte";
+  import { formatNumber } from "$lib/utils";
 
+  // Up to three experiments to choose from, with randomized prices.
   let experimentOptions: Experiment[] = [];
-  let dbInitialized = false;
-  let showAlert = false;
   let generated = false;
-  $: if ($DB) {
-    dbInitialized = true;
-    experimentOptions =
-      generated == false ? fetchNewExperiments() : experimentOptions;
-    if ($DB.lab.active_experiment?.duration === -1) {
-      showAlert = true;
-    }
-  } else {
-    dbInitialized = false;
-  }
 
-  function fetchNewExperiments() {
-    if (experimentOptions.length > 0 || !dbInitialized) {
-      return experimentOptions;
-    }
-
-    let newExperiments: Experiment[] = [];
-    // filter out experiments already in past_experiments
-    let filteredExperiments = experiments.filter(
-      (ex) =>
-        !$DB.lab.past_experiments.some((past: Experiment) => past.id === ex.id),
-    );
-    if (filteredExperiments.length === 0) {
-      return [];
-    }
-
-    for (let i = 0; i < 3; i++) {
-      let ex =
-        filteredExperiments[
-          Math.floor(Math.random() * filteredExperiments.length)
-        ];
-      ex.cost = Math.floor(Math.random() * (ex.cost * 0.35) + ex.cost * 0.8);
-      newExperiments.push(ex);
-    }
-
-    newExperiments = newExperiments.filter(
-      (value, index) => newExperiments.indexOf(value) === index,
-    );
-    // remove all entries that are undefined
-    newExperiments = newExperiments.filter((n) => n);
+  $: if ($DB && !generated) {
+    experimentOptions = drawExperiments();
     generated = true;
-    return newExperiments;
+  }
+  // duration === -1 marks a completed experiment awaiting acknowledgement.
+  $: showCompletedAlert = $DB?.lab.active_experiment?.duration === -1;
+
+  function drawExperiments(): Experiment[] {
+    const done = new Set($DB!.lab.past_experiments.map((ex) => ex.id));
+    const pool = experiments.filter((ex) => !done.has(ex.id));
+    const picks = new Set<Experiment>();
+    for (let i = 0; i < 3 && pool.length > 0; i++) {
+      picks.add(pool[Math.floor(Math.random() * pool.length)]);
+    }
+    // Copy so the base price in ExperimentsList isn't overwritten.
+    return [...picks].map((ex) => ({
+      ...ex,
+      cost: Math.floor(Math.random() * (ex.cost * 0.35) + ex.cost * 0.8),
+    }));
   }
 
   function purchaseExperiment(chosen: Experiment) {
-    if ($DB.townInfo.gold < chosen.cost) {
-      showCustomAlert(
-        "You do not have enough gold to purchase this experiment.",
-      );
+    if ($DB!.townInfo.gold < chosen.cost) {
+      showAlert("You do not have enough gold to purchase this experiment.");
       return;
     }
-    $DB.townInfo.gold -= chosen.cost;
-    $DB.lab.active_experiment = chosen;
-    $DB.lab.past_experiments.push(chosen);
+    $DB!.townInfo.gold -= chosen.cost;
+    $DB!.lab.active_experiment = { ...chosen };
+    $DB!.lab.past_experiments = [...$DB!.lab.past_experiments, chosen];
   }
 
   function completeExperiment() {
+    const active = $DB!.lab.active_experiment;
+    if (!active) return;
     $showLabMenu = false;
-    showAlert = true;
-    // fire the experiment's effects
-    let experiment = experimentOptions.find(
-      (ex) => ex.id === $DB.lab.active_experiment.id,
-    );
-    let changedDB = experiment != null ? experiment.effect($DB) : $DB;
-    $DB = changedDB;
-
-    // used to mark as already done so that the effects don't double
-    $DB.lab.active_experiment.duration = -1;
+    // Effects are functions, which aren't saved, so look them up by id.
+    const experiment = experiments.find((ex) => ex.id === active.id);
+    const changed = experiment ? experiment.effect($DB!) : $DB!;
+    // Mark as done so the effects can't be applied twice.
+    changed.lab.active_experiment!.duration = -1;
+    $DB = changed;
   }
 
   function finalizeAndNext() {
-    let z = $DB;
-    z.lab.xp += Math.round(
-      z.lab.active_experiment.cost * (Math.random() * 2 + 0.5),
-    );
+    const z = $DB!;
+    const active = z.lab.active_experiment;
+    if (active) {
+      z.lab.xp += Math.round(active.cost * (Math.random() * 2 + 0.5));
+    }
     z.lab.active_experiment = null;
-    showAlert = false;
     $DB = z;
-  }
-
-  function formatNumber(n: number) {
-    return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    // Offer a fresh set of experiments next time.
+    generated = false;
   }
 </script>
 
-<AlertDialog.Root open={showAlert}>
+<AlertDialog.Root open={showCompletedAlert}>
   <AlertDialog.Content>
     <AlertDialog.Header>
       <AlertDialog.Title class="text-center"
-        >🎉 Experiment Completed: {$DB.lab.active_experiment
-          .title}</AlertDialog.Title
+        >🎉 Experiment Completed: {$DB?.lab.active_experiment
+          ?.title}</AlertDialog.Title
       >
       <AlertDialog.Description>
         <div
@@ -120,7 +86,7 @@
 					text-center
 				"
         >
-          {$DB.lab.active_experiment.description}
+          {$DB?.lab.active_experiment?.description}
         </div>
       </AlertDialog.Description>
     </AlertDialog.Header>
@@ -183,16 +149,14 @@
       >
         {#each experimentOptions as ex}
           <Button
-            on:click={() => {
-              ex.cost < $DB.townInfo.gold ? purchaseExperiment(ex) : null;
-            }}
+            on:click={() => purchaseExperiment(ex)}
             variant="outline"
             class="min-w-48 w-max flex-col
 				{ex.cost > $DB.townInfo.gold ? 'cursor-not-allowed' : ''}
 				"
-            >${formatNumber(ex.cost).split(".")[0]} gold
+            >💰{formatNumber(ex.cost, false)} gold
 
-            {#if $DB.devMode === true}
+            {#if $DB.gameSettings.includes("devMode")}
               <span class="text-xs text-gray-400"> // dev-{ex.id}</span>
             {/if}
           </Button>
@@ -209,7 +173,3 @@
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>
-
-<style>
-  /* nothin' */
-</style>

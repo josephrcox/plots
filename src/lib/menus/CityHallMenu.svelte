@@ -3,22 +3,45 @@
     DB,
     hasPlotOfType,
     showCityHallMenu,
-    reverseClear,
-    showCustomAlert,
-  } from "../store.js";
+    showAlert,
+    freeWorkers,
+    syncEmployment,
+  } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import * as AlertDialog from "$lib/components/ui/alert-dialog";
-  import { experiments } from "$lib/objects/ExperimentsList.js";
-  import { Experiment, Plot } from "$lib/types.js";
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import { laws } from "$lib/objects/Laws";
+  import type { Law } from "$lib/types";
 
-  let dbInitialized = false;
-  $: if ($DB) {
-    dbInitialized = true;
-  } else {
-    dbInitialized = false;
+  $: hasCityHall = hasPlotOfType("city_hall", $DB!).length > 0;
+
+  function fireGuardian() {
+    if ($DB!.townInfo.guardians <= 0) return showAlert("No guardians to fire.");
+    $DB!.townInfo.guardians -= 1;
+    syncEmployment($DB!);
+  }
+
+  function hireGuardian() {
+    // Guardians are hired from the unemployed.
+    if (freeWorkers($DB!) <= 0) return showAlert("Not enough people.");
+    $DB!.townInfo.guardians += 1;
+    syncEmployment($DB!);
+  }
+
+  function toggleLaw(law: Law) {
+    const econ = $DB!.economyAndLaws;
+    if (econ.enacted.includes(law.id)) {
+      // Repeal
+      econ.enacted = econ.enacted.filter((id) => id !== law.id);
+      if (law.id === "tax_free") econ.tax_free_weeks = 0;
+    } else if (law.cost <= $DB!.resources.bureaucracy) {
+      // Enact
+      $DB!.resources.bureaucracy -= law.cost;
+      econ.enacted = [...econ.enacted, law.id];
+    } else {
+      showAlert("Not enough bureaucracy!");
+    }
+    $DB = $DB;
   }
 </script>
 
@@ -33,7 +56,7 @@
       </Dialog.Title>
 
       <Dialog.Description class="w-full "></Dialog.Description>
-      {#if hasPlotOfType("city_hall", $DB).length > 0}
+      {#if hasCityHall}
         <Separator class="mb-4" />
         <div class="w-full">
           <span class="text-lg font-bold"> Hire Guardians ⚔️ </span>
@@ -53,14 +76,7 @@
                 class="bg-accent rounded-2xl h-min select-none
             {$DB.townInfo.guardians <= 0 ? 'opacity-50 cursor-not-allowed' : ''}
             "
-                on:click={() => {
-                  if ($DB.townInfo.guardians > 0) {
-                    $DB.townInfo.guardians -= 1;
-                    $DB.townInfo.employees -= 1;
-                  } else {
-                    showCustomAlert("No guardians to fire.");
-                  }
-                }}>-</Button
+                on:click={fireGuardian}>-</Button
               >
               <span class="text-lg font-bold select-none px-2">
                 {$DB.townInfo.guardians}
@@ -68,23 +84,15 @@
               <Button
                 class="bg-accent rounded-2xl h-min select-none
             
-              {$DB.townInfo.employees >= $DB.townInfo.population_count
+              {freeWorkers($DB) <= 0
                   ? 'opacity-50 cursor-not-allowed'
                   : ''}
             "
-                on:click={() => {
-                  if ($DB.townInfo.employees < $DB.townInfo.population_count) {
-                    // There are unemployed people.
-                    $DB.townInfo.guardians += 1;
-                    $DB.townInfo.employees += 1;
-                  } else {
-                    showCustomAlert("Not enough people.");
-                  }
-                }}>+</Button
+                on:click={hireGuardian}>+</Button
               >
             </div>
             <span class="w-max"
-              >{$DB.townInfo.population_count - $DB.townInfo.employees}
+              >{freeWorkers($DB)}
               unemployed available for hire.</span
             >
           </div>
@@ -92,7 +100,7 @@
       {/if}
       <Separator class="mb-4" />
       <div class="w-full">
-        {#if hasPlotOfType("city_hall", $DB).length > 0}
+        {#if hasCityHall}
           <span class="text-lg font-bold"> Laws 🧑‍⚖️ </span>
           {#each laws as law}
             <div
@@ -112,23 +120,7 @@
                     : 'cursor-not-allowed opacity-30'
                   : 'cursor-pointer'}
                 "
-                on:click={() => {
-                  if ($DB.economyAndLaws.enacted.includes(law.id)) {
-                    // Repeal
-                    $DB.economyAndLaws.enacted.splice(
-                      $DB.economyAndLaws.enacted.indexOf(law.id),
-                      1,
-                    );
-                  } else {
-                    // Enact
-                    if (law.cost <= $DB.resources.bureaucracy) {
-                      $DB.resources.bureaucracy -= law.cost;
-                      $DB.economyAndLaws.enacted.push(law.id);
-                    } else {
-                      showCustomAlert("Not enough bureaucracy!");
-                    }
-                  }
-                }}
+                on:click={() => toggleLaw(law)}
               >
                 {#if $DB.economyAndLaws.enacted.includes(law.id)}
                   Repeal ❌

@@ -1,54 +1,55 @@
-// @ts-nocheck
-function compressAndEncode(jsonData) {
-  const compressedData = pako.gzip(JSON.stringify(jsonData));
-  const base64Data = btoa(String.fromCharCode.apply(null, compressedData));
-  const urlSafeData = base64Data
+// Share links: the active town is gzipped (pako, loaded globally from
+// index.html), base64url-encoded, and put in a `?shareId=` URL. Opening such a
+// link stores the town in TEMP storage, which the app shows read-only.
+// This file runs before main.js so the store can see the TEMP town on load.
+
+const TEMP_GAME_DB_NAME = "plots_temp_game_db";
+const ACTIVE_GAME_DB_NAME = "plots_active_game_db";
+
+function compressAndEncode(data) {
+  // @ts-ignore - pako is a global
+  const bytes = pako.gzip(JSON.stringify(data));
+  // Build the binary string in chunks to avoid call-stack limits.
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary)
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
-  return urlSafeData;
 }
 
 function decodeAndDecompress(urlSafeData) {
   const base64Data = urlSafeData.replace(/-/g, "+").replace(/_/g, "/");
   const binaryStr = atob(base64Data);
-  const charCodeArray = new Uint8Array(binaryStr.length);
+  const bytes = new Uint8Array(binaryStr.length);
   for (let i = 0; i < binaryStr.length; i++) {
-    charCodeArray[i] = binaryStr.charCodeAt(i);
+    bytes[i] = binaryStr.charCodeAt(i);
   }
-  const decompressedData = pako.ungzip(charCodeArray, { to: "string" });
-  return JSON.parse(decompressedData);
+  // @ts-ignore - pako is a global
+  return JSON.parse(pako.ungzip(bytes, { to: "string" }));
 }
 
-export async function compressMyGame() {
-  let json = localStorage.getItem("plots_active_game_db");
-  const compressedData = await compressAndEncode(json);
-
-  const isLocal = window.location.hostname == "localhost";
-  if (isLocal) {
-    return "http://localhost:5173/?shareId=" + compressedData;
-  } else {
-    return "http://plots.jsph.cx/?shareId=" + compressedData;
-  }
+/** Returns a URL that opens the current town read-only. */
+export function compressMyGame() {
+  // The payload is the saved JSON string (kept for compatibility with
+  // links created by earlier versions).
+  const json = localStorage.getItem(ACTIVE_GAME_DB_NAME);
+  const url = new URL(window.location.origin + window.location.pathname);
+  url.searchParams.set("shareId", compressAndEncode(json));
+  return url.toString();
 }
 
-const windowParams = window.location.search
-  .substring(1)
-  .split("&")
-  .reduce((acc, param) => {
-    const [key, value] = param.split("=");
-    acc[key] = value;
-    return acc;
-  }, {});
-
-if (windowParams.shareId != undefined || windowParams.shareId != null) {
-  console.log("DECRYPING FROM shareId");
-  const sharedData = JSON.parse(decodeAndDecompress(windowParams.shareId));
-  localStorage.setItem("plots_temp_game_db", JSON.stringify(sharedData));
-  console.log("DECRYPED DATA", sharedData);
+const shareId = new URLSearchParams(window.location.search).get("shareId");
+if (shareId) {
+  try {
+    const sharedData = JSON.parse(decodeAndDecompress(shareId));
+    localStorage.setItem(TEMP_GAME_DB_NAME, JSON.stringify(sharedData));
+  } catch (error) {
+    console.error("Could not open shared town", error);
+    localStorage.removeItem(TEMP_GAME_DB_NAME);
+  }
 } else {
-  localStorage.removeItem("plots_temp_game_db");
-  console.log("COMPRESSING GAME TO SHARE");
-  //   delete temp db
-  compressMyGame();
+  localStorage.removeItem(TEMP_GAME_DB_NAME);
 }

@@ -274,7 +274,7 @@ export const options: PlotOption[] = [
     title: "Quarry",
     type: "quarry",
     description:
-      "Produces stone, small amounts of metal. Isn't great for health. ",
+      "Produces stone, small amounts of metal. Isn't great for health, especially for homes right next to it.",
     revenue_per_week: 0,
     requirements: {
       gold: 2000,
@@ -1348,10 +1348,10 @@ export const options: PlotOption[] = [
     title: "Village Inn",
     type: "tourism",
     description:
-      "Each inn brings more visitors to your town, increasing profits for the Market and other stores.",
+      "Each inn brings more visitors to your town: +20% profit for the Market and other stores. Stacks with every inn.",
     revenue_per_week: 40,
     requirements: {
-      gold: 5500,
+      gold: 12000,
       plots: [],
       employees: 16,
       knowledge: 0,
@@ -1359,8 +1359,8 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 3000,
-        stone: 100,
+        wood: 4000,
+        stone: 1500,
         metal: 0,
         power: 0,
         bureaucracy: 0,
@@ -1682,7 +1682,7 @@ export const options: PlotOption[] = [
     title: "Lumber Mill",
     type: "industrial",
     description:
-      "Increases wood production by 50%, has to be next to a tree farm, but increases production at all.",
+      "Boosts wood from every tree farm it touches by 50%. Build tree farms around it. Noisy: nearby homes lose health and happiness.",
     revenue_per_week: 0,
     requirements: {
       gold: 12000,

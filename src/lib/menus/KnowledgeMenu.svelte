@@ -1,42 +1,18 @@
 <script lang="ts">
-  // @ts-ignore
-  import {
-    DB,
-    showKnowledgeMenu,
-    ACTIVE_GAME_DB_NAME,
-    showCustomAlert,
-  } from "../store.js";
+  import { DB, showKnowledgeMenu } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
+  import { formatNumber } from "$lib/utils";
   // @ts-ignore
   import LineGraph from "$lib/components/LineGraph.svelte";
-  let graphData: number[];
-  let marketRate = 0;
 
-  let dbInitialized = false;
-  $: if ($DB) {
-    dbInitialized = true;
-    graphData = $DB.economyAndLaws.knowledge_gold_market_rates;
-    marketRate =
-      $DB.economyAndLaws.knowledge_gold_market_rates[
-        $DB.economyAndLaws.knowledge_gold_market_rates.length - 1
-      ];
-  } else {
-    dbInitialized = false;
-  }
+  $: graphData = $DB?.economyAndLaws.knowledge_gold_market_rates ?? [];
+  $: marketRate = graphData[graphData.length - 1] ?? 0;
 
-  export function convertKnowledgeToGold() {
-    let z = $DB;
-    if ($DB.hasBank === true) {
-      z.townInfo.gold += Math.round(z.townInfo.knowledge_points * marketRate);
-      z.townInfo.knowledge_points = 0;
-      DB.set(z);
-      localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
-    }
-  }
-
-  function formatNumber(n: number) {
-    return n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+  function convertKnowledgeToGold() {
+    if (!$DB?.hasBank || marketRate <= 0) return;
+    $DB.townInfo.gold += Math.round($DB.townInfo.knowledge_points * marketRate);
+    $DB.townInfo.knowledge_points = 0;
   }
 </script>
 

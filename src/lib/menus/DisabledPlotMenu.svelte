@@ -1,28 +1,22 @@
 <script lang="ts">
   import * as Dialog from "$lib/components/ui/dialog";
   import { Button } from "$lib/components/ui/button";
-  import { DB, disabledPlotMenu, reverseClear } from "../store";
+  import {
+    DB,
+    disabledPlotMenu,
+    resolveDisabledPlot,
+    SNOOZE_DAYS,
+  } from "../store";
   import { flyAndScale } from "$lib/utils";
-
-  function handleSnooze() {
-    if ($DB.townInfo.gold >= $disabledPlotMenu.plotCost) {
-      $DB.townInfo.gold -= $disabledPlotMenu.plotCost;
-      $DB.plots[$disabledPlotMenu.x][$disabledPlotMenu.y].snoozedUntil =
-        $DB.environment.day + 10;
-      $DB.plots[$disabledPlotMenu.x][$disabledPlotMenu.y].disabled = false;
-    }
-    $disabledPlotMenu.visible = false;
-  }
-
-  function handleBulldoze() {
-    console.log("x:", $disabledPlotMenu.x);
-    console.log("y:", $disabledPlotMenu.y);
-    reverseClear($disabledPlotMenu.x, $disabledPlotMenu.y, $DB);
-    $disabledPlotMenu.visible = false;
-  }
 </script>
 
-<Dialog.Root bind:open={$disabledPlotMenu.visible}>
+<!-- Closing the dialog any other way bulldozes the plot. -->
+<Dialog.Root
+  open={$disabledPlotMenu.visible}
+  onOpenChange={(open) => {
+    if (!open) resolveDisabledPlot("bulldoze");
+  }}
+>
   <Dialog.Content
     transition={flyAndScale}
     class="bg-sidebarBackground text-sidebarText max-w-md rounded-md shadow-xl border border-accent"
@@ -52,17 +46,22 @@
         <p>You have two options:</p>
         <ol class="list-decimal list-inside">
           <li>Bulldoze the plot (free)</li>
-          <li>Snooze for 30 days (costs {$disabledPlotMenu.plotCost} gold)</li>
+          <li>
+            Snooze for {SNOOZE_DAYS} days (costs {$disabledPlotMenu.plotCost} gold)
+          </li>
         </ol>
       </div>
     </div>
 
     <Dialog.Footer class="p-4 border-t border-accent/20 flex justify-end gap-2">
-      <Button variant="destructive" on:click={handleBulldoze}>Bulldoze</Button>
+      <Button
+        variant="destructive"
+        on:click={() => resolveDisabledPlot("bulldoze")}>Bulldoze</Button
+      >
       <Button
         variant="default"
-        disabled={$DB.townInfo.gold < $disabledPlotMenu.plotCost}
-        on:click={handleSnooze}
+        disabled={($DB?.townInfo.gold ?? 0) < $disabledPlotMenu.plotCost}
+        on:click={() => resolveDisabledPlot("snooze")}
       >
         Snooze ({$disabledPlotMenu.plotCost} gold)
       </Button>

@@ -2,7 +2,10 @@
   import { Progress as ProgressPrimitive } from "bits-ui";
   import { cn } from "$lib/utils.js";
 
-  type $$Props = ProgressPrimitive.Props;
+  type $$Props = ProgressPrimitive.Props & {
+    color?: string;
+    text?: string;
+  };
 
   let className: $$Props["class"] = undefined;
   export let max: $$Props["max"] = 100;

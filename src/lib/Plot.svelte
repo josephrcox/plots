@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { options, getColor } from "./objects/PlotTypeOptions";
   import {
     DB,
@@ -8,133 +8,78 @@
     settingLiegeLocation,
     setLiegeLocation,
     isLiegeOnPlot,
-    disabledPlotMenu,
-    reverseClear,
-    TEMP_GAME_DB_NAME,
-  } from "./store.ts";
+    isReadOnly,
+  } from "./store";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import PlotTooltip from "./PlotTooltip.svelte";
   import { isAdjacentToWater } from "./utils";
+  import { activeEffects } from "./neighbours";
+  import type { Plot } from "./types";
 
-  export let data = {
-    id: 0,
-    active: false,
-    x: 0,
-    y: 0,
-    type: -1,
-    styling: "",
-    mineralSource: false,
-    disabled: false,
-    water: false,
-  };
-
-  let currentPlotOption;
-
-  $: {
-    if (data.type > -1) {
-      currentPlotOption = options[data.type];
-    }
-    if (data.disabled == true && $disabledPlotMenu.visible == false) {
-      // The user closed the disabledplotmenu instead of snoozing or bulldozing.
-      // We need to bulldoze the plot.
-      reverseClear(data.x, data.y, $DB);
-      data.disabled = false;
-      $disabledPlotMenu.visible = false;
-    }
-  }
+  export let data: Plot;
   export let classText = "";
   export let canBeUpgraded = false;
 
-  const isLiegeLocationPlot = (x, y) => {
-    return (
-      $DB.liege_location != null &&
-      x == $DB.liege_location[0] &&
-      y == $DB.liege_location[1]
-    );
-  };
+  $: option = data.type > -1 ? options[data.type] : undefined;
+  $: nearWater = isAdjacentToWater(data.x, data.y, $DB!);
+  $: liegeHere = isLiegeOnPlot(data.x, data.y, $DB!);
+  $: neighbourEffects = data.active ? activeEffects(data.x, data.y, $DB!) : [];
+  $: isSelected =
+    $modifyPlotMenuOptions.visible &&
+    $modifyPlotMenuOptions.x == data.x &&
+    $modifyPlotMenuOptions.y == data.y;
 
-  function openMenu(e, a, b) {
-    if (localStorage.getItem(TEMP_GAME_DB_NAME) != null) {
-      return;
-    }
-    let plots = document.querySelectorAll(".plot_container");
-    if ($paused == false) {
-      if (!data.active && !canBeUpgraded) {
-        $unique = {};
-        $modifyPlotMenuOptions.visible = false;
-        plots.forEach((plot) => {
-          plot.classList.remove("selected");
-        });
-      } else {
-        if (a != undefined && b != undefined) {
-          $modifyPlotMenuOptions.x = a;
-          $modifyPlotMenuOptions.y = b;
-        } else {
-          $modifyPlotMenuOptions.x = data.x;
-          $modifyPlotMenuOptions.y = data.y;
-        }
-        $modifyPlotMenuOptions.isMineralSource = data.mineralSource;
-        $modifyPlotMenuOptions.visible = true;
-
-        const element = document.querySelector(
-          `.plot_container[data-id="${data.id}"]`,
-        );
-        const container = document.documentElement || document.body;
-
-        const elementRect = element.getBoundingClientRect();
-        const containerHeight = window.innerHeight || container.clientHeight;
-        const containerWidth = window.innerWidth || container.clientWidth;
-
-        const scrollTop =
-          container.scrollTop + elementRect.top - containerHeight / 2 + 225;
-        const scrollLeft =
-          container.scrollLeft + elementRect.left - containerWidth / 2;
-        window.scrollTo({
-          top: scrollTop,
-          left: scrollLeft,
-          behavior: "smooth",
-        });
-
-        plots.forEach((plot) => {
-          plot.classList.remove("selected");
-        });
-        // Highlight a plot when it's clicked on
-        if (a != undefined && b != undefined) {
-          document
-            .querySelector(`.plot_container[data-x="${a}"][data-y="${b}"]`)
-            .classList.add("selected");
-        } else {
-          document
-            .querySelector(`.plot_container[data-id="${data.id}"]`)
-            .classList.add("selected");
-        }
-      }
-    }
+  function scrollPlotIntoView(element: Element) {
+    const rect = element.getBoundingClientRect();
+    const container = document.documentElement;
+    window.scrollTo({
+      top: container.scrollTop + rect.top - window.innerHeight / 2 + 225,
+      left: container.scrollLeft + rect.left - window.innerWidth / 2,
+      behavior: "smooth",
+    });
   }
 
-  export function changePlotType(type) {
-    if ($paused == false) {
-      $DB.plots[data.x][data.y].type = type;
-      $modifyPlotMenuOptions.visible = false;
+  function handleClick(e: MouseEvent) {
+    if (data.water || isReadOnly) return;
+
+    if ($settingLiegeLocation) {
+      if (data.active) setLiegeLocation(data.x, data.y, $DB!);
+      return;
     }
+    // No building while paused or while the game-over dialog is up.
+    if ($paused) return;
+    if ($DB!.endGameDetails.msg !== "") return;
+
+    if (!data.active && !canBeUpgraded) {
+      $unique = {};
+      $modifyPlotMenuOptions.visible = false;
+      return;
+    }
+
+    $modifyPlotMenuOptions = {
+      x: data.x,
+      y: data.y,
+      isMineralSource: data.mineralSource,
+      visible: true,
+    };
+    scrollPlotIntoView(e.currentTarget as Element);
   }
 </script>
 
 <Tooltip.Root openDelay={400} closeDelay={0}>
-  <Tooltip.Trigger>
+  <!-- asChild: the plot button itself is the trigger (no button-in-button). -->
+  <Tooltip.Trigger asChild let:builder>
     <button
-      class="plot_container {classText}  overflow-visible {data.type == -1 &&
-      canBeUpgraded == false
-        ? ''
-        : ''} {data.mineralSource ? 'hidden' : ''} {canBeUpgraded
-        ? 'cursor-pointer'
-        : 'cursor-not-allowed'}
-		"
+      use:builder.action
+      {...builder}
+      class="plot_container {classText} overflow-visible"
+      class:selected={isSelected}
+      class:cursor-pointer={canBeUpgraded}
+      class:cursor-not-allowed={!canBeUpgraded}
+      class:cursor-crosshair={$settingLiegeLocation && data.active}
       style="background-color: {data.water
         ? 'rgba(66, 135, 245, 1)'
-        : $modifyPlotMenuOptions.x == data.x &&
-            $modifyPlotMenuOptions.y == data.y &&
-            $modifyPlotMenuOptions.visible
+        : isSelected
           ? 'white'
           : data.mineralSource
             ? 'black'
@@ -145,37 +90,32 @@
       data-id={data.id}
       data-x={data.x}
       data-y={data.y}
-      data-optionIndex={data.optionIndex}
-      on:click={data.water
-        ? null
-        : $settingLiegeLocation
-          ? setLiegeLocation(data.x, data.y, $DB)
-          : openMenu}
+      on:click={handleClick}
       data-canBeUpgraded={canBeUpgraded}
       data-type={data.type}
       data-type-id={data.typeId}
-      data-size={data.type > -1 ? options[data.type].requirements.size : null}
+      data-size={option ? option.requirements.size : null}
       data-mineralSource={data.mineralSource}
       data-water={data.water}
-      data-nearWater={isAdjacentToWater(data.x, data.y, $DB)}
-      data-liegeLocation={isLiegeLocationPlot(data.x, data.y)}
+      data-nearWater={nearWater}
+      data-liegeLocation={liegeHere}
     >
-      {#if data.type > -1}
+      {#if option}
         <div>
           <span
-            data-size={options[data.type].requirements.size}
+            data-size={option.requirements.size}
             data-x={data.x}
             data-y={data.y}
           >
             <span class="text-lg align-text-top select-none"
-              >{options[data.type].emoji}</span
+              >{option.emoji}</span
             >
             <br />
             <span
-              class="text-sm align-text-top {options[data.type].id == 'mine'
+              class="text-sm align-text-top {option.id == 'mine'
                 ? 'text-white'
                 : 'text-black'} select-none"
-              >{options[data.type].title}
+              >{option.title}
             </span>
           </span>
         </div>
@@ -191,7 +131,7 @@
       {#if data.mineralSource && data.type == -1}
         <span class="text-lg">🧲</span>
       {/if}
-      {#if isLiegeLocationPlot(data.x, data.y)}
+      {#if liegeHere}
         <span class="text-lg absolute top-0">👑</span>
       {/if}
     </button>
@@ -203,27 +143,34 @@
       {#if data.water}
         Water - Place farms nearby for more food & revenue!
       {/if}
-      {#if isAdjacentToWater(data.x, data.y, $DB)}
+      {#if nearWater}
         <span
           class="text-xs bg-blue-500 text-white px-2 py-3 rounded-2xl text-center"
           >Near water - Generating more food & revenue!</span
         >
       {/if}
-      {#if isLiegeOnPlot(data.x, data.y, $DB)}
+      {#if liegeHere && option}
         <span
           class="text-xs bg-pink-700 text-white px-2 py-3 rounded-2xl text-center"
         >
-          {#if options[data.type].liege_on_plot_hint == null}
-            You are hanging out on the {options[data.type].title} plot, but nothing
-            seems to be changing except a revenue boost.
+          {#if option.liege_on_plot_hint == null}
+            You are hanging out on the {option.title} plot, but nothing seems to
+            be changing except a revenue boost.
           {:else}
-            {options[data.type].liege_on_plot_hint}
+            {option.liege_on_plot_hint}
           {/if}
         </span>
       {/if}
 
-      {#if data.active}
-        <PlotTooltip option={currentPlotOption} checkRequirements={false} />
+      {#each neighbourEffects as effect}
+        <span
+          class="text-xs text-white px-2 py-2 rounded-2xl text-center {effect.good
+            ? 'bg-green-700'
+            : 'bg-red-700'}">{effect.text}</span
+        >
+      {/each}
+      {#if data.active && option}
+        <PlotTooltip {option} checkRequirements={false} />
       {/if}
     </div>
   </Tooltip.Content>

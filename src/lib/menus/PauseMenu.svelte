@@ -1,42 +1,26 @@
 <script lang="ts">
-  // @ts-ignore
   import {
     DB,
-    clearDB,
     paused,
-    hasPlotOfType,
     userDB,
     showCompletedAchievements,
     pauseMenuTab,
     showAchievementPopup,
-    showCustomAlert,
-    ACTIVE_GAME_DB_NAME,
-    TEMP_GAME_DB_NAME,
+    showAlert,
+    isReadOnly,
     setSelectedGame,
-    USER_DB_NAME,
+    deleteGame,
+    leaveToNewTown,
+    loadGameFromFile,
   } from "../store";
   import * as Dialog from "$lib/components/ui/dialog";
-  // @ts-ignore
-  import { winScenarios } from "../objects/WinScenarios.js";
-
-  // @ts-ignore
-  import {
-    difficulty_options,
-    // @ts-ignore
-  } from "../objects/difficulty.js";
-
-  import { achievements } from "$lib/objects/AchievementList.js";
-  import Separator from "$lib/components/ui/separator/separator.svelte";
+  import { achievements } from "$lib/objects/AchievementList";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import SimpleButton from "$lib/components/SimpleButton.svelte";
   import { createAMockTown, formatNumber } from "$lib/utils";
   // @ts-ignore
   import { compressMyGame } from "$lib/gameShare";
-  import { local } from "d3-selection";
-  import { Game } from "$lib/types";
-  const scenarios: any = winScenarios;
-  const endGoal = scenarios[$DB.endGoal];
-  const difficulty: number = (difficulty_options as any)[$DB.difficulty] || 0;
+  import type { Game } from "$lib/types";
 
   achievements.sort((a, b) => {
     if (hasAchievement(a.id) && !hasAchievement(b.id)) return -1;
@@ -44,66 +28,40 @@
     return 0;
   });
 
-  const completedAchievements = achievements.filter((a) =>
-    hasAchievement(a.id),
-  );
+  $: completedAchievements = $userDB
+    ? achievements.filter((a) => hasAchievement(a.id))
+    : [];
 
   function getAchievementCompletionDayAndTown(id: string) {
-    const achievement = $userDB.achievements.find(
-      (a: [string, number]) => a[0] == id,
-    );
+    const achievement = $userDB.achievements.find((a) => a[0] == id);
     if (achievement == null) return 0;
     return `${achievement[1]} in ${achievement[2]}.`;
   }
 
   function achievementPrizeCollected(id: string) {
-    const achievement = $userDB.achievements.find(
-      (a: [string, number, string]) => a[0] == id,
-    );
+    const achievement = $userDB.achievements.find((a) => a[0] == id);
     if (achievement == null) return false;
     return achievement[3] != null;
   }
 
   function collectPrize(id: string) {
-    const achievement = $userDB.achievements.find(
-      (a: [string, number]) => a[0] == id,
-    );
-    if (achievement == null) return;
-    // if (achievement[3]) return;
+    const achievement = $userDB.achievements.find((a) => a[0] == id);
     const achievementObject = achievements.find((a) => a.id == id);
-    if (achievementObject == null) return;
-    $DB.townInfo.gold += achievementObject.prize;
-    achievement[3] = true;
-    $userDB.achievements = $userDB.achievements.map((a: [string, number]) =>
-      a[0] == id ? achievement : a,
+    if (!achievement || !achievementObject || achievement[3] != null) return;
+    $DB!.townInfo.gold += achievementObject.prize;
+    $userDB.achievements = $userDB.achievements.map((a) =>
+      a[0] == id ? ([a[0], a[1], a[2], true] as typeof a) : a,
     );
   }
 
-  let reactiveAchievements = achievements;
-
-  let dbInitialized = false;
-  $: if ($DB) {
-    dbInitialized = true;
-
-    // check if $showCompletedAchievements is true
-    if ($showCompletedAchievements) {
-      reactiveAchievements = achievements;
-    } else {
-      reactiveAchievements = [];
-      // Show only those that are not in the userDB
-      // OR those that ARE in the userDB but have achievementPrizeCollected == false
-      for (let i = 0; i < achievements.length; i++) {
-        if (
-          !hasAchievement(achievements[i].id) ||
-          !achievementPrizeCollected(achievements[i].id)
-        ) {
-          reactiveAchievements.push(achievements[i]);
-        }
-      }
-    }
-  } else {
-    dbInitialized = false;
-  }
+  // Hide achievements whose prize has been collected, unless toggled on.
+  $: reactiveAchievements = $showCompletedAchievements
+    ? achievements
+    : achievements.filter(
+        (a) =>
+          $userDB &&
+          (!hasAchievement(a.id) || !achievementPrizeCollected(a.id)),
+      );
 
   function saveGame() {
     const data = JSON.stringify($DB);
@@ -118,48 +76,31 @@
     URL.revokeObjectURL(url);
   }
 
-  function loadGame(e: any) {
-    const files = e.target.files;
-    if (files == null) return;
-    const file = files[0];
+  function loadGame(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
     const reader = new FileReader();
-    reader.onload = function (e) {
-      if (e.target == null) return;
-      const contents = e.target.result;
-      if (typeof contents === "string") {
-        if (!isValidFile(contents)) {
-          showCustomAlert("Invalid game file");
-          return;
+    reader.onload = () => {
+      try {
+        if (!loadGameFromFile(JSON.parse(String(reader.result)))) {
+          showAlert("Invalid game file");
         }
-        clearDB(JSON.parse(contents));
-      } else {
-        showCustomAlert("Invalid game file: is not String.");
+      } catch {
+        showAlert("Invalid game file: could not read it.");
       }
     };
     reader.readAsText(file);
   }
 
-  function isValidFile(s: string) {
-    const json = JSON.parse(s);
-    if (json.townInfo != null && json.difficulty != null) return true;
-    return false;
-  }
-
   function hasAchievement(id: string) {
-    if ($userDB.achievements == null) return false;
-    return (
-      $userDB.achievements.find((a: [string, number]) => a[0] == id) != null
-    );
+    return $userDB.achievements.some((a) => a[0] == id);
   }
 
   export function toggleShowCompleted() {
-    showCompletedAchievements.update((value) => !value);
-    localStorage.setItem(
-      "showCompletedAchievements",
-      localStorage.getItem("showCompletedAchievements") === "true"
-        ? "false"
-        : "true",
-    );
+    showCompletedAchievements.update((value) => {
+      localStorage.setItem("showCompletedAchievements", String(!value));
+      return !value;
+    });
   }
 
   if (localStorage.getItem("pauseMenuTab") == null) {
@@ -175,21 +116,24 @@
   }
 
   function restartGame() {
-    $paused = true;
-    localStorage.setItem("reset", "true");
-    $DB = null;
-    localStorage.removeItem(ACTIVE_GAME_DB_NAME);
-    clearDB();
+    $paused = false;
+    leaveToNewTown();
   }
 
-  let games: Game[] = [];
-  $: {
-    // parse each individual game and then add to the games array
-    games = [];
-    for (let i = 0; i < $userDB.games.length; i++) {
-      games.push(JSON.parse($userDB.games[i]));
-    }
+  function deleteCurrentTown() {
+    const name = $DB?.townInfo.name ?? "this town";
+    if (!confirm(`Delete ${name}? This can't be undone.`)) return;
+    deleteGame($userDB.selectedGame);
   }
+
+  // Summaries for the town switcher (games are stored as JSON strings).
+  $: games = $userDB.games.map((json) => {
+    try {
+      return JSON.parse(json) as Game;
+    } catch {
+      return null;
+    }
+  });
 </script>
 
 <Dialog.Root bind:open={$paused}>
@@ -207,29 +151,34 @@
           <div class="text-sm pb-2">Switch towns</div>
           <ul class="flex flex-col gap-0">
             {#each games as game, index}
-              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-              <li
-                class="text-sm rounded-sm p-2
+              {#if game}
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <li
+                  class="text-sm rounded-sm p-2
                  flex flex-col
                  {index == $userDB.selectedGame
-                  ? 'bg-darkerAccent text-accentText cursor-not-allowed'
-                  : 'hover:bg-white hover:text-black cursor-pointer '}
+                    ? 'bg-darkerAccent text-accentText cursor-not-allowed'
+                    : 'hover:bg-white hover:text-black cursor-pointer '}
                 "
-                on:click={() => {
-                  setSelectedGame(index, $userDB);
-                }}
-              >
-                <span class="before:content-['🏠'] before:mr-2"
-                  >{game.townInfo.name}</span
+                  on:click={() => {
+                    if (index != $userDB.selectedGame) setSelectedGame(index);
+                  }}
                 >
-                <span class="text-xs opacity-70 font-mono"
-                  >{game.environment.day} days, {formatNumber(
-                    game.townInfo.gold,
-                    false,
-                  )} gold, {formatNumber(game.townInfo.population_count, false)}
-                  population
-                </span>
-              </li>
+                  <span class="before:content-['🏠'] before:mr-2"
+                    >{game.townInfo.name}</span
+                  >
+                  <span class="text-xs opacity-70 font-mono"
+                    >{game.environment.day} days, {formatNumber(
+                      game.townInfo.gold,
+                      false,
+                    )} gold, {formatNumber(
+                      game.townInfo.population_count,
+                      false,
+                    )}
+                    population
+                  </span>
+                </li>
+              {/if}
             {/each}
           </ul>
           <div class="flex flex-row justify-end pt-2">
@@ -253,7 +202,8 @@
             onOpen={() => {
               const input = document.createElement("input");
               input.type = "file";
-              input.onchange = (e) => loadGame(e);
+              input.accept = "application/json,.json";
+              input.onchange = loadGame;
               input.click();
             }}
           />
@@ -261,36 +211,31 @@
             text="📲 Share town"
             styling="bg-gray-500"
             onOpen={async () => {
-              const url = await compressMyGame();
-              navigator.clipboard.writeText(url);
-              alert("Copied to clipboard");
+              const url = compressMyGame();
+              try {
+                await navigator.clipboard.writeText(url);
+                showAlert("Share link copied to clipboard!");
+              } catch {
+                showAlert(`Copy this link to share your town:<br/><br/>${url}`);
+              }
             }}
           />
           <SimpleButton
             text="❌ Delete current town"
             styling="bg-red-800"
-            onOpen={async () => {
-              let newUserDB = { ...$userDB };
-              newUserDB.games.splice($userDB.selectedGame, 1);
-              console.log(newUserDB);
-              localStorage.setItem(USER_DB_NAME, JSON.stringify(newUserDB));
-              userDB.set(newUserDB);
-              setSelectedGame(0, newUserDB);
-            }}
+            onOpen={deleteCurrentTown}
           />
           {#if $DB.gameSettings.includes("devMode")}
             <SimpleButton
               styling="bg-black opacity-50 w-min"
               text="🔄 New mock town"
-              onOpen={() => {
-                createAMockTown($DB);
-              }}
+              onOpen={createAMockTown}
             />
           {/if}
         </div>
       </div>
       <div class="flex flex-col gap-6 justify-between">
-        {#if localStorage.getItem(TEMP_GAME_DB_NAME) == null}
+        {#if !isReadOnly}
           <div class="flex-grow">
             <h4 class="underline underline-offset-4">
               Achievements ({completedAchievements.length}
@@ -351,16 +296,7 @@
                         <SimpleButton
                           text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
                           styling={"bg-yellow-300 text-black"}
-                          onOpen={() => {
-                            collectPrize(achievement.id);
-                            // hide this button
-                            const button = document.getElementById(
-                              `collectPrize-${achievement.id}`,
-                            );
-                            if (button) {
-                              button.style.display = "none";
-                            }
-                          }}
+                          onOpen={() => collectPrize(achievement.id)}
                         />
                       {/if}
                     </div>
@@ -404,7 +340,3 @@
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>
-
-<style>
-  /*  */
-</style>

@@ -4,14 +4,17 @@ import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
 import { options } from "./objects/PlotTypeOptions";
 import type { Game, PlotOption } from "./types";
+import { hexNeighbours } from "./neighbours";
 import {
   hasPlotOfType,
-  reverseClear,
-  ACTIVE_GAME_DB_NAME,
-  isWater,
+  clearPlot,
+  countJobs,
+  syncEmployment,
   DB,
+  createDefaultGame,
+  generatePlots,
+  flushSave,
 } from "./store";
-import { default_db } from "./objects/defaults/default_DB";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -20,7 +23,7 @@ export function cn(...inputs: ClassValue[]) {
 export function analyticsEvent(
   z: Game,
   event: string,
-  params: Record<string, string>,
+  params: Record<string, string | number>,
 ) {
   let globalParams = {
     townName: z.townInfo.name,
@@ -33,11 +36,9 @@ export function analyticsEvent(
   const eventParams = params;
   const allParams = { ...globalParams, ...eventParams };
 
-  console.log("event", event, allParams);
-
-  // This works, even though it says it won't. It rolls up to index.html.
-  // @ts-ignore
-  gtag("event", event, allParams);
+  // `gtag` is defined globally in index.html (and may be blocked).
+  const gtag = (window as any).gtag;
+  if (typeof gtag === "function") gtag("event", event, allParams);
 }
 
 type FlyAndScaleParams = {
@@ -174,110 +175,39 @@ export function formatInstantChange(change: number, divide: boolean = true) {
   }
 }
 
+/**
+ * Whether (x, y) touches water. Unless `overrideType` is set, only farms
+ * count (water doubles a farm's food and revenue).
+ */
 export function isAdjacentToWater(
   x: number,
   y: number,
   z: Game,
   overrideType: boolean = false,
 ) {
-  // Checks if a farm is adjacent to water.
-  // Not a general check – will only return true for farms.
-  if (x < 0 || x >= z.plots.length || y < 0 || y >= z.plots[0].length) {
-    return false; // Ensure x and y are within valid bounds of the grid
-  }
-
-  let adjacent = [
-    [x - 1, y], // left
-    [x + 1, y], // right
-    [x, y - 1], // up
-    [x, y + 1], // down
-    [x - 1, y - 1], // top-left diagonal
-    [x - 1, y + 1], // bottom-left diagonal
-    [x + 1, y - 1], // top-right diagonal
-    [x + 1, y + 1], // bottom-right diagonal
-  ];
-
-  for (let i = 0; i < adjacent.length; i++) {
-    let adjX = adjacent[i][0];
-    let adjY = adjacent[i][1];
-
-    if (
-      adjX >= 0 &&
-      adjX < z.plots.length &&
-      adjY >= 0 &&
-      adjY < z.plots[0].length &&
-      z.plots[adjX][adjY].water
-    ) {
-      if (overrideType) {
-        return true;
-      }
-
-      if (
-        z.plots[x][y].active == true &&
-        z.plots[x][y].type > 0 &&
-        options[z.plots[x][y].type].id == "farm"
-      )
-        return true;
-    }
-  }
-  return false;
+  const plot = z.plots[x]?.[y];
+  if (!plot) return false;
+  if (!hexNeighbours(x, y, z).some((p) => p.water)) return false;
+  if (overrideType) return true;
+  return plot.active && plot.type >= 0 && options[plot.type].id === "farm";
 }
 
-// function that takes x, y, the game state, and required plots (ids by string) and returns true if the plot is adjacent to all of the required plots.
+/** Whether (x, y) touches a built plot of every id in `requiredPlots`. */
 export function isAdjacentToPlots(
   x: number,
   y: number,
   z: Game,
   requiredPlots: string[],
 ) {
-  if (x < 0 || x >= z.plots.length || y < 0 || y >= z.plots[0].length) {
-    return false; // Ensure x and y are within valid bounds of the grid
-  }
-
-  let adjacent = [
-    [x - 1, y], // left
-    [x + 1, y], // right
-    [x, y - 1], // up
-    [x, y + 1], // down
-    [x - 1, y - 1], // top-left diagonal
-    [x - 1, y + 1], // bottom-left diagonal
-    [x + 1, y - 1], // top-right diagonal
-    [x + 1, y + 1], // bottom-right diagonal
-  ];
-
-  let allAreAdjacent = true;
-  for (let i = 0; i < requiredPlots.length; i++) {
-    let found = false;
-    let currentPlot = requiredPlots[i];
-
-    // Skip this iteration if it's a water check
-    if (currentPlot === "water") {
-      continue;
-    }
-
-    for (let j = 0; j < adjacent.length; j++) {
-      let adjX = adjacent[j][0];
-      let adjY = adjacent[j][1];
-
-      if (
-        adjX >= 0 &&
-        adjX < z.plots.length &&
-        adjY >= 0 &&
-        adjY < z.plots[0].length &&
-        z.plots[adjX][adjY].active == true &&
-        z.plots[adjX][adjY].type > 0 &&
-        options[z.plots[adjX][adjY].type].id == currentPlot
-      ) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      allAreAdjacent = false;
-      break;
-    }
-  }
-  return allAreAdjacent;
+  if (!z.plots[x]?.[y]) return false;
+  const neighbours = hexNeighbours(x, y, z);
+  return requiredPlots.every(
+    (id) =>
+      id === "water" ||
+      neighbours.some(
+        (p) => p.active && p.type >= 0 && options[p.type].id === id,
+      ),
+  );
 }
 
 // function that takes a number and returns one that is within 15% below or above
@@ -357,19 +287,16 @@ export function hasEnoughEmployees(
   )
     return true;
 
-  const availableEmployees = z.townInfo.population_count - z.townInfo.employees;
-  const existingPlot = z.plots[x][y];
-
-  if (existingPlot.type !== -1) {
-    const existingPlotType = options[existingPlot.type];
-    const existingEmployees = existingPlotType.requirements.employees || 0;
-    return (
-      plotChosen.requirements.employees <=
-      availableEmployees + existingEmployees
-    );
-  }
-
-  return plotChosen.requirements.employees <= availableEmployees;
+  // Jobs may never outnumber people. Replacing a building frees its jobs.
+  const existing = z.plots[x][y];
+  const freedJobs =
+    existing.active && existing.type > -1
+      ? (options[existing.type]?.requirements.employees ?? 0)
+      : 0;
+  return (
+    countJobs(z) - freedJobs + plotChosen.requirements.employees <=
+    z.townInfo.population_count
+  );
 }
 
 // Check if player has enough resources for active costs
@@ -459,85 +386,79 @@ export function checkIfAffordable(
   };
 }
 
-function getTypeIndex(typeId: string): number {
-  return options.findIndex((option) => option.id === typeId);
-}
-
-function choosePlotOption(
-  plotOptionID: string,
+/**
+ * Builds `plotOptionID` on plot (x, y), replacing whatever is there.
+ * Returns false (and changes nothing) if the player can't afford it, unless
+ * `force` is set. Mutates `z` without publishing it.
+ */
+export function placePlot(
+  z: Game,
   x: number,
   y: number,
-  z: Game,
-  resourceOverride: boolean = false,
-) {
-  const typeIndex = getTypeIndex(plotOptionID);
+  plotOptionID: string,
+  force = false,
+): boolean {
+  const typeIndex = getOptionIndex(plotOptionID);
   const plotChosen = options[typeIndex];
-
-  if (resourceOverride || checkIfAffordable(plotChosen, z, x, y).affordable) {
-    if (z.plots[x][y].type !== -1) {
-      reverseClear(x, y, z);
-    }
-
-    z.plots[x][y].type = typeIndex;
-    z.plots[x][y].active = true;
-    z.plots[x][y].typeId = plotChosen.id;
-    z.townInfo.gold -= plotChosen.requirements.gold;
-    z.townInfo.gold = roundTo(z.townInfo.gold, 2);
-    // Immediate variable changes
-    z.townInfo.population_count +=
-      plotChosen.immediate_variable_changes.population;
-    z.townInfo.population_max +=
-      plotChosen.immediate_variable_changes.population;
-    z.townInfo.happiness += plotChosen.immediate_variable_changes.happiness;
-    z.townInfo.health += plotChosen.immediate_variable_changes.health;
-    // Effect modifiers
-    z.modifiers.happiness = roundTo(
-      z.modifiers.happiness * plotChosen.purchase_effect_modifiers.happiness,
-      2,
-    );
-    z.modifiers.health = roundTo(
-      z.modifiers.health * plotChosen.purchase_effect_modifiers.health,
-      2,
-    );
-    z.modifiers.community = roundTo(
-      z.modifiers.community * plotChosen.purchase_effect_modifiers.community,
-      2,
-    );
-    // Employer modifications
-    z.townInfo.employees += plotChosen.requirements.employees;
-
-    // Plot count
-    if (
-      z.plotCounts[typeIndex] === undefined ||
-      z.plotCounts[typeIndex] === null
-    ) {
-      z.plotCounts[typeIndex] = 0;
-    }
-    z.plotCounts[typeIndex]++;
-    z.lastChangeDay = z.environment.day;
-
-    if (plotChosen.requirements.resources !== undefined) {
-      const resourcesForPlot = plotChosen.requirements.resources;
-      z.resources.food -= resourcesForPlot.food;
-      z.resources.wood -= resourcesForPlot.wood;
-      z.resources.stone -= resourcesForPlot.stone;
-      z.resources.metal -= resourcesForPlot.metal;
-    }
-
-    switch (plotChosen.id) {
-      case "city_hall":
-        z.hasCityHall = true;
-        break;
-      case "bank":
-        z.hasBank = true;
-        break;
-      default:
-        break;
-    }
-
-    return z;
+  if (!plotChosen) return false;
+  if (!force && !checkIfAffordable(plotChosen, z, x, y).affordable) {
+    return false;
   }
-  return z;
+
+  if (z.plots[x][y].type > -1) {
+    clearPlot(x, y, z);
+  }
+
+  const plot = z.plots[x][y];
+  plot.type = typeIndex;
+  plot.active = true;
+  plot.typeId = plotChosen.id;
+  plot.builtDay = z.environment.day;
+  z.townInfo.gold = roundTo(z.townInfo.gold - plotChosen.requirements.gold, 2);
+  // Knowledge is spent, like gold.
+  z.townInfo.knowledge_points -= plotChosen.requirements.knowledge || 0;
+  // Immediate variable changes
+  z.townInfo.population_count +=
+    plotChosen.immediate_variable_changes.population;
+  z.townInfo.population_max += plotChosen.immediate_variable_changes.population;
+  z.townInfo.happiness = Math.min(
+    z.maximums.happiness,
+    z.townInfo.happiness + plotChosen.immediate_variable_changes.happiness,
+  );
+  z.townInfo.health = Math.min(
+    z.maximums.health,
+    z.townInfo.health + plotChosen.immediate_variable_changes.health,
+  );
+  // Effect modifiers
+  z.modifiers.happiness = roundTo(
+    z.modifiers.happiness * plotChosen.purchase_effect_modifiers.happiness,
+    2,
+  );
+  z.modifiers.health = roundTo(
+    z.modifiers.health * plotChosen.purchase_effect_modifiers.health,
+    2,
+  );
+  z.modifiers.community = roundTo(
+    z.modifiers.community * plotChosen.purchase_effect_modifiers.community,
+    2,
+  );
+  syncEmployment(z);
+
+  z.plotCounts[typeIndex] = (z.plotCounts[typeIndex] ?? 0) + 1;
+  z.lastChangeDay = z.environment.day;
+
+  const resourcesForPlot = plotChosen.requirements.resources;
+  if (resourcesForPlot) {
+    z.resources.food -= resourcesForPlot.food;
+    z.resources.wood -= resourcesForPlot.wood;
+    z.resources.stone -= resourcesForPlot.stone;
+    z.resources.metal -= resourcesForPlot.metal;
+  }
+
+  if (plotChosen.id === "city_hall") z.hasCityHall = true;
+  if (plotChosen.id === "bank") z.hasBank = true;
+
+  return true;
 }
 
 export function findClosestPlot(startX: number, startY: number, z: Game) {
@@ -577,10 +498,12 @@ export function findClosestPlot(startX: number, startY: number, z: Game) {
   return null;
 }
 
-export function createAMockTown(z: Game) {
-  let json = { ...default_db };
+/** Dev tool: replaces the current town with a randomly built one. */
+export function createAMockTown() {
+  const json = createDefaultGame();
   json.difficulty = 1;
   json.endGoal = "land";
+  json.gameSettings = ["devMode"];
   json.townInfo.name = "Mock Town";
   json.townInfo.gold = Math.random() * 50000 + 20000;
   json.townInfo.happiness = 300;
@@ -592,61 +515,25 @@ export function createAMockTown(z: Game) {
   json.resources.wood = Math.random() * 10000 + 1000;
   json.resources.stone = Math.random() * 10000 + 1000;
   json.resources.metal = Math.random() * 10000 + 1000;
-
-  let default_plots = [] as any[][];
-
-  const randomSize = 25;
-  const mineX = Math.floor((Math.random() * randomSize) / 2) + 1;
-  const mineY = Math.floor((Math.random() * randomSize) / 2) + 1;
-
-  for (let i = 0; i < randomSize; i++) {
-    default_plots.push([]);
-    for (let j = 0; j < randomSize; j++) {
-      const water =
-        i == mineX && j == mineY ? false : isWater(i, j, randomSize);
-
-      default_plots[i][j] = {
-        id: Math.random().toString(36).substring(2, 9),
-        active: false,
-        x: i,
-        y: j,
-        type: water ? -9 : -1,
-        typeId: "",
-        mineralSource: water
-          ? false
-          : mineX === i && mineY === j
-            ? true
-            : false,
-        water: mineX === i && mineY === j ? false : water,
-      };
-    }
-  }
-
-  json.plots = default_plots;
-  DB.set(json);
-  localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
-  localStorage.reset = false;
+  json.plots = generatePlots(25);
 
   // Always place a small home first, then place 3 farms and a tree_farm.
-  json = choosePlotOption("small_homes", 0, 0, json, true);
-  json = choosePlotOption("farm", 1, 0, json, true);
-  json = choosePlotOption("farm", 2, 0, json, true);
-  json = choosePlotOption("farm", 3, 0, json, true);
-  json = choosePlotOption("tree_farm", 4, 0, json, true);
+  placePlot(json, 0, 0, "small_homes", true);
+  placePlot(json, 1, 0, "farm", true);
+  placePlot(json, 2, 0, "farm", true);
+  placePlot(json, 3, 0, "farm", true);
+  placePlot(json, 4, 0, "tree_farm", true);
 
-  // Then, randomly pick plots from options to place until you run out of gold.
-  for (let i = 1; i < (z.plots.length * z.plots[0].length) / 2; i++) {
-    for (let j = 0; j < options.length / 2; j++) {
-      let randomPlotOption =
-        options[Math.floor(Math.random() * options.length)];
-      z = choosePlotOption(randomPlotOption.id, i, j, json, false);
-    }
+  // Then keep building random plots next to the town until nothing fits.
+  for (let attempts = 0; attempts < 2000; attempts++) {
+    const next = findClosestPlot(0, 0, json);
+    if (!next) break;
+    const option = options[Math.floor(Math.random() * options.length)];
+    if (option.id === "mine") continue;
+    placePlot(json, next[0], next[1], option.id);
   }
 
-  // Sync to DB
   DB.set(json);
-  localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
-  localStorage.reset = false;
-
+  flushSave();
   location.reload();
 }

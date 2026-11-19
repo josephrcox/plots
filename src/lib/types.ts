@@ -1,4 +1,4 @@
-import { CustomAlerts } from "./objects/CustomAlerts";
+import type { CustomAlerts } from "./objects/CustomAlerts";
 
 export type Difficulty = "0" | "1" | "2" | "3";
 export type EndGoal = "land" | "free_play";
@@ -13,6 +13,7 @@ export type Plot = {
   mineralSource: boolean;
   water: boolean;
   snoozedUntil?: number;
+  builtDay?: number; // game day the current building was placed
 };
 
 export type Law = {
@@ -102,6 +103,7 @@ export type Game = {
     weeklyProfit: number;
     knowledge_gold_market_rates: number[];
     enacted: string[];
+    tax_free_weeks?: number; // weeks the Tax-Free Month law has been active.
   };
   plotCounts: number[];
   environment: {
@@ -117,7 +119,10 @@ export type Game = {
     still_playing: boolean;
   };
   tick: number;
-  overtime: boolean;
+  overtime: boolean; // the player chose to keep playing after a loss (allowed once)
+  lossGraceUntil?: number; // after continuing, losses aren't checked until this day
+  tomPettyUsed?: boolean; // Tom Petty mode's single revival has been spent
+  neighbourNuisanceLogged?: boolean; // the "industry next to homes" log message was shown
   last_warning_happiness: number;
   last_warning_health: number;
   lab: {
@@ -136,7 +141,7 @@ export type UserDatabase = {
     losses: number;
   };
   // id, day, town name, prize collected.
-  achievements: [string, number, string, boolean][];
+  achievements: [string, number, string, boolean?][];
   selectedGame: number;
   games: string[];
   customAlertsShown: CustomAlerts[];

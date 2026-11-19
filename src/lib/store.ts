@@ -1,14 +1,18 @@
-import { writable } from "svelte/store";
-// @ts-ignore
-import { default_db, default_user_db } from "./objects/defaults/default_DB.js";
-// @ts-ignore
-import { Difficulty, EndGoal, Game, UserDatabase, Plot, Events } from "./types";
-// @ts-ignore
+import { get, writable, type Writable } from "svelte/store";
+import { default_db, default_user_db } from "./objects/defaults/default_DB";
+import {
+  type Difficulty,
+  type EndGoal,
+  type Game,
+  type UserDatabase,
+  type Plot,
+  Events,
+} from "./types";
 import { max_tax_rates_based_on_difficulty } from "./objects/difficulty.js";
-// @ts-ignore
 import { options } from "./objects/PlotTypeOptions";
-import { analyticsEvent } from "./utils.js";
-import { CustomAlerts } from "./objects/CustomAlerts.js";
+import { analyticsEvent } from "./utils";
+import { CustomAlerts } from "./objects/CustomAlerts";
+import { generateRandomTownName } from "./objects/townNames";
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -16,439 +20,264 @@ export const ACTIVE_GAME_DB_NAME = "plots_active_game_db";
 // The user DB keeps track of progress, achievements,
 //// challenge history, and such.
 export const USER_DB_NAME = "plots_user_db";
+// Set by gameShare.js when the page is opened with a ?shareId= link.
 export const TEMP_GAME_DB_NAME = "plots_temp_game_db";
-function generateRandomTownName(): string {
-  const baseNames = [
-    "York",
-    "London",
-    "Paris",
-    "Madrid",
-    "Rome",
-    "Berlin",
-    "Vienna",
-    "Prague",
-    "Warsaw",
-    "Oslo",
-    "Lisbon",
-    "Dublin",
-    "Brussels",
-    "Amsterdam",
-    "Stockholm",
-    "Copenhagen",
-    "Edinburgh",
-    "Moscow",
-    "Beijing",
-    "Tokyo",
-    "Seoul",
-    "Bangkok",
-    "Delhi",
-    "Mumbai",
-    "Shanghai",
-    "Sydney",
-    "Melbourne",
-    "Cairo",
-    "Dubai",
-    "Istanbul",
-    "Athens",
-    "Budapest",
-    "Reykjavik",
-    "Helsinki",
-    "Tallinn",
-    "Riga",
-    "Vilnius",
-    "Sofia",
-    "Bucharest",
-    "Belgrade",
-    "Zagreb",
-    "Sarajevo",
-    "Ljubljana",
-    "Skopje",
-    "Tirana",
-    "Podgorica",
-    "Thessaloniki",
-    "Barcelona",
-    "Valencia",
-    "Seville",
-    "Granada",
-    "Malaga",
-    "Lyon",
-    "Marseille",
-    "Toulouse",
-    "Nice",
-    "Nantes",
-    "Strasbourg",
-    "Bordeaux",
-    "Lille",
-    "Venice",
-    "Milan",
-    "Florence",
-    "Naples",
-    "Turin",
-    "Bologna",
-    "Perugia",
-    "Genoa",
-    "Pisa",
-    "Verona",
-    "Palermo",
-    "Catania",
-    "Bari",
-    "Padua",
-    "Cagliari",
-    "Krakow",
-    "Gdansk",
-    "Poznan",
-    "Wroclaw",
-    "Lodz",
-    "Katowice",
-    "Bialystok",
-    "Gdynia",
-    "Sopot",
-    "Bydgoszcz",
-    "Lublin",
-    "Szczecin",
-    "Gorzow",
-    "Zakopane",
-    "Olsztyn",
-    "Torun",
-    "Rzeszow",
-    "Kielce",
-    "Radom",
-    "Siedlce",
-    "Los",
-    "Angeles",
-    "Chicago",
-    "Houston",
-    "Phoenix",
-    "San",
-    "Antonio",
-    "San",
-    "Diego",
-    "Dallas",
-    "San",
-    "Jose",
-    "Austin",
-    "Jacksonville",
-    "Fort",
-    "Worth",
-    "Columbus",
-    "Charlotte",
-    "Liverpool",
-    "Manchester",
-    "Glasgow",
-    "Birmingham",
-    "Leeds",
-    "Sheffield",
-    "Newcastle",
-    "upon",
-    "Tyne",
-    "Bristol",
-    "Nottingham",
-    "Leicester",
-    "Coventry",
-    "Belfast",
-    "Reading",
-    "Cardiff",
-    "Southampton",
-    "Aberdeen",
-    "Plymouth",
-    "Stoke",
-    "Trent",
-    "Wolverhampton",
-    "Swansea",
-    "Sunderland",
-    "Portsmouth",
-    "Yorkshire",
-    "Hull",
-    "Blackpool",
-    "Bradford",
-    "Derby",
-    "Middlesbrough",
-    "Peterborough",
-    "Stockton",
-    "on",
-    "Tees",
-    "Brighton",
-    "Poole",
-    "Bournemouth",
-    "Huddersfield",
-    "Luton",
-    "Oxford",
-    "Norwich",
-    "Oldham",
-    "Cambridge",
-    "Exeter",
-    "Walsall",
-    "Colchester",
-    "Watford",
-    "Rotherham",
-    "Newport",
-    "Gateshead",
-    "Dundee",
-    "Gloucester",
-    "Solihull",
-    "High",
-    "Wycombe",
-    "Maidstone",
-    "Slough",
-    "Basildon",
-    "Chelmsford",
-    "Salford",
-    "Bedford",
-    "Stevenage",
-    "Woking",
-    "Grimsby",
-    "Birkenhead",
-    "Halifax",
-    "Warrington",
-    "Gillingham",
-    "Wigan",
-    "Worcester",
-    "Wakefield",
-    "Lincoln",
-    "Chester",
-    "Rochdale",
-    "Dagenham",
-    "Widnes",
-    "St",
-    "Albans",
-    "Mansfield",
-    "Sutton",
-    "Coldfield",
-    "Crawley",
-    "Wokingham",
-    "Barnsley",
-    "St",
-    "Helens",
-    "Harrogate",
-    "Redditch",
-    "Scunthorpe",
-    "Nuneaton",
-    "Chesterfield",
-    "Hemel",
-    "Hempstead",
-    "Bury",
-    "Guildford",
-    "Ashford",
-    "Telford",
-    "Newcastle",
-    "under",
-    "Lyme",
-    "Aylesbury",
-    "Halesowen",
-    "Shrewsbury",
-    "Lowestoft",
-    "Loughborough",
-    "Cheltenham",
-    "Kidderminster",
-    "Basingstoke",
-    "Rugby",
-    "Stourbridge",
-    "Southport",
-    "Kettering",
-    "Royal",
-    "Leamington",
-    "Spa",
-    "Beeston",
-    "Farnborough",
-    "Wrexham",
-    "Banbury",
-    "Weymouth",
-    "Wallsend",
-    "Dartford",
-    "Grays",
-    "Tamworth",
-    "Ashford",
-    "Esher",
-    "Folkestone",
-    "Tonbridge",
-    "Taunton",
-    "Runcorn",
-    "Macclesfield",
-    "Keighley",
-    "Bridgend",
-    "Barnstaple",
-    "Letchworth",
-    "Garden",
-    "City",
-    "Worthing",
-    "Gosport",
-    "Eastleigh",
-    "Staines",
-    "upon",
-    "Thames",
-    "Lisburn",
-    "Livingston",
-    "Bognor",
-    "Regis",
-    "Scarborough",
-    "Cannock",
-    "Margate",
-    "Chippenham",
-    "Rhondda",
-    "Maidenhead",
-    "Wellingborough",
-    "Washington",
-    "Camberley",
-    "Bootle",
-    "Lancaster",
-    "Llanelli",
-    "Chatham",
-    "Cheshunt",
-    "Bishop",
-    "Auckland",
-    "Nelson",
-    "Belper",
-    "Pontefract",
-    "Barry",
-    "Braintree",
-    "Crosby",
-    "Bury",
-    "St",
-    "Edmunds",
-    "Bexhill",
-    "Margate",
-    "Aldershot",
-    "Rowley",
-    "Regis",
-    "Hoddesdon",
-    "Sittingbourne",
-    "Rugby",
-    "Newquay",
-    "Falmouth",
-    "Stretford",
-    "Camberley",
-    "Beverley",
-    "Windsor",
-    "Rochester",
-    "Wickford",
-    "Diss",
-    "Farnham",
-    "Andover",
-    "Camberwell",
-    "Bermondsey",
-    "Lewisham",
-    "Wembley",
-    "Hayes",
-    "Harrow",
-    "Ilford",
-    "Enfield",
-    "Twickenham",
-    "Richmond",
-    "Brentwood",
-    "Edgware",
-    "Ealing",
-    "Greenwich",
-    "Bromley",
-    "Hounslow",
-    "Romford",
-    "Hillingdon",
-    "Uxbridge",
-    "Wandsworth",
-    "Sutton",
-    "Kingston",
-    "upon",
-    "Thames",
-    "Bexley",
-    "Havering",
-    "Barking",
-  ];
 
-  const suffixes = [
-    "ia",
-    "ville",
-    "ton",
-    "land",
-    "field",
-    "burgh",
-    "ford",
-    "wood",
-    "port",
-    "bay",
-    "beach",
-    "peak",
-    "valley",
-    "ridge",
-    "hill",
-    "dale",
-    "island",
-    "cape",
-    "spring",
-    "grove",
-    "polis",
-    "side",
-    "view",
-    "shore",
-    "haven",
-    "place",
-    "gardens",
-    "plaza",
-    "square",
-  ];
+/** How long (ms) a disabled-resource warning can be snoozed for, in game days. */
+export const SNOOZE_DAYS = 10;
+/** Bulldozing within this many days of building undoes its one-time boost. */
+const BULLDOZE_REVERSAL_DAYS = 30;
+/** Days after "Keep playin'" during which the town can't lose again. */
+export const LOSS_GRACE_DAYS = 90;
+const SAVE_THROTTLE_MS = 1000;
 
-  const prefixes = [
-    "New",
-    "Old",
-    "North",
-    "South",
-    "East",
-    "West",
-    "Upper",
-    "Lower",
-    "Little",
-    "Great",
-    "Saint",
-    "Fort",
-    "Mount",
-    "Lake",
-    "River",
-    "The Village of",
-    "The City of",
-    "The Town of",
-    "The Borough of",
-    "The County of",
-    "The State of",
-    "The Kingdom of",
-    "The Empire of",
-    "The Republic of",
-    "The Commonwealth of",
-    "The Union of",
-    "The Federation of",
-    "Rainy",
-    "Sunny",
-    "Windy",
-    "Frosty",
-    "Snowy",
-  ];
+// ---------------------------------------------------------------------------
+// Startup
+// ---------------------------------------------------------------------------
 
-  function getRandomElement(arr: string[]): string {
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-  let prefix = getRandomElement(prefixes);
-  let baseName = getRandomElement(baseNames);
-  let suffix = getRandomElement(suffixes);
-
-  let townName = "";
-  if (Math.random() > 0.5) {
-    townName = prefix + " " + baseName + suffix;
-  } else {
-    townName = baseName + suffix;
-  }
-  return townName;
+// `?debug=true` wipes all saved data once, then removes itself from the URL so
+// the game is playable afterwards.
+if (new URLSearchParams(window.location.search).get("debug") === "true") {
+  localStorage.clear();
+  const url = new URL(window.location.href);
+  url.searchParams.delete("debug");
+  history.replaceState(null, "", url.toString());
 }
 
-// Define your DB store at the top
-export let DB = writable(
-  JSON.parse(
-    localStorage.getItem(TEMP_GAME_DB_NAME) ||
-      localStorage.getItem(ACTIVE_GAME_DB_NAME) ||
-      "null",
-  ),
+/**
+ * True when viewing someone else's shared town. In this mode nothing is
+ * simulated or saved, so the player's own towns are never overwritten.
+ */
+export const isReadOnly = localStorage.getItem(TEMP_GAME_DB_NAME) != null;
+
+function roundTo2(n: number) {
+  return Math.round(n * 100) / 100;
+}
+
+function safeParse<T>(json: string | null): T | null {
+  if (json == null || json === "") return null;
+  try {
+    return JSON.parse(json) as T;
+  } catch (error) {
+    console.error("Failed to parse saved data", error);
+    return null;
+  }
+}
+
+function isPlainObject(value: unknown): value is Record<string, any> {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+/** Recursively fills in any keys missing from `target` using `defaults`. */
+function fillDefaults<T>(target: any, defaults: T): T {
+  if (!isPlainObject(target)) return structuredClone(defaults);
+  for (const [key, defaultValue] of Object.entries(defaults as any)) {
+    if (target[key] === undefined || target[key] === null) {
+      if (defaultValue !== null) target[key] = structuredClone(defaultValue);
+      else if (target[key] === undefined) target[key] = null;
+    } else if (isPlainObject(defaultValue) && isPlainObject(target[key])) {
+      fillDefaults(target[key], defaultValue);
+    }
+  }
+  return target as T;
+}
+
+export function createDefaultGame(): Game {
+  const game = structuredClone(default_db);
+  game.gameId = Math.floor(Math.random() * 10_000_000_000);
+  return game;
+}
+
+/**
+ * Upgrades a game loaded from storage (or a file) so it matches the current
+ * shape of `Game`, and repairs state that can't be valid after a reload.
+ */
+export function normalizeGame(raw: any): Game | null {
+  if (!isPlainObject(raw) || !isPlainObject(raw.townInfo)) return null;
+  const game = fillDefaults<Game>(raw, default_db);
+
+  for (const row of game.plots) {
+    for (const plot of row) {
+      // A plot only stays "disabled" while its warning dialog is open; that
+      // dialog doesn't survive a reload, so let the next day re-check it.
+      plot.disabled = false;
+      // Plot `type` is an index into `options`, which can shift between
+      // releases. `typeId` is the stable identifier, so re-derive from it.
+      if (plot.active) {
+        if (plot.typeId) {
+          plot.type = options.findIndex((o) => o.id === plot.typeId);
+        } else if (plot.type > -1 && options[plot.type]) {
+          plot.typeId = options[plot.type].id;
+        }
+      }
+    }
+  }
+  // Older saves stored job openings here, which could exceed population.
+  syncEmployment(game);
+  // Older versions let a town keep playing after a loss with no further
+  // loss checks. Treat that as the town's one continue, with a fresh grace
+  // period so it isn't lost again immediately.
+  if (game.overtime && game.endGameDetails.msg !== "") {
+    game.endGameDetails = { msg: "", win: false, still_playing: true };
+    game.lossGraceUntil = game.environment.day + LOSS_GRACE_DAYS;
+  }
+  return game;
+}
+
+function normalizeUserDB(raw: any): UserDatabase {
+  const udb = fillDefaults<UserDatabase>(raw, default_user_db);
+  if (!udb.username) udb.username = "click_to_set_username";
+  if (!Array.isArray(udb.games)) udb.games = [];
+  if (udb.selectedGame < 0 || udb.selectedGame >= udb.games.length) {
+    udb.selectedGame = Math.max(0, udb.games.length - 1);
+  }
+  // Older versions gave every town made in one session the same gameId; the
+  // UI is keyed on it, so make them unique.
+  const seen = new Set<number>();
+  udb.games = udb.games.map((json) => {
+    const game = safeParse<Game>(json);
+    if (!game) return json;
+    if (!seen.has(game.gameId)) {
+      seen.add(game.gameId);
+      return json;
+    }
+    game.gameId = Math.floor(Math.random() * 10_000_000_000);
+    seen.add(game.gameId);
+    return JSON.stringify(game);
+  });
+  return udb;
+}
+
+// ---------------------------------------------------------------------------
+// Stores
+// ---------------------------------------------------------------------------
+
+export const userDB = writable<UserDatabase>(
+  normalizeUserDB(safeParse(localStorage.getItem(USER_DB_NAME))),
 );
 
-export let userDB = writable(
-  JSON.parse(localStorage.getItem(USER_DB_NAME) || "null"),
-);
-setUserDBIfNull();
+/**
+ * The active town, or null when none is loaded (the start menu is shown).
+ * Typed as `Game` because everything except App and this file only runs
+ * while a town is loaded; code that can see the null case uses `getGame()`.
+ */
+function loadInitialGame(): Game | null {
+  const shared = localStorage.getItem(TEMP_GAME_DB_NAME);
+  if (shared) return normalizeGame(safeParse(shared));
+  // No active town means the player is on the start menu.
+  const active = localStorage.getItem(ACTIVE_GAME_DB_NAME);
+  if (!active) return null;
+  // Prefer the town list's copy (its gameId may have been de-duplicated);
+  // both are kept in sync by flushSave.
+  const udb = get(userDB);
+  return normalizeGame(
+    safeParse(udb.games[udb.selectedGame] ?? null) ?? safeParse(active),
+  );
+}
+
+export const DB = writable<Game | null>(loadInitialGame()) as Writable<Game>;
+
+export function getGame(): Game | null {
+  return get(DB);
+}
+
+function clearGame() {
+  (DB as Writable<Game | null>).set(null);
+}
+
+// ---------------------------------------------------------------------------
+// Persistence
+// ---------------------------------------------------------------------------
+
+userDB.subscribe((udb) => {
+  if (udb) localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
+});
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Writes the active game to localStorage right away. */
+export function flushSave() {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  if (isReadOnly) return;
+  const game = getGame();
+  if (!game) return;
+
+  const serialized = JSON.stringify(game);
+  localStorage.setItem(ACTIVE_GAME_DB_NAME, serialized);
+  userDB.update((udb) => {
+    if (udb.games.length === 0) udb.selectedGame = 0;
+    udb.games[udb.selectedGame] = serialized;
+    return udb;
+  });
+}
+
+function cancelPendingSave() {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+}
+
+// The game state changes many times a second; batch writes so we serialize
+// it at most once per SAVE_THROTTLE_MS.
+DB.subscribe((game) => {
+  if (!game || isReadOnly || saveTimer) return;
+  saveTimer = setTimeout(flushSave, SAVE_THROTTLE_MS);
+});
+
+window.addEventListener("beforeunload", flushSave);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushSave();
+});
+
+// ---------------------------------------------------------------------------
+// Game lifecycle
+// ---------------------------------------------------------------------------
+
+export function createPlot(
+  x: number,
+  y: number,
+  water: boolean,
+  mineralSource = false,
+): Plot {
+  return {
+    id: Math.random().toString(36).substring(2, 9),
+    active: false,
+    x,
+    y,
+    type: water ? -9 : -1,
+    typeId: "",
+    mineralSource,
+    water,
+    disabled: false,
+  };
+}
+
+/** Generates a fresh square grid with water and a single mineral source. */
+export function generatePlots(size: number): Plot[][] {
+  const mineX = Math.floor((Math.random() * size) / 2) + 1;
+  const mineY = Math.floor((Math.random() * size) / 2) + 1;
+  const plots: Plot[][] = [];
+  for (let i = 0; i < size; i++) {
+    plots.push([]);
+    for (let j = 0; j < size; j++) {
+      const isMine = i === mineX && j === mineY;
+      const water = !isMine && isWater(i, j, size);
+      plots[i][j] = createPlot(i, j, water, isMine);
+    }
+  }
+  return plots;
+}
+
+const GRID_SIZE_BY_DIFFICULTY: Record<Difficulty, number> = {
+  "0": 8,
+  "1": 12,
+  "2": 16,
+  "3": 16,
+};
 
 export function startGame(
   difficulty: Difficulty,
@@ -456,23 +285,23 @@ export function startGame(
   townName: string,
   gameSettings: string[],
 ) {
-  // clear DB
-  localStorage.removeItem(ACTIVE_GAME_DB_NAME);
-  DB.set(null);
+  flushSave();
+  const udb = get(userDB);
 
-  let json: Game = { ...default_db }; // Use a copy of default_db
+  const json = createDefaultGame();
+  if (udb.username === "dev" && !gameSettings.includes("devMode")) {
+    gameSettings.push("devMode");
+  }
   json.gameSettings = gameSettings;
   json.economyAndLaws.max_tax_rate =
-    max_tax_rates_based_on_difficulty[difficulty];
-  json.endGoal = endGoal; // defaults to 'land' as in fill the grid.
-  let default_plots = [] as any[][];
-  // remove leading and trailing spaces, remove symbols other than numbers and letters
+    (max_tax_rates_based_on_difficulty as Record<string, number>)[difficulty] ??
+    max_tax_rates_based_on_difficulty[2];
+  json.endGoal = endGoal;
+  // Remove symbols other than numbers and letters.
   townName = townName.replace(/[^a-zA-Z0-9 ]/g, "").trim();
-  json.townInfo.name = townName != "" ? townName : generateRandomTownName();
+  json.townInfo.name = townName !== "" ? townName : generateRandomTownName();
   json.difficulty = parseInt(difficulty);
-  let udb = JSON.parse(localStorage.getItem(USER_DB_NAME) || "null");
 
-  if (udb.username == "dev") gameSettings.push("devMode");
   if (gameSettings.includes("devMode")) {
     json.townInfo.gold = 100000000;
     json.townInfo.happiness = 10000000;
@@ -485,47 +314,16 @@ export function startGame(
     json.resources.stone = 1000000;
     json.resources.metal = 1000000;
   }
-  const randomSize =
-    difficulty == "0" ? 8 : difficulty == "1" ? 12 : difficulty == "2" ? 16 : 1; // never should happen.
-  const mineX = Math.floor((Math.random() * randomSize) / 2) + 1;
-  const mineY = Math.floor((Math.random() * randomSize) / 2) + 1;
 
-  for (let i = 0; i < randomSize; i++) {
-    default_plots.push([]);
-    for (let j = 0; j < randomSize; j++) {
-      const water =
-        i == mineX && j == mineY ? false : isWater(i, j, randomSize);
+  json.plots = generatePlots(GRID_SIZE_BY_DIFFICULTY[difficulty] ?? 12);
 
-      default_plots[i][j] = {
-        id: Math.random().toString(36).substring(2, 9),
-        active: false,
-        x: i,
-        y: j,
-        type: water ? -9 : -1,
-        typeId: "",
-        mineralSource: water
-          ? false
-          : mineX === i && mineY === j
-            ? true
-            : false,
-        water: mineX === i && mineY === j ? false : water,
-      };
-    }
-  }
-
-  json.plots = default_plots;
-
-  localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(json));
-  DB.set(json); // Update the store with the new value
-  localStorage.reset = false;
-  if (udb.games == undefined) {
-    udb.games = [];
-    udb.selectedGame = 0;
-    localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
-  }
-  udb.games.push(JSON.stringify(json));
-  udb.selectedGame = udb.games.length - 1;
-  localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
+  const serialized = JSON.stringify(json);
+  localStorage.setItem(ACTIVE_GAME_DB_NAME, serialized);
+  userDB.update((u) => {
+    u.games.push(serialized);
+    u.selectedGame = u.games.length - 1;
+    return u;
+  });
 
   analyticsEvent(json, Events.START_GAME, {
     difficulty: difficulty,
@@ -535,6 +333,80 @@ export function startGame(
 
   location.reload();
 }
+
+/**
+ * Closes per-town UI (build menu, plot warning, liege placement) without
+ * acting on it. Called whenever the active town changes.
+ */
+function resetTownUi() {
+  disabledPlotMenu.update((m) => ({ ...m, visible: false }));
+  modifyPlotMenuOptions.update((m) => ({ ...m, visible: false }));
+  settingLiegeLocation.set(false);
+}
+
+/** Leaves the current town (it stays in the town list) and shows the start menu. */
+export function leaveToNewTown() {
+  flushSave();
+  resetTownUi();
+  clearGame();
+  localStorage.removeItem(ACTIVE_GAME_DB_NAME);
+}
+
+/** Replaces the active town with a loaded file. Returns false if invalid. */
+export function loadGameFromFile(raw: unknown): boolean {
+  const game = normalizeGame(raw);
+  if (!game || !Array.isArray(game.plots) || game.plots.length === 0) {
+    return false;
+  }
+  resetTownUi();
+  DB.set(game);
+  flushSave();
+  return true;
+}
+
+export function setSelectedGame(index: number) {
+  flushSave();
+  resetTownUi();
+  const udb = get(userDB);
+  const game = normalizeGame(safeParse(udb.games[index] ?? null));
+  userDB.update((u) => {
+    u.selectedGame = index;
+    return u;
+  });
+  if (game) {
+    DB.set(game);
+    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(game));
+  } else {
+    clearGame();
+    localStorage.removeItem(ACTIVE_GAME_DB_NAME);
+  }
+}
+
+/** Deletes a town from the town list and switches to another one (if any). */
+export function deleteGame(index: number) {
+  // Don't let a pending save write the deleted town back into the list.
+  cancelPendingSave();
+  resetTownUi();
+  userDB.update((u) => {
+    u.games.splice(index, 1);
+    u.selectedGame = 0;
+    return u;
+  });
+  const udb = get(userDB);
+  const next = normalizeGame(safeParse(udb.games[0] ?? null));
+  if (next) DB.set(next);
+  else clearGame();
+  if (next) localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(next));
+  else localStorage.removeItem(ACTIVE_GAME_DB_NAME);
+}
+
+export function setUserDB(z: UserDatabase) {
+  userDB.set(z);
+}
+
+// ---------------------------------------------------------------------------
+// Grid helpers
+// ---------------------------------------------------------------------------
 
 export function isWater(x: number, y: number, maxSize: number) {
   let chance = 0.08; // default chance of being water.
@@ -556,78 +428,100 @@ export function isWater(x: number, y: number, maxSize: number) {
   return Math.random() < chance;
 }
 
-function setUserDBIfNull() {
-  if (localStorage.getItem(USER_DB_NAME) === null) {
-    let def = default_user_db;
-    def.username = "click_to_set_username";
-    localStorage.setItem(USER_DB_NAME, JSON.stringify(def));
-    userDB.set(def);
-  }
-}
+/**
+ * Removes whatever is built on a plot and reverses its population and
+ * employment effects. Mutates `z` without publishing it.
+ */
+export function clearPlot(x: number, y: number, z: Game) {
+  const plot = z.plots[x][y];
+  const oldPlotType = plot.type;
+  const builtDay = plot.builtDay;
+  plot.type = plot.water ? -9 : -1;
+  plot.typeId = "";
+  plot.active = false;
+  plot.disabled = false;
+  delete plot.snoozedUntil;
+  delete plot.builtDay;
 
-function roundTo(n: number, digits: number) {
-  if (digits === undefined) {
-    digits = 0;
-  }
-
-  var multiplicator = Math.pow(10, digits);
-  n = parseFloat((n * multiplicator).toFixed(11));
-  var test = Math.round(n) / multiplicator;
-  return +test.toFixed(digits);
-}
-
-export function reverseClear(x: number, y: number, z: Game) {
-  // TODO: Use Game as type for z instead of any.
-  let oldPlotType = z.plots[x][y].type;
-  z.plots[x][y].type = -1;
-  z.plots[x][y].typeId = "";
-  z.plots[x][y].active = false;
-
-  if (oldPlotType > -1) {
-    // Immediate variable changes
-    z.townInfo.population_count -=
-      options[oldPlotType].immediate_variable_changes.population;
-    z.townInfo.population_max -=
-      options[oldPlotType].immediate_variable_changes.population;
-    // Employeer modifications
-    z.townInfo.employees -= options[oldPlotType].requirements.employees;
-
+  const option = oldPlotType > -1 ? options[oldPlotType] : undefined;
+  if (option) {
+    z.townInfo.population_count -= option.immediate_variable_changes.population;
+    z.townInfo.population_max -= option.immediate_variable_changes.population;
+    // Bulldozing a fresh building takes back its one-time boost, so
+    // build/bulldoze loops can't farm happiness and health. After the boost
+    // has had time to wear off, demolition has no side effects.
     if (
-      z.plotCounts[oldPlotType] === undefined ||
-      z.plotCounts[oldPlotType] === null
+      builtDay != null &&
+      z.environment.day - builtDay <= BULLDOZE_REVERSAL_DAYS
     ) {
-      z.plotCounts[oldPlotType] = 0;
+      const info = z.townInfo;
+      const change = option.immediate_variable_changes;
+      info.happiness = Math.min(
+        z.maximums.happiness,
+        Math.max(0, info.happiness - change.happiness),
+      );
+      info.health = Math.min(
+        z.maximums.health,
+        Math.max(0, info.health - change.health),
+      );
+      const bought = option.purchase_effect_modifiers;
+      for (const key of ["happiness", "health", "community"] as const) {
+        z.modifiers[key] = roundTo2(z.modifiers[key] / bought[key]);
+      }
     }
-    z.plotCounts[oldPlotType]--;
+    z.plotCounts[oldPlotType] = (z.plotCounts[oldPlotType] ?? 0) - 1;
+    syncEmployment(z);
   }
 
   z.lastChangeDay = z.environment.day;
-  DB.set(z);
-  localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(z));
 }
 
-export function hasPlotOfType(type: string, z: Game) {
-  let plotsOfType = [];
-  for (let x = 0; x < z.plots.length; x++) {
-    for (let y = 0; y < z.plots[x].length; y++) {
-      if (
-        z.plots[x][y].active == false ||
-        z.plots[x][y] == null ||
-        z.plots[x][y].type === null ||
-        z.plots[x][y].type < 0
-      ) {
+/** Bulldozes a plot and publishes the change. */
+export function reverseClear(x: number, y: number, z: Game) {
+  clearPlot(x, y, z);
+  DB.set(z);
+}
+
+export function hasPlotOfType(type: string, z: Game): Plot[] {
+  const plotsOfType: Plot[] = [];
+  for (const row of z.plots) {
+    for (const plot of row) {
+      if (plot == null || !plot.active || plot.type == null || plot.type < 0) {
         continue;
       }
-      if (
-        options[z.plots[x][y].type].id === type ||
-        options[z.plots[x][y].type].type === type
-      ) {
-        plotsOfType.push(z.plots[x][y]);
+      const option = options[plot.type];
+      if (option && (option.id === type || option.type === type)) {
+        plotsOfType.push(plot);
       }
     }
   }
-
   return plotsOfType;
+}
+
+/** Job openings: the workers every building needs, plus hired Guardians. */
+export function countJobs(z: Game): number {
+  let jobs = z.townInfo.guardians;
+  for (const row of z.plots) {
+    for (const plot of row) {
+      if (plot.active && plot.type > -1) {
+        jobs += options[plot.type]?.requirements.employees ?? 0;
+      }
+    }
+  }
+  return jobs;
+}
+
+/** People in town who don't have a job. */
+export function freeWorkers(z: Game): number {
+  return Math.max(0, z.townInfo.population_count - countJobs(z));
+}
+
+/**
+ * `employees` is the number of people actually working: never more than the
+ * population. If people leave, extra openings simply go unfilled.
+ */
+export function syncEmployment(z: Game) {
+  z.townInfo.employees = Math.min(countJobs(z), z.townInfo.population_count);
 }
 
 export function isLiegeOnPlot(x: number, y: number, z: Game) {
@@ -638,13 +532,18 @@ export function isLiegeOnPlot(x: number, y: number, z: Game) {
   );
 }
 
-export function expandTown(z: Game, direction: string) {
+export function requiredGuardiansForExpansion(z: Game) {
+  return Math.round(Math.pow(1.7, z.kingdom_expansions + 5));
+}
+
+/** Adds 5 rows/columns in a direction. Returns an error message on failure. */
+export function expandTown(z: Game, direction: string): string | undefined {
   const numRows = z.plots.length;
   const numCols = numRows > 0 ? z.plots[0].length : 0;
   const newCols = direction == "east" ? 5 : 0;
   const newRows = direction == "south" ? 5 : 0;
 
-  const requiredGuardians = Math.round(Math.pow(1.7, z.kingdom_expansions + 5));
+  const requiredGuardians = requiredGuardiansForExpansion(z);
 
   if (z.townInfo.guardians < requiredGuardians) {
     return `You need ${requiredGuardians - z.townInfo.guardians} more Guardians to expand the kingdom. See the City mgmt menu.`;
@@ -653,34 +552,15 @@ export function expandTown(z: Game, direction: string) {
   // East
   for (let i = 0; i < numRows; i++) {
     for (let j = numCols; j < numCols + newCols; j++) {
-      z.plots[i].push({
-        id: Math.random().toString(36).substring(2, 9),
-        active: false,
-        x: i,
-        y: j,
-        type: -1,
-        typeId: "",
-        mineralSource: false,
-        water: isWater(i, j, numRows + newRows),
-        disabled: false,
-      });
+      z.plots[i].push(createPlot(i, j, isWater(i, j, numRows + newRows)));
     }
   }
 
   // South
   for (let i = numRows; i < numRows + newRows; i++) {
-    const newRow: any[] = [];
+    const newRow: Plot[] = [];
     for (let j = 0; j < numCols + newCols; j++) {
-      newRow.push({
-        id: Math.random().toString(36).substring(2, 9),
-        active: false,
-        x: i,
-        y: j,
-        type: -1,
-        typeId: "",
-        mineralSource: false,
-        water: isWater(i, j, numRows + newRows),
-      });
+      newRow.push(createPlot(i, j, isWater(i, j, numRows + newRows)));
     }
     z.plots.push(newRow);
   }
@@ -690,112 +570,78 @@ export function expandTown(z: Game, direction: string) {
   DB.set(z);
 }
 
-export function clearDB(overridenFile: File | null = null) {
-  localStorage.removeItem(ACTIVE_GAME_DB_NAME);
-  DB.set(null); // Update the store to null
-  if (overridenFile) {
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(overridenFile));
-    DB.set(overridenFile);
-  }
-  //location.reload();
-}
-
-export function toggleShowOnlyAffordable() {
-  showOnlyAffordable.update((value) => !value);
-  localStorage.setItem(
-    "showOnlyAffordable",
-    localStorage.getItem("showOnlyAffordable") === "true" ? "false" : "true",
-  );
-}
-
 export function setLiegeLocation(x: number, y: number, z: Game) {
   z.liege_location = [x, y];
   settingLiegeLocation.set(false);
-  const plots = document.querySelectorAll(".plot_container");
-  plots.forEach((plot: any) => {
-    plot.style.cursor = "";
-  });
-
   DB.set(z);
 }
 
-export function setSelectedGame(index: number, newUserDB: UserDatabase) {
-  syncActiveGameToUserDB();
+// ---------------------------------------------------------------------------
+// UI state
+// ---------------------------------------------------------------------------
 
-  userDB.set(newUserDB);
-  localStorage.setItem(USER_DB_NAME, JSON.stringify(newUserDB));
-
-  userDB.update((udb) => {
-    udb.selectedGame = index;
-
-    if (udb.games[index] == undefined || udb.games[index] == null) {
-      localStorage.setItem(ACTIVE_GAME_DB_NAME, "");
-      DB.set(null);
-      return udb;
-    }
-
-    const activeGameDB = JSON.parse(udb.games[index]);
-    DB.set(activeGameDB);
-    localStorage.setItem(ACTIVE_GAME_DB_NAME, JSON.stringify(activeGameDB));
-    localStorage.setItem(USER_DB_NAME, JSON.stringify(udb));
-    return udb;
+export function toggleShowOnlyAffordable() {
+  showOnlyAffordable.update((value) => {
+    localStorage.setItem("showOnlyAffordable", String(!value));
+    return !value;
   });
 }
 
-export let modifyPlotMenuOptions = writable({
+export const modifyPlotMenuOptions = writable({
   visible: false,
   x: 0,
   y: 0,
   isMineralSource: false,
 });
 
-export let startGameMenu = writable({
+export const startGameMenu = writable({
   visible: false,
 });
 
-export function setUserDB(z: UserDatabase) {
-  userDB.set(z);
-  localStorage.setItem(USER_DB_NAME, JSON.stringify(z));
+export const unique = writable({});
+export const showTutorialStepConfetti = writable(false);
+export const paused = writable(false);
+// only when DB.environment.day is 1
+export const showWelcome = writable(true);
+export const showScoreboard = writable(false);
+export const showKnowledgeMenu = writable(false);
+export const showAchievementPopup = writable(false);
+export const showLabMenu = writable(false);
+export const settingLiegeLocation = writable(false);
+export const showCityHallMenu = writable(false);
+
+export const customAlertText = writable("");
+
+/** Shows a message in the alert dialog. */
+export function showAlert(message: string) {
+  customAlertText.set(message);
 }
 
-export let unique = writable({});
-export let showTutorialStepConfetti = writable(false);
-export let paused = writable(false);
-// only when DB.environment.day is 1
-export let showWelcome = writable(true);
-export let showScoreboard = writable(false);
-export let showKnowledgeMenu = writable(false);
-export let showAchievementPopup = writable(false);
-export let showLabMenu = writable(false);
-export let settingLiegeLocation = writable(false);
-export let showCityHallMenu = writable(false);
-
-export let customAlertText = writable("");
-
+/** Shows a one-time tip; it is never shown again for this player. */
 export function showCustomAlert(alert: CustomAlerts | string) {
-  let userDB = JSON.parse(localStorage.getItem(USER_DB_NAME) ?? "");
-  if (userDB.customAlertsShown.includes(alert)) return;
-  userDB.customAlertsShown.push(alert);
-  localStorage.setItem(USER_DB_NAME, JSON.stringify(userDB));
+  const udb = get(userDB);
+  if (udb.customAlertsShown.includes(alert as CustomAlerts)) return;
+  userDB.update((u) => {
+    u.customAlertsShown.push(alert as CustomAlerts);
+    return u;
+  });
   customAlertText.set(alert);
 }
 
-export let showCompletedAchievements =
-  localStorage.getItem("showCompletedAchievements") === "true"
-    ? writable(true)
-    : writable(false);
-export let showOnlyAffordable =
-  localStorage.getItem("showOnlyAffordable") === "true"
-    ? writable(true)
-    : writable(false);
-export let pauseMenuTab =
-  localStorage.getItem("pauseMenuTab") === "game"
-    ? writable("game")
-    : writable("achievements");
-export let headerHeight = writable(250);
-export let speed = writable(750);
-export let disabledPlotMenu = writable({
+export const showCompletedAchievements = writable(
+  localStorage.getItem("showCompletedAchievements") === "true",
+);
+export const showOnlyAffordable = writable(
+  localStorage.getItem("showOnlyAffordable") === "true",
+);
+export const pauseMenuTab = writable(
+  localStorage.getItem("pauseMenuTab") === "game" ? "game" : "achievements",
+);
+export const headerHeight = writable(250);
+export const speed = writable(750);
+export const disabledPlotMenu = writable({
   visible: false,
+  gameId: 0, // the town the warning belongs to
   plotName: "",
   location: "",
   missingResources: [] as string[],
@@ -804,17 +650,27 @@ export let disabledPlotMenu = writable({
   y: 0,
 });
 
-export function syncActiveGameToUserDB() {
-  const currentGame = JSON.parse(
-    localStorage.getItem(ACTIVE_GAME_DB_NAME) ?? "",
-  );
-  if (!currentGame) return;
+/**
+ * Closes the "plot disabled" warning. The player either pays to snooze it, or
+ * the plot is bulldozed (this is also what happens if the dialog is dismissed).
+ * Safe to call more than once.
+ */
+export function resolveDisabledPlot(choice: "snooze" | "bulldoze") {
+  const menu = get(disabledPlotMenu);
+  if (!menu.visible) return;
+  disabledPlotMenu.update((m) => ({ ...m, visible: false }));
 
-  const userDBData = JSON.parse(localStorage.getItem(USER_DB_NAME) ?? "");
-  if (!userDBData || userDBData.selectedGame === undefined) return;
+  const game = getGame();
+  const plot = game?.plots[menu.x]?.[menu.y];
+  // Never act on a different town than the one that raised the warning.
+  if (!game || !plot || game.gameId !== menu.gameId) return;
 
-  userDBData.games[userDBData.selectedGame] = JSON.stringify(currentGame);
-
-  localStorage.setItem(USER_DB_NAME, JSON.stringify(userDBData));
-  userDB.set(userDBData);
+  if (choice === "snooze" && game.townInfo.gold >= menu.plotCost) {
+    game.townInfo.gold -= menu.plotCost;
+    plot.snoozedUntil = game.environment.day + SNOOZE_DAYS;
+    plot.disabled = false;
+  } else {
+    clearPlot(menu.x, menu.y, game);
+  }
+  DB.set(game);
 }

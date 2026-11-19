@@ -7,11 +7,13 @@ const config = {
   ],
   safelist: ["dark"],
   theme: {
+    // Replaces Tailwind's scale, so every size used in the app must be listed.
     fontSize: {
       xs: "0.75rem",
-      sm: "0.875rem",
       sm: "0.8rem",
-      base: "0.625rem",
+      md: "1rem",
+      base: "1rem",
+      lg: "1.125rem",
       xl: "1.25rem",
       "2xl": "1.563rem",
       "3xl": "1.953rem",
@@ -39,6 +41,21 @@ const config = {
         border: "rgba(106, 126, 115, 1)", // Lighter green-gray for borders
         textHappy: "rgba(20, 152, 102, 1)", // Brighter green for success
         textDanger: "rgba(230, 90, 100, 1)", // Slightly softened red
+        // Colors used by the shadcn-svelte button/input variants.
+        primary: {
+          DEFAULT: "rgba(168, 115, 75, 1)", // = accent
+          foreground: "rgba(255, 255, 255, 1)",
+        },
+        secondary: {
+          DEFAULT: "rgba(106, 126, 115, 1)",
+          foreground: "rgba(255, 255, 255, 1)",
+        },
+        destructive: {
+          DEFAULT: "rgba(185, 55, 60, 1)",
+          foreground: "rgba(255, 255, 255, 1)",
+        },
+        input: "rgba(106, 126, 115, 1)",
+        ring: "rgba(168, 115, 75, 1)",
       },
       keyframes: {
         wiggle: {

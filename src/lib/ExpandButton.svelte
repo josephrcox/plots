@@ -1,8 +1,13 @@
 <script lang="ts">
-  import { limeGreen } from "@doist/todoist-api-typescript";
-  import { DB, expandTown, hasPlotOfType, showCustomAlert } from "./store";
+  import {
+    DB,
+    expandTown,
+    hasPlotOfType,
+    showAlert,
+    requiredGuardiansForExpansion,
+  } from "./store";
   import Button from "./components/ui/button/button.svelte";
-  export let direction: string;
+  export let direction: "east" | "south";
 </script>
 
 <div class="w-48 h-max">
@@ -10,10 +15,8 @@
     <Button
       class="bg-accent h-max rounded-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:drop-shadow-2xl"
       on:click={() => {
-        const attempt = expandTown($DB, direction);
-        if (attempt) {
-          showCustomAlert(attempt);
-        }
+        const error = expandTown($DB, direction);
+        if (error) showAlert(error);
       }}
     >
       <div>
@@ -25,7 +28,7 @@
         <br />your
         <span class="text-blue-200 bold">City Hall</span>!<br /><br />
         <span class="opacity-75 text-xs"
-          >Requires {Math.round(Math.pow(1.7, $DB.kingdom_expansions + 5))} Guardians
+          >Requires {requiredGuardiansForExpansion($DB)} Guardians
           <br />to be employed. (see city mgmt menu)</span
         >
       </div>
@@ -36,7 +39,3 @@
     </span>
   {/if}
 </div>
-
-<style>
-  /* your styles go here */
-</style>

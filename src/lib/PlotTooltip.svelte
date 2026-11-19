@@ -1,34 +1,15 @@
 <script lang="ts">
-  import * as Tooltip from "$lib/components/ui/tooltip";
   import { Separator } from "$lib/components/ui/separator";
   import {
-    firstEmoji,
     getOptionIndex,
-    formatModifier,
     formatNumber,
-    roundTo,
     formatInstantChange,
     capitalizeFirstLetter,
     getOptionFromId,
   } from "./utils";
-  import {
-    DB,
-    ACTIVE_GAME_DB_NAME,
-    modifyPlotMenuOptions,
-    reverseClear,
-    hasPlotOfType,
-    showOnlyAffordable,
-    toggleShowOnlyAffordable,
-  } from "./store";
-  import {
-    getColor,
-    options,
-    plotTypeMaximums,
-  } from "./objects/PlotTypeOptions";
-  import { Game, PlotOption } from "./types";
-  import { Input } from "$lib/components/ui/input";
-  import { onMount } from "svelte";
-  import { Button } from "./components/ui/button";
+  import { DB, hasPlotOfType, freeWorkers } from "./store";
+  import { options } from "./objects/PlotTypeOptions";
+  import type { PlotOption } from "./types";
 
   export let option: PlotOption;
   export let checkRequirements: boolean = true;
@@ -130,7 +111,7 @@
         {#if options[getOptionIndex(option.id)].requirements.employees != 0}
           <span
             class={options[getOptionIndex(option.id)].requirements.employees >
-              $DB.townInfo.population_count - $DB.townInfo.employees &&
+              freeWorkers($DB) &&
             checkRequirements
               ? "px-1 text-textDanger font-bold border-2 border-red-400"
               : ""}

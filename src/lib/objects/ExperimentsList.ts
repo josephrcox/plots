@@ -1,5 +1,5 @@
-import { hasPlotOfType, reverseClear } from "$lib/store";
-import { Experiment, Game } from "$lib/types";
+import { hasPlotOfType, clearPlot } from "$lib/store";
+import type { Experiment, Game } from "$lib/types";
 
 export const experiments: Experiment[] = [
   //   {
@@ -158,6 +158,6 @@ export const experiments: Experiment[] = [
 function removeAllPlotsOfType(typeId: string, game: Game) {
   let plotsOfType: any[] = hasPlotOfType(typeId, game);
   for (let i = 0; i < plotsOfType.length; i++) {
-    reverseClear(plotsOfType[i].x, plotsOfType[i].y, game);
+    clearPlot(plotsOfType[i].x, plotsOfType[i].y, game);
   }
 }
