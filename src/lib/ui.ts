@@ -128,7 +128,7 @@ export function placementCheck(
   replacing = false,
 ): Check {
   const plot = z.plots[x]?.[y];
-  if (!plot) return { ok: false, reason: "" };
+  if (!plot || plot.offMap) return { ok: false, reason: "" };
   if (plot.water) return { ok: false, reason: "Can't build on water" };
   if (plot.mineralSource && option.id !== "mine") {
     return { ok: false, reason: "Only a Mine fits on a mineral deposit" };

@@ -14,6 +14,12 @@ import { analyticsEvent } from "./utils";
 import { CustomAlerts } from "./objects/CustomAlerts";
 import { generateRandomTownName } from "./objects/townNames";
 import { resetMapUi } from "./ui";
+import {
+  generateTerrain,
+  expandTerrain,
+  type Cell,
+  type Grid,
+} from "./terrain";
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -273,8 +279,9 @@ export function createPlot(
   y: number,
   water: boolean,
   mineralSource = false,
+  offMap = false,
 ): Plot {
-  return {
+  const plot: Plot = {
     id: Math.random().toString(36).substring(2, 9),
     active: false,
     x,
@@ -285,22 +292,31 @@ export function createPlot(
     water,
     disabled: false,
   };
+  if (offMap) plot.offMap = true;
+  return plot;
 }
 
-/** Generates a fresh square grid with water and a single mineral source. */
+function plotFromCell(x: number, y: number, cell: Cell): Plot {
+  return createPlot(x, y, cell === "water", cell === "mineral", cell === "off");
+}
+
+function cellOf(plot: Plot): Cell {
+  if (plot.offMap) return "off";
+  if (plot.water) return "water";
+  if (plot.mineralSource) return "mineral";
+  return "land";
+}
+
+/**
+ * Generates a town's land: an irregular, connected landmass with lakes and a
+ * mineral deposit, inside a grid a bit larger than `size` × `size`. The land
+ * is roughly as much as a full `size` × `size` square used to give.
+ */
 export function generatePlots(size: number): Plot[][] {
-  const mineX = Math.floor((Math.random() * size) / 2) + 1;
-  const mineY = Math.floor((Math.random() * size) / 2) + 1;
-  const plots: Plot[][] = [];
-  for (let i = 0; i < size; i++) {
-    plots.push([]);
-    for (let j = 0; j < size; j++) {
-      const isMine = i === mineX && j === mineY;
-      const water = !isMine && isWater(i, j, size);
-      plots[i][j] = createPlot(i, j, water, isMine);
-    }
-  }
-  return plots;
+  const box = Math.round(size * 1.3);
+  const land = Math.round(size * size * (0.75 + Math.random() * 0.2));
+  const grid = generateTerrain(box, box, land);
+  return grid.map((row, i) => row.map((cell, j) => plotFromCell(i, j, cell)));
 }
 
 const GRID_SIZE_BY_DIFFICULTY: Record<Difficulty, number> = {
@@ -439,25 +455,6 @@ export function setUserDB(z: UserDatabase) {
 // Grid helpers
 // ---------------------------------------------------------------------------
 
-export function isWater(x: number, y: number, maxSize: number) {
-  let chance = 0.08; // default chance of being water.
-  if (x > 0 && y > 0 && x < maxSize - 1 && y < maxSize - 1) {
-    chance *= 2;
-  }
-  if (y == Math.round(maxSize / 2) || y == Math.round(maxSize / 2) - 1) {
-    chance *= 3;
-  }
-  if (x == 0 && y == 0) {
-    chance = 0;
-  }
-
-  const middleRow = Math.floor(maxSize / 2);
-
-  if (y === middleRow) {
-    return false;
-  }
-  return Math.random() < chance;
-}
 
 /**
  * Removes whatever is built on a plot and reverses its population and
@@ -580,20 +577,30 @@ export function expandTown(z: Game, direction: string): string | undefined {
     return `You need ${requiredGuardians - z.townInfo.guardians} more Guardians to expand the kingdom. See the City mgmt menu.`;
   }
 
-  // East
+  // Add the new area as off-map cells...
   for (let i = 0; i < numRows; i++) {
     for (let j = numCols; j < numCols + newCols; j++) {
-      z.plots[i].push(createPlot(i, j, isWater(i, j, numRows + newRows)));
+      z.plots[i].push(createPlot(i, j, false, false, true));
     }
   }
-
-  // South
   for (let i = numRows; i < numRows + newRows; i++) {
     const newRow: Plot[] = [];
     for (let j = 0; j < numCols + newCols; j++) {
-      newRow.push(createPlot(i, j, isWater(i, j, numRows + newRows)));
+      newRow.push(createPlot(i, j, false, false, true));
     }
     z.plots.push(newRow);
+  }
+
+  // ...then grow a new chunk of land into it from the existing land.
+  const grid: Grid = z.plots.map((row) => row.map(cellOf));
+  const side = direction === "east" ? numRows : numCols + newCols;
+  const count = Math.round(5 * side * (0.55 + Math.random() * 0.2));
+  for (const [i, j] of expandTerrain(
+    grid,
+    direction === "east" ? "east" : "south",
+    count,
+  )) {
+    z.plots[i][j] = plotFromCell(i, j, grid[i][j]);
   }
 
   z.kingdom_expansions++;

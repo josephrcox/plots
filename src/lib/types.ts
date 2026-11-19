@@ -12,6 +12,7 @@ export type Plot = {
   typeId: string;
   mineralSource: boolean;
   water: boolean;
+  offMap?: boolean; // outside the town's land: not drawn, never usable
   snoozedUntil?: number;
   builtDay?: number; // game day the current building was placed
 };

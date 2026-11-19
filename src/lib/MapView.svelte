@@ -31,6 +31,8 @@
   import {
     placePlot,
     checkIfPlotCanBeUpgraded,
+    suggestedStart,
+    townHasStarted,
     isAdjacentToWater,
     analyticsEvent,
   } from "./utils";
@@ -48,7 +50,7 @@
   import HoverCard from "./HoverCard.svelte";
   import { Events, type Plot as PlotData } from "./types";
 
-  const MIN_ZOOM = 0.3;
+  const MIN_ZOOM = 0.2;
   const MAX_ZOOM = 2.5;
   const KEY_PAN_SPEED = 700; // px per second
   const DRAG_THRESHOLD = 5;
@@ -77,6 +79,9 @@
           row.map((p) => placementCheck(buildOption!, p.x, p.y, $DB!).ok),
         )
       : [];
+
+  // Before the first building, point at a good starting tile.
+  $: startTile = $DB && !townHasStarted($DB) ? suggestedStart($DB) : null;
 
   $: buildable = $DB
     ? $DB.plots.map((row) =>
@@ -252,9 +257,11 @@
       minY = Infinity,
       maxX = -Infinity,
       maxY = -Infinity;
+    // Frame the buildings, or all of the land before anything is built.
+    const started = townHasStarted($DB);
     for (const row of $DB.plots) {
       for (const p of row) {
-        if (!p.active) continue;
+        if (started ? !p.active : p.offMap) continue;
         minX = Math.min(minX, tileLeft(p.x, p.y));
         maxX = Math.max(maxX, tileLeft(p.x, p.y) + TILE_W);
         minY = Math.min(minY, tileTop(p.x));
@@ -262,13 +269,13 @@
       }
     }
     if (minX === Infinity) {
-      // Nothing built yet: frame the starting corner.
+      // No land at all (shouldn't happen): frame the corner.
       minX = 0;
       minY = 0;
       maxX = TILE_W;
       maxY = TILE_H;
     }
-    const margin = 2 * COL_STEP;
+    const margin = (started ? 2 : 0.5) * COL_STEP;
     minX -= margin;
     minY -= margin;
     maxX += margin;
@@ -487,6 +494,7 @@
     >
       {#each $DB.plots as row, x}
         {#each row as plot, y (plot.id)}
+          {#if !plot.offMap}
           <Plot
             data={plot}
             buildable={buildable[x]?.[y] ?? false}
@@ -495,7 +503,9 @@
             state={tileStates ? tileStates[x][y] : "normal"}
             ghostEmoji={buildOption?.emoji ?? ""}
             crosshair={$settingLiegeLocation && plot.active}
+            startHint={startTile?.[0] === x && startTile?.[1] === y}
           />
+          {/if}
         {/each}
       {/each}
 

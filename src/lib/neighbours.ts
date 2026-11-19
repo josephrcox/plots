@@ -60,9 +60,9 @@ const SHOP_IDS = ["village_market", "general_store"];
  * half a tile to the right (see PlotController), so the rows above and below
  * touch columns (y-1, y) on even rows and (y, y+1) on odd rows.
  */
-export function hexNeighbours(x: number, y: number, z: Game): Plot[] {
+export function hexNeighbourCoords(x: number, y: number): [number, number][] {
   const shift = x % 2 === 0 ? -1 : 0;
-  const coords = [
+  return [
     [x, y - 1],
     [x, y + 1],
     [x - 1, y + shift],
@@ -70,8 +70,11 @@ export function hexNeighbours(x: number, y: number, z: Game): Plot[] {
     [x + 1, y + shift],
     [x + 1, y + shift + 1],
   ];
+}
+
+export function hexNeighbours(x: number, y: number, z: Game): Plot[] {
   const result: Plot[] = [];
-  for (const [i, j] of coords) {
+  for (const [i, j] of hexNeighbourCoords(x, y)) {
     const plot = z.plots[i]?.[j];
     if (plot) result.push(plot);
   }

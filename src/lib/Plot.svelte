@@ -35,6 +35,7 @@
   export let state: TileState = "normal";
   export let ghostEmoji = "";
   export let crosshair = false;
+  export let startHint = false;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
   $: fill = data.water
@@ -86,8 +87,9 @@
       {/if}
     {:else if data.mineralSource}
       <span class="emoji">🧲</span>
-    {:else if data.x === 0 && data.y === 0 && buildable}
-      <span class="title animate-pulse">Start here!</span>
+    {:else if startHint}
+      <span class="emoji animate-bounce">🚩</span>
+      <span class="title">Start here!</span>
     {/if}
     {#if liegeHere}
       <span class="liege">👑</span>

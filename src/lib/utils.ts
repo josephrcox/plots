@@ -231,13 +231,34 @@ export function randomizeNumber(n: number, round: number = 0) {
 }
 
 /**
- * Whether something can be built on (x, y): the starting tile (0, 0), or any
- * tile touching a built one (all six hex neighbours).
+ * Whether something can be built on (x, y): any land tile touching a built
+ * one (all six hex neighbours). Before anything is built, any land tile can
+ * be the town's first.
  */
 export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
-  if (x === 0 && y === 0) return true;
-  if (!z.plots[x]?.[y]) return false;
+  const plot = z.plots[x]?.[y];
+  if (!plot || plot.offMap || plot.water) return false;
+  if (!townHasStarted(z)) return true;
   return hexNeighbours(x, y, z).some((p) => p.active);
+}
+
+/** Whether anything has been built yet. */
+export function townHasStarted(z: Game) {
+  return z.plots.some((row) => row.some((p) => p.active));
+}
+
+/** A land tile near the middle of the land: where to suggest starting. */
+export function suggestedStart(z: Game): [number, number] | null {
+  const land = z.plots
+    .flat()
+    .filter((p) => !p.offMap && !p.water && !p.mineralSource);
+  if (!land.length) return null;
+  const cx = land.reduce((s, p) => s + p.x, 0) / land.length;
+  const cy = land.reduce((s, p) => s + p.y, 0) / land.length;
+  const best = land.reduce((a, b) =>
+    Math.hypot(a.x - cx, a.y - cy) <= Math.hypot(b.x - cx, b.y - cy) ? a : b,
+  );
+  return [best.x, best.y];
 }
 
 // Check if player has enough gold for the plot
@@ -508,15 +529,16 @@ export function createAMockTown() {
   json.plots = generatePlots(25);
 
   // Always place a small home first, then place 3 farms and a tree_farm.
-  placePlot(json, 0, 0, "small_homes", true);
-  placePlot(json, 1, 0, "farm", true);
-  placePlot(json, 2, 0, "farm", true);
-  placePlot(json, 3, 0, "farm", true);
-  placePlot(json, 4, 0, "tree_farm", true);
+  const [sx, sy] = suggestedStart(json) ?? [0, 0];
+  placePlot(json, sx, sy, "small_homes", true);
+  for (const id of ["farm", "farm", "farm", "tree_farm"]) {
+    const next = findClosestPlot(sx, sy, json);
+    if (next) placePlot(json, next[0], next[1], id, true);
+  }
 
   // Then keep building random plots next to the town until nothing fits.
   for (let attempts = 0; attempts < 2000; attempts++) {
-    const next = findClosestPlot(0, 0, json);
+    const next = findClosestPlot(sx, sy, json);
     if (!next) break;
     const option = options[Math.floor(Math.random() * options.length)];
     if (option.id === "mine") continue;
