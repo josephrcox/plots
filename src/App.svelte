@@ -8,7 +8,6 @@
   import {
     paused,
     DB,
-    modifyPlotMenuOptions,
     startGameMenu,
     showWelcome,
     settingLiegeLocation,
@@ -30,6 +29,7 @@
   import CityHallMenu from "./lib/menus/CityHallMenu.svelte";
   import CustomAlert from "./lib/components/CustomAlert.svelte";
   import { runTests } from "./tests";
+  import { tool, targetTile, inspected, resetMapUi } from "./lib/ui";
 
   runTests();
 
@@ -103,9 +103,12 @@
     if ($showLabMenu) return ($showLabMenu = false);
     if ($showCityHallMenu) return ($showCityHallMenu = false);
     if ($showScoreboard) return ($showScoreboard = false);
-    if ($modifyPlotMenuOptions.visible) {
-      return ($modifyPlotMenuOptions.visible = false);
+    // Map interactions: cancel the tool, then the target, then the inspector.
+    if (key === "escape" && $tool.kind !== "none") {
+      return tool.set({ kind: "none" });
     }
+    if (key === "escape" && $targetTile) return targetTile.set(null);
+    if (key === "escape" && $inspected) return inspected.set(null);
     if ($disabledPlotMenu.visible) {
       // Escape dismisses the warning, which bulldozes the plot. P does nothing
       // here: pausing should never destroy a building.
@@ -115,7 +118,7 @@
     if ($settingLiegeLocation) return ($settingLiegeLocation = false);
 
     $paused = !$paused;
-    if ($paused) $modifyPlotMenuOptions.visible = false;
+    if ($paused) resetMapUi();
   }
 </script>
 

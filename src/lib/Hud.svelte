@@ -1,21 +1,17 @@
 <script lang="ts">
-  import Header from "./Header.svelte";
-  import PlotController from "./PlotController.svelte";
+  import MapView from "./MapView.svelte";
+  import TopBar from "./TopBar.svelte";
   import LeftSidebar from "./LeftSidebar.svelte";
   import RightSidebar from "./RightSidebar.svelte";
+  import BuildBar from "./BuildBar.svelte";
+  import Inspector from "./Inspector.svelte";
+  import LogToasts from "./LogToasts.svelte";
 </script>
 
-<div class="flex flex-col max-h-[100%] justify-between">
-  <div>
-    <Header />
-  </div>
-  <div class="flex flex-row text-accentText">
-    <LeftSidebar />
-    <PlotController />
-    <RightSidebar />
-  </div>
-</div>
-
-<style>
-  /*  */
-</style>
+<MapView />
+<TopBar />
+<LeftSidebar />
+<RightSidebar />
+<Inspector />
+<BuildBar />
+<LogToasts />

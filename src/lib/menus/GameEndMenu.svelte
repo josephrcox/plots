@@ -2,18 +2,18 @@
   import {
     DB,
     paused,
-    modifyPlotMenuOptions,
     showAlert,
     LOSS_GRACE_DAYS,
   } from "../store";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Button } from "$lib/components/ui/button";
+  import { resetMapUi } from "../ui";
 
   $: show = $DB != null && $DB.endGameDetails.msg != "";
   // A town can keep playing after its first loss only.
   $: canContinue = $DB != null && !$DB.overtime;
-  // The build menu would otherwise cover this dialog.
-  $: if (show) $modifyPlotMenuOptions.visible = false;
+  // Drop any build tool so nothing can be placed behind this dialog.
+  $: if (show) resetMapUi();
 
   function keepPlaying() {
     if (!canContinue) return;

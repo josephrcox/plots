@@ -13,6 +13,7 @@
 
   export let option: PlotOption;
   export let checkRequirements: boolean = true;
+  export let showTitle = true;
 
   function getRequirementString(
     icon: string,
@@ -56,9 +57,11 @@
 {#if option != null}
   <div class="p-2 max-w-64">
     <div class="flex flex-col gap-1 mb-1">
-      <span class="text-md font-semibold"
-        >{options[getOptionIndex(option.id)].title}</span
-      >
+      {#if showTitle}
+        <span class="text-md font-semibold"
+          >{options[getOptionIndex(option.id)].title}</span
+        >
+      {/if}
       <span class="text-xs"
         >{options[getOptionIndex(option.id)].description}</span
       >

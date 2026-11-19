@@ -1,9 +1,10 @@
 <script lang="ts">
   import { roundTo } from "./utils";
 
+  import { fly } from "svelte/transition";
+  import { leftPanelOpen, HUD } from "./ui";
   import {
     DB,
-    modifyPlotMenuOptions,
     settingLiegeLocation,
     showCityHallMenu,
     showKnowledgeMenu,
@@ -30,15 +31,25 @@
   }
 </script>
 
-<div
-  class="flex flex-row text-sidebarText bg-sidebarBackground overflow-clip {$modifyPlotMenuOptions.visible
-    ? 'opacity-10'
-    : ''}"
->
-  <div
-    class="w-[220px] text-sidebarText bg-sidebarBackground overflow-scroll border-foregroundDark border-4 bottom-4
-		z-10 fixed left-3 py-2 top-16 drop-shadow-xl rounded-xl transition-all duration-300"
+{#if !$leftPanelOpen}
+  <button
+    class="fixed left-3 z-20 bg-sidebarBackground text-sidebarText rounded-lg shadow-lg px-3 py-2 text-sm"
+    style="top:{HUD.top + 8}px;"
+    title="Show town panel"
+    on:click={() => ($leftPanelOpen = true)}>🏛️ Town ›</button
   >
+{:else}
+<div class="text-sidebarText" transition:fly={{ x: -40, duration: 150 }}>
+  <div
+    class="text-sidebarText bg-sidebarBackground overflow-y-auto no-scrollbar border-foregroundDark border-4
+		z-20 fixed left-3 py-2 bottom-3 drop-shadow-xl rounded-xl"
+    style="top:{HUD.top + 8}px; width:{HUD.panel - 16}px;"
+  >
+    <button
+      class="absolute top-1 right-2 text-sm opacity-50 hover:opacity-100"
+      title="Hide panel"
+      on:click={() => ($leftPanelOpen = false)}>‹</button
+    >
     <div class="flex flex-col justify-center mx-2 gap-4">
       <div
         class="flex flex-col gap-2 rounded-xl text-center justify-center mb-2 mt-0 pt-2"
@@ -144,9 +155,9 @@
         </div>
       </div>
     </div>
-    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
   </div>
 </div>
+{/if}
 
 <style>
   * {

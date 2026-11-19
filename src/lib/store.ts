@@ -13,6 +13,7 @@ import { options } from "./objects/PlotTypeOptions";
 import { analyticsEvent } from "./utils";
 import { CustomAlerts } from "./objects/CustomAlerts";
 import { generateRandomTownName } from "./objects/townNames";
+import { resetMapUi } from "./ui";
 
 // The active game DB is for the current game, challenge, or play-through.
 //// This can get corrupted, so it is important to keep this separate from the user DB.
@@ -340,7 +341,7 @@ export function startGame(
  */
 function resetTownUi() {
   disabledPlotMenu.update((m) => ({ ...m, visible: false }));
-  modifyPlotMenuOptions.update((m) => ({ ...m, visible: false }));
+  resetMapUi();
   settingLiegeLocation.set(false);
 }
 
@@ -587,18 +588,10 @@ export function toggleShowOnlyAffordable() {
   });
 }
 
-export const modifyPlotMenuOptions = writable({
-  visible: false,
-  x: 0,
-  y: 0,
-  isMineralSource: false,
-});
-
 export const startGameMenu = writable({
   visible: false,
 });
 
-export const unique = writable({});
 export const showTutorialStepConfetti = writable(false);
 export const paused = writable(false);
 // only when DB.environment.day is 1

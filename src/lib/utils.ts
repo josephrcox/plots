@@ -217,37 +217,14 @@ export function randomizeNumber(n: number, round: number = 0) {
   return roundTo(Math.random() * (max - min) + min, round);
 }
 
+/**
+ * Whether something can be built on (x, y): the starting tile (0, 0), or any
+ * tile touching a built one (all six hex neighbours).
+ */
 export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
-  let plot = {
-    x: x,
-    y: y,
-  };
-
-  // the only exception is plot 0,0, which can be upgraded from the start
-  if (plot.x === 0 && plot.y === 0) {
-    return true;
-  }
-  // you can only upgrade a plot if it is adjacent to a plot that already is {active:true}.
-
-  const adjacentPlots = [
-    { x: plot.x - 1, y: plot.y },
-    { x: plot.x + 1, y: plot.y },
-    { x: plot.x, y: plot.y - 1 },
-    { x: plot.x, y: plot.y + 1 },
-  ];
-  return adjacentPlots.some((adjacentPlot) => {
-    // check if adjacent plot is outside of the 25x25 grid
-    if (
-      adjacentPlot.x < 0 ||
-      adjacentPlot.x >= z.plots.length || // Changed from '>' to '>='
-      adjacentPlot.y < 0 ||
-      adjacentPlot.y >= z.plots[adjacentPlot.x].length // Assuming a square grid
-    ) {
-      return false;
-    }
-    const adjacentPlotData = z.plots[adjacentPlot.x][adjacentPlot.y];
-    return adjacentPlotData.active;
-  });
+  if (x === 0 && y === 0) return true;
+  if (!z.plots[x]?.[y]) return false;
+  return hexNeighbours(x, y, z).some((p) => p.active);
 }
 
 // Check if player has enough gold for the plot
