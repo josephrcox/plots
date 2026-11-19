@@ -41,8 +41,8 @@
 
 {#if plot && option && pos}
   <div
-    class="fixed right-3 z-30 w-[240px] bg-sidebarBackground text-sidebarText rounded-xl shadow-2xl border-4 border-foreground p-3 flex flex-col gap-2 max-h-[calc(100vh-230px)] overflow-y-auto no-scrollbar"
-    style="top:{HUD.top + 8}px;"
+    class="fixed right-3 z-30 bg-popupBackground text-white rounded-xl shadow-2xl p-3 flex flex-col gap-2 max-h-[calc(100vh-230px)] overflow-y-auto no-scrollbar"
+    style="top:{HUD.top + 8}px; width:{HUD.panel - 16}px;"
     transition:fly={{ x: 40, duration: 150 }}
   >
     <div class="flex flex-row items-start justify-between">

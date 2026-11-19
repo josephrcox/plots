@@ -16,6 +16,11 @@
   import { CustomAlerts } from "./objects/CustomAlerts";
   import { formatNumber, formatAmount, capitalizeFirstLetter } from "./utils";
   import { HUD } from "./ui";
+  import {
+    FOOD_PER_PERSON,
+    FOOD_SPOILAGE,
+    WELL_FED_WEEKS,
+  } from "./simulation";
 
   // Milliseconds per game day for x1 / x2 / x3.
   const speeds = $DB!.gameSettings.includes("casual")
@@ -98,6 +103,15 @@
     }
     wasAtCap = full;
   }
+
+  // Food: last week's flows. The weekly rate is net of eating and spoilage.
+  $: foodEaten = $DB.foodEaten ?? $DB.townInfo.population_count * FOOD_PER_PERSON;
+  $: foodSpoiled = $DB.foodSpoiled ?? 0;
+  $: foodMade = Math.max(0, $DB.resource_rate.food + foodEaten + foodSpoiled);
+  $: foodWeeks =
+    $DB.townInfo.population_count > 0
+      ? $DB.resources.food / ($DB.townInfo.population_count * FOOD_PER_PERSON)
+      : 0;
 
   // Workers: people minus jobs. Negative means some jobs are unfilled.
   $: jobs = countJobs($DB);
@@ -210,7 +224,26 @@
             {row.icon} {capitalizeFirstLetter(row.name)}
             {#if row.rate != null}<span class="font-normal opacity-70"> ({rateText(row.rate)} per week)</span>{/if}
           </div>
-          {#if neededBy(row.name).length}
+          {#if row.name === "food"}
+            <div class="grid grid-cols-[1fr_auto] gap-x-3 my-1">
+              <span>Made</span><span class="text-green-300">+{formatAmount(foodMade)}/wk</span>
+              <span>Eaten ({FOOD_PER_PERSON} per person)</span><span class="text-red-300">−{formatAmount(foodEaten)}/wk</span>
+              <span>Spoiled ({Math.round(FOOD_SPOILAGE * 100)}% of stock)</span><span class="text-red-300">−{formatAmount(foodSpoiled)}/wk</span>
+            </div>
+            <div class="mb-1">
+              {Math.floor(foodWeeks)} weeks of food stored.
+              {#if $DB.wellFed}
+                <span class="text-green-300 font-semibold">Well fed:</span> happiness
+                and health get a small boost each week.
+              {:else}
+                With {WELL_FED_WEEKS}+ weeks stored the town is well fed (a small
+                happiness and health boost).
+              {/if}
+            </div>
+          {/if}
+          {#if row.name === "wood" || row.name === "stone"}
+            <div class="opacity-80">Used by most buildings.</div>
+          {:else if neededBy(row.name).length}
             <div class="opacity-80">Needed for: {neededBy(row.name).join(", ")}</div>
           {/if}
         </Tooltip.Content>

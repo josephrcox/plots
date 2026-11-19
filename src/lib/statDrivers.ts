@@ -5,7 +5,7 @@
 import type { Game } from "./types";
 import { hasPlotOfType } from "./store";
 import { townNeighbourhoodDelta } from "./neighbours";
-import { FOOD_PER_PERSON } from "./simulation";
+import { FOOD_PER_PERSON, WELL_FED_WEEKS } from "./simulation";
 
 export type Line = { text: string; good: boolean };
 export type StatKey = "happiness" | "health" | "community";
@@ -27,9 +27,40 @@ function builtCounts(z: Game) {
   return { total, recreation };
 }
 
-function fmt(n: number) {
-  const r = Math.round(n * 10) / 10;
-  return `${r > 0 ? "+" : ""}${r}`;
+/** A word for how the stat is doing, for the status panel. */
+export function statWord(key: StatKey, v: number): string {
+  const scale: Record<StatKey, [number, string][]> = {
+    happiness: [
+      [50, "Miserable"],
+      [100, "Unhappy"],
+      [140, "Restless"],
+      [165, "Content"],
+      [225, "Happy"],
+      [Infinity, "Joyful"],
+    ],
+    health: [
+      [25, "Dying"],
+      [50, "Sick"],
+      [100, "Unwell"],
+      [140, "Fair"],
+      [165, "Healthy"],
+      [225, "Thriving"],
+      [Infinity, "Vigorous"],
+    ],
+    community: [
+      [100, "Divided"],
+      [140, "Distant"],
+      [165, "Neighbourly"],
+      [225, "Close-knit"],
+      [Infinity, "Tight-knit"],
+    ],
+  };
+  return scale[key].find(([limit]) => v < limit)![1];
+}
+
+function pct(multiplier: number) {
+  const p = Math.round((multiplier - 1) * 100);
+  return `${p >= 0 ? "+" : "−"}${Math.abs(p)}%`;
 }
 
 /** Causes currently moving each stat, strongest-looking first. */
@@ -53,10 +84,7 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
     happiness.push({ text: "Enough recreation 🛝", good: true });
   }
   if (info.productivity > 100) {
-    happiness.push({
-      text: `Overworked (productivity ${Math.round(info.productivity)}%)`,
-      good: false,
-    });
+    happiness.push({ text: "Overworked (high productivity)", good: false });
   } else if (info.productivity < 100) {
     happiness.push({ text: "Relaxed work pace", good: true });
   }
@@ -64,10 +92,14 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
     happiness.push({ text: "Sickness is spreading", good: false });
   }
   if (Math.abs(neighbourhood.happiness) >= 0.1) {
-    happiness.push({
-      text: `Neighbours ${fmt(neighbourhood.happiness)}/wk`,
-      good: neighbourhood.happiness > 0,
-    });
+    happiness.push(
+      neighbourhood.happiness > 0
+        ? { text: "Homes near parks and amenities", good: true }
+        : { text: "Homes next to industry or pubs", good: false },
+    );
+  }
+  if (z.wellFed) {
+    happiness.push({ text: `Well fed (${WELL_FED_WEEKS}+ weeks of food)`, good: true });
   }
   pushModifier(happiness, z.modifiers.happiness);
 
@@ -80,10 +112,14 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
     health.push({ text: "Mine dust (a Healing House helps)", good: false });
   }
   if (Math.abs(neighbourhood.health) >= 0.1) {
-    health.push({
-      text: `Neighbours ${fmt(neighbourhood.health)}/wk`,
-      good: neighbourhood.health > 0,
-    });
+    health.push(
+      neighbourhood.health > 0
+        ? { text: "Homes near parks and healers", good: true }
+        : { text: "Homes next to industry or pubs", good: false },
+    );
+  }
+  if (z.wellFed) {
+    health.push({ text: `Well fed (${WELL_FED_WEEKS}+ weeks of food)`, good: true });
   }
   pushModifier(health, z.modifiers.health);
 
@@ -116,7 +152,7 @@ export function statEffect(z: Game, key: StatKey): Line {
       return { text: "Too unhappy: nobody new moves in", good: false };
     }
     return {
-      text: `Income ×${income.toFixed(2)}${v >= 200 ? " (max at 200)" : ""}`,
+      text: `Tax income ${pct(income)}${v >= 200 ? " (the most it gets)" : ""}`,
       good: income >= 1,
     };
   }
@@ -126,10 +162,10 @@ export function statEffect(z: Game, key: StatKey): Line {
     return { text: "Healthy: nobody leaves from sickness", good: true };
   }
   if (v > MIDPOINT) {
-    return { text: "Income ×1.1, production ×1.2", good: true };
+    return { text: "Income +10%, production +20%", good: true };
   }
-  if (v < 100) return { text: "Income ×0.8, production ×0.85", good: false };
-  return { text: "No effect between 100 and 150", good: true };
+  if (v < 100) return { text: "Income −20%, production −15%", good: false };
+  return { text: "No effect on income or production yet", good: true };
 }
 
 /** Needs worth flagging right now (empty when everything is fine). */

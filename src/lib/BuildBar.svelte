@@ -241,8 +241,8 @@
                 {#each previewPlacement(option.id, target.x, target.y, $DB) as line}
                   <div
                     class="text-xs px-2 py-1 rounded mb-1 {line.good
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'}"
+                      ? 'bg-green-500/20 text-green-200'
+                      : 'bg-red-500/20 text-red-200'}"
                   >
                     {line.text}
                   </div>

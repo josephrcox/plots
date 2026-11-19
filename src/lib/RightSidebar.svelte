@@ -11,6 +11,7 @@
   import {
     statDrivers,
     statEffect,
+    statWord,
     townNeeds,
     type StatKey,
   } from "./statDrivers";
@@ -118,15 +119,15 @@
             <span class="text-sm flex-grow text-left">{stat.label}</span>
             {#if t != null && Math.abs(t) >= 1}
               <span
-                class="text-[10px] font-mono"
+                class="text-[10px]"
                 class:text-green-300={t > 0}
                 class:text-red-300={t < 0}
-                title="Change over the last week"
-                >{t > 0 ? "▲" : "▼"}{Math.round(Math.abs(t))}</span
+                title={t > 0 ? "Rising this week" : "Falling this week"}
+                >{t > 0 ? "▲" : "▼"}</span
               >
             {/if}
-            <span class="font-mono text-sm" style="color:{color(value)}"
-              >{Math.round(value)}</span
+            <span class="text-sm font-medium" style="color:{color(value)}"
+              >{statWord(stat.key, value)}</span
             >
           </div>
           <div class="meter">
@@ -136,11 +137,7 @@
                 value,
               )};"
             />
-            <div
-              class="tick"
-              style="left:{(150 / max) * 100}%;"
-              title="Normal (150)"
-            />
+            <div class="tick" style="left:{(150 / max) * 100}%;" title="Normal" />
           </div>
           {#if open !== stat.key}
             <span
@@ -169,7 +166,7 @@
               <span class="opacity-60">Nothing is pushing it right now.</span>
             {/each}
             <span class="opacity-50"
-              >Stats drift back toward 150 over time.</span
+              >Drifts back toward normal (the tick) over time.</span
             >
           </div>
         {/if}

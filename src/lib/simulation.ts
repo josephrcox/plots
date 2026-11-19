@@ -39,6 +39,12 @@ type ResourceSnapshot = Record<StoredResource | "power", number>;
 const MIDPOINT = 150;
 /** Food each townsperson eats per week. */
 export const FOOD_PER_PERSON = 0.1;
+/** Share of stored food that spoils each week. */
+export const FOOD_SPOILAGE = 0.05;
+/** Weeks of food in store that make the town "well fed". */
+export const WELL_FED_WEEKS = 4;
+/** Weekly happiness and health boost while well fed. */
+const WELL_FED_BONUS = 0.5;
 // Boosts to positive income and to resource production. Casual is the
 // forgiving mode; normal games get a smaller boost so early growth isn't a
 // slog.
@@ -768,7 +774,9 @@ function feedCitizens(z: Game) {
   // Each citizen eats FOOD_PER_PERSON per week. If there isn't enough,
   // everyone gets a bit less happy and healthy.
   const foodNeeded = z.townInfo.population_count * FOOD_PER_PERSON;
+  let eaten = foodNeeded;
   if (z.resources.food < foodNeeded) {
+    eaten = z.resources.food;
     z.modifiers.happiness *= 0.95;
     z.modifiers.health *= 0.95;
     z = addToTownLog(NOT_ENOUGH_FOOD_MSG, z, Vibe.BAD);
@@ -777,7 +785,18 @@ function feedCitizens(z: Game) {
     removeFromTownLog(z, NOT_ENOUGH_FOOD_MSG);
     z.resources.food -= foodNeeded;
   }
-  z.resources.food = roundTo(z.resources.food, 3);
+  // Some stored food spoils, so surplus levels off instead of piling up.
+  const spoiled = z.resources.food * FOOD_SPOILAGE;
+  z.resources.food = roundTo(z.resources.food - spoiled, 3);
+  z.foodSpoiled = roundTo(spoiled, 2);
+  z.foodEaten = roundTo(eaten, 2);
+  // A town with weeks of food in store is well fed: a small steady boost.
+  z.wellFed =
+    foodNeeded > 0 && z.resources.food >= foodNeeded * WELL_FED_WEEKS;
+  if (z.wellFed) {
+    z.townInfo.happiness += WELL_FED_BONUS;
+    z.townInfo.health += WELL_FED_BONUS;
+  }
   return z;
 }
 

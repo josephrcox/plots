@@ -1,215 +1,141 @@
 <script lang="ts">
-  import { Separator } from "$lib/components/ui/separator";
-  import {
-    getOptionIndex,
-    formatNumber,
-    formatAmount,
-    formatInstantChange,
-    capitalizeFirstLetter,
-    getOptionFromId,
-  } from "./utils";
+  // A building's card: what it costs, what it needs, what it makes and what
+  // it uses each week. Shown in build bar tooltips and the inspector, both
+  // on the dark HUD background.
   import { DB, hasPlotOfType } from "./store";
-  import { options } from "./objects/PlotTypeOptions";
+  import { formatAmount, getOptionFromId } from "./utils";
   import type { PlotOption } from "./types";
 
   export let option: PlotOption;
-  export let checkRequirements: boolean = true;
+  /** Mark costs the town can't pay yet (off in the inspector). */
+  export let checkRequirements = true;
   export let showTitle = true;
 
-  function getRequirementString(
-    icon: string,
-    required: number,
-    current: number,
-  ) {
-    if (required == 0 || required == null)
-      return "<span class='hidden'></span>";
-    let s = "";
-    let classText = "";
-    if (current < required && checkRequirements) {
-      classText = "text-textDanger border-2 border-red-400 px-2";
-    }
-    s = `<span class='${classText}'>${icon} ${formatAmount(required)}</span>`;
+  type Chip = { icon: string; text: string; short?: boolean };
 
-    return s;
+  const ICONS: Record<string, string> = {
+    gold: "💰",
+    food: "🥕",
+    wood: "🪵",
+    stone: "🪨",
+    metal: "🧲",
+    power: "🔋",
+    bureaucracy: "🧑‍⚖️",
+    knowledge: "🧠",
+  };
+
+  function have(key: string): number {
+    if (key === "gold") return $DB.townInfo.gold;
+    if (key === "knowledge") return $DB.townInfo.knowledge_points;
+    return $DB.resources[key as keyof typeof $DB.resources] ?? 0;
   }
 
-  function getEmojiForResource(resource: string) {
-    switch (resource) {
-      case "food":
-        return "🥕";
-      case "knowledge":
-        return "🧠";
-      case "wood":
-        return "🪵";
-      case "stone":
-        return "🪨";
-      case "metal":
-        return "🧲";
-      case "power":
-        return "🔋";
-      case "bureaucracy":
-        return "🧑‍⚖️";
-      default:
-        return "💰";
-    }
-  }
+  $: req = option.requirements;
+  $: cost = [
+    ["gold", req.gold],
+    ["knowledge", req.knowledge],
+    ...Object.entries(req.resources),
+  ]
+    .filter(([, n]) => Number(n) > 0)
+    .map(([key, n]) => ({
+      icon: ICONS[key as string],
+      text: formatAmount(Number(n)),
+      short: checkRequirements && have(key as string) < Number(n),
+    })) as Chip[];
+
+  $: makes = [
+    ...(option.revenue_per_week > 0
+      ? [{ icon: "💰", text: `+${formatAmount(option.revenue_per_week)}/wk` }]
+      : []),
+    ...Object.entries(option.generated_resources)
+      .filter(([, n]) => n > 0)
+      .map(([key, n]) => ({
+        icon: ICONS[key],
+        text: key === "power" ? `+${formatAmount(n)}` : `+${formatAmount(n)}/wk`,
+      })),
+    ...(option.knowledge_points_per_month > 0
+      ? [{ icon: "🧠", text: `+${formatAmount(option.knowledge_points_per_month)}/mo` }]
+      : []),
+  ] as Chip[];
+
+  $: uses = Object.entries(option.active_costs)
+    .filter(([, n]) => n > 0)
+    .map(([key, n]) => ({
+      icon: ICONS[key],
+      text: key === "power" ? formatAmount(n) : `${formatAmount(n)}/wk`,
+    })) as Chip[];
+
+  $: needs = [
+    ...req.plots.map((id) => ({
+      text: getOptionFromId(id)?.title ?? id,
+      short: checkRequirements && hasPlotOfType(id, $DB).length === 0,
+    })),
+    ...req.adjacent_plots.map((id) => ({
+      text: `Next to ${id === "water" ? "water" : (getOptionFromId(id)?.title ?? id)}`,
+      short: false,
+    })),
+  ];
+
+  $: rows = [
+    { label: "Cost", chips: cost },
+    { label: "Makes", chips: makes },
+    { label: "Uses", chips: uses },
+  ].filter((r) => r.chips.length);
 </script>
 
-{#if option != null}
-  <div class="p-2 max-w-64">
-    <div class="flex flex-col gap-1 mb-1">
-      {#if showTitle}
-        <span class="text-md font-semibold"
-          >{options[getOptionIndex(option.id)].title}</span
-        >
-      {/if}
-      <span class="text-xs"
-        >{options[getOptionIndex(option.id)].description}</span
-      >
-    </div>
+<div class="flex flex-col gap-2 max-w-64 text-white">
+  {#if showTitle}
+    <span class="text-sm font-semibold">{option.emoji} {option.title}</span>
+  {/if}
+  {#if option.description}
+    <span class="text-xs opacity-75 leading-snug">{option.description}</span>
+  {/if}
 
-    <div class="flex flex-col w-36 h-min text-xs pb-1">
-      <Separator class={"bg-accent opacity-25 mt-1 mb-1"} />
-      <span class="font-semibold">Requirements</span>
-      <div class="flex flex-row gap-1 flex-wrap">
-        {@html getRequirementString(
-          "💰",
-          options[getOptionIndex(option.id)].requirements.gold,
-          $DB.townInfo.gold,
-        )}
-        {@html getRequirementString(
-          "🥕",
-          options[getOptionIndex(option.id)].requirements.resources.food,
-          $DB.resources.food,
-        )}
-        {@html getRequirementString(
-          "🧠",
-          options[getOptionIndex(option.id)].requirements.knowledge,
-          $DB.townInfo.knowledge_points,
-        )}
-        {@html getRequirementString(
-          "🪵",
-          options[getOptionIndex(option.id)].requirements.resources.wood,
-          $DB.resources.wood,
-        )}
-        {@html getRequirementString(
-          "🪨",
-          options[getOptionIndex(option.id)].requirements.resources.stone,
-          $DB.resources.stone,
-        )}
-        {@html getRequirementString(
-          "🧲",
-          options[getOptionIndex(option.id)].requirements.resources.metal,
-          $DB.resources.metal,
-        )}
-        {@html getRequirementString(
-          "🔋",
-          options[getOptionIndex(option.id)].active_costs.power,
-          $DB.resources.power,
-        )}
-        {@html getRequirementString(
-          "🧑‍⚖️",
-          options[getOptionIndex(option.id)].requirements.resources.bureaucracy,
-          $DB.resources.bureaucracy,
-        )}
-        {#if options[getOptionIndex(option.id)].requirements.employees != 0}
-          <span
-            >👷 {options[getOptionIndex(option.id)].requirements.employees} workers</span
+  <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 items-baseline text-xs">
+    {#each rows as row}
+      <span class="label">{row.label}</span>
+      <span class="flex flex-wrap gap-1">
+        {#each row.chips as chip}
+          <span class="chip" class:short={chip.short} class:make={row.label === "Makes"}
+            >{chip.icon} {chip.text}</span
           >
-        {/if}
-      </div>
-    </div>
-    {#if options[getOptionIndex(option.id)].revenue_per_week != 0}
-      <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-accent opacity-25 mt-0"} />
-        <span class="font-semibold">Weekly revenue</span>
-        <span>💰 {options[getOptionIndex(option.id)].revenue_per_week} </span>
-      </div>
-    {/if}
-
-    {#if Object.values(options[getOptionIndex(option.id)].active_costs).some((value) => value != 0)}
-      <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-accent opacity-25 mt-2"} />
-        <span class="font-semibold">Weekly Costs</span>
-        {#each Object.keys(options[getOptionIndex(option.id)].active_costs) as key, index}
-          {#if Object.values(options[getOptionIndex(option.id)].active_costs)[index] != 0}
-            <span
-              class={Object.values(
-                options[getOptionIndex(option.id)].active_costs,
-              )[index] > 0
-                ? "text-textDanger"
-                : "text-textHappy"}
-              >{capitalizeFirstLetter(key)}
-              {getEmojiForResource(key)}
-              {-1 *
-                Object.values(options[getOptionIndex(option.id)].active_costs)[
-                  index
-                ]}
-            </span>
-          {/if}
         {/each}
-      </div>
+      </span>
+    {/each}
+    {#if req.employees > 0}
+      <span class="label">Workers</span>
+      <span><span class="chip">👷 {req.employees}</span></span>
     {/if}
-    {#if Object.values(options[getOptionIndex(option.id)].requirements.plots).length > 0}
-      <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-accent opacity-25 mt-2"} />
-        <span class="font-semibold">Required Plots</span>
-        {#each Object.keys(options[getOptionIndex(option.id)].requirements.plots) as key, index}
-          {#if Object.values(options[getOptionIndex(option.id)].requirements.plots)[index] != 0}
-            <span
-              class="
-              {hasPlotOfType(
-                Object.values(
-                  options[getOptionIndex(option.id)].requirements.plots,
-                )[index],
-                $DB,
-              ).length == 0
-                ? 'text-textDanger border-2 border-red-400 font-semibold px-1'
-                : 'text-textHappy'}
-            "
-            >
-              {getOptionFromId(
-                Object.values(
-                  options[getOptionIndex(option.id)].requirements.plots,
-                )[index],
-              )?.title}
-            </span>
-          {/if}
+    {#if needs.length}
+      <span class="label">Needs</span>
+      <span class="flex flex-wrap gap-1">
+        {#each needs as need}
+          <span class="chip" class:short={need.short}>{need.text}</span>
         {/each}
-      </div>
-    {/if}
-    {#if Object.values(options[getOptionIndex(option.id)].generated_resources).some((value) => value != 0) || options[getOptionIndex(option.id)].knowledge_points_per_month > 0}
-      <div class="flex flex-col gap-1 text-xs">
-        <Separator class={"bg-accent opacity-25 mt-2"} />
-        <span class="font-semibold">Generated Resources</span>
-        {#if options[getOptionIndex(option.id)].knowledge_points_per_month > 0}
-          <span
-            >🧠 {Math.round(
-              options[getOptionIndex(option.id)].knowledge_points_per_month,
-            )} (monthly)
-          </span>
-        {/if}
-        {#each Object.keys(options[getOptionIndex(option.id)].generated_resources) as key, index}
-          {#if Object.values(options[getOptionIndex(option.id)].generated_resources)[index] != 0}
-            <span
-              class={Object.values(
-                options[getOptionIndex(option.id)].generated_resources,
-              )[index] > 0
-                ? "text-textHappy"
-                : "text-textDanger"}
-            >
-              {getEmojiForResource(key)}
-              {capitalizeFirstLetter(key)}
-              {formatInstantChange(
-                Object.values(
-                  options[getOptionIndex(option.id)].generated_resources,
-                )[index],
-                false,
-              )}
-            </span>
-          {/if}
-        {/each}
-      </div>
+      </span>
     {/if}
   </div>
-{/if}
+</div>
+
+<style>
+  .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.55;
+  }
+  .chip {
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.09);
+    white-space: nowrap;
+  }
+  .chip.make {
+    background: rgba(74, 222, 128, 0.15);
+    color: rgb(187, 247, 208);
+  }
+  .chip.short {
+    background: rgba(248, 113, 113, 0.22);
+    color: rgb(254, 202, 202);
+  }
+</style>
