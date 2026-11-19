@@ -2,7 +2,7 @@
   // Right panel: town stats and milestones. Collapsible.
   import { fly } from "svelte/transition";
   import { formatNumber, roundTo } from "./utils";
-  import { DB, showTutorialStepConfetti } from "./store";
+  import { DB, showTutorialStepConfetti, countJobs } from "./store";
   import * as Tooltip from "$lib/components/ui/tooltip";
   import Separator from "./components/ui/separator/separator.svelte";
   import { Progress } from "$lib/components/ui/progress/index.js";
@@ -57,16 +57,14 @@
       max: $DB.maximums.community,
     },
     {
-      name: "Employment",
+      name: "Jobs filled",
       description:
-        "The number of people employed in your town. Unemployed people are more likely to leave.",
+        "How many of your buildings' jobs have workers. Buildings without enough workers produce and earn less; the newest ones go short first. Build homes to bring in more people.",
       value: $DB.townInfo.employees,
       color: employmentColor(
-        $DB.townInfo.population_count > 0
-          ? $DB.townInfo.employees / $DB.townInfo.population_count
-          : 1,
+        countJobs($DB) > 0 ? $DB.townInfo.employees / countJobs($DB) : 1,
       ),
-      max: $DB.townInfo.population_count,
+      max: countJobs($DB),
     },
     {
       name: "🛝 Recreation",

@@ -4,7 +4,7 @@
 import { writable } from "svelte/store";
 import { options, plotTypeMaximums } from "./objects/PlotTypeOptions";
 import type { Game, PlotOption } from "./types";
-import { hasPlotOfType, freeWorkers } from "./store";
+import { hasPlotOfType } from "./store";
 import {
   checkIfAffordable,
   checkIfPlotCanBeUpgraded,
@@ -101,12 +101,6 @@ export function availability(option: PlotOption, z: Game): Check {
       return { ok: false, reason: `Not enough ${key}` };
     }
   }
-  if (option.requirements.employees > freeWorkers(z)) {
-    return {
-      ok: false,
-      reason: `Needs ${option.requirements.employees} free workers`,
-    };
-  }
   for (const [key, amount] of Object.entries(option.active_costs)) {
     if (key === "gold" || !amount) continue;
     if (z.resources[key as keyof Game["resources"]] < amount) {
@@ -146,15 +140,8 @@ export function placementCheck(
     return { ok: false, reason: "Must touch your town" };
   }
   const global = availability(option, z);
-  // Replacing frees the old building's workers, so re-check them per tile.
-  if (!global.ok && !global.reason.includes("workers")) return global;
+  if (!global.ok) return global;
   const tile = checkIfAffordable(option, z, x, y);
-  if (!tile.employees) {
-    return {
-      ok: false,
-      reason: `Needs ${option.requirements.employees} free workers`,
-    };
-  }
   if (!tile.adjacent) {
     const names = option.requirements.adjacent_plots.map((id) =>
       id === "water" ? "water" : (getOptionFromId(id)?.title ?? id),

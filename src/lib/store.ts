@@ -544,6 +544,51 @@ export function freeWorkers(z: Game): number {
   return Math.max(0, z.townInfo.population_count - countJobs(z));
 }
 
+/** People minus jobs: positive = free workers, negative = jobs unfilled. */
+export function workerBalance(z: Game): number {
+  return z.townInfo.population_count - countJobs(z);
+}
+
+export type Staffing = Map<string, { staffed: number; needed: number }>;
+
+/**
+ * Who actually has workers. Guardians are staffed first, then buildings in
+ * the order they were built, so when people run short it's the newest
+ * buildings that go understaffed. Keyed by plot id.
+ */
+export function staffing(z: Game): Staffing {
+  let available = Math.max(
+    0,
+    z.townInfo.population_count - z.townInfo.guardians,
+  );
+  const workplaces: Plot[] = [];
+  for (const row of z.plots) {
+    for (const plot of row) {
+      if (!plot.active || plot.type < 0) continue;
+      if ((options[plot.type]?.requirements.employees ?? 0) > 0) {
+        workplaces.push(plot);
+      }
+    }
+  }
+  workplaces.sort(
+    (a, b) => (a.builtDay ?? 0) - (b.builtDay ?? 0) || a.x - b.x || a.y - b.y,
+  );
+  const result: Staffing = new Map();
+  for (const plot of workplaces) {
+    const needed = options[plot.type].requirements.employees;
+    const staffed = Math.min(needed, available);
+    available -= staffed;
+    result.set(plot.id, { staffed, needed });
+  }
+  return result;
+}
+
+/** Share of a plot's jobs that are filled (1 for plots without jobs). */
+export function staffRatio(map: Staffing, plot: Plot): number {
+  const s = map.get(plot.id);
+  return s && s.needed > 0 ? s.staffed / s.needed : 1;
+}
+
 /**
  * `employees` is the number of people actually working: never more than the
  * population. If people leave, extra openings simply go unfilled.

@@ -8,7 +8,6 @@ import { hexNeighbours } from "./neighbours";
 import {
   hasPlotOfType,
   clearPlot,
-  countJobs,
   syncEmployment,
   DB,
   createDefaultGame,
@@ -285,31 +284,6 @@ export function hasEnoughResources(plotChosen: PlotOption, z: Game): boolean {
   );
 }
 
-// Check if player has enough employees
-export function hasEnoughEmployees(
-  plotChosen: PlotOption,
-  z: Game,
-  x: number,
-  y: number,
-): boolean {
-  if (
-    !plotChosen.requirements.employees ||
-    plotChosen.requirements.employees <= 0
-  )
-    return true;
-
-  // Jobs may never outnumber people. Replacing a building frees its jobs.
-  const existing = z.plots[x][y];
-  const freedJobs =
-    existing.active && existing.type > -1
-      ? (options[existing.type]?.requirements.employees ?? 0)
-      : 0;
-  return (
-    countJobs(z) - freedJobs + plotChosen.requirements.employees <=
-    z.townInfo.population_count
-  );
-}
-
 // Check if player has enough resources for active costs
 export function canSupportActiveCosts(
   plotChosen: PlotOption,
@@ -364,7 +338,6 @@ export function checkIfAffordable(
   gold: boolean;
   knowledge: boolean;
   resources: boolean;
-  employees: boolean;
   activeCosts: boolean;
   adjacent: boolean;
   requiredPlots: boolean;
@@ -372,7 +345,6 @@ export function checkIfAffordable(
   const goldCheck = hasEnoughGold(plotChosen, z);
   const knowledgeCheck = hasEnoughKnowledge(plotChosen, z);
   const resourcesCheck = hasEnoughResources(plotChosen, z);
-  const employeesCheck = hasEnoughEmployees(plotChosen, z, x, y);
   const activeCostsCheck = canSupportActiveCosts(plotChosen, z);
   const adjacentCheck = meetsAdjacentRequirements(plotChosen, x, y, z);
   const requiredPlotsCheck = hasRequiredPlots(plotChosen, z);
@@ -382,7 +354,6 @@ export function checkIfAffordable(
       goldCheck,
       knowledgeCheck,
       resourcesCheck,
-      employeesCheck,
       activeCostsCheck,
       adjacentCheck,
       requiredPlotsCheck,
@@ -390,7 +361,6 @@ export function checkIfAffordable(
     gold: goldCheck,
     knowledge: knowledgeCheck,
     resources: resourcesCheck,
-    employees: employeesCheck,
     activeCosts: activeCostsCheck,
     adjacent: adjacentCheck,
     requiredPlots: requiredPlotsCheck,

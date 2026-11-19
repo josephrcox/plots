@@ -6,6 +6,7 @@
   import type { Check } from "./ui";
   import type { EffectLine } from "./neighbours";
   import { formatAmount } from "./utils";
+  import { DB, workerBalance } from "./store";
 
   export let x: number;
   export let y: number;
@@ -25,6 +26,11 @@
       ].filter(([, n]) => Number(n) > 0)
     : [];
 
+  // A new building is staffed last, from whoever is free.
+  $: needed = option?.requirements.employees ?? 0;
+  $: free = $DB ? Math.max(0, workerBalance($DB)) : 0;
+  $: staffedPct = needed > 0 ? Math.round((Math.min(free, needed) / needed) * 100) : 100;
+
   // Keep the card on screen.
   $: left = Math.min(x + 18, window.innerWidth - 240);
   $: top = Math.min(y + 18, window.innerHeight - 160);
@@ -43,6 +49,15 @@
     <span class="font-mono opacity-80">
       {#each costs as [icon, n]}<span class="mr-2">{icon}{formatAmount(Number(n))}</span>{/each}
     </span>
+    {#if needed > 0}
+      {#if free >= needed}
+        <span class="opacity-80">👷 {needed} workers ({free} free)</span>
+      {:else}
+        <span class="text-amber-300"
+          >👷 Only {free} of {needed} workers free: runs at {staffedPct}%</span
+        >
+      {/if}
+    {/if}
     {#if !check.ok}
       <span class="text-red-300">{check.reason || "Can't build here"}</span>
     {:else}

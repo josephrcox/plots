@@ -14,6 +14,7 @@
     isReadOnly,
     reverseClear,
     isLiegeOnPlot,
+    staffing,
   } from "./store";
   import {
     tool,
@@ -79,6 +80,9 @@
           row.map((p) => placementCheck(buildOption!, p.x, p.y, $DB!).ok),
         )
       : [];
+
+  // Buildings without all their workers get a badge.
+  $: staff = $DB ? staffing($DB) : null;
 
   // Before the first building, point at a good starting tile.
   $: startTile = $DB && !townHasStarted($DB) ? suggestedStart($DB) : null;
@@ -504,6 +508,10 @@
             ghostEmoji={buildOption?.emoji ?? ""}
             crosshair={$settingLiegeLocation && plot.active}
             startHint={startTile?.[0] === x && startTile?.[1] === y}
+            understaffed={(() => {
+              const s = staff?.get(plot.id);
+              return !!s && s.staffed < s.needed;
+            })()}
           />
           {/if}
         {/each}

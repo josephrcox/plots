@@ -19,6 +19,8 @@ import {
   showCityHallMenu,
   isReadOnly,
   syncEmployment,
+  staffing,
+  staffRatio,
 } from "./store";
 // @ts-ignore
 import { messages } from "./objects/TownLogMessages.js";
@@ -104,7 +106,6 @@ function performWeeklyTasks(db: Game) {
 function performMonthlyTasks(db: Game) {
   db = reactToProductivity(db);
   db = mineEffects(db);
-  db = unemployment(db);
   db = listenToTownspeople(db);
   db = recreationImpact(db);
   return db;
@@ -267,6 +268,7 @@ function getProfit(
   x: number,
   y: number,
   villageInnCount: number,
+  staffed = 1,
 ) {
   // Profit is revenue * tax rate * percentage of population out of the max population
   let profitModifiers = clamp(z.townInfo.happiness / 100, 0.75, 2.0);
@@ -297,8 +299,9 @@ function getProfit(
     ? 0
     : z.economyAndLaws.tax_rate;
 
+  // Understaffed buildings earn their staffed share; upkeep is paid in full.
   return (
-    option.revenue_per_week * taxRate * occupancy * profitModifiers -
+    option.revenue_per_week * staffed * taxRate * occupancy * profitModifiers -
     option.active_costs.gold
   );
 }
@@ -310,10 +313,12 @@ function calculateProfits(z: Game) {
     ? PROFIT_BOOST.casual
     : PROFIT_BOOST.normal;
 
-  forEachBuiltPlot(z, (_plot, option, i, j) => {
+  const staff = staffing(z);
+  forEachBuiltPlot(z, (plot, option, i, j) => {
     // Productivity doesn't scale gold directly: pushing it up yields more
     // resources but unhappier townspeople, who pay less (see getProfit).
-    let profit = getProfit(z, option, i, j, villageInnCount) / 7;
+    let profit =
+      getProfit(z, option, i, j, villageInnCount, staffRatio(staff, plot)) / 7;
     if (profit > 0) profit *= profitBoost;
     if (isAdjacentToWater(i, j, z)) profit *= 2;
     z.townInfo.gold += profit;
@@ -415,12 +420,9 @@ function adjustForStockpile(z: Game) {
 }
 
 function cleanUpTownLog(z: Game) {
-  const unemployed = z.townInfo.population_count - z.townInfo.employees;
-  // Replace the running unemployment notice with today's number.
+  // Unemployment no longer has a penalty or a notice; clear old notices
+  // from saves made before that change.
   removeFromTownLog(z, "people can't find jobs");
-  if (unemployed > 0) {
-    z = addToTownLog(`${unemployed} people can't find jobs!`, z, Vibe.BAD);
-  }
   return z;
 }
 
@@ -677,21 +679,24 @@ function generateResources(z: Game) {
   multiplier *=
     z.townInfo.community > 150 ? 1.2 : z.townInfo.community < 100 ? 0.85 : 1;
 
+  const staff = staffing(z);
   forEachBuiltPlot(z, (plot, option, i, j) => {
     const generated = option.generated_resources;
     if (plot.disabled || generated == null) return;
     const nearWater = isAdjacentToWater(i, j, z);
     const liegeBonus = isLiegeOnPlot(i, j, z) ? 2 : 1;
-    // Neighbour synergies (livestock by farms, tree farms by a lumber mill).
-    const synergy = synergyAt(i, j, z).resource;
+    // Neighbour synergies (livestock by farms, tree farms by a lumber mill),
+    // times the share of the building's jobs that are filled.
+    const synergy = synergyAt(i, j, z).resource * staffRatio(staff, plot);
 
     // No per-building rounding: outputs are small (a farm makes ~1 food).
     z.resources.food +=
       generated.food * multiplier * synergy * (nearWater ? 2 : 1) * liegeBonus;
     z.resources.wood += generated.wood * multiplier * synergy * liegeBonus;
-    z.resources.stone += generated.stone * multiplier * liegeBonus;
-    z.resources.metal += generated.metal * multiplier * liegeBonus;
-    z.resources.bureaucracy += generated.bureaucracy * multiplier * liegeBonus;
+    z.resources.stone += generated.stone * multiplier * synergy * liegeBonus;
+    z.resources.metal += generated.metal * multiplier * synergy * liegeBonus;
+    z.resources.bureaucracy +=
+      generated.bureaucracy * multiplier * synergy * liegeBonus;
   });
 
   for (const key of ["food", "wood", "stone", "metal", "bureaucracy"] as const) {
@@ -710,8 +715,11 @@ function lawEffects(z: Game) {
 
 function calculatePower(z: Game) {
   let power = 0;
-  forEachBuiltPlot(z, (_plot, option) => {
-    power += option.generated_resources.power - option.active_costs.power;
+  const staff = staffing(z);
+  forEachBuiltPlot(z, (plot, option) => {
+    power +=
+      option.generated_resources.power * staffRatio(staff, plot) -
+      option.active_costs.power;
   });
   z.resources.power = power;
 
@@ -727,10 +735,13 @@ function calculatePower(z: Game) {
 
 function calculateKnowledge(z: Game) {
   let weekly = 0;
-  forEachBuiltPlot(z, (_plot, option, i, j) => {
+  const staff = staffing(z);
+  forEachBuiltPlot(z, (plot, option, i, j) => {
     if (option.knowledge_points_per_month == null) return;
     const liegeBonus = isLiegeOnPlot(i, j, z) ? 0.75 : 1;
-    const gained = (option.knowledge_points_per_month * liegeBonus) / 4;
+    const gained =
+      (option.knowledge_points_per_month * liegeBonus * staffRatio(staff, plot)) /
+      4;
     z.townInfo.knowledge_points += gained;
     weekly += gained;
   });
@@ -854,20 +865,6 @@ function mineEffects(z: Game) {
       z,
       Vibe.BAD,
     );
-  }
-  return z;
-}
-
-function unemployment(z: Game) {
-  // Casual games skip this 75% of the time.
-  if (z.gameSettings.includes("casual") && Math.random() < 0.75) return z;
-
-  const unemployed = z.townInfo.population_count - z.townInfo.employees;
-  if (unemployed > 0) {
-    z.townInfo.happiness -= Math.min(unemployed * 0.2, 10);
-    z = addToTownLog(unemployed + messages.unemployment_num, z, Vibe.BAD);
-  } else {
-    removeFromTownLog(z, messages.unemployment_num);
   }
   return z;
 }

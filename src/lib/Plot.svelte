@@ -36,6 +36,7 @@
   export let ghostEmoji = "";
   export let crosshair = false;
   export let startHint = false;
+  export let understaffed = false;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
   $: fill = data.water
@@ -84,6 +85,8 @@
       >
       {#if data.disabled}
         <span class="badge" title="Shut down">⚠️</span>
+      {:else if understaffed}
+        <span class="badge staff" title="Not enough workers">👷</span>
       {/if}
     {:else if data.mineralSource}
       <span class="emoji">🧲</span>
@@ -153,6 +156,12 @@
     position: absolute;
     top: 14px;
     font-size: 0.8rem;
+  }
+  .badge.staff {
+    background: rgb(217, 119, 6);
+    border-radius: 9999px;
+    padding: 0 3px;
+    font-size: 0.7rem;
   }
   .liege {
     position: absolute;

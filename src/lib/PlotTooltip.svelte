@@ -8,7 +8,7 @@
     capitalizeFirstLetter,
     getOptionFromId,
   } from "./utils";
-  import { DB, hasPlotOfType, freeWorkers } from "./store";
+  import { DB, hasPlotOfType } from "./store";
   import { options } from "./objects/PlotTypeOptions";
   import type { PlotOption } from "./types";
 
@@ -114,13 +114,8 @@
         )}
         {#if options[getOptionIndex(option.id)].requirements.employees != 0}
           <span
-            class={options[getOptionIndex(option.id)].requirements.employees >
-              freeWorkers($DB) &&
-            checkRequirements
-              ? "px-1 text-textDanger font-bold border-2 border-red-400"
-              : ""}
-            >👥 {options[getOptionIndex(option.id)].requirements.employees} employees
-          </span>
+            >👷 {options[getOptionIndex(option.id)].requirements.employees} workers</span
+          >
         {/if}
       </div>
     </div>

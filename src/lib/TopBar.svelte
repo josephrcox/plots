@@ -2,7 +2,16 @@
   // Top bar: town, population, resources, date, speed and pause.
   import { onMount } from "svelte";
   import * as Tooltip from "$lib/components/ui/tooltip";
-  import { DB, speed, paused, isReadOnly, hasPlotOfType, showCustomAlert } from "./store";
+  import {
+    DB,
+    speed,
+    paused,
+    isReadOnly,
+    hasPlotOfType,
+    showCustomAlert,
+    countJobs,
+    staffing,
+  } from "./store";
   import { options } from "./objects/PlotTypeOptions";
   import { CustomAlerts } from "./objects/CustomAlerts";
   import { formatNumber, formatAmount, capitalizeFirstLetter } from "./utils";
@@ -90,6 +99,13 @@
     wasAtCap = full;
   }
 
+  // Workers: people minus jobs. Negative means some jobs are unfilled.
+  $: jobs = countJobs($DB);
+  $: workers = $DB.townInfo.population_count - jobs;
+  $: understaffed = [...staffing($DB).values()].filter(
+    (s) => s.staffed < s.needed,
+  ).length;
+
   function rateText(rate: number | null) {
     if (rate == null) return "–";
     if (Math.abs(rate) < 0.05) return "±0";
@@ -129,6 +145,40 @@
       </Tooltip.Trigger>
       <Tooltip.Content class="text-xs max-w-60">
         💰 Gold ({rateText($DB.economyAndLaws.weeklyProfit)} per week). Income depends on tax rate, happiness and how full your homes are.
+      </Tooltip.Content>
+    </Tooltip.Root>
+
+    <Tooltip.Root openDelay={250} closeDelay={0}>
+      <Tooltip.Trigger asChild let:builder>
+        <div use:builder.action {...builder} class="res" class:full={workers < 0}>
+          <span class="top"><span>👷</span><span class="val">{Math.abs(workers)}</span></span>
+          <span class="rate" class:up={workers > 0} class:down={workers < 0}
+            >{workers < 0 ? "short" : workers > 0 ? "free" : "all busy"}</span
+          >
+        </div>
+      </Tooltip.Trigger>
+      <Tooltip.Content class="text-xs max-w-64">
+        <div class="font-semibold mb-1">👷 Workers</div>
+        <div>
+          {$DB.townInfo.population_count} people, {jobs} jobs{$DB.townInfo
+            .guardians > 0
+            ? ` (incl. ${$DB.townInfo.guardians} guardians)`
+            : ""}.
+        </div>
+        {#if workers < 0}
+          <div class="mt-1">
+            {-workers} jobs are unfilled, so {understaffed} building{understaffed ===
+            1
+              ? " is"
+              : "s are"} running below full output. The newest buildings are
+            short first. Build homes to bring in more people.
+          </div>
+        {:else}
+          <div class="mt-1">
+            Every building is fully staffed. New buildings take workers from
+            the {workers} free.
+          </div>
+        {/if}
       </Tooltip.Content>
     </Tooltip.Root>
 

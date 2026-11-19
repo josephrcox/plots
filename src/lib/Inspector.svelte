@@ -2,7 +2,13 @@
   // Details for the clicked building: what it does, what its neighbours do
   // to it, and Replace / Bulldoze.
   import { fly } from "svelte/transition";
-  import { DB, reverseClear, isLiegeOnPlot, isReadOnly } from "./store";
+  import {
+    DB,
+    reverseClear,
+    isLiegeOnPlot,
+    isReadOnly,
+    staffing,
+  } from "./store";
   import { inspected, targetTile, tool, HUD } from "./ui";
   import { options } from "./objects/PlotTypeOptions";
   import { activeEffects } from "./neighbours";
@@ -17,6 +23,7 @@
   $: effects = $DB && pos && plot?.active ? activeEffects(pos.x, pos.y, $DB) : [];
   $: nearWater = $DB && pos ? isAdjacentToWater(pos.x, pos.y, $DB) : false;
   $: liege = $DB && pos ? isLiegeOnPlot(pos.x, pos.y, $DB) : false;
+  $: staff = $DB && plot ? staffing($DB).get(plot.id) : undefined;
 
   function replace() {
     if (!pos) return;
@@ -50,6 +57,17 @@
     {#if plot.disabled}
       <span class="chip bg-red-600 text-white"
         >⚠️ Shut down: it can't cover its running costs</span
+      >
+    {/if}
+    {#if staff && staff.staffed < staff.needed}
+      <span class="chip bg-amber-600 text-white"
+        >👷 {staff.staffed} of {staff.needed} workers: running at {Math.round(
+          (staff.staffed / staff.needed) * 100,
+        )}%. Build homes for more people.</span
+      >
+    {:else if staff}
+      <span class="chip bg-green-700 text-white"
+        >👷 Fully staffed ({staff.needed} workers)</span
       >
     {/if}
     {#if nearWater}
