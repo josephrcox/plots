@@ -14,14 +14,14 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return z.townInfo.population_max > 0;
     },
-    goldReward: 600,
+    goldReward: 60,
   },
   {
     message: "Start producing food for the villagers",
     isComplete: (z: Game) => {
       return hasPlotOfType("farm", z).length >= 1;
     },
-    goldReward: 400,
+    goldReward: 40,
   },
   {
     message:
@@ -29,21 +29,21 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("tree_farm", z).length >= 1;
     },
-    goldReward: 400,
+    goldReward: 40,
   },
   {
     message: "Build a quarry to start mining stone and metals",
     isComplete: (z: Game) => {
       return hasPlotOfType("quarry", z).length > 0;
     },
-    goldReward: 800,
+    goldReward: 80,
   },
   {
     message: "Settlement: Grow population to 50",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 50;
     },
-    goldReward: 1600,
+    goldReward: 160,
   },
   {
     message: "Build a Market or Bakery to sell excess food",
@@ -53,35 +53,35 @@ export const tutorialMessages: TutorialStep[] = [
         hasPlotOfType("bakery", z).length > 0
       );
     },
-    goldReward: 1600,
+    goldReward: 160,
   },
   {
     message: "Complete Year 1",
     isComplete: (z: Game) => {
       return z.environment.day >= 365;
     },
-    goldReward: 4000,
+    goldReward: 400,
   },
   {
     message: "Village: Grow population to 100",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 100;
     },
-    goldReward: 6400,
+    goldReward: 640,
   },
   {
     message: "Complete Year 2",
     isComplete: (z: Game) => {
       return z.environment.day >= 365 * 2;
     },
-    goldReward: 4000,
+    goldReward: 400,
   },
   {
     message: "Hamlet: Grow population to 200",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 200;
     },
-    goldReward: 16000,
+    goldReward: 1600,
   },
   {
     message: "Start generating power. Build a Water Wheel or Solar Farm",
@@ -93,22 +93,22 @@ export const tutorialMessages: TutorialStep[] = [
         hasPlotOfType("adv_water_wheel", z).length > 0
       );
     },
-    goldReward: 8000,
+    goldReward: 800,
   },
   {
     message: "Small Town: Grow population to 300",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 300;
     },
-    goldReward: 20000,
+    goldReward: 2000,
   },
   {
     message:
-      "Generate 300 Knowledge 🧠 from libraries, schools, pubs, and vineyards",
+      "Generate 30 Knowledge 🧠 from libraries, schools, pubs, and vineyards",
     isComplete: (z: Game) => {
-      return z.townInfo.knowledge_points >= 300;
+      return z.townInfo.knowledge_points >= 30;
     },
-    goldReward: 4000,
+    goldReward: 400,
   },
   {
     message:
@@ -116,41 +116,41 @@ export const tutorialMessages: TutorialStep[] = [
     isComplete: (z: Game) => {
       return hasPlotOfType("mine", z).length > 0;
     },
-    goldReward: 16000,
+    goldReward: 1600,
   },
   {
     message: "Complete Year 5",
     isComplete: (z: Game) => {
       return z.environment.day >= 365 * 5;
     },
-    goldReward: 10000,
+    goldReward: 1000,
   },
   {
     message: "Town: Grow our population to 500",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 500;
     },
-    goldReward: 20000,
+    goldReward: 2000,
   },
   {
     message: "City: Grow our population to 1000",
     isComplete: (z: Game) => {
       return z.townInfo.population_count >= 1000;
     },
-    goldReward: 40000,
+    goldReward: 4000,
   },
   {
     message: "Establish a City Hall to advance our town",
     isComplete: (z: Game) => {
       return hasPlotOfType("city_hall", z).length > 0;
     },
-    goldReward: 40000,
+    goldReward: 4000,
   },
   {
     message: "Complete Year 10",
     isComplete: (z: Game) => {
       return z.environment.day >= 365 * 10;
     },
-    goldReward: 50000,
+    goldReward: 5000,
   },
 ];

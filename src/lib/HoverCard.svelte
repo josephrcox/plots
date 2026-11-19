@@ -5,7 +5,7 @@
   import type { Plot, PlotOption } from "./types";
   import type { Check } from "./ui";
   import type { EffectLine } from "./neighbours";
-  import { formatNumber } from "./utils";
+  import { formatAmount } from "./utils";
 
   export let x: number;
   export let y: number;
@@ -41,7 +41,7 @@
   {:else if option && check}
     <span class="font-semibold">{option.emoji} {option.title}</span>
     <span class="font-mono opacity-80">
-      {#each costs as [icon, n]}<span class="mr-2">{icon}{formatNumber(Number(n), false)}</span>{/each}
+      {#each costs as [icon, n]}<span class="mr-2">{icon}{formatAmount(Number(n))}</span>{/each}
     </span>
     {#if !check.ok}
       <span class="text-red-300">{check.reason || "Can't build here"}</span>

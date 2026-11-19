@@ -2,7 +2,7 @@
   import { DB, showKnowledgeMenu } from "../store";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import { formatNumber } from "$lib/utils";
+  import { formatNumber, formatAmount } from "$lib/utils";
   // @ts-ignore
   import LineGraph from "$lib/components/LineGraph.svelte";
 
@@ -11,7 +11,7 @@
 
   function convertKnowledgeToGold() {
     if (!$DB?.hasBank || marketRate <= 0) return;
-    $DB.townInfo.gold += Math.round($DB.townInfo.knowledge_points * marketRate);
+    $DB.townInfo.gold += $DB.townInfo.knowledge_points * marketRate;
     $DB.townInfo.knowledge_points = 0;
   }
 </script>
@@ -23,7 +23,7 @@
   >
     <Dialog.Header>
       <Dialog.Title
-        >Manage your Knowledge ({$DB.townInfo.knowledge_points} pts)</Dialog.Title
+        >Manage your Knowledge ({formatAmount($DB.townInfo.knowledge_points)} pts)</Dialog.Title
       >
       <Dialog.Description>
         <!--  -->

@@ -3,6 +3,7 @@
   import {
     getOptionIndex,
     formatNumber,
+    formatAmount,
     formatInstantChange,
     capitalizeFirstLetter,
     getOptionFromId,
@@ -27,7 +28,7 @@
     if (current < required && checkRequirements) {
       classText = "text-textDanger border-2 border-red-400 px-2";
     }
-    s = `<span class='${classText}'>${icon} ${formatNumber(required, false)}</span>`;
+    s = `<span class='${classText}'>${icon} ${formatAmount(required)}</span>`;
 
     return s;
   }

@@ -8,6 +8,7 @@
     syncEmployment,
   } from "../store";
   import { Button } from "$lib/components/ui/button";
+  import { formatAmount } from "$lib/utils";
   import * as Dialog from "$lib/components/ui/dialog";
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import { laws } from "$lib/objects/Laws";
@@ -51,7 +52,7 @@
       <Dialog.Title class="text-lg">
         <div class="flex justify-between mr-10">
           <span>{$DB.townInfo.name}</span>
-          <span>🧑‍⚖️ {$DB.resources.bureaucracy}</span>
+          <span>🧑‍⚖️ {formatAmount($DB.resources.bureaucracy)}</span>
         </div>
       </Dialog.Title>
 

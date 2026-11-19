@@ -142,6 +142,19 @@ export function firstEmoji(s: string): string | null {
   return match ? match[0] : null;
 }
 
+/**
+ * Formats a resource or gold amount for display: whole numbers get thousands
+ * separators; small fractional amounts keep one decimal (1.5 wood, 0.2/wk).
+ */
+export function formatAmount(n: number) {
+  if (!Number.isFinite(n)) return "0";
+  const abs = Math.abs(n);
+  if (abs < 100 && Math.abs(n - Math.round(n)) >= 0.05) {
+    return (Math.round(n * 10) / 10).toFixed(1);
+  }
+  return formatNumber(Math.round(n), false);
+}
+
 export function formatNumber(n: number, decimal = true) {
   let toReturn = n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
   if (!decimal) {
@@ -482,16 +495,16 @@ export function createAMockTown() {
   json.endGoal = "land";
   json.gameSettings = ["devMode"];
   json.townInfo.name = "Mock Town";
-  json.townInfo.gold = Math.random() * 50000 + 20000;
+  json.townInfo.gold = Math.random() * 5000 + 2000;
   json.townInfo.happiness = 300;
   json.townInfo.health = 300;
-  json.townInfo.knowledge_points = Math.random() * 1000 + 100;
+  json.townInfo.knowledge_points = Math.random() * 100 + 10;
   json.modifiers.happiness = 10000;
   json.modifiers.health = 10000;
-  json.resources.food = Math.random() * 10000 + 1000;
-  json.resources.wood = Math.random() * 10000 + 1000;
-  json.resources.stone = Math.random() * 10000 + 1000;
-  json.resources.metal = Math.random() * 10000 + 1000;
+  json.resources.food = Math.random() * 1000 + 100;
+  json.resources.wood = Math.random() * 1000 + 100;
+  json.resources.stone = Math.random() * 1000 + 100;
+  json.resources.metal = Math.random() * 1000 + 100;
   json.plots = generatePlots(25);
 
   // Always place a small home first, then place 3 farms and a tree_farm.

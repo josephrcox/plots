@@ -5,7 +5,7 @@
   import { DB, speed, paused, isReadOnly, hasPlotOfType, showCustomAlert } from "./store";
   import { options } from "./objects/PlotTypeOptions";
   import { CustomAlerts } from "./objects/CustomAlerts";
-  import { formatNumber, capitalizeFirstLetter } from "./utils";
+  import { formatNumber, formatAmount, capitalizeFirstLetter } from "./utils";
   import { HUD } from "./ui";
 
   // Milliseconds per game day for x1 / x2 / x3.
@@ -91,8 +91,9 @@
   }
 
   function rateText(rate: number | null) {
-    if (rate == null) return "";
-    return rate > 0 ? `+${formatNumber(rate, false)}` : formatNumber(rate, false);
+    if (rate == null) return "–";
+    if (Math.abs(rate) < 0.05) return "±0";
+    return rate > 0 ? `▲ ${formatAmount(rate)}` : `▼ ${formatAmount(-rate)}`;
   }
 </script>
 
@@ -120,15 +121,14 @@
     <Tooltip.Root openDelay={250} closeDelay={0}>
       <Tooltip.Trigger asChild let:builder>
         <div use:builder.action {...builder} class="res">
-          <span>💰</span>
-          <span class="val">{formatNumber(Math.trunc($DB.townInfo.gold), false)}</span>
-          <span class="rate" class:up={$DB.economyAndLaws.weeklyProfit > 0} class:down={$DB.economyAndLaws.weeklyProfit < 0}
-            >{rateText(Math.round($DB.economyAndLaws.weeklyProfit))}/wk</span
+          <span class="top"><span>💰</span><span class="val">{formatAmount($DB.townInfo.gold)}</span></span>
+          <span class="rate" class:up={$DB.economyAndLaws.weeklyProfit >= 0.05} class:down={$DB.economyAndLaws.weeklyProfit <= -0.05}
+            >{rateText($DB.economyAndLaws.weeklyProfit)}</span
           >
         </div>
       </Tooltip.Trigger>
       <Tooltip.Content class="text-xs max-w-60">
-        💰 Gold. Income depends on tax rate, happiness and how full your homes are.
+        💰 Gold ({rateText($DB.economyAndLaws.weeklyProfit)} per week). Income depends on tax rate, happiness and how full your homes are.
       </Tooltip.Content>
     </Tooltip.Root>
 
@@ -142,12 +142,14 @@
             class:empty={row.value <= 0}
             class:full={atCap(row)}
           >
-            <span>{row.icon}</span>
-            <span class="val">{formatNumber(Math.trunc(row.value), false)}</span>
+            <span class="top"><span>{row.icon}</span><span class="val">{formatAmount(row.value)}</span></span>
             {#if atCap(row)}
               <span class="rate down">FULL</span>
-            {:else if row.rate != null}
-              <span class="rate" class:up={row.rate > 0} class:down={row.rate < 0}
+            {:else}
+              <span
+                class="rate"
+                class:up={row.rate != null && row.rate >= 0.05}
+                class:down={row.rate != null && row.rate <= -0.05}
                 >{rateText(row.rate)}</span
               >
             {/if}
@@ -156,7 +158,7 @@
         <Tooltip.Content class="text-xs max-w-64">
           <div class="font-semibold mb-1">
             {row.icon} {capitalizeFirstLetter(row.name)}
-            {#if row.rate != null}<span class="font-normal opacity-70"> ({rateText(row.rate)} weekly)</span>{/if}
+            {#if row.rate != null}<span class="font-normal opacity-70"> ({rateText(row.rate)} per week)</span>{/if}
           </div>
           {#if neededBy(row.name).length}
             <div class="opacity-80">Needed for: {neededBy(row.name).join(", ")}</div>
@@ -168,8 +170,8 @@
     <Tooltip.Root openDelay={250} closeDelay={0}>
       <Tooltip.Trigger asChild let:builder>
         <div use:builder.action {...builder} class="res opacity-70">
-          <span>📦</span>
-          <span class="val">{bag ? "∞" : formatNumber(cap, false)}</span>
+          <span class="top"><span>📦</span><span class="val">{bag ? "∞" : formatNumber(cap, false)}</span></span>
+          <span class="rate">storage</span>
         </div>
       </Tooltip.Trigger>
       <Tooltip.Content class="text-xs max-w-64">
@@ -209,9 +211,11 @@
 <style>
   .res {
     display: flex;
-    align-items: baseline;
-    gap: 4px;
-    padding: 3px 8px;
+    flex-direction: column;
+    align-items: center;
+    min-width: 58px;
+    padding: 2px 8px;
+    line-height: 1.15;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.07);
     font-size: 0.8rem;
@@ -223,6 +227,11 @@
   }
   .res.full {
     background: rgba(230, 90, 100, 0.35);
+  }
+  .top {
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
   }
   .val {
     font-family: monospace;

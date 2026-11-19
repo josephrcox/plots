@@ -8,7 +8,7 @@ export const experiments: Experiment[] = [
   //     description: `Scientist Jane T. found that more sunlight makes everyone a bit happier.
   //           Now, every home is equipped with a pair of sunglasses and a sunhat. Enjoy happier citizens!,
   //           `,
-  //     cost: 100,
+  //     cost: 10,
   //     duration: 7,
   //     effect: (game: Game) => {
   //       game.townInfo.gold = 1000;
@@ -21,7 +21,7 @@ export const experiments: Experiment[] = [
     description: `Scientist Jane T. found that more sunlight makes everyone a bit happier.
           Now, every home is equipped with a pair of sunglasses and a sunhat. Enjoy happier citizens!,
           `,
-    cost: 5000,
+    cost: 500,
     duration: 180,
     effect: (game: Game) => {
       game.townInfo.happiness += 100;
@@ -34,7 +34,7 @@ export const experiments: Experiment[] = [
     description: `Scientist Alfred C. has pitched us an idea that he calls 'Antibiotics'.
            We don't really know what that means, but it seems to make people healthier.
           `,
-    cost: 8000,
+    cost: 800,
     duration: 200,
     effect: (game: Game) => {
       game.townInfo.health += 180;
@@ -48,7 +48,7 @@ export const experiments: Experiment[] = [
     description: `Scientist Barry T. thought that showing cows some stand-up comedy would make them produce better milk, but it didn't have the desired effect.
           The cows are now following Mike Birbiglia on Twitter, but the milk production has not increased.
           `,
-    cost: 3000,
+    cost: 300,
     duration: 60,
     effect: (game: Game) => {
       return game;
@@ -60,10 +60,10 @@ export const experiments: Experiment[] = [
     description: `Scientist Sarah H. was running an experiment on tree growth and found a stash of gold near the lab.
           She hopes nobody will miss it. Your town now has some more money.
           `,
-    cost: 15000,
+    cost: 1500,
     duration: 180,
     effect: (game: Game) => {
-      game.townInfo.gold += Math.floor(Math.random() * 35000);
+      game.townInfo.gold += Math.floor(Math.random() * 3500);
       return game;
     },
   },
@@ -72,7 +72,7 @@ export const experiments: Experiment[] = [
     title: "'Maybe the government is not so bad after all'",
     description: `Scientist Sam P. conducted a study and found that if you put a tiny bit of CHEMICAL X in the water supply, people are more likely to be ok with tax hikes.
           We don't question it, as these experiments cost a lot of moo-lah.`,
-    cost: 7500,
+    cost: 750,
     duration: 360,
     effect: (game: Game) => {
       game.economyAndLaws.max_tax_rate =
@@ -85,7 +85,7 @@ export const experiments: Experiment[] = [
     title: "Spring Break",
     description: `The Scientists took our money and spent the week at the beach.
           We are not sure what they did, but they came back with a tan and a smile.`,
-    cost: 2000,
+    cost: 200,
     duration: 7,
     effect: (game: Game) => {
       return game;
@@ -96,10 +96,10 @@ export const experiments: Experiment[] = [
     title: "A Gust of Grain",
     description: `Scientist Clint C. is sulking after a botched weather experiment caused about half of the food supply to be sucked into a tornado.
   		The only positive seems to be that the town now knows what a tornado is, and that makes us a bit smarter as a whole.`,
-    cost: 7000,
+    cost: 700,
     duration: 150,
     effect: (game: Game) => {
-      game.townInfo.knowledge_points += 3000;
+      game.townInfo.knowledge_points += 300;
       game.resources.food = Math.floor(game.resources.food / 2);
       return game;
     },
@@ -109,10 +109,10 @@ export const experiments: Experiment[] = [
     title: "Fishy Business",
     description: `An attempt to genetically enhance fish intelligence by Scientist Goldie F. in fisheries has gone awry, resulting in fish that are too smart to be caught. The fisheries are now underpopulated and shut down, but the town enjoys an unexpected tourism boom as people flock to see the genius fish who are now hanging out in local parks.
           Who knew fish could be such a draw?`,
-    cost: 6000,
+    cost: 600,
     duration: 90,
     effect: (game: Game) => {
-      game.townInfo.gold += 10000;
+      game.townInfo.gold += 1000;
       removeAllPlotsOfType("fishery", game);
       return game;
     },
@@ -122,7 +122,7 @@ export const experiments: Experiment[] = [
     title: "A Sudden Drop in IQ",
     description: `Scientist Albert E. wanted to see if the towns' children would become smarter if THEY ran the schools.
           This was obviously a terrible idea and the first thing the kids did was shut down the schools.`,
-    cost: 1000,
+    cost: 100,
     duration: 45,
     effect: (game: Game) => {
       removeAllPlotsOfType("schoolhouse", game);
@@ -133,11 +133,11 @@ export const experiments: Experiment[] = [
     id: "education_grant",
     title: "Education Grant",
     description: `Scientist Marie C. took this experiments funding and applied the town for a grant to improve education.
-          The town wins a grant for $150,000 to build schools and improve education. (but it's up to you if that's how you want to spend the money)`,
-    cost: 25000,
+          The town wins a grant for $15,000 to build schools and improve education. (but it's up to you if that's how you want to spend the money)`,
+    cost: 2500,
     duration: 45,
     effect: (game: Game) => {
-      game.townInfo.gold += 150000;
+      game.townInfo.gold += 15000;
       return game;
     },
   },
@@ -146,7 +146,7 @@ export const experiments: Experiment[] = [
     title: "'Mindfulness Meditation Classes'",
     description: `Scientist Zen M. has introduced mindfulness meditation classes to the town after realizing that breathing in certain ways can lower stress.
   		Now, the town is a bit more relaxed, for now.`,
-    cost: 13000,
+    cost: 1300,
     duration: 540,
     effect: (game: Game) => {
       game.townInfo.happiness += 75;

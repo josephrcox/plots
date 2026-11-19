@@ -122,6 +122,7 @@ export type Game = {
   overtime: boolean; // the player chose to keep playing after a loss (allowed once)
   lossGraceUntil?: number; // after continuing, losses aren't checked until this day
   tomPettyUsed?: boolean; // Tom Petty mode's single revival has been spent
+  amountScale?: number; // 10 once gold/resources use the ÷10 scale (Nov 2026)
   neighbourNuisanceLogged?: boolean; // the "industry next to homes" log message was shown
   last_warning_happiness: number;
   last_warning_health: number;

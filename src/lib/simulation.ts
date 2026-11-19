@@ -35,6 +35,8 @@ type StoredResource = "food" | "wood" | "stone" | "metal" | "bureaucracy";
 type ResourceSnapshot = Record<StoredResource | "power", number>;
 
 const MIDPOINT = 150;
+/** Food each townsperson eats per week. */
+export const FOOD_PER_PERSON = 0.1;
 // Boosts to positive income and to resource production. Casual is the
 // forgiving mode; normal games get a smaller boost so early growth isn't a
 // slog.
@@ -295,9 +297,9 @@ function getProfit(
     ? 0
     : z.economyAndLaws.tax_rate;
 
-  return Math.round(
+  return (
     option.revenue_per_week * taxRate * occupancy * profitModifiers -
-      option.active_costs.gold,
+    option.active_costs.gold
   );
 }
 
@@ -332,7 +334,7 @@ export function fixVariables(z: Game) {
     // Daily upkeep is weekly cost / 7, so round away float noise. Laws can
     // subtract more than is stored; stock can't go below zero (power is a
     // net balance and can).
-    const value = roundTo(finiteOr(z.resources[key], 0), 2);
+    const value = roundTo(finiteOr(z.resources[key], 0), 3);
     z.resources[key] = key === "power" ? value : Math.max(0, value);
   }
 
@@ -344,18 +346,20 @@ export function fixVariables(z: Game) {
   info.knowledge_points = Math.max(0, info.knowledge_points);
   info.population_count = Math.max(0, info.population_count);
 
-  z.economyAndLaws.weeklyProfit = roundTo(z.economyAndLaws.weeklyProfit, 0);
+  z.economyAndLaws.weeklyProfit = roundTo(z.economyAndLaws.weeklyProfit, 2);
   if (info.employees > info.population_count) {
     info.employees = info.population_count;
   }
 
-  info.gold = roundTo(info.gold, 0);
+  // Amounts are small (a farm earns well under 1 gold a day), so keep
+  // fractions; the UI rounds for display.
+  info.gold = roundTo(info.gold, 3);
   info.population_count = roundTo(info.population_count, 0);
   info.employees = roundTo(info.employees, 0);
   info.population_max = roundTo(info.population_max, 0);
   info.happiness = roundTo(info.happiness, 2);
   info.health = roundTo(info.health, 2);
-  info.knowledge_points = roundTo(info.knowledge_points, 0);
+  info.knowledge_points = roundTo(info.knowledge_points, 3);
 
   info.happiness = Math.min(info.happiness, z.maximums.happiness);
   info.health = Math.min(info.health, z.maximums.health);
@@ -401,7 +405,7 @@ function adjustForStockpile(z: Game) {
   }
   const stockpiles = hasPlotOfType("stockpile", z).length;
   const advStockpiles = hasPlotOfType("adv_stockpile", z).length;
-  const capacity = 1000 + stockpiles * 2000 + advStockpiles * 12000;
+  const capacity = 100 + stockpiles * 200 + advStockpiles * 1200;
   z.resource_capacity = capacity;
 
   for (const key of Object.keys(z.resources) as (keyof Game["resources"])[]) {
@@ -441,7 +445,7 @@ function checkGameLost(z: Game) {
     z.modifiers.happiness = 1;
     info.health = 300;
     z.modifiers.health = 1;
-    info.gold = roundTo(info.gold * 0.5, 0);
+    info.gold = roundTo(info.gold * 0.5, 2);
     showAlert(
       "Since you are playing in Tom Petty mode, you have been given another chance. All it took was 50% of your gold. This only works once, so good luck!",
     );
@@ -681,24 +685,18 @@ function generateResources(z: Game) {
     // Neighbour synergies (livestock by farms, tree farms by a lumber mill).
     const synergy = synergyAt(i, j, z).resource;
 
+    // No per-building rounding: outputs are small (a farm makes ~1 food).
     z.resources.food +=
-      Math.round(generated.food * multiplier * synergy) *
-      (nearWater ? 2 : 1) *
-      liegeBonus;
-    z.resources.wood +=
-      Math.round(generated.wood * multiplier * synergy) *
-      liegeBonus;
-    z.resources.stone += Math.round(generated.stone * multiplier) * liegeBonus;
-    z.resources.metal += Math.round(generated.metal * multiplier) * liegeBonus;
-    z.resources.bureaucracy +=
-      Math.round(generated.bureaucracy * multiplier) * liegeBonus;
+      generated.food * multiplier * synergy * (nearWater ? 2 : 1) * liegeBonus;
+    z.resources.wood += generated.wood * multiplier * synergy * liegeBonus;
+    z.resources.stone += generated.stone * multiplier * liegeBonus;
+    z.resources.metal += generated.metal * multiplier * liegeBonus;
+    z.resources.bureaucracy += generated.bureaucracy * multiplier * liegeBonus;
   });
 
-  z.resources.food = Math.round(z.resources.food);
-  z.resources.wood = Math.round(z.resources.wood);
-  z.resources.stone = Math.round(z.resources.stone);
-  z.resources.metal = Math.round(z.resources.metal);
-  z.resources.bureaucracy = Math.round(z.resources.bureaucracy);
+  for (const key of ["food", "wood", "stone", "metal", "bureaucracy"] as const) {
+    z.resources[key] = roundTo(z.resources[key], 3);
+  }
   return z;
 }
 
@@ -733,10 +731,10 @@ function calculateKnowledge(z: Game) {
     if (option.knowledge_points_per_month == null) return;
     const liegeBonus = isLiegeOnPlot(i, j, z) ? 0.75 : 1;
     const gained = (option.knowledge_points_per_month * liegeBonus) / 4;
-    z.townInfo.knowledge_points += Math.round(gained);
+    z.townInfo.knowledge_points += gained;
     weekly += gained;
   });
-  z.resource_rate.knowledge = roundTo(weekly, 0);
+  z.resource_rate.knowledge = roundTo(weekly, 2);
   return z;
 }
 
@@ -756,9 +754,9 @@ function bringStatsBackToNormal(z: Game) {
 }
 
 function feedCitizens(z: Game) {
-  // Each citizen eats 1 food per week. If there isn't enough, everyone gets a
-  // bit less happy and healthy.
-  const foodNeeded = z.townInfo.population_count;
+  // Each citizen eats FOOD_PER_PERSON per week. If there isn't enough,
+  // everyone gets a bit less happy and healthy.
+  const foodNeeded = z.townInfo.population_count * FOOD_PER_PERSON;
   if (z.resources.food < foodNeeded) {
     z.modifiers.happiness *= 0.95;
     z.modifiers.health *= 0.95;
@@ -768,7 +766,7 @@ function feedCitizens(z: Game) {
     removeFromTownLog(z, NOT_ENOUGH_FOOD_MSG);
     z.resources.food -= foodNeeded;
   }
-  z.resources.food = Math.round(z.resources.food);
+  z.resources.food = roundTo(z.resources.food, 3);
   return z;
 }
 
@@ -812,7 +810,7 @@ function calculateResourceRates(
     "metal",
     "bureaucracy",
   ] as const) {
-    z.resource_rate[key] = roundTo(end[key] - start[key], 0);
+    z.resource_rate[key] = roundTo(end[key] - start[key], 2);
   }
   return z;
 }
@@ -894,7 +892,7 @@ function getRandomTip(z: Game) {
       info.employees < info.population_count
         ? `I am unemployed and I hate it here`
         : "",
-    () => (info.knowledge_points < 100 ? `I wish we had more schools!` : ""),
+    () => (info.knowledge_points < 10 ? `I wish we had more schools!` : ""),
     () =>
       tax_rate > max_tax_rate
         ? `I wish the taxes were lower, I could use a break!`

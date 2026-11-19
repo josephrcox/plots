@@ -11,76 +11,76 @@ export const achievements: Achievement[] = [
     check: (z: Game) => {
       return z.townInfo.happiness >= 300 && z.townInfo.health >= 300;
     },
-    prize: 15000,
+    prize: 1500,
   },
   {
     id: "10k",
-    title: "💰 10,000",
+    title: "💰 1,000",
     description: "",
-    requirements: "10,000 gold in the bank in one of your towns",
+    requirements: "1,000 gold in the bank in one of your towns",
     icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 10000,
-    prize: 2500,
+    check: (z: Game) => z.townInfo.gold >= 1000,
+    prize: 250,
   },
   {
     id: "50k",
-    title: "💰 50,000",
+    title: "💰 5,000",
     description: "",
-    requirements: "50,000 gold in the bank in one of your towns",
+    requirements: "5,000 gold in the bank in one of your towns",
     icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 50000,
-    prize: 10000,
+    check: (z: Game) => z.townInfo.gold >= 5000,
+    prize: 1000,
   },
   {
     id: "250k",
-    title: "💰 250,000",
+    title: "💰 25,000",
     description: "",
-    requirements: "250,000 gold in the bank in one of your towns",
+    requirements: "25,000 gold in the bank in one of your towns",
     icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 250000,
-    prize: 50000,
+    check: (z: Game) => z.townInfo.gold >= 25000,
+    prize: 5000,
   },
   // same as above but with a million
 
   {
     id: "1m",
+    title: "💰 100,000",
+    description: "",
+    requirements: "100,000 gold in the bank in one of your towns",
+    icon: "💸",
+    check: (z: Game) => z.townInfo.gold >= 100000,
+    prize: 15000,
+  },
+  {
+    id: "10m",
     title: "💰 1,000,000",
     description: "",
     requirements: "1,000,000 gold in the bank in one of your towns",
     icon: "💸",
     check: (z: Game) => z.townInfo.gold >= 1000000,
-    prize: 150000,
-  },
-  {
-    id: "10m",
-    title: "💰 10,000,000",
-    description: "",
-    requirements: "10,000,000 gold in the bank in one of your towns",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 10000000,
-    prize: 500000,
+    prize: 50000,
   },
   {
     id: "stayin_frugal",
     title: "Stayin' Frugal!",
     description: "",
-    requirements: "Gold under 50 with >=200 population in one of your towns",
+    requirements: "Gold under 5 with >=200 population in one of your towns",
     icon: "🚲",
     check: (z: Game) => {
-      return z.townInfo.gold <= 50 && z.townInfo.population_count >= 200;
+      return z.townInfo.gold <= 5 && z.townInfo.population_count >= 200;
     },
-    prize: 10000,
+    prize: 1000,
   },
   {
     id: "profits_to_the_moon",
     title: "Profits to the moon!",
     description: "Now you're making dough!",
-    requirements: "Reach a monthly profit of $10,000",
+    requirements: "Reach a monthly profit of $1,000",
     icon: "🌛",
     check: (z: Game) => {
-      return z.economyAndLaws.weeklyProfit * 4 >= 10000;
+      return z.economyAndLaws.weeklyProfit * 4 >= 1000;
     },
-    prize: 15000,
+    prize: 1500,
   },
   {
     id: "happily_dying",
@@ -91,7 +91,7 @@ export const achievements: Achievement[] = [
     check: (z: Game) => {
       return z.townInfo.happiness > 275 && z.townInfo.health < 25;
     },
-    prize: 10000,
+    prize: 1000,
   },
   {
     id: "tax_man",
@@ -106,7 +106,7 @@ export const achievements: Achievement[] = [
       let cleanMax = Math.floor(z.economyAndLaws.max_tax_rate * 20) / 20;
       return z.economyAndLaws.tax_rate === cleanMax;
     },
-    prize: 750,
+    prize: 75,
   },
   {
     id: "good_job",
@@ -121,7 +121,7 @@ export const achievements: Achievement[] = [
         !z.gameSettings.includes("casual")
       );
     },
-    prize: 10000,
+    prize: 1000,
   },
   {
     id: "great_job",
@@ -137,7 +137,7 @@ export const achievements: Achievement[] = [
         !z.gameSettings.includes("casual")
       );
     },
-    prize: 30000,
+    prize: 3000,
   },
   {
     id: "superb_job",
@@ -152,23 +152,23 @@ export const achievements: Achievement[] = [
         z.gameSettings.includes("casual")
       );
     },
-    prize: 15000,
+    prize: 1500,
   },
 
   {
     id: "pub_knowledge",
     title: "Street smartz",
-    description: "You get 250 knowledge without building a school or library.",
-    requirements: "Knowledge >= 250 without building a school or library",
+    description: "You get 25 knowledge without building a school or library.",
+    requirements: "Knowledge >= 25 without building a school or library",
     icon: "🤓",
     check: (z: Game) => {
       return (
         hasPlotOfType("small_school", z).length === 0 &&
         hasPlotOfType("large_school", z).length === 0 &&
         hasPlotOfType("library", z).length === 0 &&
-        z.townInfo.knowledge_points >= 250
+        z.townInfo.knowledge_points >= 25
       );
     },
-    prize: 50000,
+    prize: 5000,
   },
 ];

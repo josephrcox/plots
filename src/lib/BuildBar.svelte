@@ -22,7 +22,7 @@
     optionsIn,
     categoryOf,
   } from "./objects/categories";
-  import { getOptionIndex, placePlot, formatNumber, analyticsEvent } from "./utils";
+  import { getOptionIndex, placePlot, formatAmount, analyticsEvent } from "./utils";
   import { previewPlacement } from "./neighbours";
   import PlotTooltip from "./PlotTooltip.svelte";
   import { Events, type PlotOption } from "./types";
@@ -131,7 +131,7 @@
       .sort((a, b) => b[1] - a[1])
       .slice(0, 2);
     return [["💰", option.requirements.gold] as [string, number], ...others]
-      .map(([icon, n]) => `${icon}${formatNumber(n, false)}`)
+      .map(([icon, n]) => `${icon}${formatAmount(n)}`)
       .join(" ");
   }
 

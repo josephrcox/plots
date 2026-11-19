@@ -90,11 +90,39 @@ export function createDefaultGame(): Game {
 }
 
 /**
+ * Saves from before the ÷10 rescale (Nov 2026) hold 10× the gold and
+ * resources the game now uses. Divides them once; returns whether it did.
+ */
+function migrateAmountScale(raw: any): boolean {
+  if (!isPlainObject(raw) || raw.amountScale != null) return false;
+  const div = (n: unknown) => (typeof n === "number" ? n / 10 : n);
+  if (isPlainObject(raw.townInfo)) {
+    raw.townInfo.gold = div(raw.townInfo.gold);
+    raw.townInfo.knowledge_points = div(raw.townInfo.knowledge_points);
+  }
+  for (const group of ["resources", "resource_rate"]) {
+    if (!isPlainObject(raw[group])) continue;
+    for (const key of Object.keys(raw[group])) {
+      raw[group][key] = div(raw[group][key]);
+    }
+  }
+  raw.resource_capacity = div(raw.resource_capacity);
+  if (isPlainObject(raw.economyAndLaws)) {
+    raw.economyAndLaws.weeklyProfit = div(raw.economyAndLaws.weeklyProfit);
+  }
+  if (isPlainObject(raw.lab)) raw.lab.xp = div(raw.lab.xp);
+  raw.amountScale = 10;
+  return true;
+}
+
+/**
  * Upgrades a game loaded from storage (or a file) so it matches the current
  * shape of `Game`, and repairs state that can't be valid after a reload.
  */
 export function normalizeGame(raw: any): Game | null {
   if (!isPlainObject(raw) || !isPlainObject(raw.townInfo)) return null;
+  // Before fillDefaults, which would mark old saves as already converted.
+  migrateAmountScale(raw);
   const game = fillDefaults<Game>(raw, default_db);
 
   for (const row of game.plots) {
@@ -138,9 +166,11 @@ function normalizeUserDB(raw: any): UserDatabase {
   udb.games = udb.games.map((json) => {
     const game = safeParse<Game>(json);
     if (!game) return json;
+    // Town list entries show gold too, so convert them as well.
+    const migrated = migrateAmountScale(game);
     if (!seen.has(game.gameId)) {
       seen.add(game.gameId);
-      return json;
+      return migrated ? JSON.stringify(game) : json;
     }
     game.gameId = Math.floor(Math.random() * 10_000_000_000);
     seen.add(game.gameId);
