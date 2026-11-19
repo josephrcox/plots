@@ -167,10 +167,11 @@
       : 0}px;"
   >
     <div
-      class="pointer-events-auto bg-popupBackground text-white rounded-t-xl shadow-2xl px-3 pt-2 pb-3 w-full max-w-[980px] mx-3"
+      class="pointer-events-auto bg-popupBackground text-white rounded-t-xl shadow-2xl px-3 pt-2 pb-3 min-w-0 shrink-0"
+      style="width: min(980px, calc(100% - 24px));"
     >
       <!-- Tabs + status -->
-      <div class="flex flex-row items-center gap-1 mb-2 overflow-x-auto no-scrollbar">
+      <div class="flex flex-row items-center gap-1 mb-2 overflow-x-auto no-scrollbar min-w-0">
         {#each categories as c, i}
           <button
             class="tab"
@@ -204,7 +205,7 @@
 
       <!-- Buildings -->
       <div
-        class="flex flex-row gap-2 overflow-x-auto no-scrollbar"
+        class="flex flex-row gap-2 overflow-x-auto no-scrollbar min-w-0 overscroll-x-contain"
         on:wheel={(e) => {
           // Let a normal mouse wheel scroll this row sideways.
           if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
