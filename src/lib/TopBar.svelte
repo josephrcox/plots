@@ -16,6 +16,7 @@
   import { CustomAlerts } from "./objects/CustomAlerts";
   import { formatNumber, formatAmount, capitalizeFirstLetter } from "./utils";
   import { HUD } from "./ui";
+  import { attraction, weeklyArrivals } from "./migration";
   import {
     FOOD_PER_PERSON,
     FOOD_SPOILAGE,
@@ -113,6 +114,11 @@
       ? $DB.resources.food / ($DB.townInfo.population_count * FOOD_PER_PERSON)
       : 0;
 
+  // People: how full the homes are, and who's moving in.
+  $: emptySpaces = $DB.townInfo.population_max - $DB.townInfo.population_count;
+  $: arrivals = weeklyArrivals($DB);
+  $: pull = attraction($DB);
+
   // Workers: people minus jobs. Negative means some jobs are unfilled.
   $: jobs = countJobs($DB);
   $: workers = $DB.townInfo.population_count - jobs;
@@ -138,12 +144,43 @@
       title="Rename town"
       on:click={changeName}>{$DB.townInfo.name}</button
     >
-    <span class="text-[11px] opacity-70"
-      >👥 {formatNumber($DB.townInfo.population_count, false)} / {formatNumber(
-        $DB.townInfo.population_max,
-        false,
-      )}</span
-    >
+    <Tooltip.Root openDelay={250} closeDelay={0}>
+      <Tooltip.Trigger asChild let:builder>
+        <span use:builder.action {...builder} class="text-[11px] opacity-80 cursor-default"
+          >👥 {formatNumber($DB.townInfo.population_count, false)} / {formatNumber(
+            $DB.townInfo.population_max,
+            false,
+          )}
+          {#if emptySpaces > 0}
+            <span class={arrivals > 0 ? "text-green-300" : "text-red-300"}
+              >{arrivals > 0 ? `+${arrivals}/wk` : "nobody arriving"}</span
+            >
+          {/if}</span
+        >
+      </Tooltip.Trigger>
+      <Tooltip.Content class="max-w-64">
+        <div class="font-semibold mb-1">👥 People</div>
+        <div>
+          {$DB.townInfo.population_count} people in homes with room for {$DB
+            .townInfo.population_max}.
+        </div>
+        {#if emptySpaces > 0}
+          <div class="mt-1">
+            {emptySpaces} empty spaces.
+            {arrivals > 0
+              ? `About ${arrivals} people move in each week.`
+              : "Nobody is moving in."}
+          </div>
+        {:else}
+          <div class="mt-1">Every home is full. Build homes to grow.</div>
+        {/if}
+        {#each pull.reasons as r}
+          <div class={r.good ? "text-green-300" : "text-red-300"}>
+            {r.good ? "▲" : "▼"} {r.text}
+          </div>
+        {/each}
+      </Tooltip.Content>
+    </Tooltip.Root>
   </div>
 
   <!-- Resources -->

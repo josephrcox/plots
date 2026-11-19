@@ -6,7 +6,7 @@ export const options: PlotOption[] = [
     emoji: "🏠",
     title: "Homes",
     type: "residential",
-    description: "+16 people",
+    description: "Room for 16 people. New homes fill as people move in.",
     revenue_per_week: 0,
     requirements: {
       gold: 15,
@@ -72,7 +72,7 @@ export const options: PlotOption[] = [
     emoji: "🏡",
     title: "Large Homes",
     type: "residential",
-    description: "+32 people",
+    description: "Room for 32 people. New homes fill as people move in.",
     revenue_per_week: 0,
     requirements: {
       gold: 180,

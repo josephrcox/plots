@@ -29,6 +29,7 @@ import { achievements } from "./objects/AchievementList";
 import { tutorialMessages } from "./objects/tutorial_messages";
 import { isAdjacentToWater, randomizeNumber, roundTo } from "./utils";
 import { synergyAt, townNeighbourhoodDelta } from "./neighbours";
+import { weeklyArrivals } from "./migration";
 import { laws } from "./objects/Laws";
 import { type Game, type Plot, type PlotOption, Vibe } from "./types";
 import { townPeopleNames, townPeopleJobsHobbies } from "./objects/townPeople";
@@ -101,6 +102,7 @@ function performWeeklyTasks(db: Game) {
   db = bringStatsBackToNormal(db);
   db = neighbourEffects(db);
   db = feedCitizens(db);
+  db = moveIn(db);
   const endResources = snapshotResources(db);
   if (db.environment.day % 14 === 0) {
     // Biweekly tasks
@@ -968,17 +970,18 @@ function recreationImpact(z: Game) {
 // Quarterly tasks
 // ---------------------------------------------------------------------------
 
+/** Newcomers fill empty homes each week, faster in an attractive town. */
+function moveIn(z: Game) {
+  const arrivals = weeklyArrivals(z);
+  z.townInfo.population_count += arrivals;
+  z.lastArrivals = arrivals;
+  if (arrivals > 0) syncEmployment(z);
+  return z;
+}
+
 function movePeopleInMovePeopleOut(z: Game) {
   const info = z.townInfo;
-  if (info.population_count < info.population_max && info.happiness > 50) {
-    // Fill open homes in proportion to happiness (100 fills them all).
-    const availableSpots = info.population_max - info.population_count;
-    const newPeople = Math.round((info.happiness / 100) * availableSpots);
-    info.population_count = Math.min(
-      info.population_count + newPeople,
-      info.population_max,
-    );
-  }
+  // Moving in happens weekly (moveIn); this only handles people leaving.
   if (info.happiness < 50 && info.population_count > 0) {
     // When happiness is low, some people leave.
     const unhappyPeople = Math.round((150 - info.happiness) / 5);

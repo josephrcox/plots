@@ -389,6 +389,9 @@ export function placePlot(
   if (z.plots[x][y].type > -1) {
     clearPlot(x, y, z);
   }
+  // The town's first home arrives with its founding settlers; every other
+  // home is built empty and fills as people move in (see migration.ts).
+  const founding = !townHasStarted(z);
 
   const plot = z.plots[x][y];
   plot.type = typeIndex;
@@ -399,8 +402,10 @@ export function placePlot(
   // Knowledge is spent, like gold.
   z.townInfo.knowledge_points -= plotChosen.requirements.knowledge || 0;
   // Immediate variable changes
-  z.townInfo.population_count +=
-    plotChosen.immediate_variable_changes.population;
+  if (founding) {
+    z.townInfo.population_count +=
+      plotChosen.immediate_variable_changes.population;
+  }
   z.townInfo.population_max += plotChosen.immediate_variable_changes.population;
   z.townInfo.happiness = Math.min(
     z.maximums.happiness,

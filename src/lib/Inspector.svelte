@@ -14,6 +14,7 @@
   import { activeEffects } from "./neighbours";
   import { isAdjacentToWater } from "./utils";
   import PlotTooltip from "./PlotTooltip.svelte";
+  import { homeOccupancy, weeklyArrivals } from "./migration";
 
   $: pos = $inspected;
   $: plot = $DB && pos ? $DB.plots[pos.x]?.[pos.y] : null;
@@ -24,6 +25,8 @@
   $: nearWater = $DB && pos ? isAdjacentToWater(pos.x, pos.y, $DB) : false;
   $: liege = $DB && pos ? isLiegeOnPlot(pos.x, pos.y, $DB) : false;
   $: staff = $DB && plot ? staffing($DB).get(plot.id) : undefined;
+  $: home = $DB && plot ? homeOccupancy($DB).get(plot.id) : undefined;
+  $: arrivals = $DB ? weeklyArrivals($DB) : 0;
 
   function replace() {
     if (!pos) return;
@@ -57,6 +60,18 @@
     {#if plot.disabled}
       <span class="chip bg-red-600 text-white"
         >⚠️ Shut down: it can't cover its running costs</span
+      >
+    {/if}
+    {#if home}
+      <span
+        class="chip text-white {home.people < home.capacity
+          ? 'bg-amber-600'
+          : 'bg-green-700'}"
+        >🏠 {home.people} of {home.capacity} people{home.people < home.capacity
+          ? arrivals > 0
+            ? `. Newcomers arrive weekly (about ${arrivals} town-wide).`
+            : ". Nobody is moving in right now."
+          : " (full)"}</span
       >
     {/if}
     {#if staff && staff.staffed < staff.needed}

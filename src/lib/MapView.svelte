@@ -48,6 +48,7 @@
     type TileState,
   } from "./Plot.svelte";
   import ExpandButton from "./ExpandButton.svelte";
+  import { homeOccupancy } from "./migration";
   import HoverCard from "./HoverCard.svelte";
   import { Events, type Plot as PlotData } from "./types";
 
@@ -81,8 +82,9 @@
         )
       : [];
 
-  // Buildings without all their workers get a badge.
+  // Buildings without all their workers get a badge; homes show how full.
   $: staff = $DB ? staffing($DB) : null;
+  $: occupancy = $DB ? homeOccupancy($DB) : null;
 
   // Before the first building, point at a good starting tile.
   $: startTile = $DB && !townHasStarted($DB) ? suggestedStart($DB) : null;
@@ -508,6 +510,7 @@
             ghostEmoji={buildOption?.emoji ?? ""}
             crosshair={$settingLiegeLocation && plot.active}
             startHint={startTile?.[0] === x && startTile?.[1] === y}
+            occupancy={occupancy?.get(plot.id) ?? null}
             understaffed={(() => {
               const s = staff?.get(plot.id);
               return !!s && s.staffed < s.needed;

@@ -149,7 +149,7 @@ export function statEffect(z: Game, key: StatKey): Line {
   if (key === "happiness") {
     const income = Math.min(2, Math.max(0.75, v / 100));
     if (v <= 50) {
-      return { text: "Too unhappy: nobody new moves in", good: false };
+      return { text: "Too unhappy: nobody moves in, people leave", good: false };
     }
     return {
       text: `Tax income ${pct(income)}${v >= 200 ? " (the most it gets)" : ""}`,

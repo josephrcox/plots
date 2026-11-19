@@ -123,6 +123,7 @@ export type Game = {
   overtime: boolean; // the player chose to keep playing after a loss (allowed once)
   lossGraceUntil?: number; // after continuing, losses aren't checked until this day
   tomPettyUsed?: boolean; // Tom Petty mode's single revival has been spent
+  lastArrivals?: number; // people who moved in last week
   foodSpoiled?: number; // food that spoiled last week
   foodEaten?: number; // food eaten last week
   wellFed?: boolean; // 4+ weeks of food in store at the last weekly check

@@ -16,6 +16,7 @@
     type StatKey,
   } from "./statDrivers";
   import { formatAmount } from "./utils";
+  import { attraction, weeklyArrivals } from "./migration";
 
   const STATS: { key: StatKey; label: string; icon: string; about: string }[] = [
     {
@@ -70,6 +71,17 @@
 
   $: drivers = $DB ? statDrivers($DB) : null;
   $: needs = $DB ? townNeeds($DB) : [];
+  $: emptySpaces = $DB ? $DB.townInfo.population_max - $DB.townInfo.population_count : 0;
+  $: arrivals = $DB ? weeklyArrivals($DB) : 0;
+  $: pull = $DB ? attraction($DB) : { factor: 0, reasons: [] };
+  $: pullWord =
+    pull.factor <= 0
+      ? "Nobody"
+      : pull.factor < 0.7
+        ? "Slowly"
+        : pull.factor < 1.3
+          ? "Steadily"
+          : "Quickly";
   $: goalIndex = $DB?.currentTutorialStep ?? 0;
   $: goal = tutorialMessages[goalIndex];
   $: doneCount = Math.min(goalIndex, tutorialMessages.length);
@@ -171,6 +183,30 @@
           </div>
         {/if}
       {/each}
+    </div>
+
+    <!-- Newcomers -->
+    <div class="flex flex-col gap-1">
+      <span class="heading">Newcomers</span>
+      <div class="goal">
+        {#if emptySpaces > 0}
+          <div class="flex flex-row justify-between text-sm">
+            <span>🏠 Moving in</span>
+            <span class={arrivals > 0 ? "text-green-300" : "text-red-300"}>{pullWord}</span>
+          </div>
+          <span class="text-[11px] opacity-70"
+            >{emptySpaces} empty spaces{arrivals > 0 ? `, about ${arrivals} arrive each week` : ""}</span
+          >
+          {#each pull.reasons as r}
+            <span class="text-[11px] {r.good ? 'text-green-300' : 'text-red-300'}"
+              >{r.good ? "▲" : "▼"} {r.text}</span
+            >
+          {/each}
+        {:else}
+          <span class="text-sm">🏠 Homes are full</span>
+          <span class="text-[11px] opacity-70">Build homes to make room for more people.</span>
+        {/if}
+      </div>
     </div>
 
     <!-- Needs -->

@@ -37,6 +37,8 @@
   export let crosshair = false;
   export let startHint = false;
   export let understaffed = false;
+  /** For homes that aren't full yet: people living there / room. */
+  export let occupancy: { people: number; capacity: number } | null = null;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
   $: fill = data.water
@@ -83,6 +85,11 @@
       <span class="title" class:text-white={option.id === "mine"}
         >{option.title}</span
       >
+      {#if occupancy && occupancy.people < occupancy.capacity}
+        <span class="occupancy" title="People living here"
+          >👥 {occupancy.people}/{occupancy.capacity}</span
+        >
+      {/if}
     {:else if data.mineralSource}
       <span class="emoji">🧲</span>
     {:else if startHint}
@@ -162,6 +169,11 @@
     position: absolute;
     top: 14px;
     font-size: 0.8rem;
+  }
+  .occupancy {
+    font-size: 0.6rem;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 1.2;
   }
   .badge.staff {
     background: rgb(217, 119, 6);

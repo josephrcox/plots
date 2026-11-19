@@ -473,8 +473,13 @@ export function clearPlot(x: number, y: number, z: Game) {
 
   const option = oldPlotType > -1 ? options[oldPlotType] : undefined;
   if (option) {
-    z.townInfo.population_count -= option.immediate_variable_changes.population;
+    // Residents of a demolished home move into any empty space elsewhere;
+    // only those who don't fit leave town.
     z.townInfo.population_max -= option.immediate_variable_changes.population;
+    z.townInfo.population_count = Math.max(
+      0,
+      Math.min(z.townInfo.population_count, z.townInfo.population_max),
+    );
     // Bulldozing a fresh building takes back its one-time boost, so
     // build/bulldoze loops can't farm happiness and health. After the boost
     // has had time to wear off, demolition has no side effects.
