@@ -83,24 +83,28 @@
       <span class="title" class:text-white={option.id === "mine"}
         >{option.title}</span
       >
-      {#if data.disabled}
-        <span class="badge" title="Shut down">⚠️</span>
-      {:else if understaffed}
-        <span class="badge staff" title="Not enough workers">👷</span>
-      {/if}
     {:else if data.mineralSource}
       <span class="emoji">🧲</span>
     {:else if startHint}
       <span class="emoji animate-bounce">🚩</span>
       <span class="title">Start here!</span>
     {/if}
-    {#if liegeHere}
-      <span class="liege">👑</span>
-    {/if}
-    {#if state === "doomed"}
-      <span class="doom">🚜</span>
-    {/if}
   </div>
+  <!-- Badges hang off the outer tile, which keeps its size when the inner
+       tile shrinks to show a selection ring, so they never shift. -->
+  {#if option && state !== "ghost"}
+    {#if data.disabled}
+      <span class="badge" title="Shut down">⚠️</span>
+    {:else if understaffed}
+      <span class="badge staff" title="Not enough workers">👷</span>
+    {/if}
+  {/if}
+  {#if liegeHere}
+    <span class="liege">👑</span>
+  {/if}
+  {#if state === "doomed"}
+    <span class="doom">🚜</span>
+  {/if}
 </div>
 
 <style>
@@ -153,6 +157,8 @@
     padding: 0 6px;
   }
   .badge {
+    left: 50%;
+    transform: translateX(-50%);
     position: absolute;
     top: 14px;
     font-size: 0.8rem;
@@ -164,11 +170,15 @@
     font-size: 0.7rem;
   }
   .liege {
+    left: 50%;
+    transform: translateX(-50%);
     position: absolute;
     top: 4px;
     font-size: 1rem;
   }
   .doom {
+    left: 50%;
+    transform: translateX(-50%);
     position: absolute;
     bottom: 10px;
     font-size: 1rem;
