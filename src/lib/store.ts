@@ -696,7 +696,6 @@ export const showTutorialStepConfetti = writable(false);
 export const paused = writable(false);
 // only when DB.environment.day is 1
 export const showWelcome = writable(true);
-export const showScoreboard = writable(false);
 export const showKnowledgeMenu = writable(false);
 export const showAchievementPopup = writable(false);
 export const showLabMenu = writable(false);
@@ -721,14 +720,8 @@ export function showCustomAlert(alert: CustomAlerts | string) {
   customAlertText.set(alert);
 }
 
-export const showCompletedAchievements = writable(
-  localStorage.getItem("showCompletedAchievements") === "true",
-);
 export const showOnlyAffordable = writable(
   localStorage.getItem("showOnlyAffordable") === "true",
-);
-export const pauseMenuTab = writable(
-  localStorage.getItem("pauseMenuTab") === "game" ? "game" : "achievements",
 );
 export const headerHeight = writable(250);
 export const speed = writable(750);

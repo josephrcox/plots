@@ -1,11 +1,9 @@
 <script lang="ts">
   import { DB, showLabMenu, showAlert } from "../store";
-  import { Button } from "$lib/components/ui/button";
-  import * as Dialog from "$lib/components/ui/dialog";
-  import * as AlertDialog from "$lib/components/ui/alert-dialog";
+  import Modal from "$lib/components/Modal.svelte";
+  import Btn from "$lib/components/Btn.svelte";
   import { experiments } from "$lib/objects/ExperimentsList";
   import type { Experiment } from "$lib/types";
-  import Separator from "$lib/components/ui/separator/separator.svelte";
   import { formatNumber } from "$lib/utils";
 
   // Up to three experiments to choose from, with randomized prices.
@@ -68,108 +66,47 @@
   }
 </script>
 
-<AlertDialog.Root open={showCompletedAlert}>
-  <AlertDialog.Content>
-    <AlertDialog.Header>
-      <AlertDialog.Title class="text-center"
-        >🎉 Experiment Completed: {$DB?.lab.active_experiment
-          ?.title}</AlertDialog.Title
-      >
-      <AlertDialog.Description>
-        <div
-          class=" select-none whitespace-pre-wrap
-					text-lg
-					text-gray-400
-					leading-6
-					px-4
-					py-4
-					text-center
-				"
-        >
-          {$DB?.lab.active_experiment?.description}
-        </div>
-      </AlertDialog.Description>
-    </AlertDialog.Header>
-    <AlertDialog.Footer>
-      <!-- <AlertDialog.Cancel>Cancel</AlertDialog.Cancel> -->
-      <AlertDialog.Action
-        on:click={() => {
-          finalizeAndNext();
-        }}>Thank the scientists</AlertDialog.Action
-      >
-    </AlertDialog.Footer>
-  </AlertDialog.Content>
-</AlertDialog.Root>
+<!-- An experiment finished: show what it did. -->
+<Modal
+  open={showCompletedAlert}
+  dismissible={false}
+  size="sm"
+  icon="🎉"
+  title="Experiment complete: {$DB?.lab.active_experiment?.title ?? ''}"
+>
+  <p class="text-center opacity-80 whitespace-pre-wrap">{$DB?.lab.active_experiment?.description}</p>
+  <svelte:fragment slot="footer">
+    <Btn variant="primary" on:click={finalizeAndNext}>Thank the scientists</Btn>
+  </svelte:fragment>
+</Modal>
 
-<Dialog.Root bind:open={$showLabMenu}>
-  <Dialog.Content class="bg-foreground text-accentText">
-    <Dialog.Header>
-      <Dialog.Title>
-        <span>Manage your Laboratory 🔬 🧪</span>
-      </Dialog.Title>
-
-      <Dialog.Description>
-        <span
-          >You have earned <span
-            class="
-				{$DB.lab.xp < 0 ? 'text-textDanger' : 'text-primaryText'}
-					">{$DB.lab.xp} XP</span
-          > from experiments. XP can be used to buy advanced plots and develop your
-          city.
-        </span>
-      </Dialog.Description>
-    </Dialog.Header>
-    <Separator />
-    {#if $DB.lab.active_experiment !== null}
-      <!-- spot to show current experiment -->
-      Currently running an experiment... check back in {$DB.lab
-        .active_experiment.duration} days.
-      {#if $DB.lab.active_experiment.duration === 0}
-        <Button
-          on:click={() => {
-            completeExperiment();
-          }}
-          variant="outline">Complete experiment (and face the impact)</Button
-        >
-      {/if}
-    {:else if experimentOptions.length > 0}
-      <div
-        class=" select-none
-					text-sm
-					"
-      >
-        It's time to fund your next experiment! Choose a project below based on
-        it's funding requirement. Once the experiment is over, you will see the
-        results.
-      </div>
-      <div
-        class="text-center flex flex-col justify-center
-			items-center gap-4
-			"
-      >
-        {#each experimentOptions as ex}
-          <Button
-            on:click={() => purchaseExperiment(ex)}
-            variant="outline"
-            class="min-w-48 w-max flex-col
-				{ex.cost > $DB.townInfo.gold ? 'cursor-not-allowed' : ''}
-				"
-            >💰{formatNumber(ex.cost, false)} gold
-
-            {#if $DB.gameSettings.includes("devMode")}
-              <span class="text-xs text-gray-400"> // dev-{ex.id}</span>
-            {/if}
-          </Button>
-        {/each}
-      </div>
-    {:else if experimentOptions.length === 0}
-      No more experiments available
+<Modal
+  open={$showLabMenu}
+  title="🧪 Laboratory"
+  subtitle="{$DB.lab.xp} XP earned from experiments. Not every experiment goes well."
+  onClose={() => ($showLabMenu = false)}
+>
+  {#if $DB.lab.active_experiment !== null}
+    {#if $DB.lab.active_experiment.duration === 0}
+      <p>The experiment is finished. Time to face the results.</p>
+    {:else}
+      <p class="opacity-80">An experiment is running: {$DB.lab.active_experiment.duration} days to go.</p>
     {/if}
-    <Separator class="mt-4" />
-    <Dialog.Footer>
-      <span class=" text-left text-textDanger">
-        Keep in mind that not all experiments yield positive results.</span
-      >
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
+  {:else if experimentOptions.length > 0}
+    <p class="opacity-80">Fund the next experiment. You'll learn what it does when it's done.</p>
+    <div class="flex flex-col gap-1.5">
+      {#each experimentOptions as ex}
+        <Btn full disabled={ex.cost > $DB.townInfo.gold} on:click={() => purchaseExperiment(ex)}
+          >🧪 Mystery experiment · 💰{formatNumber(ex.cost, false)}{$DB.gameSettings.includes("devMode") ? ` (${ex.id})` : ""}</Btn
+        >
+      {/each}
+    </div>
+  {:else}
+    <p class="opacity-70">No experiments left to run.</p>
+  {/if}
+  <svelte:fragment slot="footer">
+    {#if $DB.lab.active_experiment?.duration === 0}
+      <Btn variant="primary" on:click={completeExperiment}>See the results</Btn>
+    {/if}
+  </svelte:fragment>
+</Modal>

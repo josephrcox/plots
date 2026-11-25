@@ -6,14 +6,14 @@
     showAlert,
     requiredGuardiansForExpansion,
   } from "./store";
-  import Button from "./components/ui/button/button.svelte";
+  import Btn from "./components/Btn.svelte";
   export let direction: "east" | "south";
 </script>
 
 <div class="w-48 h-max">
   {#if hasPlotOfType("city_hall", $DB).length > 0}
-    <Button
-      class="bg-accent h-max rounded-2xl hover:scale-110 transition-transform duration-200 ease-in-out hover:drop-shadow-2xl"
+    <Btn
+      variant="primary"
       on:click={() => {
         const error = expandTown($DB, direction);
         if (error) showAlert(error);
@@ -32,7 +32,7 @@
           <br />to be employed. (see city mgmt menu)</span
         >
       </div>
-    </Button>
+    </Btn>
   {:else}
     <span class="text-xs">
       My liege, if you build a City Hall, you can expand your city {direction}

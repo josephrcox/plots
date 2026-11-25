@@ -73,7 +73,12 @@ const NOT_ENOUGH_FOOD_MSG = "There isn't enough food for everyone!";
 /** Whether the clock should advance today, given the game and UI state. */
 export function canAdvanceDay(game: Game | null): game is Game {
   if (!game || isReadOnly) return false;
-  if (get(paused) || get(disabledPlotMenu).visible || get(showCityHallMenu)) {
+  if (
+    get(paused) ||
+    get(disabledPlotMenu).visible ||
+    get(showCityHallMenu) ||
+    get(showAchievementPopup)
+  ) {
     return false;
   }
   if (game.endGameDetails.msg !== "") return false;
@@ -561,7 +566,6 @@ function checkForAchievements(z: Game) {
     }
     return udb;
   });
-  paused.set(true);
   showAchievementPopup.set(true);
   return z;
 }

@@ -1,77 +1,44 @@
 <script lang="ts">
+  // Selling knowledge for gold at the bank, at a market rate that moves.
   import { DB, showKnowledgeMenu } from "../store";
-  import { Button } from "$lib/components/ui/button";
-  import * as Dialog from "$lib/components/ui/dialog";
-  import { formatNumber, formatAmount } from "$lib/utils";
+  import { formatAmount, formatNumber } from "$lib/utils";
+  import Modal from "$lib/components/Modal.svelte";
+  import Btn from "$lib/components/Btn.svelte";
   // @ts-ignore
   import LineGraph from "$lib/components/LineGraph.svelte";
 
   $: graphData = $DB?.economyAndLaws.knowledge_gold_market_rates ?? [];
   $: marketRate = graphData[graphData.length - 1] ?? 0;
+  $: value = ($DB?.townInfo.knowledge_points ?? 0) * marketRate;
 
-  function convertKnowledgeToGold() {
+  function sell() {
     if (!$DB?.hasBank || marketRate <= 0) return;
-    $DB.townInfo.gold += $DB.townInfo.knowledge_points * marketRate;
+    $DB.townInfo.gold += value;
     $DB.townInfo.knowledge_points = 0;
   }
 </script>
 
-<Dialog.Root bind:open={$showKnowledgeMenu}>
-  <Dialog.Content
-    transitionConfig={{ duration: 0 }}
-    class="bg-foreground text-accentText"
-  >
-    <Dialog.Header>
-      <Dialog.Title
-        >Manage your Knowledge ({formatAmount($DB.townInfo.knowledge_points)} pts)</Dialog.Title
-      >
-      <Dialog.Description>
-        <!--  -->
-      </Dialog.Description>
-    </Dialog.Header>
-    <span class="">Knowledge is power, unlock it!</span>
-    <div class="py-0 flex flex-col gap-4 text-gray-400 overflow-x-auto">
-      <div>
-        Market Rate: <span
-          class="
-				{marketRate < 0 ? 'text-red-500' : 'text-green-500'}
-			">{marketRate ?? 0} gold</span
-        >
-        per Knowledge Point
-        {#if marketRate > 0}
-          <br />
-          (total value: ${formatNumber(
-            $DB.townInfo.knowledge_points * marketRate,
-          )})
-        {/if}
-      </div>
-      <LineGraph data={graphData} />
-
-      {#if marketRate < 0}
-        <div>
-          Wait until the market value is <span class="text-green-500"
-            >positive</span
-          > to sell your Knowledge for Gold. Keep in mind that you need a bank to
-          convert.
-        </div>
-      {/if}
-      {#if $DB.hasBank && marketRate > 0}
-        <div>
-          <Button variant={"default"} on:click={convertKnowledgeToGold}>
-            Convert Knowledge to Gold
-          </Button>
-        </div>
-      {/if}
-      {#if $DB.hasBank === false}
-        <div>You need a bank to convert knowledge to gold.</div>
-      {/if}
-    </div>
-    <Dialog.Footer>
-      <!--  -->
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
-
-<style>
-  /* nothin' */
-</style>
+<Modal
+  open={$showKnowledgeMenu}
+  title="🧠 Knowledge market"
+  subtitle="{formatAmount($DB.townInfo.knowledge_points)} knowledge on hand"
+  onClose={() => ($showKnowledgeMenu = false)}
+>
+  <div class="flex flex-row justify-between">
+    <span class="opacity-70">Today's rate</span>
+    <span class={marketRate > 0 ? "text-green-300" : "text-red-300"}>💰{marketRate} per point</span>
+  </div>
+  <LineGraph data={graphData} />
+  <p class="text-xs opacity-70">
+    {#if !$DB.hasBank}
+      You need a bank to sell knowledge.
+    {:else if marketRate <= 0}
+      Wait for the rate to turn positive before selling.
+    {:else}
+      Selling everything now would bring in 💰{formatNumber(value)}.
+    {/if}
+  </p>
+  <svelte:fragment slot="footer">
+    <Btn variant="primary" disabled={!$DB.hasBank || marketRate <= 0} on:click={sell}>Sell all knowledge</Btn>
+  </svelte:fragment>
+</Modal>

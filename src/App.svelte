@@ -16,12 +16,11 @@
     showKnowledgeMenu,
     showCityHallMenu,
     showLabMenu,
-    showScoreboard,
     showAchievementPopup,
   } from "./lib/store";
   import GameEndMenu from "./lib/menus/GameEndMenu.svelte";
   import StartGameMenu from "./lib/menus/StartGameMenu.svelte";
-  import Scoreboard from "./lib/menus/Scoreboard.svelte";
+  import AchievementPopup from "./lib/menus/AchievementPopup.svelte";
   import KnowledgeMenu from "./lib/menus/KnowledgeMenu.svelte";
   import LabMenu from "./lib/menus/LabMenu.svelte";
   import Hud from "./lib/Hud.svelte";
@@ -102,7 +101,6 @@
     if ($showKnowledgeMenu) return ($showKnowledgeMenu = false);
     if ($showLabMenu) return ($showLabMenu = false);
     if ($showCityHallMenu) return ($showCityHallMenu = false);
-    if ($showScoreboard) return ($showScoreboard = false);
     // Map interactions: cancel the tool, then the target, then the inspector.
     if (key === "escape" && $tool.kind !== "none") {
       return tool.set({ kind: "none" });
@@ -140,7 +138,7 @@
     <Hud />
     <GameClock />
     <GameEndMenu />
-    <Scoreboard />
+    <AchievementPopup />
     <KnowledgeMenu />
     <LabMenu />
     <CityHallMenu />

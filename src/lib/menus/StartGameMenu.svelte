@@ -1,153 +1,121 @@
 <script lang="ts">
+  // New town: a name and a few settings.
   import { startGame, startGameMenu, userDB, paused } from "../store";
-  import { Button } from "$lib/components/ui/button";
-  import * as Dialog from "$lib/components/ui/dialog";
-  import { flyAndScale } from "$lib/utils";
-  import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
+  import Modal from "$lib/components/Modal.svelte";
+  import Btn from "$lib/components/Btn.svelte";
 
   paused.set(false);
 
-  function captureAndStart() {
-    const townName = (document.getElementById("townName") as HTMLInputElement)
-      .value;
+  let name = "";
+  let casual = true;
+  let tomPetty = false;
+  let bagOfHolding = false;
 
-    const checkboxes = ["devMode", "tomPetty", "casual", "bagOfHolding"];
-    const settings = checkboxes.filter(
-      (id) => (document.getElementById(id) as HTMLInputElement).checked,
-    );
+  const SETTINGS = [
+    { key: "casual", title: "Casual", about: "Faster and easier, with more of the game's workings explained. Recommended for a first town." },
+    { key: "tomPetty", title: "Tom Petty mode", about: "If happiness or health hits zero, lose half your gold and carry on. You won't back down." },
+    { key: "bagOfHolding", title: "Bag of Holding", about: "No storage limit; no need for stockpiles." },
+  ] as const;
+  $: values = { casual, tomPetty, bagOfHolding };
+  function toggle(key: (typeof SETTINGS)[number]["key"]) {
+    if (key === "casual") casual = !casual;
+    if (key === "tomPetty") tomPetty = !tomPetty;
+    if (key === "bagOfHolding") bagOfHolding = !bagOfHolding;
+  }
 
-    const dif = "1";
-    const eg = "free_play";
-
-    startGame(dif, eg, townName, settings);
+  function start() {
+    const settings = SETTINGS.filter((s) => values[s.key]).map((s) => s.key as string);
+    startGame("1", "free_play", name, settings);
   }
 
   function setUsername() {
-    const newName = prompt("Enter new username")?.trim();
-    if (newName) $userDB.username = newName;
-  }
-
-  function keyPressed(e: KeyboardEvent) {
-    if (e.key === "Enter") {
-      captureAndStart();
-    }
+    const next = prompt("Your player name")?.trim();
+    if (next) $userDB.username = next;
   }
 </script>
 
-<Dialog.Root
-  bind:open={$startGameMenu.visible}
-  onOutsideClick={(e) => e.preventDefault()}
->
-  <Dialog.Content
-    transition={flyAndScale}
-    class="bg-sidebarBackground text-sidebarText max-w-xl rounded-md shadow-xl border border-accent"
-  >
-    <Dialog.Title class="text-3xl font-semibold ">Welcome to Plots</Dialog.Title
+<Modal open={$startGameMenu.visible} title="Found a new town" dismissible={false} size="md">
+  <label class="flex flex-col gap-1">
+    <span class="label">Town name</span>
+    <!-- svelte-ignore a11y-autofocus -->
+    <input
+      class="field"
+      bind:value={name}
+      autofocus
+      placeholder="Leave blank for a random name"
+      on:keydown={(e) => e.key === "Enter" && start()}
+    />
+  </label>
+
+  <div class="flex flex-col gap-1.5">
+    <span class="label">Settings</span>
+    {#each SETTINGS as s}
+      <button class="setting" class:on={values[s.key]} on:click={() => toggle(s.key)}>
+        <span class="check">{values[s.key] ? "✓" : ""}</span>
+        <span class="flex flex-col text-left">
+          <span class="font-semibold">{s.title}</span>
+          <span class="text-xs opacity-70">{s.about}</span>
+        </span>
+      </button>
+    {/each}
+  </div>
+
+  <svelte:fragment slot="footer">
+    <a
+      href="https://github.com/josephrcox/plots#how-to-play"
+      target="_blank"
+      class="text-xs opacity-60 hover:opacity-100 mr-auto">How to play ↗</a
     >
-
-    <div>
-      <div class="pb-8 flex flex-col gap-2">
-        <Label for="townName" class="text-md font-bold">Your town name</Label>
-        <Input
-          id="townName"
-          autofocus
-          class="w-full p-2 ml-2 rounded-md border border-accent/20 bg-sidebarBackground text-sidebarText focus:ring-2 focus:ring-accent/50"
-          placeholder="Will be randomized if left blank"
-          on:keydown={(e) => {
-            keyPressed(e);
-          }}
-        />
-      </div>
-
-      <div class="pb-4">
-        <Label class="text-md font-bold pb-1 flex flex-col gap-2"
-          >Town settings</Label
-        >
-        <div class="hidden">
-          <input type="checkbox" id="devMode" />
-        </div>
-        <div class="flex flex-col gap-4 pl-2">
-          <div class="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="casual"
-              checked
-              class="mt-1 rounded border-accent/20"
-            />
-            <label for="casual" class="text-sm">
-              Casual game: Faster and easier overall while exposing more of the
-              game mechanics. Recommended for most games.
-            </label>
-          </div>
-          <div class="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="tomPetty"
-              class="mt-1 rounded border-accent/20"
-            />
-            <label for="tomPetty" class="text-sm">
-              The 'Tom Petty' mode: If your happiness or health reaches 0, you
-              lose 50% of your gold and continue the game. You won't back down.
-            </label>
-          </div>
-          <div class="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="bagOfHolding"
-              class="mt-1 rounded border-accent/20"
-            />
-            <label for="bagOfHolding" class="text-sm">
-              Bag of Holding: No resource cap or need to purchase stockpiles.
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-row justify-between">
-        <div class="flex flex-grow align-middle items-center text-start">
-          <a
-            href="https://github.com/josephrcox/plots#how-to-play"
-            class="text-accent hover:text-accent/80 text-sm italic opacity-65"
-            target="_blank"
-          >
-            GitHub / Learn how to play</a
-          >
-        </div>
-        <div class="flex flex-row align-middle items-center gap-2">
-          <span
-            class="text-xs text-sidebarText/50 hover:text-sidebarText cursor-pointer"
-            on:click={setUsername}
-          >
-            {$userDB.username}
-          </span>
-          <div class="space-x-2">
-            <Button
-              class="bg-accent hover:bg-accent/80 text-white"
-              on:click={captureAndStart}
-            >
-              Start game
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div></Dialog.Content
-  >
-</Dialog.Root>
+    <button class="text-xs opacity-60 hover:opacity-100" title="Change player name" on:click={setUsername}
+      >👤 {$userDB.username}</button
+    >
+    <Btn variant="primary" on:click={start}>Start town</Btn>
+  </svelte:fragment>
+</Modal>
 
 <style>
-  :global(.dialog-overlay) {
-    background-color: rgba(0, 0, 0, 0.5);
+  .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
   }
-
-  input[type="checkbox"] {
-    accent-color: rgb(168, 115, 75);
+  .field {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9px;
+    padding: 8px 10px;
+    color: white;
+    outline: none;
   }
-
-  :global(.text-sm) {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+  .field:focus {
+    border-color: rgb(168, 115, 75);
+  }
+  .setting {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .setting.on {
+    background: rgba(168, 115, 75, 0.22);
+  }
+  .check {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+  .setting.on .check {
+    background: rgb(168, 115, 75);
+    border-color: rgb(168, 115, 75);
   }
 </style>

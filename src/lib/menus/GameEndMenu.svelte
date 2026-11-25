@@ -1,12 +1,7 @@
 <script lang="ts">
-  import {
-    DB,
-    paused,
-    showAlert,
-    LOSS_GRACE_DAYS,
-  } from "../store";
-  import * as Dialog from "$lib/components/ui/dialog";
-  import { Button } from "$lib/components/ui/button";
+  import { DB, paused, showAlert, LOSS_GRACE_DAYS } from "../store";
+  import Modal from "$lib/components/Modal.svelte";
+  import Btn from "$lib/components/Btn.svelte";
   import { resetMapUi } from "../ui";
 
   $: show = $DB != null && $DB.endGameDetails.msg != "";
@@ -28,39 +23,23 @@
 </script>
 
 <!-- Only the buttons close this dialog. -->
-<Dialog.Root open={show} closeOnEscape={false} closeOnOutsideClick={false}>
-  <Dialog.Content class="bg-foregroundDark text-accentText">
-    <Dialog.Header>
-      <Dialog.Title>
-        {$DB.endGameDetails.win == true
-          ? "You won! 🎉"
-          : canContinue
-            ? "You lost! 😭"
-            : "Your town has fallen for good 🪦"}</Dialog.Title
-      >
-      <Dialog.Description>
-        <span class="text-gray-500 text-sm">{$DB.endGameDetails.msg}</span>
-        <br />
-        <br />
-        {#if canContinue}
-          <Button on:click={keepPlaying} class="bg-accent">Keep playin'</Button>
-        {:else}
-          <Button on:click={() => paused.set(true)} class="bg-accent"
-            >Start a new town</Button
-          >
-        {/if}
-      </Dialog.Description>
-    </Dialog.Header>
-
-    <Dialog.Footer>
-      <span class="text-gray-500 text-sm">
-        {#if canContinue}
-          You can only keep playing once per town. To start over, press P and
-          click "+ Build new town".
-        {:else}
-          Press P and click "+ Build new town" to start over.
-        {/if}
-      </span>
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
+<Modal
+  open={show}
+  dismissible={false}
+  size="sm"
+  icon={$DB.endGameDetails.win ? "🎉" : canContinue ? "😭" : "🪦"}
+  title={$DB.endGameDetails.win ? "You won!" : canContinue ? "Your town has fallen" : "Your town has fallen for good"}
+  subtitle={$DB.endGameDetails.msg}
+>
+  <p class="text-center text-xs opacity-60">
+    {canContinue ? "You can keep playing once per town." : "Start fresh from the pause menu."}
+  </p>
+  <svelte:fragment slot="footer">
+    {#if canContinue}
+      <Btn on:click={() => paused.set(true)}>New town…</Btn>
+      <Btn variant="primary" on:click={keepPlaying}>Keep playin'</Btn>
+    {:else}
+      <Btn variant="primary" on:click={() => paused.set(true)}>Start a new town</Btn>
+    {/if}
+  </svelte:fragment>
+</Modal>

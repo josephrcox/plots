@@ -1,11 +1,9 @@
 <script lang="ts">
+  // Pause: switch or manage towns, and see achievements.
   import {
     DB,
     paused,
     userDB,
-    showCompletedAchievements,
-    pauseMenuTab,
-    showAchievementPopup,
     showAlert,
     isReadOnly,
     setSelectedGame,
@@ -13,120 +11,18 @@
     leaveToNewTown,
     loadGameFromFile,
   } from "../store";
-  import * as Dialog from "$lib/components/ui/dialog";
   import { achievements } from "$lib/objects/AchievementList";
-  import * as AlertDialog from "$lib/components/ui/alert-dialog";
-  import SimpleButton from "$lib/components/SimpleButton.svelte";
+  import Modal from "$lib/components/Modal.svelte";
+  import Btn from "$lib/components/Btn.svelte";
   import { createAMockTown, formatNumber } from "$lib/utils";
   // @ts-ignore
   import { compressMyGame } from "$lib/gameShare";
   import type { Game } from "$lib/types";
 
-  achievements.sort((a, b) => {
-    if (hasAchievement(a.id) && !hasAchievement(b.id)) return -1;
-    if (!hasAchievement(a.id) && hasAchievement(b.id)) return 1;
-    return 0;
-  });
+  let tab: "towns" | "achievements" = "towns";
+  let showCollected = false;
 
-  $: completedAchievements = $userDB
-    ? achievements.filter((a) => hasAchievement(a.id))
-    : [];
-
-  function getAchievementCompletionDayAndTown(id: string) {
-    const achievement = $userDB.achievements.find((a) => a[0] == id);
-    if (achievement == null) return 0;
-    return `${achievement[1]} in ${achievement[2]}.`;
-  }
-
-  function achievementPrizeCollected(id: string) {
-    const achievement = $userDB.achievements.find((a) => a[0] == id);
-    if (achievement == null) return false;
-    return achievement[3] != null;
-  }
-
-  function collectPrize(id: string) {
-    const achievement = $userDB.achievements.find((a) => a[0] == id);
-    const achievementObject = achievements.find((a) => a.id == id);
-    if (!achievement || !achievementObject || achievement[3] != null) return;
-    $DB!.townInfo.gold += achievementObject.prize;
-    $userDB.achievements = $userDB.achievements.map((a) =>
-      a[0] == id ? ([a[0], a[1], a[2], true] as typeof a) : a,
-    );
-  }
-
-  // Hide achievements whose prize has been collected, unless toggled on.
-  $: reactiveAchievements = $showCompletedAchievements
-    ? achievements
-    : achievements.filter(
-        (a) =>
-          $userDB &&
-          (!hasAchievement(a.id) || !achievementPrizeCollected(a.id)),
-      );
-
-  function saveGame() {
-    const data = JSON.stringify($DB);
-    const blob = new Blob([data], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${new Date().toISOString()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  function loadGame(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        if (!loadGameFromFile(JSON.parse(String(reader.result)))) {
-          showAlert("Invalid game file");
-        }
-      } catch {
-        showAlert("Invalid game file: could not read it.");
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  function hasAchievement(id: string) {
-    return $userDB.achievements.some((a) => a[0] == id);
-  }
-
-  export function toggleShowCompleted() {
-    showCompletedAchievements.update((value) => {
-      localStorage.setItem("showCompletedAchievements", String(!value));
-      return !value;
-    });
-  }
-
-  if (localStorage.getItem("pauseMenuTab") == null) {
-    localStorage.setItem("pauseMenuTab", "game");
-    pauseMenuTab.set("game");
-  }
-
-  function getLatestAchievementObject() {
-    const latestAchievement =
-      $userDB.achievements[$userDB.achievements.length - 1];
-    if (latestAchievement == null) return;
-    return achievements.find((a) => a.id == latestAchievement[0]);
-  }
-
-  function restartGame() {
-    $paused = false;
-    leaveToNewTown();
-  }
-
-  function deleteCurrentTown() {
-    const name = $DB?.townInfo.name ?? "this town";
-    if (!confirm(`Delete ${name}? This can't be undone.`)) return;
-    deleteGame($userDB.selectedGame);
-  }
-
-  // Summaries for the town switcher (games are stored as JSON strings).
+  // ---- Towns ----
   $: games = $userDB.games.map((json) => {
     try {
       return JSON.parse(json) as Game;
@@ -134,209 +30,218 @@
       return null;
     }
   });
+
+  function newTown() {
+    $paused = false;
+    leaveToNewTown();
+  }
+
+  function saveGame() {
+    const blob = new Blob([JSON.stringify($DB)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${$DB?.townInfo.name ?? "town"} ${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function loadGame() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json,.json";
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      file.text().then((text) => {
+        try {
+          if (!loadGameFromFile(JSON.parse(text))) showAlert("That isn't a Plots town file.");
+        } catch {
+          showAlert("Couldn't read that file.");
+        }
+      });
+    };
+    input.click();
+  }
+
+  async function share() {
+    const url = compressMyGame();
+    try {
+      await navigator.clipboard.writeText(url);
+      showAlert("Share link copied to clipboard!");
+    } catch {
+      showAlert(`Copy this link to share your town:<br/><br/>${url}`);
+    }
+  }
+
+  function deleteTown() {
+    const name = $DB?.townInfo.name ?? "this town";
+    if (!confirm(`Delete ${name}? This can't be undone.`)) return;
+    deleteGame($userDB.selectedGame);
+  }
+
+  // ---- Achievements ----
+  type Entry = [string, number, string, boolean?]; // id, day, town, collected
+  $: earned = new Map<string, Entry>(($userDB.achievements as Entry[]).map((a) => [a[0], a]));
+  $: doneCount = achievements.filter((a) => earned.has(a.id)).length;
+  // Ready to collect first, then not yet earned, then collected.
+  $: list = [...achievements]
+    .map((a) => {
+      const e = earned.get(a.id);
+      const state = !e ? "todo" : e[3] ? "collected" : "ready";
+      return { a, e, state };
+    })
+    .filter((x) => showCollected || x.state !== "collected")
+    .sort((x, y) => order(x.state) - order(y.state));
+  const order = (s: string) => (s === "ready" ? 0 : s === "todo" ? 1 : 2);
+
+  function collect(id: string) {
+    const a = achievements.find((x) => x.id === id);
+    const e = earned.get(id);
+    if (!a || !e || e[3] || !$DB) return;
+    $DB.townInfo.gold += a.prize;
+    $userDB.achievements = ($userDB.achievements as Entry[]).map((x) =>
+      x[0] === id ? ([x[0], x[1], x[2], true] as Entry) : x,
+    );
+  }
+
 </script>
 
-<Dialog.Root bind:open={$paused}>
-  <Dialog.Content
-    class="max-w-[75%] max-h-[100%] flex flex-col justify-between bg-popupBackground text-accentText overflow-scroll"
-  >
-    <Dialog.Header>
-      <Dialog.Title class="text-3xl font-semibold text-accentText"
-        >Pause</Dialog.Title
+<Modal open={$paused} title="Paused" size="lg" onClose={() => ($paused = false)}>
+  <div class="tabs" slot="header">
+    <button class:on={tab === "towns"} on:click={() => (tab = "towns")}>🏘️ Towns</button>
+    {#if !isReadOnly}
+      <button class:on={tab === "achievements"} on:click={() => (tab = "achievements")}
+        >🏆 Achievements <span class="opacity-60">{doneCount}/{achievements.length}</span></button
       >
-    </Dialog.Header>
-    <div class="flex flex-row w-full gap-10 justify-between">
-      <div class="flex flex-col flex-grow max-h-[80%] justify-between">
-        <div class="flex flex-col bg-accent rounded-md p-2 pt-3">
-          <div class="text-sm pb-2">Switch towns</div>
-          <ul class="flex flex-col gap-0">
-            {#each games as game, index}
-              {#if game}
-                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                <li
-                  class="text-sm rounded-sm p-2
-                 flex flex-col
-                 {index == $userDB.selectedGame
-                    ? 'bg-darkerAccent text-accentText cursor-not-allowed'
-                    : 'hover:bg-white hover:text-black cursor-pointer '}
-                "
-                  on:click={() => {
-                    if (index != $userDB.selectedGame) setSelectedGame(index);
-                  }}
-                >
-                  <span class="before:content-['🏠'] before:mr-2"
-                    >{game.townInfo.name}</span
-                  >
-                  <span class="text-xs opacity-70 font-mono"
-                    >{game.environment.day} days, {formatNumber(
-                      game.townInfo.gold,
-                      false,
-                    )} gold, {formatNumber(
-                      game.townInfo.population_count,
-                      false,
-                    )}
-                    population
-                  </span>
-                </li>
-              {/if}
-            {/each}
-          </ul>
-          <div class="flex flex-row justify-end pt-2">
-            <SimpleButton
-              styling="font-bold hover:brightness-110 hover:bg-sidebarBackground hover:text-black w-min"
-              text="+ Build new town"
-              onOpen={restartGame}
-            />
-          </div>
-        </div>
-        <div class="flex flex-row flex-wrap gap-3">
-          <SimpleButton
-            styling="bg-gray-500"
-            text="💾 Save town file"
-            onOpen={saveGame}
-          />
+    {/if}
+  </div>
 
-          <SimpleButton
-            text="📤 Load town file"
-            styling="bg-gray-500"
-            onOpen={() => {
-              const input = document.createElement("input");
-              input.type = "file";
-              input.accept = "application/json,.json";
-              input.onchange = loadGame;
-              input.click();
-            }}
-          />
-          <SimpleButton
-            text="📲 Share town"
-            styling="bg-gray-500"
-            onOpen={async () => {
-              const url = compressMyGame();
-              try {
-                await navigator.clipboard.writeText(url);
-                showAlert("Share link copied to clipboard!");
-              } catch {
-                showAlert(`Copy this link to share your town:<br/><br/>${url}`);
-              }
-            }}
-          />
-          <SimpleButton
-            text="❌ Delete current town"
-            styling="bg-red-800"
-            onOpen={deleteCurrentTown}
-          />
-          {#if $DB.gameSettings.includes("devMode")}
-            <SimpleButton
-              styling="bg-black opacity-50 w-min"
-              text="🔄 New mock town"
-              onOpen={createAMockTown}
-            />
+  {#if tab === "towns"}
+    <div class="flex flex-col gap-1.5">
+      {#each games as game, index}
+        {#if game}
+          <button
+            class="town"
+            class:current={index === $userDB.selectedGame}
+            disabled={index === $userDB.selectedGame}
+            on:click={() => setSelectedGame(index)}
+          >
+            <span class="font-semibold">🏠 {game.townInfo.name}</span>
+            <span class="text-xs opacity-65"
+              >Year {Math.floor(game.environment.day / 360) + 1} · 👥 {formatNumber(
+                game.townInfo.population_count,
+                false,
+              )} · 💰{formatNumber(game.townInfo.gold, false)}</span
+            >
+            {#if index === $userDB.selectedGame}<span class="tag">Playing</span>{/if}
+          </button>
+        {/if}
+      {/each}
+    </div>
+  {:else}
+    <div class="flex flex-row justify-between items-center">
+      <span class="opacity-70">Rewards go to the town you're playing.</span>
+      <label class="text-xs opacity-70 flex items-center gap-1.5 cursor-pointer">
+        <input type="checkbox" bind:checked={showCollected} /> Show collected
+      </label>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      {#each list as { a, e, state } (a.id)}
+        <div class="ach {state}">
+          <span class="text-2xl">{a.icon}</span>
+          <div class="flex-1 flex flex-col gap-0.5">
+            <span class="font-semibold">{a.title}</span>
+            <span class="text-xs opacity-75">{a.description}</span>
+            {#if e}
+              <span class="text-[11px] text-green-300">Earned on day {e[1]} in {e[2]}</span>
+            {/if}
+          </div>
+          {#if state === "ready"}
+            <Btn variant="gold" on:click={() => collect(a.id)}>Collect 💰{formatNumber(a.prize, false)}</Btn>
+          {:else if state === "todo"}
+            <span class="text-xs opacity-60">💰{formatNumber(a.prize, false)}</span>
+          {:else}
+            <span class="text-xs text-green-300">✓</span>
           {/if}
         </div>
-      </div>
-      <div class="flex flex-col gap-6 justify-between">
-        {#if !isReadOnly}
-          <div class="flex-grow">
-            <h4 class="underline underline-offset-4">
-              Achievements ({completedAchievements.length}
-              / {achievements.length})
-            </h4>
-            <span class="text-sm text-gray-400"
-              >Track your progress through towns & complete challenges! Rewards
-              for completing achievements can be applied to the current town.
-            </span>
-            <br />
-            <div class="overflow-scroll mt-2 h-[60vh]">
-              <div
-                class="flex flex-col gap-4 overflow-scroll pb-10 scroll-smooth"
-              >
-                {#each reactiveAchievements as achievement}
-                  <div
-                    class="flex flex-col gap-3 cursor-default rounded-xl
-						{hasAchievement(achievement.id)
-                      ? 'bg-green-700 text-accentText'
-                      : 'bg-gray-500 opacity-35'}
-						
-						"
-                  >
-                    <div class="flex-col flex px-3 py-2 gap-1">
-                      <div class="min-w-32 flex">
-                        <span class="flex flex-row w-[100%]">
-                          <div
-                            class="flex flex-row w-[100%] justify-between gap-6
+      {:else}
+        <span class="opacity-60">All rewards collected.</span>
+      {/each}
+    </div>
+  {/if}
 
-										"
-                          >
-                            <span class="font-semibold text-sm text-nowrap">
-                              {achievement.icon} {achievement.title}</span
-                            >
+  <svelte:fragment slot="footer">
+    {#if tab === "towns"}
+      {#if $DB?.gameSettings.includes("devMode")}
+        <Btn on:click={createAMockTown}>🔄 Mock town</Btn>
+      {/if}
+      <Btn on:click={saveGame}>💾 Save file</Btn>
+      <Btn on:click={loadGame}>📤 Load file</Btn>
+      <Btn on:click={share}>📲 Share</Btn>
+      <Btn variant="danger" on:click={deleteTown}>Delete town</Btn>
+      <Btn variant="primary" on:click={newTown}>+ New town</Btn>
+    {:else}
+      <Btn variant="primary" on:click={() => ($paused = false)}>Resume</Btn>
+    {/if}
+  </svelte:fragment>
+</Modal>
 
-                            <div
-                              class="font-thin opacity-75 text-xs text-wrap max-w-[50%]"
-                            >
-                              {achievement.requirements}
-                            </div>
-                          </div>
-                        </span>
-                      </div>
-                      <div class=" opacity-85 text-xs font-light">
-                        {achievement.description}
-                      </div>
-                      <div
-                        class="pb-2 {hasAchievement(achievement.id)
-                          ? ''
-                          : 'hidden'} text-xs text-green-400"
-                      >
-                        ✅ Completed on Day {getAchievementCompletionDayAndTown(
-                          achievement.id,
-                        )}
-                      </div>
-
-                      {#if hasAchievement(achievement.id) && !achievementPrizeCollected(achievement.id)}
-                        <SimpleButton
-                          text={`💰 Collect Prize: $${formatNumber(achievement.prize)} gold`}
-                          styling={"bg-yellow-300 text-black"}
-                          onOpen={() => collectPrize(achievement.id)}
-                        />
-                      {/if}
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div></Dialog.Content
-  >
-</Dialog.Root>
-
-<AlertDialog.Root open={$showAchievementPopup}>
-  <AlertDialog.Content>
-    <AlertDialog.Header>
-      <AlertDialog.Title class="text-center text-lg font-bold"
-        >{getLatestAchievementObject()?.title}</AlertDialog.Title
-      >
-      <AlertDialog.Description>
-        <div class="flex flex-row align-middle justify-evenly px-6 py-2">
-          <div class=" absolute top-4 left-4 text-5xl">
-            {getLatestAchievementObject()?.icon}
-          </div>
-          <div
-            class="pl-8 w-[80%] align-middle flex flex-col justify-center text-lg"
-          >
-            {getLatestAchievementObject()?.description}
-            {getLatestAchievementObject()?.requirements}
-          </div>
-        </div>
-      </AlertDialog.Description>
-    </AlertDialog.Header>
-    <AlertDialog.Footer>
-      <AlertDialog.Cancel
-        on:click={() => {
-          $showAchievementPopup = false;
-        }}>Close to collect prize</AlertDialog.Cancel
-      >
-    </AlertDialog.Footer>
-  </AlertDialog.Content>
-</AlertDialog.Root>
+<style>
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .tabs button {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 8px;
+    opacity: 0.65;
+  }
+  .tabs button.on {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+  }
+  .town {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .town:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .town.current {
+    background: rgba(168, 115, 75, 0.25);
+    cursor: default;
+  }
+  .tag {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: rgba(168, 115, 75, 0.8);
+  }
+  .ach {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .ach.todo {
+    opacity: 0.55;
+  }
+  .ach.ready {
+    background: rgba(250, 204, 21, 0.12);
+  }
+</style>
