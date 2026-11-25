@@ -19,11 +19,12 @@
   } from "./simulation";
   import Slider from "./components/ui/slider/slider.svelte";
   import { Vibe } from "./types";
+  import { taxMood } from "./tax";
 
   $: hasLab = hasPlotOfType("lab", $DB!).length >= 1;
   $: hasCityHall = hasPlotOfType("city_hall", $DB!).length >= 1;
-  $: taxTooHigh =
-    $DB!.economyAndLaws.tax_rate > $DB!.economyAndLaws.max_tax_rate;
+  // Recomputed whenever the game state or the slider changes.
+  $: tax = taxMood($DB!);
   $: productivity = $DB!.townInfo.productivity;
   $: output = productivityResourceMultiplier(productivity);
   $: mood = productivityHappinessMultiplier(productivity);
@@ -111,13 +112,17 @@
         disabled={isReadOnly}
         class="cursor-pointer"
       />
-      <span class="text-[11px]" class:text-red-300={taxTooHigh} class:opacity-70={!taxTooHigh}>
-        {taxTooHigh
-          ? "Too high: people are unhappy about taxes"
-          : "People accept this rate"} · 💰{formatAmount(
-          $DB.economyAndLaws.weeklyProfit,
-        )}/wk
+      <span
+        class="text-[11px]"
+        class:text-red-300={tax.level === "bad"}
+        class:text-amber-200={tax.level === "high"}
+        class:text-green-300={tax.level === "low"}
+        class:opacity-70={tax.level === "ok"}
+        title={tax.hint}
+      >
+        {tax.word}: {tax.hint.toLowerCase()}
       </span>
+      <span class="text-[11px] opacity-70">💰{formatAmount($DB.economyAndLaws.weeklyProfit)}/wk income</span>
     </div>
 
     <!-- Productivity -->

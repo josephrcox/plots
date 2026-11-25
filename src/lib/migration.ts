@@ -4,6 +4,7 @@
 
 import type { Game, Plot } from "./types";
 import { options } from "./objects/PlotTypeOptions";
+import { taxMood } from "./tax";
 
 /** Share of empty spaces filled per week at normal attractiveness. */
 export const BASE_MOVE_IN_RATE = 0.2;
@@ -44,6 +45,10 @@ export function attraction(z: Game): { factor: number; reasons: Reason[] } {
     factor *= 0.8;
     reasons.push({ text: "Few jobs for newcomers", good: false });
   }
+  const tax = taxMood(z);
+  if (tax.moveIn > 1.05) reasons.push({ text: "Low taxes", good: true });
+  else if (tax.moveIn < 0.95) reasons.push({ text: "High taxes put people off", good: false });
+  factor *= tax.moveIn;
   if (z.wellFed) {
     factor *= 1.1;
     reasons.push({ text: "Plenty of food", good: true });

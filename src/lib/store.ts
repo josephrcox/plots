@@ -8,7 +8,7 @@ import {
   type Plot,
   Events,
 } from "./types";
-import { max_tax_rates_based_on_difficulty } from "./objects/difficulty.js";
+import { rollBaseTolerance } from "./tax";
 import { options } from "./objects/PlotTypeOptions";
 import { analyticsEvent } from "./utils";
 import { CustomAlerts } from "./objects/CustomAlerts";
@@ -340,9 +340,7 @@ export function startGame(
     gameSettings.push("devMode");
   }
   json.gameSettings = gameSettings;
-  json.economyAndLaws.max_tax_rate =
-    (max_tax_rates_based_on_difficulty as Record<string, number>)[difficulty] ??
-    max_tax_rates_based_on_difficulty[2];
+  json.economyAndLaws.max_tax_rate = rollBaseTolerance(parseInt(difficulty));
   json.endGoal = endGoal;
   // Remove symbols other than numbers and letters.
   townName = townName.replace(/[^a-zA-Z0-9 ]/g, "").trim();

@@ -3,6 +3,7 @@
 import { get } from "svelte/store";
 import { DB, createDefaultGame, generatePlots, disabledPlotMenu, clearPlot, userDB } from "../src/lib/store";
 import { simulateDay } from "../src/lib/simulation";
+import { rollBaseTolerance } from "../src/lib/tax";
 import { placePlot, isAdjacentToWater } from "../src/lib/utils";
 import { availability, placementCheck } from "../src/lib/ui";
 import { options } from "../src/lib/objects/PlotTypeOptions";
@@ -22,8 +23,7 @@ export function newTown(mapSeed: number, difficulty = 1): Game {
   g.endGoal = "free_play" as any;
   g.gameSettings = [];
   g.townInfo.name = "Sim";
-  // Same range as difficulty.js, but drawn per map.
-  g.economyAndLaws.max_tax_rate = 0.2 + Math.random() * 0.2;
+  g.economyAndLaws.max_tax_rate = rollBaseTolerance(difficulty);
   g.plots = generatePlots({ 0: 8, 1: 12, 2: 16, 3: 16 }[difficulty] ?? 12);
   return g;
 }

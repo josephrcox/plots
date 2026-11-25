@@ -100,7 +100,7 @@ export type Game = {
   };
   economyAndLaws: {
     tax_rate: number; // current tax rate set by user.
-    max_tax_rate: number; // the max the town is willing to pay, random each game between 0.2 and 0.6.
+    max_tax_rate: number; // base tax tolerance; see taxTolerance() in tax.ts.
     weeklyProfit: number;
     knowledge_gold_market_rates: number[];
     enacted: string[];

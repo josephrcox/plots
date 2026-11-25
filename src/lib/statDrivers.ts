@@ -3,6 +3,7 @@
 // the rules in simulation.ts so the panel can say *why*, not just *what*.
 
 import type { Game } from "./types";
+import { taxMood } from "./tax";
 import { hasPlotOfType } from "./store";
 import { townNeighbourhoodDelta } from "./neighbours";
 import { FOOD_PER_PERSON, WELL_FED_WEEKS } from "./simulation";
@@ -71,8 +72,11 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   const { total, recreation } = builtCounts(z);
 
   const happiness: Line[] = [];
-  if (z.economyAndLaws.tax_rate > z.economyAndLaws.max_tax_rate) {
-    happiness.push({ text: "Taxes are higher than people accept", good: false });
+  const tax = taxMood(z);
+  if (tax.level === "high" || tax.level === "bad") {
+    happiness.push({ text: `Taxes: ${tax.word.toLowerCase()}`, good: false });
+  } else if (tax.level === "low") {
+    happiness.push({ text: "Low taxes", good: true });
   }
   if (foodShort) happiness.push({ text: "Not enough food", good: false });
   if (z.resources.power < 0) {

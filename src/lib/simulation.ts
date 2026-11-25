@@ -31,6 +31,7 @@ import { isAdjacentToWater, randomizeNumber, roundTo } from "./utils";
 import { synergyAt, townNeighbourhoodDelta } from "./neighbours";
 import { weeklyArrivals } from "./migration";
 import { laws } from "./objects/Laws";
+import { taxMood, taxTolerance } from "./tax";
 import { type Game, type Plot, type PlotOption, Vibe } from "./types";
 import { townPeopleNames, townPeopleJobsHobbies } from "./objects/townPeople";
 
@@ -540,23 +541,12 @@ function checkForAchievements(z: Game) {
 // ---------------------------------------------------------------------------
 
 function taxRateEffects(z: Game) {
-  const { tax_rate, max_tax_rate } = z.economyAndLaws;
-  if (tax_rate <= max_tax_rate || z.townInfo.population_count <= 0) return z;
-
-  // With a bank, the town tolerates twice as much before it gets very upset.
-  const bankModifier = z.hasBank ? 2 : 1;
-  const lenientChance = z.difficulty == 0 ? 0.7 : z.difficulty == 1 ? 0.4 : 0.2; // higher == more lenient
-  const taxPercent = ` (${roundTo(tax_rate * 100, 0)}%)`;
-
-  if (
-    Math.random() < lenientChance &&
-    tax_rate > max_tax_rate * 2 * bankModifier
-  ) {
-    z.modifiers.happiness -= 0.02;
-    z = addToTownLog(messages.very_high_tax_rate + taxPercent, z, Vibe.BAD);
-  } else {
-    z.modifiers.happiness -= 0.01;
-    z = addToTownLog(messages.high_tax_rate + taxPercent, z, Vibe.BAD);
+  if (z.townInfo.population_count <= 0) return z;
+  const mood = taxMood(z);
+  z.townInfo.happiness += mood.happiness;
+  removeFromTownLog(z, "TAXES:");
+  if (mood.level === "bad") {
+    z = addToTownLog(`TAXES: ${mood.word}. ${mood.hint}.`, z, Vibe.BAD);
   }
   return z;
 }
@@ -892,7 +882,8 @@ function mineEffects(z: Game) {
 
 function getRandomTip(z: Game) {
   const info = z.townInfo;
-  const { tax_rate, max_tax_rate } = z.economyAndLaws;
+  const tax_rate = z.economyAndLaws.tax_rate;
+  const max_tax_rate = taxTolerance(z);
   const tips = [
     () =>
       info.happiness < 100

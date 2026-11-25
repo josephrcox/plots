@@ -1,4 +1,5 @@
 import type { Achievement, Game } from "$lib/types";
+import { taxTolerance } from "../tax";
 import { hasPlotOfType } from "$lib/store";
 
 export const achievements: Achievement[] = [
@@ -101,9 +102,8 @@ export const achievements: Achievement[] = [
     requirements: "",
     icon: "🙃",
     check: (z: Game) => {
-      // cleanMax is taking the max tax rate and
-      // rounding down to the nearest 0.05 multiple.
-      let cleanMax = Math.floor(z.economyAndLaws.max_tax_rate * 20) / 20;
+      // The highest 5% step the town currently accepts.
+      const cleanMax = Math.floor(taxTolerance(z) * 20) / 20;
       return z.economyAndLaws.tax_rate === cleanMax;
     },
     prize: 75,

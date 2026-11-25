@@ -52,7 +52,7 @@ export const default_db: Game = {
   },
   economyAndLaws: {
     tax_rate: 0.1,
-    max_tax_rate: 1,
+    max_tax_rate: 0.25,
     weeklyProfit: 0,
     knowledge_gold_market_rates: [],
     enacted: [],
