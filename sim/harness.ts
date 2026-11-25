@@ -130,6 +130,6 @@ export function build(g: Game, id: string, smart: TileMode = true): boolean {
 /** Score used for comparing outcomes. Dead towns score far below living ones. */
 export function value(g: Game): number {
   const i = g.townInfo;
-  const v = i.population_count + 0.02 * Math.max(0, i.gold) + 0.05 * Math.min(i.happiness, 300) + 0.05 * Math.min(i.health, 300);
+  const v = i.population_count + 0.005 * Math.max(0, i.gold) + 0.05 * Math.min(i.happiness, 300) + 0.05 * Math.min(i.health, 300);
   return alive(g) ? v : v - 1000;
 }

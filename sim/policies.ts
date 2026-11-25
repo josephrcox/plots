@@ -49,11 +49,12 @@ export function decide(g: Game, s: Style): string | null {
     if (can.includes("small_homes")) return "small_homes";
     return null; // save up for homes
   }
-  if (g.resource_rate.food < 0.1 * need || g.resources.food < need * 3) {
+  // Food spoils, so the rate hovers near zero; judge by weeks of food in store.
+  if (g.resources.food < need * 4) {
     const f = can.filter((c) => FOOD.includes(c)).sort((a, b) => worth(b, s) - worth(a, s))[0];
     if (f) return f;
   }
-  if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || g.resource_rate.wood < 0.3) {
+  if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || g.resource_rate.wood < 1 || g.resources.wood < 40) {
     if (can.includes("tree_farm")) return "tree_farm";
   }
   if (i.happiness < 120) { const a = cheapest(g, AMEN_HAPPY, can); if (a) return a; }
@@ -68,7 +69,9 @@ export function decide(g: Game, s: Style): string | null {
     // Homes need stone and only a quarry makes it: save up for one.
     return can.includes("quarry") ? "quarry" : null;
   }
-  const best = can.filter((c) => c !== "small_homes" && c !== "large_homes").sort((a, b) => worth(b, s) - worth(a, s))[0];
+  // Enough food in store: don't keep adding farms.
+  const fed = g.resources.food >= need * 8;
+  const best = can.filter((c) => c !== "small_homes" && c !== "large_homes" && !(fed && FOOD.includes(c))).sort((a, b) => worth(b, s) - worth(a, s))[0];
   // Keep a little gold back unless it's a strong buy.
   return best ?? null;
 }

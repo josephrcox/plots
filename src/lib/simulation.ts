@@ -52,6 +52,8 @@ const WELL_FED_BONUS = 0.5;
 // slog.
 const PROFIT_BOOST = { casual: 3, normal: 1.25 };
 const VILLAGE_INN_SHOP_BOOST = 1.2;
+/** Weekly wage tax per employed person at a 100% rate (scaled by tax rate). */
+const WAGE_TAX_BASE = 0.4;
 const RESOURCE_BOOST = { casual: 1.5, normal: 1.1 };
 const POWER_SHORTAGE_MSG =
   "🔋 POWER SHORTAGE. HAPPINESS DROPPING THROUGH BLACKOUTS.";
@@ -315,6 +317,13 @@ function getProfit(
   );
 }
 
+/** Weekly tax paid by employed townspeople. */
+export function residentTax(z: Game): number {
+  if (z.economyAndLaws.enacted.includes("tax_free")) return 0;
+  const boost = z.gameSettings.includes("casual") ? PROFIT_BOOST.casual : PROFIT_BOOST.normal;
+  return z.townInfo.employees * WAGE_TAX_BASE * z.economyAndLaws.tax_rate * boost;
+}
+
 function calculateProfits(z: Game) {
   z.economyAndLaws.weeklyProfit = 0;
   const villageInnCount = hasPlotOfType("village_inn", z).length;
@@ -333,6 +342,10 @@ function calculateProfits(z: Game) {
     z.townInfo.gold += profit;
     z.economyAndLaws.weeklyProfit += profit * 7;
   });
+  // Working townspeople pay tax on their wages.
+  const residents = residentTax(z) / 7;
+  z.townInfo.gold += residents;
+  z.economyAndLaws.weeklyProfit += residents * 7;
   return z;
 }
 
@@ -419,7 +432,7 @@ function adjustForStockpile(z: Game) {
   }
   const stockpiles = hasPlotOfType("stockpile", z).length;
   const advStockpiles = hasPlotOfType("adv_stockpile", z).length;
-  const capacity = 100 + stockpiles * 200 + advStockpiles * 1200;
+  const capacity = 200 + stockpiles * 300 + advStockpiles * 1200;
   z.resource_capacity = capacity;
 
   for (const key of Object.keys(z.resources) as (keyof Game["resources"])[]) {

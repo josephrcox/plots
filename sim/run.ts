@@ -19,7 +19,7 @@ import { availableParallelism } from "node:os";
 const MAPS = +(process.argv[2] ?? 30);
 const YEARS = +(process.argv[3] ?? 3);
 const WEEKS = Math.round((YEARS * 360) / 7);
-const H = +(process.env.H ?? 12); // lookahead weeks
+const H = +(process.env.H ?? 20); // lookahead weeks
 const TAXES = [0.1, 0.2, 0.3, 0.4, 0.5];
 const NEAR = 0.03; // "near-best" = within 3% of the best option's value
 

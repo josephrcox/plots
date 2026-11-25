@@ -8,7 +8,7 @@ export const default_db: Game = {
   townLog: [],
   currentTutorialStep: 0,
   gameSettings: [],
-  resource_capacity: 100,
+  resource_capacity: 200,
   amountScale: 10,
   townInfo: {
     name: "Your town",

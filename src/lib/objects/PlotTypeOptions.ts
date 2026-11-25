@@ -120,7 +120,7 @@ export const options: PlotOption[] = [
     active_costs: {
       gold: 0,
       power: 0,
-      wood: 4,
+      wood: 0.6,
       stone: 0,
       metal: 0,
       bureaucracy: 0,
@@ -196,7 +196,7 @@ export const options: PlotOption[] = [
       "Your presence on the farm is encouraging the farmers to work harder!",
     weekly_effect_modifiers: {
       happiness: 1.0,
-      health: 1.002,
+      health: 1.0,
       community: 1.0,
     },
   },
@@ -207,7 +207,7 @@ export const options: PlotOption[] = [
     title: "Tree Farm",
     type: "lumber",
     description: "Produces some wood",
-    revenue_per_week: 0.8,
+    revenue_per_week: 0.5,
     requirements: {
       gold: 30,
       plots: [],
@@ -244,7 +244,7 @@ export const options: PlotOption[] = [
     knowledge_points_per_month: 0,
     generated_resources: {
       food: 0,
-      wood: 1,
+      wood: 2.5,
       stone: 0,
       metal: 0,
       power: 0,
@@ -277,7 +277,7 @@ export const options: PlotOption[] = [
       "Produces stone, small amounts of metal. Isn't great for health, especially for homes right next to it.",
     revenue_per_week: 0,
     requirements: {
-      gold: 200,
+      gold: 60,
       plots: [],
       employees: 6,
       knowledge: 0,
@@ -410,7 +410,7 @@ export const options: PlotOption[] = [
     type: "farm",
     description:
       "Makes more money and food than a regular farm, but doesn't bonus from water.",
-    revenue_per_week: 6,
+    revenue_per_week: 3,
     requirements: {
       gold: 60,
       plots: [],
@@ -445,7 +445,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 1.4,
+      food: 1.6,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -611,7 +611,7 @@ export const options: PlotOption[] = [
     type: "business",
     description:
       "Converts food into some extra cash. Make sure you have enough food.",
-    revenue_per_week: 8,
+    revenue_per_week: 16,
     requirements: {
       gold: 180,
       plots: [],
@@ -677,7 +677,7 @@ export const options: PlotOption[] = [
     title: "Stables",
     type: "recreation",
     description: "Improves the health of the town and provides recreation.",
-    revenue_per_week: 2.4,
+    revenue_per_week: 5,
     requirements: {
       gold: 170,
       plots: [],
@@ -811,7 +811,7 @@ export const options: PlotOption[] = [
     type: "recreation",
     description:
       "Generates knowledge, happiness, community. Isn't great for health.",
-    revenue_per_week: 10,
+    revenue_per_week: 16,
     knowledge_points_per_month: 0.5,
     requirements: {
       gold: 200,
@@ -878,7 +878,7 @@ export const options: PlotOption[] = [
     type: "shop",
     description:
       "Turns food into money. Sells goods and employs many. Makes significantly more money from tourism if you have a Village Inn.",
-    revenue_per_week: 15,
+    revenue_per_week: 45,
     requirements: {
       gold: 600,
       plots: [],
@@ -924,12 +924,12 @@ export const options: PlotOption[] = [
     level: 2,
     active_costs: {
       gold: 0,
-      power: 1.5,
-      wood: 3.5,
+      power: 0,
+      wood: 1,
       stone: 0,
       metal: 0,
       bureaucracy: 0,
-      food: 3.5,
+      food: 1.5,
     },
     liege_on_plot_hint: "Your presence is helping the market make more money.",
     weekly_effect_modifiers: {
@@ -945,7 +945,7 @@ export const options: PlotOption[] = [
     type: "business",
     description:
       "Requires metal but generates a lot of food. Must be near water.",
-    revenue_per_week: 3.5,
+    revenue_per_week: 6,
     requirements: {
       gold: 750,
       plots: [],
@@ -1013,7 +1013,7 @@ export const options: PlotOption[] = [
     type: "recreation",
     description:
       "Makes fair money, lowers health. Generates knowledge too similar to a pub.",
-    revenue_per_week: 6,
+    revenue_per_week: 12,
     requirements: {
       gold: 180,
       plots: [],
@@ -1349,7 +1349,7 @@ export const options: PlotOption[] = [
     type: "tourism",
     description:
       "Each inn brings more visitors to your town: +20% profit for the Market and other stores. Stacks with every inn.",
-    revenue_per_week: 4,
+    revenue_per_week: 30,
     requirements: {
       gold: 1200,
       plots: [],
@@ -1550,7 +1550,7 @@ export const options: PlotOption[] = [
     type: "business",
     description:
       "Converts metal into tools for money. Make sure you have enough metal!",
-    revenue_per_week: 15,
+    revenue_per_week: 60,
     requirements: {
       gold: 1800,
       plots: [],
@@ -1561,8 +1561,8 @@ export const options: PlotOption[] = [
       resources: {
         food: 0,
         wood: 25,
-        stone: 1000,
-        metal: 100,
+        stone: 300,
+        metal: 40,
         power: 0,
         bureaucracy: 0,
       },
@@ -1817,7 +1817,7 @@ export const options: PlotOption[] = [
     type: "shop",
     description:
       "Makes the most money of any plot, requires power. Makes significantly more from tourism if you have a Village Inn.",
-    revenue_per_week: 75,
+    revenue_per_week: 110,
     requirements: {
       gold: 2750,
       plots: [],
@@ -1827,8 +1827,8 @@ export const options: PlotOption[] = [
       xp: 0,
       resources: {
         food: 0,
-        wood: 3000,
-        stone: 500,
+        wood: 400,
+        stone: 200,
         metal: 0,
         power: 0,
         bureaucracy: 0,
@@ -1863,12 +1863,12 @@ export const options: PlotOption[] = [
     level: 4,
     active_costs: {
       gold: 0,
-      power: 16,
+      power: 6,
       wood: 0,
       stone: 0,
       metal: 0,
       bureaucracy: 0,
-      food: 10,
+      food: 4,
     },
     liege_on_plot_hint:
       "Your experience managing towns is increasing the profits at the general store!",
