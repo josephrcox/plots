@@ -61,7 +61,7 @@
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
   import { siteOf, allowedTitles } from "./sites";
-  import { isFogged, showsFog } from "./fog";
+  import { isFogged, showsFog, fogBackground } from "./fog";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -290,8 +290,55 @@
   // Camera
   // ---------------------------------------------------------------------------
 
+  // The part of the world worth looking at: explored land (all land without
+  // fog). Zooming out and panning stay within reach of it, so the camera
+  // can't drift off into endless fog; the limit loosens as the town grows.
+  const VIEW_MARGIN = 3 * COL_STEP;
+  $: known = (() => {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const row of $DB?.plots ?? []) {
+      for (const p of row) {
+        if (p.offMap || ($DB!.fog && !p.seen)) continue;
+        minX = Math.min(minX, tileLeft(p.x, p.y));
+        maxX = Math.max(maxX, tileLeft(p.x, p.y) + TILE_W);
+        minY = Math.min(minY, tileTop(p.x));
+        maxY = Math.max(maxY, tileTop(p.x) + TILE_H);
+      }
+    }
+    if (minX === Infinity) return null;
+    return { minX: minX - VIEW_MARGIN, maxX: maxX + VIEW_MARGIN, minY: minY - VIEW_MARGIN, maxY: maxY + VIEW_MARGIN };
+  })();
+  $: minZoom = (() => {
+    if (!known || typeof window === "undefined") return MIN_ZOOM;
+    const view = visibleRect();
+    const fit = Math.min(view.width / (known.maxX - known.minX), view.height / (known.maxY - known.minY));
+    return Math.max(MIN_ZOOM, Math.min(1, fit));
+  })();
+
   function clampZoom(z: number) {
-    return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
+    return Math.min(MAX_ZOOM, Math.max(minZoom, z));
+  }
+
+  /** Keeps some of the known area on screen. */
+  function clampCam(c: typeof cam) {
+    if (!known) return c;
+    const view = visibleRect();
+    const keep = 120; // px of the known area that must stay visible
+    const left = known.minX * c.zoom + c.x;
+    const right = known.maxX * c.zoom + c.x;
+    const top = known.minY * c.zoom + c.y;
+    const bottom = known.maxY * c.zoom + c.y;
+    let { x, y } = c;
+    if (right < view.left + keep) x += view.left + keep - right;
+    if (left > view.left + view.width - keep) x -= left - (view.left + view.width - keep);
+    if (bottom < view.top + keep) y += view.top + keep - bottom;
+    if (top > view.top + view.height - keep) y -= top - (view.top + view.height - keep);
+    return x === c.x && y === c.y ? c : { ...c, x, y };
+  }
+  $: if (cam && known) {
+    const zoom = clampZoom(cam.zoom);
+    const next = clampCam(zoom === cam.zoom ? cam : { ...cam, zoom });
+    if (next !== cam) cam = next;
   }
 
   function zoomAt(factor: number, sx: number, sy: number) {
@@ -544,6 +591,7 @@
   <div
     bind:this={viewport}
     class="fixed inset-0 overflow-hidden touch-none select-none"
+    style={$DB.fog ? fogBackground(cam) : ""}
     class:cursor-grabbing={dragged && dragStart}
     on:click={handleClick}
     on:contextmenu={handleContextMenu}
@@ -559,7 +607,7 @@
     >
       {#each $DB.plots as row, x}
         {#each row as plot, y (plot.id)}
-          {#if !plot.offMap || showsFog($DB, plot)}
+          {#if !plot.offMap || $DB.fog}
           <Plot
             data={plot}
             buildable={buildable[x]?.[y] ?? false}
@@ -586,6 +634,7 @@
         {/each}
       {/each}
 
+      {#if !$DB.fog || $DB.hasCityHall}
       <div
         class="absolute"
         style="left:{worldW + 30}px; top:{worldH / 2 - 60}px;"
@@ -600,6 +649,7 @@
       >
         <ExpandButton direction="south" />
       </div>
+      {/if}
     </div>
   </div>
 

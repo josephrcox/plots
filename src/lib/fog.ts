@@ -8,6 +8,23 @@ import { siteOf } from "./sites";
 import { suggestedStart } from "./utils";
 import { Vibe, type Game, type Plot } from "./types";
 
+/** The colour of unexplored land (the whole map background when fog is on). */
+export const FOG_COLOR = "rgb(188, 196, 206)";
+
+/**
+ * Soft cloud puffs drawn over the fog: one background on the map, moved and
+ * scaled with the camera (cheap: no per-tile effects).
+ */
+export function fogBackground(cam: { x: number; y: number; zoom: number }): string {
+  const size = 420 * cam.zoom;
+  return [
+    `background-color:${FOG_COLOR}`,
+    "background-image:radial-gradient(ellipse 38% 26% at 30% 35%, rgba(255,255,255,0.55), rgba(255,255,255,0) 70%), radial-gradient(ellipse 30% 22% at 75% 70%, rgba(255,255,255,0.45), rgba(255,255,255,0) 70%), radial-gradient(ellipse 22% 16% at 80% 20%, rgba(255,255,255,0.35), rgba(255,255,255,0) 70%)",
+    `background-size:${size}px ${size}px`,
+    `background-position:${cam.x}px ${cam.y}px`,
+  ].join(";");
+}
+
 /** Tiles revealed around a new building. */
 export const REVEAL_RADIUS = 2;
 /** Tiles revealed around the suggested start of a new town. */

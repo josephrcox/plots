@@ -53,8 +53,10 @@
   $: mineral = data.site === "mineral";
   $: usedSite = siteFor(data);
   $: fill = fogged
-    ? "rgb(120, 128, 140)"
-    : data.water
+    ? "transparent"
+    : data.offMap
+      ? "rgb(104, 80, 56)" // explored edge of the land
+      : data.water
     ? "rgb(64, 140, 170)"
     : tint && !option && !mineral
       ? "rgb(205, 200, 185)" // neutral under an overlay, so the tint reads
@@ -96,7 +98,7 @@
     style="background-color:{fill};"
   >
     {#if fogged}
-      {#if (data.x * 7 + data.y * 3) % 6 === 0}<span class="cloud">☁️</span>{/if}
+      <!-- nothing shows through fog -->
     {:else if state === "ghost"}
       <span class="emoji opacity-70">{ghostEmoji}</span>
     {:else if option}
@@ -245,24 +247,17 @@
     padding: 0 3px;
     font-size: 0.7rem;
   }
-  /* Fog: tiles grow to overlap and blur into one soft blanket, so neither
-     the grid nor the land's outline shows through. */
+  /* Fog: a solid dark sheet. Each unexplored cell is a plain square, a bit
+     larger than its tile so neighbours overlap with no gaps; no filters or
+     gradients, so it stays cheap to draw. */
   .plot_container.fogbank {
     clip-path: none;
-    transform: scale(1.35);
+    transform: scale(1.25);
     z-index: 0;
-    pointer-events: auto;
+    background: transparent !important;
   }
   .inner.fog {
-    clip-path: none;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgb(196, 200, 206) 0%, rgb(170, 176, 186) 55%, rgba(170, 176, 186, 0) 72%) !important;
-    filter: blur(4px);
-  }
-  .cloud {
-    font-size: 1.3rem;
-    opacity: 0.35;
-    filter: blur(1px);
+    display: none;
   }
   .site-title {
     font-size: 0.62rem;
