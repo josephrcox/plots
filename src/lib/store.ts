@@ -339,11 +339,13 @@ export function generatePlots(size: number): Plot[][] {
   return grid.map((row, i) => row.map((cell, j) => plotFromCell(i, j, cell)));
 }
 
-const GRID_SIZE_BY_DIFFICULTY: Record<Difficulty, number> = {
-  "0": 8,
-  "1": 12,
-  "2": 16,
-  "3": 16,
+// Twice the land of the original sizes (×√2 per side): fog of war makes a
+// bigger first map worth exploring before you ever expand.
+export const GRID_SIZE_BY_DIFFICULTY: Record<Difficulty, number> = {
+  "0": 11,
+  "1": 17,
+  "2": 23,
+  "3": 23,
 };
 
 export function startGame(
