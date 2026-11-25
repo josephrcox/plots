@@ -1,4 +1,4 @@
-// Fog of war (#62). Land more than a few tiles from anything you've built is
+// Fog of war (#62). Land more than 2 tiles from anything you've built is
 // unexplored: you can't see its terrain or special sites, and can't build on
 // it. Building reveals the land around it, for good. The start is always in
 // view, and land gained by expanding is revealed straight away.
@@ -9,9 +9,9 @@ import { suggestedStart } from "./utils";
 import { Vibe, type Game, type Plot } from "./types";
 
 /** Tiles revealed around a new building. */
-export const REVEAL_RADIUS = 3;
+export const REVEAL_RADIUS = 2;
 /** Tiles revealed around the suggested start of a new town. */
-export const START_RADIUS = 4;
+export const START_RADIUS = 2;
 
 export function isFogged(z: Game, plot: Plot | undefined): boolean {
   return !!z.fog && !!plot && !plot.offMap && !plot.seen;
