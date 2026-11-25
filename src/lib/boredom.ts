@@ -9,6 +9,7 @@
 
 import { options } from "./objects/PlotTypeOptions";
 import type { Game, PlotOption } from "./types";
+import { restlessShare } from "./people";
 
 /** Boredom added per week at the first needs tier; more as the town grows. */
 const WEEKLY_GROWTH = 1.0;
@@ -30,6 +31,7 @@ export const NOVELTY = {
   homeLevelUp: 1, // homes grow on their own, so it counts for little
   tier: 20,
   law: 8,
+  request: 10,
   expansion: 30,
 };
 
@@ -80,7 +82,8 @@ function started(z: Game) {
 export function updateBoredom(z: Game): number {
   if (!started(z)) return 0;
   const casual = z.gameSettings.includes("casual") ? CASUAL_FACTOR : 1;
-  const growth = WEEKLY_GROWTH * (1 + GROWTH_PER_TIER * (z.needsTier ?? 0)) * casual;
+  // Restless townspeople (#65) make the town bore faster.
+  const growth = WEEKLY_GROWTH * (1 + GROWTH_PER_TIER * (z.needsTier ?? 0)) * (1 + 2 * restlessShare(z)) * casual;
   z.boredom = Math.min(100, boredom(z) + growth);
   const effect = boredomEffect(z);
   z.townInfo.happiness += effect;

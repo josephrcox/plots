@@ -5,7 +5,7 @@ import { newTown, alive, stepDays, seed, options } from "./harness";
 import { STYLES, ruleWeek } from "./policies";
 import { reverseClear } from "../src/lib/store";
 import { homeCapacity } from "../src/lib/housing";
-import { GUARD, plotById, worksDream, wishes, moodSummary } from "../src/lib/people";
+import { GUARD, plotById, worksDream, wishes, moodSummary, ageMix, canWork, REQUIRED_EDU, currentRequest } from "../src/lib/people";
 import type { Game } from "../src/lib/types";
 
 const MAPS = +(process.argv[2] ?? 5);
@@ -53,6 +53,13 @@ function invariants(z: Game, where: string) {
   check(z.townInfo.employees === employed, `${where}: employees ${z.townInfo.employees} ≠ employed ${employed}`);
   check(people.every((p) => p.edu >= 0 && p.edu <= 3 && Number.isFinite(p.mood)), `${where}: bad edu or mood`);
   check(Number.isFinite(z.townInfo.happiness), `${where}: happiness not finite`);
+  for (const p of people) {
+    if (!p.job || p.job === GUARD) continue;
+    check(canWork(p, z), `${where}: ${p.name} works but can't (child or retired)`);
+    const job = plotById(z, p.job);
+    const need = job ? REQUIRED_EDU[options[job.type].id] ?? 0 : 0;
+    check(Math.floor(p.edu) >= need, `${where}: ${p.name} lacks the education for their job`);
+  }
 }
 
 for (let m = 1; m <= MAPS; m++) {
@@ -78,6 +85,9 @@ for (let m = 1; m <= MAPS; m++) {
   console.log(`map ${m}: day ${z.environment.day} alive ${alive(z)} pop ${p.length} happy ${z.townInfo.happiness.toFixed(0)} (base ${z.moodBase?.toFixed(0)} + avg mood ${z.moodAverage?.toFixed(1)}) employed ${p.filter((x) => x.job).length}, dream jobs ${p.filter((x) => worksDream(x, z)).length}, edu avg ${(p.reduce((s, x) => s + x.edu, 0) / Math.max(1, p.length)).toFixed(2)}`);
   console.log(`   moods: ${moodSummary(z).map((x) => `${x.text} ${x.amount.toFixed(1)}`).join("; ")}`);
   console.log(`   wishes: ${wishes(z).map((x) => x.text).join("; ")}`);
+  const mix = ageMix(z);
+  const req = currentRequest(z);
+  console.log(`   ages: ${mix.child} children, ${mix.adult} adults, ${mix.elder} elders; births ${z.lifeStats?.births ?? 0}, deaths ${z.lifeStats?.deaths ?? 0}; request: ${req ? `${req.person.name} ${req.text}` : "none"}`);
 }
 console.log(`${checks} checks, ${failures} failures`);
 process.exit(failures ? 1 : 0);

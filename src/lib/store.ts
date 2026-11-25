@@ -16,7 +16,7 @@ import { CustomAlerts } from "./objects/CustomAlerts";
 import { generateRandomTownName } from "./objects/townNames";
 import { resetMapUi } from "./ui";
 import { syncCapacity } from "./housing";
-import { syncPeople, assignJobs, workforce } from "./people";
+import { syncPeople, assignJobs, workforce, migrateAges } from "./people";
 import {
   generateTerrain,
   expandTerrain,
@@ -151,6 +151,7 @@ export function normalizeGame(raw: any): Game | null {
     }
   }
   // Older saves stored job openings here, which could exceed population.
+  migrateAges(game);
   syncEmployment(game);
   // Older versions let a town keep playing after a loss with no further
   // loss checks. Treat that as the town's one continue, with a fresh grace

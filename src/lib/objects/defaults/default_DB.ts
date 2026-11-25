@@ -10,6 +10,7 @@ export const default_db: Game = {
   gameSettings: [],
   resource_capacity: 200,
   amountScale: 10,
+  ageScale: 72, // days per year of age (people.ts DAYS_PER_AGE_YEAR)
   townInfo: {
     name: "Your town",
     gold: 15,

@@ -86,23 +86,37 @@ function pickWeighted<T>(items: T[], weight: (t: T) => number): T {
 }
 
 const ADULT_MIN = 18;
-const ADULT_MAX = 55;
-/** Game days per year of a person's age. v2 (#65) compresses lifespans. */
-export const DAYS_PER_YEAR = 360;
+const ADULT_MAX = 45;
+export const ELDER_AGE = 65;
+/** Game days in a year of the calendar (for roots). */
+export const GAME_YEAR = 360;
+/**
+ * Game days per year of a person's age. Lives are compressed (#65): a game
+ * year ages people five years, so a normal game sees generations.
+ */
+export const DAYS_PER_AGE_YEAR = 72;
 
-/** A newcomer with random traits. */
-export function newPerson(z: Game): Person {
-  const age = ADULT_MIN + Math.floor(Math.random() * (ADULT_MAX - ADULT_MIN));
+/** Education newcomers arrive with: mostly none or basic, a few skilled. */
+function arrivingEducation(): number {
+  const r = Math.random();
+  return r < 0.45 ? 0 : r < 0.8 ? 1 : r < 0.95 ? 2 : 3;
+}
+
+/** A newcomer with random traits (or a newborn, given a parent). */
+export function newPerson(z: Game, parent?: Person): Person {
+  const age = parent ? 0 : ADULT_MIN + Math.floor(Math.random() * (ADULT_MAX - ADULT_MIN));
   const fav = pickWeighted(Object.keys(FAVOURITES), (id) => FAVOURITES[id].weight);
   z.nextPersonId = (z.nextPersonId ?? 0) + 1;
+  const surname = parent ? parent.name.split(" ").slice(1).join(" ") : SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
   return {
     id: z.nextPersonId,
-    name: `${townPeopleNames[Math.floor(Math.random() * townPeopleNames.length)]} ${SURNAMES[Math.floor(Math.random() * SURNAMES.length)]}`,
-    born: z.environment.day - age * DAYS_PER_YEAR - Math.floor(Math.random() * DAYS_PER_YEAR),
+    name: `${townPeopleNames[Math.floor(Math.random() * townPeopleNames.length)]} ${surname}`,
+    born: z.environment.day - age * DAYS_PER_AGE_YEAR - (parent ? 0 : Math.floor(Math.random() * DAYS_PER_AGE_YEAR)),
     arrived: z.environment.day,
-    home: null,
+    home: parent?.home ?? null,
     job: null,
-    edu: Math.random() < 0.3 ? 1 : 0,
+    edu: parent ? 0 : arrivingEducation(),
+    restless: Math.random() < 0.1 || undefined,
     dream: pickWeighted(CAREERS, (c) => c.weight).id,
     fav,
     work: round2(0.8 + Math.random() * 0.4),
@@ -116,7 +130,49 @@ function round2(n: number) {
 }
 
 export function ageOf(p: Person, z: Game): number {
-  return Math.floor((z.environment.day - p.born) / DAYS_PER_YEAR);
+  return Math.floor((z.environment.day - p.born) / DAYS_PER_AGE_YEAR);
+}
+
+export type Stage = "child" | "adult" | "elder";
+export function stageOf(p: Person, z: Game): Stage {
+  const age = ageOf(p, z);
+  return age < ADULT_MIN ? "child" : age >= ELDER_AGE ? "elder" : "adult";
+}
+
+/** About 3 in 10 elders keep working (decided once, by who they are). */
+export function keepsWorking(p: Person): boolean {
+  return (p.id * 2654435761) % 10 < 3;
+}
+
+/** Whether someone is of working age (adults, and elders who keep working). */
+export function canWork(p: Person, z: Game): boolean {
+  const s = stageOf(p, z);
+  return s === "adult" || (s === "elder" && keepsWorking(p));
+}
+
+/** Education level a building's workers need (#65). 1 basic, 2 skilled, 3 scholar. */
+export const REQUIRED_EDU: Record<string, number> = {
+  library: 1,
+  healing_house: 1,
+  city_hall: 1,
+  blacksmith: 2,
+  schoolhouse: 2,
+  academy: 2,
+  bank: 2,
+  university: 3,
+  lab: 3,
+};
+
+function qualified(p: Person, buildingId: string): boolean {
+  return Math.floor(p.edu) >= (REQUIRED_EDU[buildingId] ?? 0);
+}
+
+/** Saves from before compressed lives (#65) stored births on a 360-day year. */
+export function migrateAges(z: Game) {
+  if (z.ageScale === DAYS_PER_AGE_YEAR) return;
+  const day = z.environment.day;
+  for (const p of z.people ?? []) p.born = day - Math.round(((day - p.born) * DAYS_PER_AGE_YEAR) / GAME_YEAR);
+  z.ageScale = DAYS_PER_AGE_YEAR;
 }
 
 // ---------------------------------------------------------------------------
@@ -150,6 +206,7 @@ function homesInOrder(z: Game): Plot[] {
  * Returns who arrived and who left, for the town log.
  */
 export function syncPeople(z: Game): { arrived: Person[]; left: Person[] } {
+  if (!z.people) z.ageScale ??= DAYS_PER_AGE_YEAR; // a town's first people
   const people = (z.people ??= []);
   const homes = homesInOrder(z);
   const cap = new Map(homes.map((h) => [h.id, capacityOf(h)]));
@@ -218,6 +275,8 @@ export function residents(z: Game): Map<string, Person[]> {
 /** Productivity bonus for working your dream job, and the drag otherwise. */
 export const DREAM_BOOST = 1.3;
 export const OTHER_JOB = 0.9;
+/** Elders who keep working get less done. */
+export const ELDER_WORK = 0.7;
 
 function workplaces(z: Game): Plot[] {
   const list: Plot[] = [];
@@ -263,9 +322,14 @@ export function assignJobs(z: Game) {
   let guards = 0;
   const wantGuards = Math.min(z.townInfo.guardians, people.length);
 
+  // Children and retired elders don't work.
+  for (const p of people) if (!canWork(p, z)) p.job = null;
+  const idOf = new Map(places.map((pl) => [pl.id, options[pl.type].id]));
   // Keep valid jobs.
   for (const p of people) {
+    if (!canWork(p, z)) continue;
     if (p.job === GUARD && guards < wantGuards) { guards++; continue; }
+    if (p.job && p.job !== GUARD && !qualified(p, idOf.get(p.job) ?? "")) p.job = null;
     const n = p.job ? needed.get(p.job) : undefined;
     if (n != null && (filled.get(p.job!) ?? 0) < n) filled.set(p.job!, (filled.get(p.job!) ?? 0) + 1);
     else p.job = null;
@@ -284,7 +348,7 @@ export function assignJobs(z: Game) {
   for (const pass of [0, 1]) {
     for (const p of people) {
       if (guards >= wantGuards) break;
-      if (p.job === GUARD || (pass === 0 && p.job)) continue;
+      if (!canWork(p, z) || stageOf(p, z) !== "adult" || p.job === GUARD || (pass === 0 && p.job)) continue;
       leave(p);
       p.job = GUARD;
       guards++;
@@ -299,17 +363,16 @@ export function assignJobs(z: Game) {
     byCareer.get(c)!.push(pl);
   }
   for (const p of people) {
-    if (p.job === GUARD || worksDream(p, z)) continue;
-    const spot = byCareer.get(p.dream)?.find((pl) => opening(pl.id));
+    if (!canWork(p, z) || p.job === GUARD || worksDream(p, z)) continue;
+    const spot = byCareer.get(p.dream)?.find((pl) => opening(pl.id) && qualified(p, idOf.get(pl.id)!));
     if (spot) take(p, spot.id);
   }
   // Everyone else who's jobless takes any opening.
-  let i = 0;
   for (const p of people) {
-    if (p.job) continue;
-    while (i < places.length && !opening(places[i].id)) i++;
-    if (i >= places.length) break;
-    take(p, places[i].id);
+    if (p.job || !canWork(p, z)) continue;
+    const spot = places.find((pl) => opening(pl.id) && qualified(p, idOf.get(pl.id)!));
+    if (!spot) continue;
+    take(p, spot.id);
   }
   z.townInfo.employees = people.filter((p) => p.job && p.job !== GUARD).length + guards;
 }
@@ -323,7 +386,8 @@ export function workforce(z: Game): Map<string, { staffed: number; needed: numbe
     const w = m.get(p.job);
     if (!w) continue;
     w.staffed++;
-    w.output += p.work * (worksDream(p, z) ? DREAM_BOOST : OTHER_JOB);
+    const elder = stageOf(p, z) === "elder" ? ELDER_WORK : 1;
+    w.output += p.work * elder * (worksDream(p, z) ? DREAM_BOOST : OTHER_JOB);
   }
   for (const w of m.values()) w.output = w.needed ? w.output / w.needed : 1;
   return m;
@@ -414,9 +478,9 @@ export function moodParts(p: Person, z: Game, ctx = moodContext(z)): MoodPart[] 
       else parts.push({ text: `Has a ${title} in town`, amount: MOOD.favInTown });
     }
   }
-  if (p.job === null) parts.push({ text: "Out of work", amount: MOOD.jobless });
+  if (p.job === null && canWork(p, z)) parts.push({ text: "Out of work", amount: MOOD.jobless });
   else if (worksDream(p, z)) parts.push({ text: "Works their dream job", amount: MOOD.dreamJob });
-  const years = Math.floor((z.environment.day - p.arrived) / DAYS_PER_YEAR);
+  const years = Math.floor((z.environment.day - p.arrived) / GAME_YEAR);
   if (years > 0) parts.push({ text: `Has roots here (${years} yr)`, amount: Math.min(MOOD.rootsMax, years * MOOD.rootsPerYear) });
   return parts;
 }
@@ -466,7 +530,8 @@ export function updateEducation(z: Game) {
   for (const p of z.people ?? []) {
     if (!p.home || p.edu >= 3) continue;
     let gain = 0;
-    if (school.has(p.home)) gain += EDU_SCHOOL_WEEKLY;
+    // Children learn fastest.
+    if (school.has(p.home)) gain += EDU_SCHOOL_WEEKLY * (stageOf(p, z) === "child" ? 2.5 : 1);
     const home = plotById(z, p.home);
     if (home && libraries.some((l) => hexDistance(home.x, home.y, l.x, l.y) <= 3)) gain += EDU_LIBRARY_WEEKLY;
     p.edu = Math.min(3, Math.round((p.edu + gain) * 1000) / 1000);
@@ -513,10 +578,11 @@ export function wishes(z: Game, limit = 3): Wish[] {
   return list.sort((a, b) => b.count - a.count).slice(0, limit);
 }
 
+const CHILD_APPETITE = 0.6;
 /** Sum of everyone's appetite (1 per average person). */
 export function townAppetite(z: Game): number {
   if (!z.people) return z.townInfo.population_count;
-  return z.people.reduce((s, p) => s + p.appetite, 0);
+  return z.people.reduce((s, p) => s + p.appetite * (stageOf(p, z) === "child" ? CHILD_APPETITE : 1), 0);
 }
 
 /** The biggest reasons the town's moods differ from the baseline, added up. */
@@ -538,4 +604,146 @@ export function moodSummary(z: Game, limit = 4): MoodPart[] {
     .filter((p) => Math.abs(p.amount) >= 0.5)
     .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
     .slice(0, limit);
+}
+
+// ---------------------------------------------------------------------------
+// Life: births and deaths (#65)
+// ---------------------------------------------------------------------------
+
+/** Weekly chance an adult aged 20–45 has a child, when their home has room. */
+const BIRTH_CHANCE = 0.006;
+/** Yearly chance of dying at 65; it rises steeply with age. */
+const DEATH_AT_65 = 0.01;
+const WEEKS_PER_AGE_YEAR = DAYS_PER_AGE_YEAR / 7;
+
+/** Weekly: babies are born into homes with room; the old pass away. */
+export function lifeEvents(z: Game): { born: Person[]; died: Person[] } {
+  const people = z.people ?? [];
+  const born: Person[] = [];
+  const died: Person[] = [];
+  const cap = new Map<string, number>();
+  for (const row of z.plots) for (const pl of row) { const c = capacityOf(pl); if (c) cap.set(pl.id, c); }
+  const used = new Map<string, number>();
+  for (const p of people) if (p.home) used.set(p.home, (used.get(p.home) ?? 0) + 1);
+  const cov = coverage(z);
+  const health = z.townInfo.health;
+  const healthFactor = health < 100 ? 1.5 : health > 200 ? 0.75 : 1;
+  for (const p of people) {
+    const age = ageOf(p, z);
+    if (age >= ELDER_AGE) {
+      let yearly = DEATH_AT_65 * Math.exp((age - ELDER_AGE) / 6);
+      yearly *= healthFactor * (p.home && cov.get("health")!.has(p.home) ? 0.8 : 1);
+      if (Math.random() < yearly / WEEKS_PER_AGE_YEAR) died.push(p);
+    } else if (age >= 20 && age <= 45 && p.home && Math.random() < BIRTH_CHANCE) {
+      // The baby lives with the family, or with relatives if there's no room.
+      let home: string | undefined = (used.get(p.home) ?? 0) < (cap.get(p.home) ?? 0) ? p.home : undefined;
+      if (!home) for (const [id, c] of cap) if ((used.get(id) ?? 0) < c) { home = id; break; }
+      if (home) {
+        const baby = newPerson(z, p);
+        baby.home = home;
+        born.push(baby);
+        used.set(home, (used.get(home) ?? 0) + 1);
+      }
+    }
+  }
+  if (died.length) {
+    const gone = new Set(died);
+    z.people = people.filter((p) => !gone.has(p));
+  }
+  z.people!.push(...born);
+  z.townInfo.population_count = z.people!.length;
+  z.lifeStats = {
+    births: (z.lifeStats?.births ?? 0) + born.length,
+    deaths: (z.lifeStats?.deaths ?? 0) + died.length,
+  };
+  if (born.length || died.length) assignJobs(z);
+  return { born, died };
+}
+
+/** Children, adults and elders in town. */
+export function ageMix(z: Game): Record<Stage, number> {
+  const mix: Record<Stage, number> = { child: 0, adult: 0, elder: 0 };
+  for (const p of z.people ?? []) mix[stageOf(p, z)]++;
+  return mix;
+}
+
+/** Share of restless people (they make the town bore faster). */
+export function restlessShare(z: Game): number {
+  const people = z.people ?? [];
+  return people.length ? people.filter((p) => p.restless).length / people.length : 0;
+}
+
+// ---------------------------------------------------------------------------
+// Requests (#65): one named townsperson at a time asks for something.
+// ---------------------------------------------------------------------------
+
+const REQUEST_WEEKS = 26;
+const REQUEST_NEAR = 3; // tiles
+
+export type RequestView = { person: Person; text: string; weeksLeft: number; reward: number };
+
+function requestMet(z: Game, p: Person): boolean {
+  const r = z.request!;
+  if (r.kind === "job") return worksDream(p, z);
+  const home = p.home ? plotById(z, p.home) : undefined;
+  if (!home) return false;
+  return z.plots.some((row) => row.some((pl) => builtId(pl) === r.target && hexDistance(home.x, home.y, pl.x, pl.y) <= REQUEST_NEAR));
+}
+
+/** Weekly: settle the open request, or make a new one now and then. */
+export function updateRequest(z: Game): { done?: string; expired?: string; reward?: number } {
+  const people = z.people ?? [];
+  const r = z.request;
+  if (r) {
+    const p = people.find((x) => x.id === r.personId);
+    if (!p) {
+      delete z.request;
+      return {};
+    }
+    if (requestMet(z, p)) {
+      delete z.request;
+      z.townInfo.gold += r.reward;
+      return { done: `🎁 ${p.name} is delighted: ${describe(r)} at last!`, reward: r.reward };
+    }
+    if (z.environment.day - r.since > REQUEST_WEEKS * 7) {
+      delete z.request;
+      return { expired: `😞 ${p.name} gave up waiting for ${describe(r)}.` };
+    }
+    return {};
+  }
+  if (people.length < 30 || (z.environment.day / 7) % 4 !== 0) return {};
+  // Someone whose favourite place isn't near, or whose dream career has no opening.
+  const ctx = moodContext(z);
+  const candidates = people.filter((p) => {
+    if (stageOf(p, z) === "child") return false;
+    const home = p.home ? plotById(z, p.home) : undefined;
+    if (!home || POLLUTERS[p.fav]) return false;
+    const spots = ctx.where.get(p.fav) ?? [];
+    return !spots.some((s) => hexDistance(home.x, home.y, s.x, s.y) <= REQUEST_NEAR);
+  });
+  const p = candidates[Math.floor(Math.random() * candidates.length)];
+  if (p) {
+    z.request = { personId: p.id, kind: "near", target: p.fav, since: z.environment.day, reward: 60 + 40 * Math.max(0, z.needsTier ?? 0) };
+  }
+  return {};
+}
+
+function describe(r: NonNullable<Game["request"]>): string {
+  if (r.kind === "job") return `work as a ${CAREERS.find((c) => c.id === r.target)?.title.toLowerCase() ?? r.target}`;
+  const o = options.find((o) => o.id === r.target);
+  return `a ${o?.title.toLowerCase() ?? r.target} near home`;
+}
+
+export function currentRequest(z: Game): RequestView | null {
+  const r = z.request;
+  if (!r) return null;
+  const person = (z.people ?? []).find((p) => p.id === r.personId);
+  if (!person) return null;
+  const o = options.find((o) => o.id === r.target);
+  return {
+    person,
+    text: r.kind === "near" ? `wants a ${o?.emoji ?? ""} ${o?.title.toLowerCase()} within ${REQUEST_NEAR} tiles of home` : describe(r),
+    weeksLeft: Math.max(0, REQUEST_WEEKS - Math.floor((z.environment.day - r.since) / 7)),
+    reward: r.reward,
+  };
 }

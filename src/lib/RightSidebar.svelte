@@ -18,7 +18,8 @@
   import { formatAmount } from "./utils";
   import { attraction, weeklyArrivals } from "./migration";
   import { needStatus, currentTier, TIERS, SERVICES } from "./needs";
-  import { wishes, personMood } from "./people";
+  import { wishes, personMood, ageMix, currentRequest } from "./people";
+  import { inspected as inspectedTile } from "./ui";
 
   const STATS: { key: StatKey; label: string; icon: string; about: string }[] = [
     {
@@ -86,6 +87,13 @@
     return s;
   })();
   $: topWishes = $DB && folks.length ? wishes($DB, 3) : [];
+  $: ages = $DB ? ageMix($DB) : { child: 0, adult: 0, elder: 0 };
+  $: request = $DB ? currentRequest($DB) : null;
+  function showRequester() {
+    const home = request?.person.home;
+    const plot = home ? $DB?.plots.flat().find((p) => p.id === home) : undefined;
+    if (plot) inspectedTile.set({ x: plot.x, y: plot.y });
+  }
   // Service needs of the town's size tier (#48), and what the next tier adds.
   $: services = $DB ? needStatus($DB) : [];
   $: tier = $DB ? currentTier($DB) : -1;
@@ -244,6 +252,15 @@
           <div class="flex flex-row justify-between text-[11px] opacity-80">
             <span>🙁 {moodSpread.unhappy}</span><span>😐 {moodSpread.ok}</span><span>🙂 {moodSpread.happy}</span>
           </div>
+          <span class="text-[11px] opacity-70"
+            >🧒 {ages.child} children · 🧑 {ages.adult} adults · 🧓 {ages.elder} elders</span
+          >
+          {#if request}
+            <button class="request" on:click={showRequester}>
+              🙋 <b>{request.person.name}</b> {request.text}.
+              <span class="opacity-70">💰{request.reward} · {request.weeksLeft} wks left</span>
+            </button>
+          {/if}
           {#each topWishes as w}
             <span class="text-[11px] opacity-80">{w.text}</span>
           {/each}
@@ -401,6 +418,18 @@
   .need.good {
     background: rgba(74, 222, 128, 0.12);
     color: rgb(187, 247, 208);
+  }
+  .request {
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.35;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background: rgba(56, 189, 248, 0.15);
+    color: rgb(186, 230, 253);
+  }
+  .request:hover {
+    background: rgba(56, 189, 248, 0.25);
   }
   .spread {
     display: flex;

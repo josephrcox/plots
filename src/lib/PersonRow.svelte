@@ -13,6 +13,7 @@
     personMood,
     plotById,
     worksDream,
+    stageOf,
   } from "./people";
   import { options } from "./objects/PlotTypeOptions";
   import type { Person } from "./types";
@@ -27,17 +28,23 @@
   $: dream = CAREERS.find((c) => c.id === person.dream);
   $: jobPlot = person.job && person.job !== GUARD ? plotById(z, person.job) : undefined;
   $: jobOption = jobPlot ? options[jobPlot.type] : undefined;
+  $: stage = stageOf(person, z);
   $: jobTitle =
     person.job === GUARD
       ? "Guardian"
       : jobOption
         ? `${careerOf(jobOption.id)?.title ?? "Worker"} at the ${jobOption.title.toLowerCase()}`
-        : "Out of work";
+        : stage === "child"
+          ? "Too young to work"
+          : stage === "elder"
+            ? "Retired"
+            : "Out of work";
   $: isDream = worksDream(person, z);
   $: fav = options.find((o) => o.id === person.fav);
   $: traits = [
     person.work >= 1.1 ? "hard worker" : person.work <= 0.9 ? "takes it easy" : "",
     person.appetite >= 1.1 ? "big eater" : person.appetite <= 0.9 ? "small appetite" : "",
+    person.restless ? "restless" : "",
   ].filter(Boolean);
   $: parts = open ? moodParts(person, z).sort((a, b) => a.amount - b.amount) : [];
 </script>

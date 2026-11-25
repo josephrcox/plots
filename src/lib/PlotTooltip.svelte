@@ -7,6 +7,7 @@
   import type { PlotOption } from "./types";
   import { SERVICES } from "./needs";
   import { POLLUTERS, AMENITIES } from "./land";
+  import { REQUIRED_EDU, EDU_LEVELS, careerOf } from "./people";
 
   export let option: PlotOption;
   /** Mark costs the town can't pay yet (off in the inspector). */
@@ -133,7 +134,11 @@
     {/each}
     {#if req.employees > 0}
       <span class="label">Workers</span>
-      <span><span class="chip">👷 {req.employees}</span></span>
+      <span class="flex flex-wrap gap-1"
+        ><span class="chip">👷 {req.employees}</span>
+        {#if careerOf(option.id)}<span class="chip">{careerOf(option.id)?.emoji} {careerOf(option.id)?.title}s</span>{/if}
+        {#if REQUIRED_EDU[option.id]}<span class="chip">🎓 {EDU_LEVELS[REQUIRED_EDU[option.id]]}+</span>{/if}</span
+      >
     {/if}
     {#if needs.length}
       <span class="label">Needs</span>

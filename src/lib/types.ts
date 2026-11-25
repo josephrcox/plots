@@ -15,6 +15,7 @@ export type Person = {
   fav: string; // building id they love
   work: number; // productivity multiplier, 0.8–1.2
   appetite: number; // food multiplier, 0.8–1.2
+  restless?: boolean; // gets bored faster (#65)
   mood: number; // offset from the town baseline, recomputed weekly
 };
 
@@ -152,7 +153,10 @@ export type Game = {
   nextPersonId?: number;
   moodBase?: number; // town happiness before personal moods (option B, #64)
   moodAverage?: number; // average personal mood offset
-  moodShown?: number; // happiness shown after the last weekly update
+  moodShown?: number;
+  ageScale?: number; // days per year of age the people's birth days use (#65)
+  lifeStats?: { births: number; deaths: number };
+  request?: { personId: number; kind: "near" | "job"; target: string; since: number; reward: number }; // happiness shown after the last weekly update
   boredom?: number; // hidden 0–100: how stale the town feels (boredom.ts)
   recentBuilds?: { id: string; day: number }[]; // for boredom's repeat check
   needsTier?: number; // highest town-size tier whose needs apply (needs.ts)

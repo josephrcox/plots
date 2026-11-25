@@ -6,7 +6,7 @@
 
 import { get } from "svelte/store";
 import { updateBoredom, relieve, NOVELTY } from "./boredom";
-import { syncPeople, assignJobs, updateMoods, updateEducation, educationBoost, personMood, moodParts, townAppetite } from "./people";
+import { syncPeople, assignJobs, updateMoods, updateEducation, educationBoost, personMood, moodParts, townAppetite, lifeEvents, migrateAges, ageOf, updateRequest } from "./people";
 import {
   DB,
   getGame,
@@ -109,6 +109,7 @@ function performWeeklyTasks(db: Game) {
   db = townNeedsEffects(db);
   db = boredomEffects(db);
   db = feedCitizens(db);
+  db = lifeWeekly(db);
   db = moveIn(db);
   db = levelHomes(db);
   db = peopleWeekly(db);
@@ -955,7 +956,15 @@ const LEAVE_BELOW = 45;
 const LEAVE_CHANCE = 0.2;
 
 function peopleWeekly(z: Game) {
+  migrateAges(z);
   syncPeople(z);
+  const req = updateRequest(z);
+  if (req.done) {
+    relieve(z, NOVELTY.request);
+    z = addToTownLog(`${req.done} (+💰${req.reward})`, z, Vibe.GOOD);
+  } else if (req.expired) {
+    z = addToTownLog(req.expired, z, Vibe.BAD);
+  }
   updateEducation(z);
   assignJobs(z);
   updateMoods(z);
@@ -1024,6 +1033,30 @@ function townNeedsEffects(z: Game) {
 // ---------------------------------------------------------------------------
 
 /** Newcomers fill empty homes each week, faster in an attractive town. */
+/** Births (before newcomers take the free space) and deaths (#65). */
+function lifeWeekly(z: Game) {
+  migrateAges(z);
+  syncPeople(z);
+  const life = lifeEvents(z);
+  if (life.born.length) {
+    const b = life.born[0];
+    z = addToTownLog(
+      `👶 ${b.name} was born${life.born.length > 1 ? `, and ${life.born.length - 1} other bab${life.born.length > 2 ? "ies" : "y"}` : ""}.`,
+      z,
+      Vibe.GOOD,
+    );
+  }
+  if (life.died.length) {
+    const d = life.died[0];
+    z = addToTownLog(
+      `🕯️ ${d.name} passed away at ${ageOf(d, z)}${life.died.length > 1 ? `, as did ${life.died.length - 1} other${life.died.length > 2 ? "s" : ""}` : ""}.`,
+      z,
+      Vibe.NORMAL,
+    );
+  }
+  return z;
+}
+
 function moveIn(z: Game) {
   const arrivals = weeklyArrivals(z);
   z.townInfo.population_count += arrivals;
