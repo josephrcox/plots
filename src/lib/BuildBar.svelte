@@ -152,11 +152,35 @@
       return;
     }
     const n = Number(e.key);
-    if (Number.isInteger(n) && n >= 1 && n <= categories.length) {
+    if (armed && Number.isInteger(n) && n >= 1) {
+      // Second key: the nth building in the open tab (1 then 1 = Homes).
+      const option = categoryOptions[n - 1];
+      disarm();
+      if (option) pick(option);
+    } else if (Number.isInteger(n) && n >= 1 && n <= categories.length) {
+      // First key: open the tab and wait briefly for a building number.
       $buildCategory = categories[n - 1].id;
+      arm();
     } else if (e.key.toLowerCase() === "b") {
+      disarm();
       toggleBulldoze();
+    } else if (e.key === "Escape") {
+      disarm();
     }
+  }
+
+  // Two-key shortcuts: a tab number, then a building number.
+  const ARM_MS = 2000;
+  let armed = false;
+  let armTimer: ReturnType<typeof setTimeout> | undefined;
+  function arm() {
+    armed = true;
+    clearTimeout(armTimer);
+    armTimer = setTimeout(disarm, ARM_MS);
+  }
+  function disarm() {
+    armed = false;
+    clearTimeout(armTimer);
   }
 </script>
 
@@ -217,7 +241,7 @@
           }
         }}
       >
-        {#each categoryOptions as option (option.id)}
+        {#each categoryOptions as option, index (option.id)}
           {@const check = checks ? checks[option.id] : { ok: false, reason: "" }}
           {@const selected = $tool.kind === "build" && $tool.id === option.id}
           <Tooltip.Root openDelay={350} closeDelay={0}>
@@ -231,6 +255,7 @@
                 data-option-id={option.id}
                 on:click={() => pick(option)}
               >
+                {#if index < 9}<span class="hotkey" class:armed>{index + 1}</span>{/if}
                 <span class="text-2xl leading-none">{option.emoji}</span>
                 <span class="name">{option.title}</span>
                 {#if check.ok}
@@ -307,7 +332,21 @@
     border-radius: 9999px;
     background: rgb(255, 210, 90);
   }
+  .hotkey {
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-size: 0.6rem;
+    font-family: monospace;
+    opacity: 0.35;
+  }
+  .hotkey.armed {
+    opacity: 1;
+    color: rgb(255, 210, 90);
+    font-weight: 700;
+  }
   .building {
+    position: relative;
     flex: 0 0 auto;
     width: 112px;
     height: 88px;
