@@ -152,36 +152,23 @@
       return;
     }
     const n = Number(e.key);
-    if (armed && Number.isInteger(n) && n >= 1) {
-      // Second key: the nth building in the open tab (1 then 1 = Homes).
-      const option = categoryOptions[n - 1];
-      disarm();
-      if (option) pick(option);
-    } else if (Number.isInteger(n) && n >= 1 && n <= categories.length) {
-      // First key: open the tab and wait briefly for a building number.
+    const key = e.key.toLowerCase();
+    const slot = BUILD_KEYS.indexOf(key);
+    if (Number.isInteger(n) && n >= 1 && n <= categories.length) {
+      // Number keys pick the tab.
       $buildCategory = categories[n - 1].id;
-      arm();
-    } else if (e.key.toLowerCase() === "b") {
-      disarm();
+    } else if (slot >= 0) {
+      // The QWERTY row picks a building in the open tab (Q = first).
+      const option = categoryOptions[slot];
+      if (option) pick(option);
+    } else if (key === "b") {
       toggleBulldoze();
-    } else if (e.key === "Escape") {
-      disarm();
     }
   }
 
-  // Two-key shortcuts: a tab number, then a building number.
-  const ARM_MS = 2000;
-  let armed = false;
-  let armTimer: ReturnType<typeof setTimeout> | undefined;
-  function arm() {
-    armed = true;
-    clearTimeout(armTimer);
-    armTimer = setTimeout(disarm, ARM_MS);
-  }
-  function disarm() {
-    armed = false;
-    clearTimeout(armTimer);
-  }
+  /** Keys for the buildings in the open tab, in order. */
+  const BUILD_KEYS = ["q", "w", "e", "r", "t", "y", "u", "i"];
+
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
@@ -255,7 +242,7 @@
                 data-option-id={option.id}
                 on:click={() => pick(option)}
               >
-                {#if index < 9}<span class="hotkey" class:armed>{index + 1}</span>{/if}
+                {#if index < BUILD_KEYS.length}<span class="hotkey">{BUILD_KEYS[index].toUpperCase()}</span>{/if}
                 <span class="text-2xl leading-none">{option.emoji}</span>
                 <span class="name">{option.title}</span>
                 {#if check.ok}
@@ -338,12 +325,7 @@
     left: 6px;
     font-size: 0.6rem;
     font-family: monospace;
-    opacity: 0.35;
-  }
-  .hotkey.armed {
-    opacity: 1;
-    color: rgb(255, 210, 90);
-    font-weight: 700;
+    opacity: 0.45;
   }
   .building {
     position: relative;

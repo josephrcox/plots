@@ -493,16 +493,13 @@
     if (pointers.size === 0) dragStart = null;
   }
 
-  // Keyboard: WASD / arrows pan, +/- zoom, F fits the town.
+  // Keyboard: arrows pan, +/- zoom, F fits the town, O cycles overlays.
   const held = new Set<string>();
+  // Arrow keys pan (the letter row picks buildings, see BuildBar).
   const PAN_KEYS: Record<string, [number, number]> = {
-    w: [0, 1],
     arrowup: [0, 1],
-    s: [0, -1],
     arrowdown: [0, -1],
-    a: [1, 0],
     arrowleft: [1, 0],
-    d: [-1, 0],
     arrowright: [-1, 0],
   };
 
