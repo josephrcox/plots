@@ -13,6 +13,7 @@ import { townPeopleNames } from "./objects/townPeople";
 import { landValue, BASE_LAND_VALUE, NEUTRAL_BAND, POLLUTERS } from "./land";
 import { coverage, needStatus, type ServiceId } from "./needs";
 import type { Game, Person, Plot } from "./types";
+import { isVenue, VENUE, RETIREE_MOOD, MEMBER_DEATH_FACTOR } from "./retirement";
 
 // ---------------------------------------------------------------------------
 // Careers and favourite places
@@ -96,6 +97,14 @@ export const GAME_YEAR = 360;
  */
 export const DAYS_PER_AGE_YEAR = 72;
 
+/** Age for someone in an established town: some children, mostly adults, some elders. */
+function settledAge(): number {
+  const r = Math.random();
+  if (r < 0.2) return Math.floor(Math.random() * ADULT_MIN);
+  if (r < 0.85) return ADULT_MIN + Math.floor(Math.random() * (ELDER_AGE - ADULT_MIN));
+  return ELDER_AGE + Math.floor(Math.random() * 15);
+}
+
 /** Education newcomers arrive with: mostly none or basic, a few skilled. */
 function arrivingEducation(): number {
   const r = Math.random();
@@ -103,8 +112,12 @@ function arrivingEducation(): number {
 }
 
 /** A newcomer with random traits (or a newborn, given a parent). */
-export function newPerson(z: Game, parent?: Person): Person {
-  const age = parent ? 0 : ADULT_MIN + Math.floor(Math.random() * (ADULT_MAX - ADULT_MIN));
+export function newPerson(z: Game, parent?: Person, spreadAges = false): Person {
+  const age = parent
+    ? 0
+    : spreadAges
+      ? settledAge()
+      : ADULT_MIN + Math.floor(Math.random() * (ADULT_MAX - ADULT_MIN));
   const fav = pickWeighted(Object.keys(FAVOURITES), (id) => FAVOURITES[id].weight);
   z.nextPersonId = (z.nextPersonId ?? 0) + 1;
   const surname = parent ? parent.name.split(" ").slice(1).join(" ") : SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
@@ -142,6 +155,16 @@ export function stageOf(p: Person, z: Game): Stage {
 /** About 3 in 10 elders keep working (decided once, by who they are). */
 export function keepsWorking(p: Person): boolean {
   return (p.id * 2654435761) % 10 < 3;
+}
+
+/** Elders who have stopped working (they may join a place for retirees). */
+export function isRetired(p: Person, z: Game): boolean {
+  return stageOf(p, z) === "elder" && !keepsWorking(p);
+}
+
+/** Whether someone is a member of a place for retirees. */
+export function isMember(p: Person, z: Game): boolean {
+  return !!p.job && p.job !== GUARD && isVenue(plotById(z, p.job));
 }
 
 /** Whether someone is of working age (adults, and elders who keep working). */
@@ -239,8 +262,10 @@ export function syncPeople(z: Game): { arrived: Person[]; left: Person[] } {
   // Match the count the rest of the game expects.
   const target = Math.max(0, Math.round(z.townInfo.population_count));
   const arrived: Person[] = [];
+  // A whole town appearing at once (an older save) gets a realistic age mix.
+  const bulk = target - z.people.length > 30;
   while (z.people.length < target) {
-    const p = newPerson(z);
+    const p = newPerson(z, undefined, bulk);
     if (!place(p)) break;
     z.people.push(p);
     arrived.push(p);
@@ -309,6 +334,15 @@ export function plotById(z: Game, id: string): Plot | undefined {
   return hit.map.get(id);
 }
 
+/** 0 = power, 1 = food, 2 = everything else. */
+function essential(pl: Plot): number {
+  const o = options[pl.type];
+  if (!o) return 2;
+  if (o.generated_resources.power > 0) return 0;
+  if (o.generated_resources.food > 0) return 1;
+  return 2;
+}
+
 /**
  * Fills jobs: everyone keeps a valid job, people move to an opening in their
  * dream career when there is one, then the jobless take any opening (oldest
@@ -316,14 +350,16 @@ export function plotById(z: Game, id: string): Plot | undefined {
  */
 export function assignJobs(z: Game) {
   const people = z.people ?? [];
-  const places = workplaces(z);
+  const all = workplaces(z);
+  const places = all.filter((pl) => !isVenue(pl));
   const needed = new Map(places.map((p) => [p.id, options[p.type].requirements.employees]));
   const filled = new Map<string, number>();
   let guards = 0;
   const wantGuards = Math.min(z.townInfo.guardians, people.length);
 
-  // Children and retired elders don't work.
-  for (const p of people) if (!canWork(p, z)) p.job = null;
+  // Children and retired elders don't work (retirees may keep a venue membership).
+  for (const p of people) if (!canWork(p, z) && !(isRetired(p, z) && isMember(p, z))) p.job = null;
+  for (const p of people) if (canWork(p, z) && isMember(p, z)) p.job = null;
   const idOf = new Map(places.map((pl) => [pl.id, options[pl.type].id]));
   // Keep valid jobs.
   for (const p of people) {
@@ -368,13 +404,55 @@ export function assignJobs(z: Game) {
     if (spot) take(p, spot.id);
   }
   // Everyone else who's jobless takes any opening.
+  // Essentials (power, then food) are staffed first when workers run short.
+  const byPriority = [...places].sort((a, b) => essential(a) - essential(b));
   for (const p of people) {
     if (p.job || !canWork(p, z)) continue;
-    const spot = places.find((pl) => opening(pl.id) && qualified(p, idOf.get(pl.id)!));
+    const spot = byPriority.find((pl) => opening(pl.id) && qualified(p, idOf.get(pl.id)!));
     if (!spot) continue;
     take(p, spot.id);
   }
-  z.townInfo.employees = people.filter((p) => p.job && p.job !== GUARD).length + guards;
+  // Still short on essentials: move people from other jobs (not dream jobs).
+  for (const pl of byPriority) {
+    if (essential(pl) === 2) break;
+    while (opening(pl.id)) {
+      const mover = people.find((p) => p.job && p.job !== GUARD && !worksDream(p, z) && essential(plotById(z, p.job)!) === 2 && qualified(p, idOf.get(pl.id)!));
+      if (!mover) break;
+      take(mover, pl.id);
+    }
+  }
+  assignVenues(z, all.filter(isVenue));
+  z.townInfo.employees = people.filter((p) => p.job && p.job !== GUARD && !isMember(p, z)).length + guards;
+}
+
+/**
+ * Retirees join places for retirees: their favourite kind first, skilled
+ * retirees to a craft guild, otherwise the nearest one with room.
+ */
+function assignVenues(z: Game, venues: Plot[]) {
+  const slots = new Map(venues.map((v) => [v.id, options[v.type].requirements.employees]));
+  const used = new Map<string, number>();
+  const retirees = (z.people ?? []).filter((p) => isRetired(p, z));
+  for (const p of retirees) {
+    if (!p.job) continue;
+    const n = used.get(p.job) ?? 0;
+    if (slots.has(p.job) && n < slots.get(p.job)!) used.set(p.job, n + 1);
+    else p.job = null;
+  }
+  const room = (v: Plot) => (used.get(v.id) ?? 0) < slots.get(v.id)!;
+  for (const p of retirees) {
+    if (p.job) continue;
+    const home = p.home ? plotById(z, p.home) : undefined;
+    const open = venues.filter(room);
+    if (!open.length) break;
+    const dist = (v: Plot) => (home ? hexDistance(home.x, home.y, v.x, v.y) : 0);
+    const pick =
+      open.find((v) => options[v.type].id === p.fav) ??
+      (p.edu >= 2 ? open.find((v) => options[v.type].id === "craft_guild") : undefined) ??
+      [...open].sort((a, b) => dist(a) - dist(b))[0];
+    p.job = pick.id;
+    used.set(pick.id, (used.get(pick.id) ?? 0) + 1);
+  }
 }
 
 /** Workers per building and their combined output (1 = fully staffed by average workers). */
@@ -386,10 +464,26 @@ export function workforce(z: Game): Map<string, { staffed: number; needed: numbe
     const w = m.get(p.job);
     if (!w) continue;
     w.staffed++;
+    if (isVenue(plotById(z, p.job))) continue;
     const elder = stageOf(p, z) === "elder" ? ELDER_WORK : 1;
     w.output += p.work * elder * (worksDream(p, z) ? DREAM_BOOST : OTHER_JOB);
   }
-  for (const w of m.values()) w.output = w.needed ? w.output / w.needed : 1;
+  for (const [id, w] of m) {
+    const pl = plotById(z, id);
+    // Venue members aren't workers: a venue's "output" is just how full it is.
+    w.output = !w.needed ? 1 : isVenue(pl) ? w.staffed / w.needed : w.output / w.needed;
+  }
+  // Craft guilds: workshops next door get a little more done.
+  const guilds = workplaces(z).filter((pl) => options[pl.type].id === "craft_guild");
+  for (const g of guilds) {
+    const fill = m.get(g.id)?.output ?? 0;
+    if (!fill) continue;
+    for (const [id, w] of m) {
+      const pl = plotById(z, id);
+      if (!pl || isVenue(pl)) continue;
+      if (hexDistance(g.x, g.y, pl.x, pl.y) <= VENUE.craft_guild.workshopReach) w.output *= 1 + VENUE.craft_guild.workshopBoost * fill;
+    }
+  }
   return m;
 }
 
@@ -433,6 +527,7 @@ type MoodContext = {
   needed: { id: ServiceId; title: string; emoji: string }[];
   where: Map<string, Plot[]>; // building id → plots
   land: Map<string, number>; // home id → land value
+  fill: Map<string, number>; // venue id → how full (0–1)
 };
 
 function moodContext(z: Game): MoodContext {
@@ -449,7 +544,9 @@ function moodContext(z: Game): MoodContext {
       where.get(id)!.push(p);
     }
   }
-  return { cov, needed, where, land: new Map() };
+  const fill = new Map<string, number>();
+  for (const [id, w] of workforce(z)) if (isVenue(plotById(z, id))) fill.set(id, w.output);
+  return { cov, needed, where, land: new Map(), fill };
 }
 
 /** Why a person's mood differs from the town's baseline. */
@@ -476,6 +573,19 @@ export function moodParts(p: Person, z: Game, ctx = moodContext(z)): MoodPart[] 
       } else if (d <= 2) parts.push({ text: `Their favourite ${title} is next door`, amount: MOOD.favNear });
       else if (d <= 4) parts.push({ text: `Their favourite ${title} is close by`, amount: MOOD.favClose });
       else parts.push({ text: `Has a ${title} in town`, amount: MOOD.favInTown });
+    }
+  }
+  if (isRetired(p, z)) {
+    const venue = p.job ? plotById(z, p.job) : undefined;
+    if (venue && isVenue(venue)) parts.push({ text: `Spends their days at the ${options[venue.type].title.toLowerCase()}`, amount: RETIREE_MOOD.member });
+    else parts.push({ text: "Bored in retirement", amount: RETIREE_MOOD.idle });
+  }
+  if (home) {
+    const clubs = ctx.where.get("social_club") ?? [];
+    const near = clubs.find((c) => hexDistance(home.x, home.y, c.x, c.y) <= VENUE.social_club.reach);
+    if (near) {
+      const fill = ctx.fill.get(near.id) ?? 0;
+      if (fill > 0) parts.push({ text: "A lively social club nearby", amount: VENUE.social_club.mood * fill });
     }
   }
   if (p.job === null && canWork(p, z)) parts.push({ text: "Out of work", amount: MOOD.jobless });
@@ -527,6 +637,8 @@ export function updateEducation(z: Game) {
   const cov = coverage(z);
   const school = cov.get("school")!;
   const libraries = (z.plots.flat().filter((p) => builtId(p) === "library"));
+  const venues = z.plots.flat().filter((p) => builtId(p) && isVenue(p));
+  const staff = workforce(z);
   for (const p of z.people ?? []) {
     if (!p.home || p.edu >= 3) continue;
     let gain = 0;
@@ -534,6 +646,18 @@ export function updateEducation(z: Game) {
     if (school.has(p.home)) gain += EDU_SCHOOL_WEEKLY * (stageOf(p, z) === "child" ? 2.5 : 1);
     const home = plotById(z, p.home);
     if (home && libraries.some((l) => hexDistance(home.x, home.y, l.x, l.y) <= 3)) gain += EDU_LIBRARY_WEEKLY;
+    // Retirees teaching: storytellers for children, the craft guild for adults.
+    if (home) {
+      const stage = stageOf(p, z);
+      for (const v of venues) {
+        const id = options[v.type].id;
+        const fill = staff.get(v.id)?.output ?? 0;
+        if (!fill) continue;
+        const d = hexDistance(home.x, home.y, v.x, v.y);
+        if (id === "storyteller" && stage === "child" && d <= VENUE.storyteller.reach) gain += VENUE.storyteller.childLearning * fill;
+        if (id === "craft_guild" && stage === "adult" && d <= VENUE.craft_guild.reach && p.edu < VENUE.craft_guild.maxEdu) gain += VENUE.craft_guild.adultLearning * fill;
+      }
+    }
     p.edu = Math.min(3, Math.round((p.edu + gain) * 1000) / 1000);
   }
 }
@@ -633,6 +757,7 @@ export function lifeEvents(z: Game): { born: Person[]; died: Person[] } {
     if (age >= ELDER_AGE) {
       let yearly = DEATH_AT_65 * Math.exp((age - ELDER_AGE) / 6);
       yearly *= healthFactor * (p.home && cov.get("health")!.has(p.home) ? 0.8 : 1);
+      if (isMember(p, z)) yearly *= MEMBER_DEATH_FACTOR;
       if (Math.random() < yearly / WEEKS_PER_AGE_YEAR) died.push(p);
     } else if (age >= 20 && age <= 45 && p.home && Math.random() < BIRTH_CHANCE) {
       // The baby lives with the family, or with relatives if there's no room.

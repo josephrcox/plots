@@ -32,6 +32,8 @@
   $: jobTitle =
     person.job === GUARD
       ? "Guardian"
+      : jobOption?.type === "retirement"
+        ? `Retired · spends their days at the ${jobOption.title.toLowerCase()}`
       : jobOption
         ? `${careerOf(jobOption.id)?.title ?? "Worker"} at the ${jobOption.title.toLowerCase()}`
         : stage === "child"

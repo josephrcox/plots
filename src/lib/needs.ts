@@ -32,7 +32,7 @@ export const SERVICES: Service[] = [
     short: "Recreation",
     emoji: "🛝",
     title: "Recreation",
-    providers: { park: 2, stables: 2, pub: 2, vineyard: 2, village_inn: 3 },
+    providers: { park: 2, stables: 2, pub: 2, vineyard: 2, village_inn: 3, social_club: 2 },
     hurts: "happiness",
   },
   {
@@ -56,7 +56,7 @@ export const SERVICES: Service[] = [
     short: "Faith",
     emoji: "⛪",
     title: "Faith & culture",
-    providers: { church: 3, library: 3 },
+    providers: { church: 3, library: 3, museum: 3 },
     hurts: "happiness",
   },
   {

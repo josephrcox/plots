@@ -35,7 +35,7 @@ export const NOVELTY = {
   expansion: 30,
 };
 
-const AMENITY_TYPES = new Set(["recreation", "medical", "education", "shop", "tourism"]);
+const AMENITY_TYPES = new Set(["recreation", "medical", "education", "shop", "tourism", "retirement"]);
 
 export function boredom(z: Game): number {
   return z.boredom ?? 0;

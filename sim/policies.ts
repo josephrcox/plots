@@ -5,6 +5,7 @@ import { buildable, build, options } from "./harness";
 import { countJobs } from "../src/lib/store";
 import { levelStatus } from "../src/lib/housing";
 import { needStatus } from "../src/lib/needs";
+import { isRetired, isMember } from "../src/lib/people";
 import type { Game } from "../src/lib/types";
 
 export type Style = { name: string; w: Record<string, number>; homesAt: number; taxRate: number };
@@ -58,6 +59,13 @@ export function decide(g: Game, s: Style): string | null {
   }
   if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || (g.resource_rate.wood < 1 && g.resources.wood < g.resource_capacity * 0.8) || g.resources.wood < 40) {
     if (can.includes("tree_farm")) return "tree_farm";
+  }
+  // Retirees with nowhere to go: build a place for them.
+  const idleRetirees = (g.people ?? []).filter((p) => isRetired(p, g) && !isMember(p, g)).length;
+  if (idleRetirees >= 8) {
+    const count = (id: string) => g.plots.flat().filter((p) => p.typeId === id).length;
+    const venue = can.filter((c) => options.find((o) => o.id === c)?.type === "retirement").sort((a, b) => count(a) - count(b))[0];
+    if (venue) return venue;
   }
   // Unmet town needs: build the cheapest provider of the worst one.
   const unmet = needStatus(g).filter((n) => !n.met).sort((a, b) => (b.target - b.covered) - (a.target - a.covered));

@@ -44,6 +44,7 @@ export const CATEGORIES: Category[] = [
     emoji: "🎓",
     types: ["education", "science"],
   },
+  { id: "retirees", label: "Retirees", emoji: "🧓", types: ["retirement"] },
   { id: "civic", label: "Civic", emoji: "🏛️", types: ["federal"] },
 ];
 

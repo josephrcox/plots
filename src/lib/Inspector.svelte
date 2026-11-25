@@ -32,7 +32,8 @@
   $: level = $DB && plot && home ? levelStatus(plot, $DB, home.people >= home.capacity) : null;
   // Who lives or works here (#64).
   $: people = $DB && plot ? ($DB.people ?? []).filter((p) => p.home === plot!.id || p.job === plot!.id) : [];
-  $: peopleLabel = home ? "Residents" : "Workers";
+  $: venue = option?.type === "retirement";
+  $: peopleLabel = home ? "Residents" : venue ? "Members" : "Workers";
 
   function replace() {
     if (!pos) return;
@@ -100,7 +101,13 @@
         {/if}
       </div>
     {/if}
-    {#if staff && staff.staffed < staff.needed}
+    {#if staff && venue}
+      <span class="chip text-white {staff.staffed > 0 ? 'bg-green-700' : 'bg-sky-800'}"
+        >🧓 {staff.staffed} of {staff.needed} members · retirees spend their days here{staff.staffed === 0
+          ? ". It fills as townspeople retire."
+          : ""}</span
+      >
+    {:else if staff && staff.staffed < staff.needed}
       <span class="chip bg-amber-600 text-white"
         >👷 {staff.staffed} of {staff.needed} workers: running at {Math.round(
           (staff.staffed / staff.needed) * 100,

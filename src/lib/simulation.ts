@@ -6,6 +6,7 @@
 
 import { get } from "svelte/store";
 import { updateBoredom, relieve, NOVELTY } from "./boredom";
+import { VENUE, EXHIBITS } from "./retirement";
 import { syncPeople, assignJobs, updateMoods, updateEducation, educationBoost, personMood, moodParts, townAppetite, lifeEvents, migrateAges, ageOf, updateRequest } from "./people";
 import {
   DB,
@@ -107,6 +108,7 @@ function performWeeklyTasks(db: Game) {
   db = bringStatsBackToNormal(db);
   db = neighbourEffects(db);
   db = townNeedsEffects(db);
+  db = retireeVenues(db);
   db = boredomEffects(db);
   db = feedCitizens(db);
   db = lifeWeekly(db);
@@ -293,6 +295,11 @@ function getProfit(
     profitModifiers *= 1.1;
   } else if (z.townInfo.community < 100) {
     profitModifiers *= 0.8;
+  }
+
+  // Museums draw visitors who stay at the inn.
+  if (option.id === "village_inn" && hasPlotOfType("museum", z).length > 0) {
+    profitModifiers *= VENUE.museum.innBoost;
   }
 
   if (option.type === "shop" && villageInnCount > 0) {
@@ -719,17 +726,20 @@ function lawEffects(z: Game) {
 
 function calculatePower(z: Game) {
   let power = 0;
+  let demand = 0;
   const staff = staffing(z);
   forEachBuiltPlot(z, (plot, option) => {
     power +=
       option.generated_resources.power * staffRatio(staff, plot) -
       option.active_costs.power;
+    demand += option.active_costs.power;
   });
   z.resources.power = power;
 
   if (power < 0) {
-    z.modifiers.happiness *= 0.98;
-    z.townInfo.happiness -= 5;
+    // Worse the bigger the shortfall, but steady rather than snowballing.
+    const short = demand > 0 ? Math.min(1, -power / demand) : 1;
+    z.townInfo.happiness -= Math.min(5, 1 + 8 * short);
     z = addToTownLog(POWER_SHORTAGE_MSG, z, Vibe.BAD);
   } else {
     removeFromTownLog(z, POWER_SHORTAGE_MSG);
@@ -989,6 +999,21 @@ function peopleWeekly(z: Game) {
   }
   z.townInfo.happiness = base + (z.moodAverage ?? 0);
   z.moodShown = z.townInfo.happiness;
+  return z;
+}
+
+/** Places for retirees: the social club and the museum's exhibits. */
+function retireeVenues(z: Game) {
+  const staff = staffing(z);
+  forEachBuiltPlot(z, (plot, option) => {
+    const fill = staffRatio(staff, plot);
+    if (!fill || option.type !== "retirement") return;
+    if (option.id === "social_club") z.townInfo.community += VENUE.social_club.community * fill;
+    if (option.id === "museum" && Math.floor(z.environment.day / 7) % VENUE.museum.exhibitWeeks === 0) {
+      relieve(z, VENUE.museum.boredomRelief * fill);
+      z = addToTownLog(`🖼️ New exhibit at the museum: ${pick(EXHIBITS)}.`, z, Vibe.GOOD);
+    }
+  });
   return z;
 }
 

@@ -49,7 +49,9 @@
     <span class="font-mono opacity-80">
       {#each costs as [icon, n]}<span class="mr-2">{icon}{formatAmount(Number(n))}</span>{/each}
     </span>
-    {#if needed > 0}
+    {#if needed > 0 && option.type === "retirement"}
+      <span class="opacity-80">🧓 Room for {needed} retirees</span>
+    {:else if needed > 0}
       {#if free >= needed}
         <span class="opacity-80">👷 {needed} workers ({free} free)</span>
       {:else}

@@ -132,7 +132,10 @@
         {/each}
       </span>
     {/each}
-    {#if req.employees > 0}
+    {#if req.employees > 0 && option.type === "retirement"}
+      <span class="label">Members</span>
+      <span><span class="chip">🧓 {req.employees} retirees</span></span>
+    {:else if req.employees > 0}
       <span class="label">Workers</span>
       <span class="flex flex-wrap gap-1"
         ><span class="chip">👷 {req.employees}</span>

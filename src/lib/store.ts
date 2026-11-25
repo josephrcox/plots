@@ -540,7 +540,8 @@ export function countJobs(z: Game): number {
   let jobs = z.townInfo.guardians;
   for (const row of z.plots) {
     for (const plot of row) {
-      if (plot.active && plot.type > -1) {
+      // Places for retirees have members, not jobs.
+      if (plot.active && plot.type > -1 && options[plot.type]?.type !== "retirement") {
         jobs += options[plot.type]?.requirements.employees ?? 0;
       }
     }

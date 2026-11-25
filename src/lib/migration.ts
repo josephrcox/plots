@@ -36,7 +36,7 @@ export function attraction(z: Game): { factor: number; reasons: Reason[] } {
   let jobs = 0;
   for (const row of z.plots) {
     for (const p of row) {
-      if (p.active && p.type > -1) jobs += options[p.type]?.requirements.employees ?? 0;
+      if (p.active && p.type > -1 && options[p.type]?.type !== "retirement") jobs += options[p.type]?.requirements.employees ?? 0;
     }
   }
   jobs += info.guardians;

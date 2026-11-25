@@ -5,7 +5,7 @@ import { newTown, alive, stepDays, seed, options } from "./harness";
 import { STYLES, ruleWeek } from "./policies";
 import { reverseClear } from "../src/lib/store";
 import { homeCapacity } from "../src/lib/housing";
-import { GUARD, plotById, worksDream, wishes, moodSummary, ageMix, canWork, REQUIRED_EDU, currentRequest } from "../src/lib/people";
+import { GUARD, plotById, worksDream, wishes, moodSummary, ageMix, canWork, REQUIRED_EDU, currentRequest, isRetired, isMember } from "../src/lib/people";
 import type { Game } from "../src/lib/types";
 
 const MAPS = +(process.argv[2] ?? 5);
@@ -49,12 +49,17 @@ function invariants(z: Game, where: string) {
   }
   check(guards <= z.townInfo.guardians, `${where}: ${guards} guards > ${z.townInfo.guardians} guardians`);
   check(z.townInfo.population_count <= z.townInfo.population_max, `${where}: population over capacity`);
-  const employed = people.filter((p) => p.job).length;
+  const employed = people.filter((p) => p.job && !isMember(p, z)).length;
   check(z.townInfo.employees === employed, `${where}: employees ${z.townInfo.employees} ≠ employed ${employed}`);
   check(people.every((p) => p.edu >= 0 && p.edu <= 3 && Number.isFinite(p.mood)), `${where}: bad edu or mood`);
   check(Number.isFinite(z.townInfo.happiness), `${where}: happiness not finite`);
   for (const p of people) {
     if (!p.job || p.job === GUARD) continue;
+    const jp = plotById(z, p.job);
+    if (jp && options[jp.type]?.type === "retirement") {
+      check(isRetired(p, z), `${where}: ${p.name} is a venue member but not retired`);
+      continue;
+    }
     check(canWork(p, z), `${where}: ${p.name} works but can't (child or retired)`);
     const job = plotById(z, p.job);
     const need = job ? REQUIRED_EDU[options[job.type].id] ?? 0 : 0;
@@ -87,6 +92,9 @@ for (let m = 1; m <= MAPS; m++) {
   console.log(`   wishes: ${wishes(z).map((x) => x.text).join("; ")}`);
   const mix = ageMix(z);
   const req = currentRequest(z);
+  const members = p.filter((x) => isMember(x, z)).length;
+  const retired = p.filter((x) => isRetired(x, z)).length;
+  console.log(`   retirees ${retired}, at venues ${members}; venues built: ${z.plots.flat().filter((q) => q.active && options[q.type]?.type === "retirement").map((q) => options[q.type].id).join(", ") || "none"}`);
   console.log(`   ages: ${mix.child} children, ${mix.adult} adults, ${mix.elder} elders; births ${z.lifeStats?.births ?? 0}, deaths ${z.lifeStats?.deaths ?? 0}; request: ${req ? `${req.person.name} ${req.text}` : "none"}`);
 }
 console.log(`${checks} checks, ${failures} failures`);

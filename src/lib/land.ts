@@ -27,7 +27,7 @@ const SPREAD = [1, 0.6, 0.25];
 /** Share of pollution that stays each week. */
 const PERSIST = 0.94;
 /** Extra cleanup on tiles next to these. */
-const ABSORBERS: Record<string, number> = { park: 0.3, tree_farm: 0.12 };
+const ABSORBERS: Record<string, number> = { park: 0.3, tree_farm: 0.12, community_garden: 0.2 };
 export const MAX_POLLUTION = 100;
 
 /** Land value added at distance 1 and 2 (noise is negative). */
@@ -44,6 +44,11 @@ export const AMENITIES: Record<string, [number, number]> = {
   general_store: [6, 3],
   bakery: [3, 1],
   village_inn: [4, 2],
+  community_garden: [8, 4],
+  museum: [6, 3],
+  social_club: [4, 2],
+  storyteller: [3, 1],
+  craft_guild: [2, 1],
   pub: [-6, -2],
   water_wheel: [-3, -1],
   farm: [-1, 0],

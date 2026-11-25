@@ -57,6 +57,7 @@
   } from "./Plot.svelte";
   import ExpandButton from "./ExpandButton.svelte";
   import { homeOccupancy } from "./migration";
+  import { options } from "./objects/PlotTypeOptions";
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
   import HoverCard from "./HoverCard.svelte";
@@ -571,6 +572,8 @@
             tintLabel={overlays[x]?.[y]?.label ?? null}
             understaffed={(() => {
               const s = staff?.get(plot.id);
+              // Places for retirees fill as people retire; not a shortage.
+              if (plot.type > -1 && options[plot.type]?.type === "retirement") return false;
               return !!s && s.staffed < s.needed;
             })()}
           />
