@@ -789,7 +789,7 @@
     width: 90px;
     height: 105px;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background: rgb(232, 226, 120);
+    background: rgb(196, 188, 160); /* muted earth: yellow means buildable */
     pointer-events: none;
   }
   .fringe.water {

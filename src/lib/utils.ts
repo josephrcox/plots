@@ -240,7 +240,11 @@ export function randomizeNumber(n: number, round: number = 0) {
 export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
   const plot = z.plots[x]?.[y];
   if (!plot || plot.offMap || plot.water || isFogged(z, plot)) return false;
-  if (!townHasStarted(z)) return true;
+  // The town is founded on its suggested start; everything grows from there.
+  if (!townHasStarted(z)) {
+    const start = suggestedStart(z);
+    return !!start && start[0] === x && start[1] === y;
+  }
   return hexNeighbours(x, y, z).some((p) => p.active);
 }
 
