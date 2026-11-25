@@ -1,5 +1,6 @@
 import { relieve, NOVELTY } from "./boredom";
 import { get, writable, type Writable } from "svelte/store";
+import { initFog, reveal } from "./fog";
 import { default_db, default_user_db } from "./objects/defaults/default_DB";
 import {
   type Difficulty,
@@ -163,6 +164,8 @@ export function normalizeGame(raw: any): Game | null {
     placeSites(game);
     game.sitesPlaced = true;
   }
+  // Towns from before fog of war (#62): everything away from the town is unexplored.
+  if (game.fog === undefined) initFog(game);
   // Older saves stored job openings here, which could exceed population.
   migrateAges(game);
   syncEmployment(game);
@@ -380,6 +383,7 @@ export function startGame(
   json.plots = generatePlots(GRID_SIZE_BY_DIFFICULTY[difficulty] ?? 12);
   placeSites(json);
   json.sitesPlaced = true;
+  initFog(json);
 
   const serialized = JSON.stringify(json);
   localStorage.setItem(ACTIVE_GAME_DB_NAME, serialized);
@@ -648,8 +652,9 @@ export function expandTown(z: Game, direction: string): string | undefined {
     z.plots[i][j] = plotFromCell(i, j, grid[i][j]);
     fresh.push(z.plots[i][j]);
   }
-  // New land brings new special sites.
+  // New land brings new special sites, and it's yours: no fog on it.
   placeSites(z, fresh);
+  reveal(z, fresh);
 
   z.kingdom_expansions++;
   relieve(z, NOVELTY.expansion);

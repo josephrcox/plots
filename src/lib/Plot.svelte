@@ -43,15 +43,18 @@
   /** Map overlay tint and its number, when an overlay is on. */
   export let tint: string | null = null;
   /** Homes: level (1–3) and which way it's heading. */
+  export let fogged = false;
   export let homeLevel = 0;
   export let levelTrend: "up" | "down" | "steady" = "steady";
   export let tintLabel: string | null = null;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
-  $: site = siteOf(data);
+  $: site = fogged ? undefined : siteOf(data);
   $: mineral = data.site === "mineral";
   $: usedSite = siteFor(data);
-  $: fill = data.water
+  $: fill = fogged
+    ? "rgb(120, 128, 140)"
+    : data.water
     ? "rgb(64, 140, 170)"
     : tint && !option && !mineral
       ? "rgb(205, 200, 185)" // neutral under an overlay, so the tint reads
@@ -86,11 +89,14 @@
   <div
     class="inner"
     class:inset={ring !== ""}
-    class:water={data.water}
+    class:water={data.water && !fogged}
+    class:fog={fogged}
     class:sparkle={nearWater}
     style="background-color:{fill};"
   >
-    {#if state === "ghost"}
+    {#if fogged}
+      <span class="cloud">☁️</span>
+    {:else if state === "ghost"}
       <span class="emoji opacity-70">{ghostEmoji}</span>
     {:else if option}
       <span class="emoji">{option.emoji}</span>
@@ -236,6 +242,14 @@
     border-radius: 9999px;
     padding: 0 3px;
     font-size: 0.7rem;
+  }
+  .inner.fog {
+    opacity: 0.55;
+    filter: blur(0.3px);
+  }
+  .cloud {
+    font-size: 1.1rem;
+    opacity: 0.5;
   }
   .site-title {
     font-size: 0.62rem;

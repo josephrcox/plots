@@ -2,6 +2,7 @@
 // the placement rules the build bar and map share.
 
 import { writable } from "svelte/store";
+import { isFogged } from "./fog";
 import { siteOf, allowedTitles, REQUIRES_SITE, SITES } from "./sites";
 import { options, plotTypeMaximums } from "./objects/PlotTypeOptions";
 import type { Game, PlotOption } from "./types";
@@ -128,6 +129,7 @@ export function placementCheck(
 ): Check {
   const plot = z.plots[x]?.[y];
   if (!plot || plot.offMap) return { ok: false, reason: "" };
+  if (isFogged(z, plot)) return { ok: false, reason: "Unexplored land: build closer to explore it" };
   if (plot.water) return { ok: false, reason: "Can't build on water" };
   const site = siteOf(plot);
   if (site && !site.allows.includes(option.id)) {

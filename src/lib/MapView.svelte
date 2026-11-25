@@ -61,6 +61,7 @@
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
   import { siteOf, allowedTitles } from "./sites";
+  import { isFogged } from "./fog";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -165,7 +166,7 @@
   // Overlay tints (#59). Land value: red below ordinary, green above.
   // Pollution: brown, stronger the dirtier.
   function overlayFor(p: PlotData, mode: string, z: typeof $DB) {
-    if (mode === "none" || !z || p.water || p.offMap) return null;
+    if (mode === "none" || !z || p.water || p.offMap || isFogged(z, p)) return null;
     if (mode === "pollution") {
       const v = p.pollution ?? 0;
       if (v < 1) return { tint: "rgba(80, 200, 120, 0.18)", label: null };
@@ -265,7 +266,7 @@
     if (plot.active) {
       targetTile.set(null);
       inspected.set(pos);
-    } else if (buildable[pos.x]?.[pos.y] || plot.site === "mineral") {
+    } else if (buildable[pos.x]?.[pos.y] || (plot.site === "mineral" && !isFogged(z, plot))) {
       inspected.set(null);
       const same = $targetTile?.x === pos.x && $targetTile?.y === pos.y;
       targetTile.set(same ? null : pos);
@@ -323,7 +324,7 @@
     const started = townHasStarted($DB);
     for (const row of $DB.plots) {
       for (const p of row) {
-        if (started ? !p.active : p.offMap) continue;
+        if (started ? !p.active : p.offMap || isFogged($DB, p)) continue;
         minX = Math.min(minX, tileLeft(p.x, p.y));
         maxX = Math.max(maxX, tileLeft(p.x, p.y) + TILE_W);
         minY = Math.min(minY, tileTop(p.x));
@@ -569,6 +570,7 @@
             crosshair={$settingLiegeLocation && plot.active}
             startHint={startTile?.[0] === x && startTile?.[1] === y}
             occupancy={occupancy?.get(plot.id) ?? null}
+            fogged={isFogged($DB, plot)}
             homeLevel={levels.get(plot.id)?.level ?? 0}
             levelTrend={levels.get(plot.id)?.trend ?? "steady"}
             tint={overlays[x]?.[y]?.tint ?? null}
@@ -657,7 +659,7 @@
     </div>
   {/if}
 
-  {#if $overlay === "none" && $tool.kind === "none" && hoveredPlot && siteOf(hoveredPlot) && !dragged}
+  {#if $overlay === "none" && $tool.kind === "none" && hoveredPlot && siteOf(hoveredPlot) && !isFogged($DB, hoveredPlot) && !dragged}
     {@const site = siteOf(hoveredPlot)}
     <div
       class="fixed z-30 pointer-events-none w-56 rounded-lg bg-popupBackground text-white text-xs p-2 shadow-xl flex flex-col gap-1"
@@ -669,7 +671,7 @@
     </div>
   {/if}
 
-  {#if $overlay !== "none" && $tool.kind === "none" && hoveredPlot && !hoveredPlot.water && !hoveredPlot.offMap && !dragged && $DB}
+  {#if $overlay !== "none" && $tool.kind === "none" && hoveredPlot && !hoveredPlot.water && !hoveredPlot.offMap && !isFogged($DB, hoveredPlot) && !dragged && $DB}
     {@const lv = landValue(hoveredPlot.x, hoveredPlot.y, $DB)}
     {@const pol = pollutionAt($DB, hoveredPlot.x, hoveredPlot.y)}
     <div

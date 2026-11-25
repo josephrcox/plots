@@ -31,6 +31,7 @@ export type Plot = {
   offMap?: boolean; // outside the town's land: not drawn, never usable
   snoozedUntil?: number;
   builtDay?: number; // game day the current building was placed
+  seen?: boolean; // explored (fog of war, #62)
   site?: string; // special site (sites.ts): only some buildings fit, and they do better
   pollution?: number; // 0–100, builds up from nearby industry (land.ts)
   novelty?: number; // boredom relief this building gave (taken back if bulldozed soon)
@@ -154,6 +155,8 @@ export type Game = {
   moodBase?: number; // town happiness before personal moods (option B, #64)
   moodAverage?: number; // average personal mood offset
   moodShown?: number;
+  fog?: boolean; // fog of war is on for this town (#62)
+  fogReady?: boolean; // initial reveal done; later reveals log discoveries
   sitesPlaced?: boolean; // special sites (#63) have been placed on this town's land
   ageScale?: number; // days per year of age the people's birth days use (#65)
   lifeStats?: { births: number; deaths: number };

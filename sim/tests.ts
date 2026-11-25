@@ -55,6 +55,7 @@ function invariants(z: Game, where: string) {
   check(people.every((p) => p.edu >= 0 && p.edu <= 3 && Number.isFinite(p.mood)), `${where}: bad edu or mood`);
   check(Number.isFinite(z.townInfo.happiness), `${where}: happiness not finite`);
   for (const pl of z.plots.flat()) {
+    check(!(pl.active && z.fog && !pl.seen), `${where}: building on unexplored land`);
     const site = siteOf(pl);
     if (site && pl.active && pl.type > -1) check(site.allows.includes(options[pl.type].id), `${where}: ${options[pl.type].id} built on ${site.id}`);
   }

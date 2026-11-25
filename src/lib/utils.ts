@@ -1,5 +1,6 @@
 import { recordBuild } from "./boredom";
 import { type ClassValue, clsx } from "clsx";
+import { revealAround, isFogged } from "./fog";
 import { twMerge } from "tailwind-merge";
 import { syncCapacity } from "./housing";
 import { cubicOut } from "svelte/easing";
@@ -238,7 +239,7 @@ export function randomizeNumber(n: number, round: number = 0) {
  */
 export function checkIfPlotCanBeUpgraded(x: number, y: number, z: Game) {
   const plot = z.plots[x]?.[y];
-  if (!plot || plot.offMap || plot.water) return false;
+  if (!plot || plot.offMap || plot.water || isFogged(z, plot)) return false;
   if (!townHasStarted(z)) return true;
   return hexNeighbours(x, y, z).some((p) => p.active);
 }
@@ -433,6 +434,7 @@ export function placePlot(
   syncEmployment(z);
 
   plot.novelty = recordBuild(z, plotChosen);
+  revealAround(z, x, y);
 
   z.plotCounts[typeIndex] = (z.plotCounts[typeIndex] ?? 0) + 1;
   z.lastChangeDay = z.environment.day;

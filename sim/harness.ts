@@ -5,6 +5,7 @@ import { DB, createDefaultGame, generatePlots, disabledPlotMenu, clearPlot, user
 import { simulateDay } from "../src/lib/simulation";
 import { rollBaseTolerance } from "../src/lib/tax";
 import { placeSites, siteOf } from "../src/lib/sites";
+import { initFog } from "../src/lib/fog";
 import { placePlot, isAdjacentToWater } from "../src/lib/utils";
 import { availability, placementCheck } from "../src/lib/ui";
 import { options } from "../src/lib/objects/PlotTypeOptions";
@@ -30,6 +31,7 @@ export function newTown(mapSeed: number, difficulty = 1): Game {
   g.plots = generatePlots({ 0: 8, 1: 12, 2: 16, 3: 16 }[difficulty] ?? 12);
   placeSites(g);
   g.sitesPlaced = true;
+  initFog(g);
   return g;
 }
 
