@@ -1,0 +1,3 @@
+import { options } from "./harness";
+const nz = (o: any) => Object.entries(o).filter(([, v]) => v).map(([k, v]) => `${k}${v}`).join(",");
+for (const o of options) console.log([o.id, o.type, "g" + o.requirements.gold, "kn" + o.requirements.knowledge, "emp" + o.requirements.employees, "req[" + nz(o.requirements.resources) + "]", "adj[" + o.requirements.adjacent_plots + "]", "plots[" + o.requirements.plots + "]", "rev" + o.revenue_per_week, "gen[" + nz(o.generated_resources) + "]", "cost[" + nz(o.active_costs) + "]", "kpm" + o.knowledge_points_per_month, "pop" + o.immediate_variable_changes.population, "wk[" + nz(Object.fromEntries(Object.entries(o.weekly_effect_modifiers).map(([k, v]) => [k, v === 1 ? 0 : v]))) + "]"].join(" "));

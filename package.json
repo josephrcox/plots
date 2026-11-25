@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "sim": "sh sim/build.sh && node sim/dist/run.mjs ${MAPS:-30} ${YEARS:-3} > /dev/null && node sim/dist/consequences.mjs ${MAPS:-30} > /dev/null && node sim/scorecard.mjs",
+    "sim:score": "node sim/scorecard.mjs"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",
