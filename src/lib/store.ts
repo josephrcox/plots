@@ -159,6 +159,11 @@ export function normalizeGame(raw: any): Game | null {
       delete p.mineralSource;
     }
   }
+  // Drop repeated log messages (an old bug could add the same one twice).
+  if (Array.isArray(game.townLog)) {
+    const seen = new Set<string>();
+    game.townLog = game.townLog.filter((l) => !seen.has(l.message) && !!seen.add(l.message));
+  }
   // Towns from before special sites (#63) get them on their empty land.
   if (!game.sitesPlaced) {
     placeSites(game);

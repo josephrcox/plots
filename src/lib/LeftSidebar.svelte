@@ -182,7 +182,7 @@
     <!-- Town log -->
     <span class="heading">Town log</span>
     <div class="flex flex-col gap-1.5 overflow-y-auto no-scrollbar flex-1 min-h-0 -mt-1">
-      {#each $DB.townLog as log (log.day + log.message)}
+      {#each $DB.townLog as log, i (log.day + log.message + i)}
         <div
           class="log"
           class:bad={log.vibe == Vibe.BAD}
