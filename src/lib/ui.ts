@@ -2,6 +2,7 @@
 // the placement rules the build bar and map share.
 
 import { writable } from "svelte/store";
+import { siteOf, allowedTitles, REQUIRES_SITE, SITES } from "./sites";
 import { options, plotTypeMaximums } from "./objects/PlotTypeOptions";
 import type { Game, PlotOption } from "./types";
 import { hasPlotOfType } from "./store";
@@ -128,11 +129,14 @@ export function placementCheck(
   const plot = z.plots[x]?.[y];
   if (!plot || plot.offMap) return { ok: false, reason: "" };
   if (plot.water) return { ok: false, reason: "Can't build on water" };
-  if (plot.mineralSource && option.id !== "mine") {
-    return { ok: false, reason: "Only a Mine fits on a mineral deposit" };
+  const site = siteOf(plot);
+  if (site && !site.allows.includes(option.id)) {
+    return { ok: false, reason: `Only ${allowedTitles(site)} fit on ${site.title.toLowerCase()}` };
   }
-  if (option.id === "mine" && !plot.mineralSource) {
-    return { ok: false, reason: "Mines go on mineral deposits 🧲" };
+  const needs = REQUIRES_SITE[option.id];
+  if (needs && plot.site !== needs) {
+    const s = SITES.find((x) => x.id === needs)!;
+    return { ok: false, reason: `Only goes on a ${s.title.toLowerCase()} ${s.emoji}` };
   }
   if (plot.active && !replacing) {
     return { ok: false, reason: "Occupied" };

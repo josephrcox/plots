@@ -4,6 +4,7 @@ import { get } from "svelte/store";
 import { DB, createDefaultGame, generatePlots, disabledPlotMenu, clearPlot, userDB } from "../src/lib/store";
 import { simulateDay } from "../src/lib/simulation";
 import { rollBaseTolerance } from "../src/lib/tax";
+import { placeSites, siteOf } from "../src/lib/sites";
 import { placePlot, isAdjacentToWater } from "../src/lib/utils";
 import { availability, placementCheck } from "../src/lib/ui";
 import { options } from "../src/lib/objects/PlotTypeOptions";
@@ -27,6 +28,8 @@ export function newTown(mapSeed: number, difficulty = 1): Game {
   g.townInfo.name = "Sim";
   g.economyAndLaws.max_tax_rate = rollBaseTolerance(difficulty);
   g.plots = generatePlots({ 0: 8, 1: 12, 2: 16, 3: 16 }[difficulty] ?? 12);
+  placeSites(g);
+  g.sitesPlaced = true;
   return g;
 }
 
@@ -82,6 +85,9 @@ function tileScore(g: Game, id: string, p: Plot): number {
   const idOf = (q: Plot) => (q.active && q.type > -1 ? options[q.type].id : "");
   const homesNear = (ring: Plot[]) => ring.filter((q) => options[q.type]?.type === "residential" && q.active).length;
   let s = 0.2 * nb.length; // compact towns keep options open
+  // A special site that fits is worth using (and others shouldn't waste it).
+  const site = siteOf(p);
+  if (site) s += site.allows.includes(id) ? 5 : -5;
   if (opt.revenue_per_week > 0 && isAdjacentToWater(p.x, p.y, g)) s += 3;
   if (opt.type === "residential") {
     s += (landValue(p.x, p.y, g).value - 50) / 5;

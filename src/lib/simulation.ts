@@ -7,6 +7,7 @@
 import { get } from "svelte/store";
 import { updateBoredom, relieve, NOVELTY } from "./boredom";
 import { VENUE, EXHIBITS } from "./retirement";
+import { siteResource, siteIncome } from "./sites";
 import { syncPeople, assignJobs, updateMoods, updateEducation, educationBoost, personMood, moodParts, townAppetite, lifeEvents, migrateAges, ageOf, updateRequest } from "./people";
 import {
   DB,
@@ -312,6 +313,8 @@ function getProfit(
   }
 
   profitModifiers *= synergyAt(x, y, z).income;
+  const plot = z.plots[x]?.[y];
+  if (plot) profitModifiers *= siteIncome(plot);
 
   const occupancy =
     z.townInfo.population_max > 0
@@ -698,7 +701,7 @@ function generateResources(z: Game) {
     const liegeBonus = isLiegeOnPlot(i, j, z) ? 2 : 1;
     // Neighbour synergies (livestock by farms, tree farms by a lumber mill),
     // times the share of the building's jobs that are filled.
-    const synergy = synergyAt(i, j, z).resource * staffRatio(staff, plot);
+    const synergy = synergyAt(i, j, z).resource * staffRatio(staff, plot) * siteResource(plot);
 
     // No per-building rounding: outputs are small (a farm makes ~1 food).
     z.resources.food +=

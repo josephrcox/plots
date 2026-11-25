@@ -17,6 +17,7 @@ import {
 import { serviceImpact, SERVICES, coverage, servicesAt } from "./needs";
 import { landMood } from "./people";
 import { strength, STEPS } from "./strength";
+import { siteOf, siteFor } from "./sites";
 
 const LIVESTOCK_NEAR_FARM = 1.25;
 const TREE_FARM_NEAR_MILL = 1.5;
@@ -185,6 +186,8 @@ export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
   }
   const synergy = synergyFor(option.id, x, y, z);
   if (synergy.reason) lines.push(synergyLine(synergy));
+  const site = siteFor(plot);
+  if (site) lines.push({ text: `${site.emoji} On ${site.title.toLowerCase()}: ${site.bonus.toLowerCase()}`, good: true, strength: 3 });
   const [d1, d2] = rings(x, y, z);
   const homes = [...d1, ...d2].filter((p) => isHome(builtOption(p))).length;
   if (homes > 0 && POLLUTERS[option.id]) {
@@ -206,6 +209,8 @@ export function previewPlacement(
   ];
   const plot = z.plots[x]?.[y];
   if (!plot) return lines;
+  const site = siteOf(plot);
+  if (site?.allows.includes(optionId)) lines.unshift({ text: `${site.emoji} ${site.title}: ${site.bonus.toLowerCase()}`, good: true, strength: 3 });
   // Synergies need the building in place to check its neighbours.
   const typeIndex = options.findIndex((o) => o.id === optionId);
   const saved = { type: plot.type, active: plot.active, typeId: plot.typeId, disabled: plot.disabled };

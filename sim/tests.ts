@@ -7,6 +7,7 @@ import { reverseClear } from "../src/lib/store";
 import { homeCapacity } from "../src/lib/housing";
 import { GUARD, plotById, worksDream, wishes, moodSummary, ageMix, canWork, REQUIRED_EDU, currentRequest, isRetired, isMember } from "../src/lib/people";
 import type { Game } from "../src/lib/types";
+import { siteOf, SITES } from "../src/lib/sites";
 
 const MAPS = +(process.argv[2] ?? 5);
 const YEARS = +(process.argv[3] ?? 3);
@@ -53,6 +54,10 @@ function invariants(z: Game, where: string) {
   check(z.townInfo.employees === employed, `${where}: employees ${z.townInfo.employees} ≠ employed ${employed}`);
   check(people.every((p) => p.edu >= 0 && p.edu <= 3 && Number.isFinite(p.mood)), `${where}: bad edu or mood`);
   check(Number.isFinite(z.townInfo.happiness), `${where}: happiness not finite`);
+  for (const pl of z.plots.flat()) {
+    const site = siteOf(pl);
+    if (site && pl.active && pl.type > -1) check(site.allows.includes(options[pl.type].id), `${where}: ${options[pl.type].id} built on ${site.id}`);
+  }
   for (const p of people) {
     if (!p.job || p.job === GUARD) continue;
     const jp = plotById(z, p.job);
@@ -95,6 +100,8 @@ for (let m = 1; m <= MAPS; m++) {
   const members = p.filter((x) => isMember(x, z)).length;
   const retired = p.filter((x) => isRetired(x, z)).length;
   console.log(`   retirees ${retired}, at venues ${members}; venues built: ${z.plots.flat().filter((q) => q.active && options[q.type]?.type === "retirement").map((q) => options[q.type].id).join(", ") || "none"}`);
+  const sites = z.plots.flat().filter((q) => q.site);
+  console.log(`   sites: ${sites.map((q) => `${SITES.find((s) => s.id === q.site)?.emoji}${q.active ? "✓" : ""}`).join(" ")}`);
   console.log(`   ages: ${mix.child} children, ${mix.adult} adults, ${mix.elder} elders; births ${z.lifeStats?.births ?? 0}, deaths ${z.lifeStats?.deaths ?? 0}; request: ${req ? `${req.person.name} ${req.text}` : "none"}`);
 }
 console.log(`${checks} checks, ${failures} failures`);

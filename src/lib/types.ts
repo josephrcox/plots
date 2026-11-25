@@ -27,11 +27,11 @@ export type Plot = {
   type: number;
   disabled: boolean;
   typeId: string;
-  mineralSource: boolean;
   water: boolean;
   offMap?: boolean; // outside the town's land: not drawn, never usable
   snoozedUntil?: number;
   builtDay?: number; // game day the current building was placed
+  site?: string; // special site (sites.ts): only some buildings fit, and they do better
   pollution?: number; // 0–100, builds up from nearby industry (land.ts)
   novelty?: number; // boredom relief this building gave (taken back if bulldozed soon)
   level?: number; // homes only: 1–3, see housing.ts (absent = 1)
@@ -154,6 +154,7 @@ export type Game = {
   moodBase?: number; // town happiness before personal moods (option B, #64)
   moodAverage?: number; // average personal mood offset
   moodShown?: number;
+  sitesPlaced?: boolean; // special sites (#63) have been placed on this town's land
   ageScale?: number; // days per year of age the people's birth days use (#65)
   lifeStats?: { births: number; deaths: number };
   request?: { personId: number; kind: "near" | "job"; target: string; since: number; reward: number }; // happiness shown after the last weekly update

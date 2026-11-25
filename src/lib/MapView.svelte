@@ -60,6 +60,7 @@
   import { options } from "./objects/PlotTypeOptions";
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
+  import { siteOf, allowedTitles } from "./sites";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -264,7 +265,7 @@
     if (plot.active) {
       targetTile.set(null);
       inspected.set(pos);
-    } else if (buildable[pos.x]?.[pos.y] || plot.mineralSource) {
+    } else if (buildable[pos.x]?.[pos.y] || plot.site === "mineral") {
       inspected.set(null);
       const same = $targetTile?.x === pos.x && $targetTile?.y === pos.y;
       targetTile.set(same ? null : pos);
@@ -653,6 +654,18 @@
         <div class="flex justify-between opacity-80"><span>Clean</span><span>Toxic</span></div>
         <div class="opacity-70 mt-1 w-52">Mines, quarries, smithies and mills pollute 2 tiles around them. It builds up over months and fades slowly. Parks and tree farms clean it.</div>
       {/if}
+    </div>
+  {/if}
+
+  {#if $overlay === "none" && $tool.kind === "none" && hoveredPlot && siteOf(hoveredPlot) && !dragged}
+    {@const site = siteOf(hoveredPlot)}
+    <div
+      class="fixed z-30 pointer-events-none w-56 rounded-lg bg-popupBackground text-white text-xs p-2 shadow-xl flex flex-col gap-1"
+      style="left:{Math.min(mouse.x + 18, window.innerWidth - 240)}px; top:{Math.min(mouse.y + 18, window.innerHeight - 160)}px;"
+    >
+      <span class="font-semibold">{site?.emoji} {site?.title}</span>
+      <span class="text-green-300">{site?.bonus}</span>
+      <span class="opacity-75">Fits: {site ? allowedTitles(site) : ""}</span>
     </div>
   {/if}
 

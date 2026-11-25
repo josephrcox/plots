@@ -27,6 +27,7 @@
 <script lang="ts">
   import { options, getColor } from "./objects/PlotTypeOptions";
   import type { Plot } from "./types";
+  import { siteOf, siteFor } from "./sites";
 
   export let data: Plot;
   export let buildable = false;
@@ -47,11 +48,14 @@
   export let tintLabel: string | null = null;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
+  $: site = siteOf(data);
+  $: mineral = data.site === "mineral";
+  $: usedSite = siteFor(data);
   $: fill = data.water
     ? "rgb(64, 140, 170)"
-    : tint && !option && !data.mineralSource
+    : tint && !option && !mineral
       ? "rgb(205, 200, 185)" // neutral under an overlay, so the tint reads
-    : data.mineralSource && !option
+    : mineral && !option
       ? "rgb(20, 20, 20)"
       : getColor(data.type, buildable);
   $: ring =
@@ -109,8 +113,9 @@
           >👥 {occupancy.people}/{occupancy.capacity}</span
         >
       {/if}
-    {:else if data.mineralSource}
-      <span class="emoji">🧲</span>
+    {:else if site}
+      <span class="emoji">{site.emoji}</span>
+      <span class="title site-title" class:text-white={mineral}>{site.title}</span>
     {:else if startHint}
       <span class="emoji animate-bounce">🚩</span>
       <span class="title">Start here!</span>
@@ -129,6 +134,9 @@
     {:else if understaffed}
       <span class="badge staff" title="Not enough workers">👷</span>
     {/if}
+  {/if}
+  {#if site && option && state !== "ghost"}
+    <span class="site-badge" class:dim-badge={!usedSite} title={site.title}>{site.emoji}</span>
   {/if}
   {#if liegeHere}
     <span class="liege">👑</span>
@@ -228,6 +236,19 @@
     border-radius: 9999px;
     padding: 0 3px;
     font-size: 0.7rem;
+  }
+  .site-title {
+    font-size: 0.62rem;
+    opacity: 0.75;
+  }
+  .site-badge {
+    position: absolute;
+    right: 12px;
+    top: 20px;
+    font-size: 0.7rem;
+  }
+  .site-badge.dim-badge {
+    opacity: 0.4;
   }
   .liege {
     left: 50%;

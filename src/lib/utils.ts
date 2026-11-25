@@ -252,7 +252,7 @@ export function townHasStarted(z: Game) {
 export function suggestedStart(z: Game): [number, number] | null {
   const land = z.plots
     .flat()
-    .filter((p) => !p.offMap && !p.water && !p.mineralSource);
+    .filter((p) => !p.offMap && !p.water && !p.site);
   if (!land.length) return null;
   const cx = land.reduce((s, p) => s + p.x, 0) / land.length;
   const cy = land.reduce((s, p) => s + p.y, 0) / land.length;
@@ -474,7 +474,7 @@ export function findClosestPlot(startX: number, startY: number, z: Game) {
 
         if (
           !z.plots[i][j].active &&
-          !z.plots[i][j].mineralSource &&
+          !z.plots[i][j].site &&
           !z.plots[i][j].water &&
           !z.plots[i][j].disabled &&
           checkIfPlotCanBeUpgraded(i, j, z)

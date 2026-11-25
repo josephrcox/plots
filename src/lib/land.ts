@@ -14,6 +14,7 @@ import { options } from "./objects/PlotTypeOptions";
 import { hexNeighbourCoords } from "./neighbours";
 import type { Game, Plot, PlotOption } from "./types";
 import { strength, STEPS } from "./strength";
+import { siteFor } from "./sites";
 
 /** Pollution added per week on the source tile (less further out). */
 export const POLLUTERS: Record<string, number> = {
@@ -126,7 +127,7 @@ export function updatePollution(z: Game) {
       const id = builtId(p);
       if (!id) continue;
       const out = POLLUTERS[id];
-      const absorb = ABSORBERS[id];
+      const absorb = (ABSORBERS[id] ?? 0) + (siteFor(p)?.cleans ?? 0) || undefined;
       if (!out && !absorb) continue;
       const [d1, d2] = rings(p.x, p.y, z);
       if (out) {
@@ -183,7 +184,7 @@ export function landValue(x: number, y: number, z: Game): { value: number; parts
       if (!v) continue;
       // The best of each kind counts; a second park next door adds nothing.
       const key = id!;
-      const amount = v[k];
+      const amount = v[k] * (v[k] > 0 ? siteFor(p)?.land ?? 1 : 1);
       const prev = bonus.get(key);
       if (prev === undefined || Math.abs(amount) > Math.abs(prev)) bonus.set(key, amount);
     }

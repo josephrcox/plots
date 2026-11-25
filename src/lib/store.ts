@@ -16,6 +16,7 @@ import { CustomAlerts } from "./objects/CustomAlerts";
 import { generateRandomTownName } from "./objects/townNames";
 import { resetMapUi } from "./ui";
 import { syncCapacity } from "./housing";
+import { placeSites } from "./sites";
 import { syncPeople, assignJobs, workforce, migrateAges } from "./people";
 import {
   generateTerrain,
@@ -150,6 +151,18 @@ export function normalizeGame(raw: any): Game | null {
       }
     }
   }
+  // The mineral deposit used to be its own flag; it's a special site now.
+  for (const row of game.plots ?? []) {
+    for (const p of row as any[]) {
+      if (p.mineralSource) p.site = "mineral";
+      delete p.mineralSource;
+    }
+  }
+  // Towns from before special sites (#63) get them on their empty land.
+  if (!game.sitesPlaced) {
+    placeSites(game);
+    game.sitesPlaced = true;
+  }
   // Older saves stored job openings here, which could exceed population.
   migrateAges(game);
   syncEmployment(game);
@@ -282,7 +295,7 @@ export function createPlot(
   x: number,
   y: number,
   water: boolean,
-  mineralSource = false,
+  site?: string,
   offMap = false,
 ): Plot {
   const plot: Plot = {
@@ -292,22 +305,22 @@ export function createPlot(
     y,
     type: water ? -9 : -1,
     typeId: "",
-    mineralSource,
     water,
     disabled: false,
   };
+  if (site) plot.site = site;
   if (offMap) plot.offMap = true;
   return plot;
 }
 
 function plotFromCell(x: number, y: number, cell: Cell): Plot {
-  return createPlot(x, y, cell === "water", cell === "mineral", cell === "off");
+  return createPlot(x, y, cell === "water", cell === "mineral" ? "mineral" : undefined, cell === "off");
 }
 
 function cellOf(plot: Plot): Cell {
   if (plot.offMap) return "off";
   if (plot.water) return "water";
-  if (plot.mineralSource) return "mineral";
+  if (plot.site === "mineral") return "mineral";
   return "land";
 }
 
@@ -365,6 +378,8 @@ export function startGame(
   }
 
   json.plots = generatePlots(GRID_SIZE_BY_DIFFICULTY[difficulty] ?? 12);
+  placeSites(json);
+  json.sitesPlaced = true;
 
   const serialized = JSON.stringify(json);
   localStorage.setItem(ACTIVE_GAME_DB_NAME, serialized);
@@ -609,13 +624,13 @@ export function expandTown(z: Game, direction: string): string | undefined {
   // Add the new area as off-map cells...
   for (let i = 0; i < numRows; i++) {
     for (let j = numCols; j < numCols + newCols; j++) {
-      z.plots[i].push(createPlot(i, j, false, false, true));
+      z.plots[i].push(createPlot(i, j, false, undefined, true));
     }
   }
   for (let i = numRows; i < numRows + newRows; i++) {
     const newRow: Plot[] = [];
     for (let j = 0; j < numCols + newCols; j++) {
-      newRow.push(createPlot(i, j, false, false, true));
+      newRow.push(createPlot(i, j, false, undefined, true));
     }
     z.plots.push(newRow);
   }
@@ -624,13 +639,17 @@ export function expandTown(z: Game, direction: string): string | undefined {
   const grid: Grid = z.plots.map((row) => row.map(cellOf));
   const side = direction === "east" ? numRows : numCols + newCols;
   const count = Math.round(5 * side * (0.55 + Math.random() * 0.2));
+  const fresh: Plot[] = [];
   for (const [i, j] of expandTerrain(
     grid,
     direction === "east" ? "east" : "south",
     count,
   )) {
     z.plots[i][j] = plotFromCell(i, j, grid[i][j]);
+    fresh.push(z.plots[i][j]);
   }
+  // New land brings new special sites.
+  placeSites(z, fresh);
 
   z.kingdom_expansions++;
   relieve(z, NOVELTY.expansion);

@@ -14,7 +14,7 @@ import { isAdjacentToWater } from "../src/lib/utils";
 const z = normalizeGame(JSON.parse(readFileSync(process.argv[2], "utf8")))!;
 const t = z.townInfo, r = z.resources, rr = z.resource_rate;
 const built = z.plots.flat().filter((p) => p.active && p.type > -1);
-const land = z.plots.flat().filter((p) => !p.offMap && !p.water && !p.mineralSource);
+const land = z.plots.flat().filter((p) => !p.offMap && !p.water && !p.site);
 const counts: Record<string, number> = {};
 for (const p of built) counts[options[p.type].id] = (counts[options[p.type].id] ?? 0) + 1;
 console.log(`day ${z.environment.day} (year ${(z.environment.day / 360).toFixed(1)}), difficulty ${z.difficulty}, settings [${z.gameSettings}], tutorial step ${z.currentTutorialStep}, ended: ${z.endGameDetails.msg || "no"}`);
@@ -55,6 +55,6 @@ console.log("log:", z.townLog.slice(0, 8).map((l) => `d${l.day} ${l.message.slic
 const sym: Record<string, string> = { small_homes: "h", large_homes: "H", farm: "f", livestock_farm: "l", tree_farm: "t", quarry: "Q", park: "p", church: "c", Apothecary: "a", stables: "s", bakery: "b", village_market: "m", pub: "u", vineyard: "v", stockpile: "k", water_wheel: "w", library: "y", mine: "M", lumber_mill: "L", blacksmith: "B", schoolhouse: "S", healing_house: "+" };
 console.log("\nmap (h home, H large, f farm, l livestock, t tree, Q quarry, p park, c church, a apothecary, s stables, b bakery, m market, ~ water, * mineral, . land):");
 for (const row of z.plots) {
-  const line = row.map((p) => (p.offMap ? " " : p.water ? "~" : p.active && p.type > -1 ? (sym[options[p.type].id] ?? "?") : p.mineralSource ? "*" : ".")).join(" ");
+  const line = row.map((p) => (p.offMap ? " " : p.water ? "~" : p.active && p.type > -1 ? (sym[options[p.type].id] ?? "?")   : p.site === "mineral" ? "*" : ".")).join(" ");
   if (line.trim()) console.log((row[0].x % 2 ? " " : "") + line);
 }

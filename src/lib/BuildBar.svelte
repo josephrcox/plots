@@ -28,6 +28,7 @@
   import PlotTooltip from "./PlotTooltip.svelte";
   import { Events, type PlotOption } from "./types";
   import { options } from "./objects/PlotTypeOptions";
+  import { siteOf } from "./sites";
 
   const categories = categoriesWithOptions();
 
@@ -41,10 +42,11 @@
   $: targetPlot = $DB && target ? $DB.plots[target.x]?.[target.y] : null;
   $: replacing = targetPlot?.active ? options[targetPlot.type] : null;
 
-  // A mineral deposit only takes a Mine: jump to its tab.
-  $: if (targetPlot?.mineralSource) {
-    const mine = options.find((o) => o.id === "mine");
-    if (mine) $buildCategory = categoryOf(mine).id;
+  // A mineral deposit only takes a Mine, and a special site only a few
+  // buildings: jump to the tab with the first one that fits.
+  $: if (targetPlot && !targetPlot.active && siteOf(targetPlot)) {
+    const first = options.find((o) => o.id === siteOf(targetPlot)!.allows[0]);
+    if (first) $buildCategory = categoryOf(first).id;
   }
 
   $: status = (() => {

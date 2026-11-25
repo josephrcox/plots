@@ -11,6 +11,7 @@
 import { options } from "./objects/PlotTypeOptions";
 import { hexNeighbourCoords } from "./neighbours";
 import type { Game, Plot } from "./types";
+import { siteFor } from "./sites";
 
 export type ServiceId = "recreation" | "health" | "shops" | "faith" | "school";
 
@@ -158,7 +159,8 @@ function computeCoverage(z: Game): Map<ServiceId, Set<string>> {
       const id = builtId(p);
       const provides = id ? providerOf.get(id) : undefined;
       if (!provides) continue;
-      for (const [service, r] of provides) {
+      for (const [service, reach] of provides) {
+        const r = reach + (siteFor(p)?.reach ?? 0);
         for (const q of tilesWithin(p.x, p.y, r, z)) {
           if (isHome(q)) result.get(service)!.add(q.id);
         }
