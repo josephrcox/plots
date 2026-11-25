@@ -41,6 +41,9 @@
   export let occupancy: { people: number; capacity: number } | null = null;
   /** Map overlay tint and its number, when an overlay is on. */
   export let tint: string | null = null;
+  /** Homes: level (1–3) and which way it's heading. */
+  export let homeLevel = 0;
+  export let levelTrend: "up" | "down" | "steady" = "steady";
   export let tintLabel: string | null = null;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
@@ -90,6 +93,17 @@
       <span class="title" class:text-white={option.id === "mine"}
         >{option.title}</span
       >
+      {#if homeLevel > 1 || levelTrend !== "steady"}
+        <span
+          class="level"
+          title="Home level {homeLevel}{levelTrend === 'up'
+            ? ', growing'
+            : levelTrend === 'down'
+              ? ', declining'
+              : ''}"
+          >{"★".repeat(homeLevel)}{levelTrend === "up" ? "↑" : levelTrend === "down" ? "↓" : ""}</span
+        >
+      {/if}
       {#if occupancy && occupancy.people < occupancy.capacity}
         <span class="occupancy" title="People living here"
           >👥 {occupancy.people}/{occupancy.capacity}</span
@@ -197,6 +211,12 @@
     position: absolute;
     top: 14px;
     font-size: 0.8rem;
+  }
+  .level {
+    font-size: 0.65rem;
+    line-height: 1.1;
+    color: rgb(120, 80, 0);
+    letter-spacing: -1px;
   }
   .occupancy {
     font-size: 0.6rem;

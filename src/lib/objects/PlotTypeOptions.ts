@@ -6,7 +6,7 @@ export const options: PlotOption[] = [
     emoji: "🏠",
     title: "Homes",
     type: "residential",
-    description: "Room for 16 people. New homes fill as people move in.",
+    description: "Room for 16 people, growing to 24 and 32 as it levels up on good land. New homes fill as people move in.",
     revenue_per_week: 0,
     requirements: {
       gold: 15,
@@ -26,8 +26,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -62,9 +62,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: "Listen to the townspeople.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -72,7 +72,7 @@ export const options: PlotOption[] = [
     emoji: "🏡",
     title: "Large Homes",
     type: "residential",
-    description: "Room for 32 people. New homes fill as people move in.",
+    description: "Room for 32 people, growing to 48 and 64 as it levels up on good land. New homes fill as people move in.",
     revenue_per_week: 0,
     requirements: {
       gold: 180,
@@ -92,12 +92,12 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.01,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 10,
+      happiness: 0,
       health: 0,
       population: 32,
       community: 0,
@@ -128,9 +128,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: "Listen to the townspeople.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -158,8 +158,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.03,
-      health: 1.03,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -195,9 +195,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "Your presence on the farm is encouraging the farmers to work harder!",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
 
@@ -226,8 +226,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -263,9 +263,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "Your presence on the farm is encouraging the farmers to work harder!",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -294,8 +294,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 0.98,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -331,9 +331,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "The workers at the quarry are working harder with the presence of their liege.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 0.998,
-      community: 0.9998,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -362,13 +362,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.15,
-      health: 1.15,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 25,
-      health: 30,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -398,9 +398,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.03,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -429,8 +429,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.1,
-      health: 1.05,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -466,9 +466,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "The cows are producing more milk and cheese when you are hanging out on the farm.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -496,8 +496,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -532,9 +532,9 @@ export const options: PlotOption[] = [
     check_for_variety: false,
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -563,8 +563,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -599,9 +599,9 @@ export const options: PlotOption[] = [
     check_for_variety: false,
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -630,12 +630,12 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.11,
-      health: 0.95,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 25,
+      happiness: 0,
       health: 0,
       population: 0,
       community: 0,
@@ -666,9 +666,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -696,13 +696,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.2,
-      health: 1.2,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 5,
-      health: 10,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -732,9 +732,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -763,15 +763,15 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.1,
-      health: 1.0,
-      community: 1.2,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 25,
+      happiness: 0,
       health: 0,
       population: 0,
-      community: 25,
+      community: 0,
       bureaucracy: 0,
     },
     knowledge_points_per_month: 0.5,
@@ -799,9 +799,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.002,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -831,13 +831,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.2,
-      health: 0.97,
-      community: 1.1,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 10,
-      health: -15,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -866,9 +866,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.001,
-      health: 0.998,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -897,8 +897,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.05,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -933,9 +933,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: "Your presence is helping the market make more money.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -964,13 +964,13 @@ export const options: PlotOption[] = [
       adjacent_plots: ["water"],
     },
     purchase_effect_modifiers: {
-      happiness: 1.05,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 5,
-      health: 8,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -1001,9 +1001,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "Your expertise in fishing is helping the town reel in far more fish!",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1032,13 +1032,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.2,
-      health: 0.9,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
       happiness: 0,
-      health: -10,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -1068,9 +1068,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.001,
-      health: 0.998,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1098,8 +1098,8 @@ export const options: PlotOption[] = [
       adjacent_plots: ["water"],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -1135,9 +1135,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "You are trying to improve the efficiency of the water wheel, but you aren't making a difference.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1165,8 +1165,8 @@ export const options: PlotOption[] = [
       adjacent_plots: ["water"],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -1202,9 +1202,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "You are trying to improve the efficiency of the water wheel, but you aren't making a difference.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1233,13 +1233,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
-      happiness: 15,
-      health: 15,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -1270,9 +1270,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "Your presence on the farm is encouraging the farmer to work harder!",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1301,15 +1301,15 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.5,
-      health: 1.5,
-      community: 1.3,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 40,
-      health: 40,
+      happiness: 0,
+      health: 0,
       population: 0,
-      community: 40,
+      community: 0,
       bureaucracy: 0,
     },
     knowledge_points_per_month: 0,
@@ -1337,9 +1337,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.002,
-      community: 1.002,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1368,12 +1368,12 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.02,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 10,
+      happiness: 0,
       health: 0,
       population: 0,
       community: 0,
@@ -1404,9 +1404,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1435,13 +1435,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.1,
-      health: 1.1,
-      community: 1.2,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 15,
-      health: 3,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -1471,9 +1471,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "The children seem to be learning worse when you are around, maybe you are a distraction from the teachers.",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.002,
-      community: 1.002,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1503,15 +1503,15 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.1,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
       happiness: 0,
       health: 0,
       population: 0,
-      community: 50,
+      community: 0,
       bureaucracy: 0,
     },
     styling: "",
@@ -1538,9 +1538,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1569,9 +1569,9 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
       happiness: 0,
@@ -1605,9 +1605,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1636,12 +1636,12 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.3,
-      health: 1.0,
-      community: 1.1,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 15,
+      happiness: 0,
       health: 0,
       population: 0,
       community: 0,
@@ -1671,9 +1671,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1702,8 +1702,8 @@ export const options: PlotOption[] = [
       adjacent_plots: ["tree_farm"],
     },
     purchase_effect_modifiers: {
-      happiness: 1.2,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -1738,9 +1738,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 0.9998,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1769,8 +1769,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -1805,9 +1805,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1836,15 +1836,15 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 2.0,
-      health: 2.0,
-      community: 1.1,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 50,
-      health: 50,
+      happiness: 0,
+      health: 0,
       population: 0,
-      community: 50,
+      community: 0,
       bureaucracy: 0,
     },
     check_for_variety: true,
@@ -1873,9 +1873,9 @@ export const options: PlotOption[] = [
     liege_on_plot_hint:
       "Your experience managing towns is increasing the profits at the general store!",
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -1904,13 +1904,13 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.25,
-      health: 1.5,
-      community: 1.1,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
-      happiness: 5,
-      health: 75,
+      happiness: 0,
+      health: 0,
       population: 0,
       community: 0,
       bureaucracy: 0,
@@ -1939,9 +1939,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
 
@@ -1972,9 +1972,9 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.3,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
     immediate_variable_changes: {
       happiness: 0,
@@ -2007,9 +2007,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -2037,8 +2037,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.0,
-      health: 0.95,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -2073,9 +2073,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 0.998,
-      community: 0.9998,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -2105,15 +2105,15 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 1.1,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
       happiness: 0,
       health: 0,
       population: 0,
-      community: 50,
+      community: 0,
       bureaucracy: 0,
     },
     styling: "",
@@ -2140,9 +2140,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -2172,8 +2172,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 0.8,
-      health: 1.0,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -2207,9 +2207,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
   {
@@ -2238,8 +2238,8 @@ export const options: PlotOption[] = [
       adjacent_plots: [],
     },
     purchase_effect_modifiers: {
-      happiness: 0.98,
-      health: 0.99,
+      happiness: 1,
+      health: 1,
       community: 1,
     },
     immediate_variable_changes: {
@@ -2273,9 +2273,9 @@ export const options: PlotOption[] = [
     },
     liege_on_plot_hint: null,
     weekly_effect_modifiers: {
-      happiness: 1.0,
-      health: 1.0,
-      community: 1.0,
+      happiness: 1,
+      health: 1,
+      community: 1,
     },
   },
 ];

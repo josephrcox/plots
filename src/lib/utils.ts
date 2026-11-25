@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { syncCapacity } from "./housing";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
 import { options } from "./objects/PlotTypeOptions";
@@ -406,7 +407,7 @@ export function placePlot(
     z.townInfo.population_count +=
       plotChosen.immediate_variable_changes.population;
   }
-  z.townInfo.population_max += plotChosen.immediate_variable_changes.population;
+  syncCapacity(z);
   z.townInfo.happiness = Math.min(
     z.maximums.happiness,
     z.townInfo.happiness + plotChosen.immediate_variable_changes.happiness,

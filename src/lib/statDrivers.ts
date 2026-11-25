@@ -109,12 +109,6 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
 
   const health: Line[] = [];
   if (foodShort) health.push({ text: "Not enough food", good: false });
-  if (
-    hasPlotOfType("mine", z).length > 0 &&
-    hasPlotOfType("healing_house", z).length === 0
-  ) {
-    health.push({ text: "Mine dust (a Healing House helps)", good: false });
-  }
   if (neighbourhood.health <= -0.1) {
     health.push({
       text: `Polluted air around ${neighbourhood.pollutedHomes || "some"} home${neighbourhood.pollutedHomes === 1 ? "" : "s"}`,

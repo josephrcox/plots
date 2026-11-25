@@ -16,6 +16,8 @@ export type Plot = {
   snoozedUntil?: number;
   builtDay?: number; // game day the current building was placed
   pollution?: number; // 0–100, builds up from nearby industry (land.ts)
+  level?: number; // homes only: 1–3, see housing.ts (absent = 1)
+  levelProgress?: number; // homes only: weeks toward a level change (+ up, − down)
 };
 
 export type Law = {
@@ -129,6 +131,7 @@ export type Game = {
   foodEaten?: number; // food eaten last week
   wellFed?: boolean; // 4+ weeks of food in store at the last weekly check
   amountScale?: number; // 10 once gold/resources use the ÷10 scale (Nov 2026)
+  homeLevelLogged?: boolean; // the first home-level-up log message was shown
   pollutionLogged?: boolean; // the "homes in polluted air" log message was shown
   last_warning_happiness: number;
   last_warning_health: number;

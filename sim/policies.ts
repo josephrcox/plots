@@ -3,6 +3,7 @@
 // for the adaptive (lookahead) bot.
 import { buildable, build, options } from "./harness";
 import { countJobs } from "../src/lib/store";
+import { levelStatus } from "../src/lib/housing";
 import type { Game } from "../src/lib/types";
 
 export type Style = { name: string; w: Record<string, number>; homesAt: number; taxRate: number };
@@ -56,6 +57,17 @@ export function decide(g: Game, s: Style): string | null {
   }
   if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || g.resource_rate.wood < 1 || g.resources.wood < 40) {
     if (can.includes("tree_farm")) return "tree_farm";
+  }
+  // Homes stuck below the land value they need to grow: add an amenity
+  // (the tile picker puts it next to the most homes).
+  const stuck = g.plots.flat().filter((p) => {
+    if (!p.active || options[p.type]?.type !== "residential") return false;
+    const s2 = levelStatus(p, g);
+    return s2.level < 3 && s2.missing.some((m) => m.startsWith("land value"));
+  }).length;
+  if (stuck >= 3) {
+    const a = cheapest(g, ["park", "church", "Apothecary", "stables", "library", "healing_house"], can);
+    if (a) return a;
   }
   if (i.happiness < 120) { const a = cheapest(g, AMEN_HAPPY, can); if (a) return a; }
   if (i.health < 120) { const a = cheapest(g, AMEN_HEALTH, can); if (a) return a; }

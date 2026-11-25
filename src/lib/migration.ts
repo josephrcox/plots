@@ -5,6 +5,7 @@
 import type { Game, Plot } from "./types";
 import { options } from "./objects/PlotTypeOptions";
 import { taxMood } from "./tax";
+import { homeCapacity } from "./housing";
 
 /** Share of empty spaces filled per week at normal attractiveness. */
 export const BASE_MOVE_IN_RATE = 0.2;
@@ -77,7 +78,7 @@ export function homeOccupancy(z: Game): Occupancy {
   for (const row of z.plots) {
     for (const p of row) {
       if (!p.active || p.type < 0) continue;
-      if ((options[p.type]?.immediate_variable_changes.population ?? 0) > 0) {
+      if (homeCapacity(p) > 0) {
         homes.push(p);
       }
     }
@@ -88,7 +89,7 @@ export function homeOccupancy(z: Game): Occupancy {
   let left = z.townInfo.population_count;
   const result: Occupancy = new Map();
   for (const home of homes) {
-    const capacity = options[home.type].immediate_variable_changes.population;
+    const capacity = homeCapacity(home);
     const people = Math.max(0, Math.min(capacity, left));
     left -= people;
     result.set(home.id, { people, capacity });

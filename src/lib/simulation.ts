@@ -30,7 +30,8 @@ import { tutorialMessages } from "./objects/tutorial_messages";
 import { isAdjacentToWater, randomizeNumber, roundTo } from "./utils";
 import { synergyAt } from "./neighbours";
 import { townHomeEffect, updatePollution } from "./land";
-import { weeklyArrivals } from "./migration";
+import { weeklyArrivals, homeOccupancy } from "./migration";
+import { updateHomeLevels, syncCapacity } from "./housing";
 import { laws } from "./objects/Laws";
 import { taxMood, taxTolerance } from "./tax";
 import { type Game, type Plot, type PlotOption, Vibe } from "./types";
@@ -107,6 +108,7 @@ function performWeeklyTasks(db: Game) {
   db = neighbourEffects(db);
   db = feedCitizens(db);
   db = moveIn(db);
+  db = levelHomes(db);
   const endResources = snapshotResources(db);
   if (db.environment.day % 14 === 0) {
     // Biweekly tasks
@@ -117,7 +119,6 @@ function performWeeklyTasks(db: Game) {
 
 function performMonthlyTasks(db: Game) {
   db = reactToProductivity(db);
-  db = mineEffects(db);
   db = listenToTownspeople(db);
   db = recreationImpact(db);
   return db;
@@ -640,21 +641,7 @@ function bringModifiersBackToNormal(z: Game) {
     rateFor(z.modifiers.community),
   );
 
-  const healingHouses = hasPlotOfType("healing_house", z).length;
-  if (z.modifiers.health > 1.0) {
-    if (healingHouses > 0) {
-      // Healing houses make health boosts wear off much more slowly.
-      z = addToTownLog(messages.hospital_advantage, z, Vibe.GOOD);
-      z.modifiers.health = settle(z.modifiers.health, 0.03);
-    } else {
-      z.modifiers.health = settle(z.modifiers.health, decay);
-    }
-  } else if (healingHouses > 0) {
-    z.modifiers.health += 0.8;
-    z.townInfo.health += Math.floor(Math.random() * 10) + 5;
-  } else {
-    z.modifiers.health = settle(z.modifiers.health, recovery);
-  }
+  z.modifiers.health = settle(z.modifiers.health, rateFor(z.modifiers.health));
   return z;
 }
 
@@ -879,22 +866,6 @@ function reactToProductivity(z: Game) {
   return z;
 }
 
-function mineEffects(z: Game) {
-  // Casual games skip this 75% of the time.
-  if (z.gameSettings.includes("casual") && Math.random() < 0.75) return z;
-  if (hasPlotOfType("mine", z).length === 0) return z;
-
-  // A mine hurts the town's health.
-  z.townInfo.health -= 7;
-  if (hasPlotOfType("healing_house", z).length === 0) {
-    z = addToTownLog(
-      "The mine is actively hurting the health of the town. A Healing House can counteract this.",
-      z,
-      Vibe.BAD,
-    );
-  }
-  return z;
-}
 
 function getRandomTip(z: Game) {
   const info = z.townInfo;
@@ -983,6 +954,32 @@ function moveIn(z: Game) {
   z.townInfo.population_count += arrivals;
   z.lastArrivals = arrivals;
   if (arrivals > 0) syncEmployment(z);
+  return z;
+}
+
+/** Homes grow or shrink with their surroundings (#60). */
+function levelHomes(z: Game) {
+  const full = new Set<string>();
+  for (const [id, o] of homeOccupancy(z)) if (o.people >= o.capacity) full.add(id);
+  const changes = updateHomeLevels(z, full);
+  const ups = changes.filter((c) => c.to > c.from).length;
+  const downs = changes.length - ups;
+  if (ups && !z.homeLevelLogged) {
+    z.homeLevelLogged = true;
+    z = addToTownLog(
+      "🏠⭐ A home has grown to level 2 and holds more people. Full homes on good land (parks, churches, water nearby, clean air) grow over time while the town is happy. Homes on poor or polluted land shrink back.",
+      z,
+      Vibe.GOOD,
+    );
+  }
+  if (downs) {
+    z = addToTownLog(
+      `🏚️ ${downs} home${downs > 1 ? "s" : ""} lost a level: the land around ${downs > 1 ? "them" : "it"} got worse. Some residents moved out.`,
+      z,
+      Vibe.BAD,
+    );
+  }
+  if (changes.length) syncEmployment(z);
   return z;
 }
 

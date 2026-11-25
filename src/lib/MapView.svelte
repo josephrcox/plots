@@ -56,6 +56,7 @@
   } from "./Plot.svelte";
   import ExpandButton from "./ExpandButton.svelte";
   import { homeOccupancy } from "./migration";
+  import { levelStatus, homeCapacity } from "./housing";
   import HoverCard from "./HoverCard.svelte";
   import { Events, type Plot as PlotData } from "./types";
 
@@ -92,6 +93,20 @@
   // Buildings without all their workers get a badge; homes show how full.
   $: staff = $DB ? staffing($DB) : null;
   $: occupancy = $DB ? homeOccupancy($DB) : null;
+  // Home levels and where they're heading (#60).
+  $: levels = (() => {
+    const m = new Map<string, { level: number; trend: "up" | "down" | "steady" }>();
+    if (!$DB || !occupancy) return m;
+    for (const row of $DB.plots) {
+      for (const p of row) {
+        if (homeCapacity(p) === 0) continue;
+        const o = occupancy.get(p.id);
+        const s = levelStatus(p, $DB, !!o && o.people >= o.capacity);
+        m.set(p.id, { level: s.level, trend: s.trend });
+      }
+    }
+    return m;
+  })();
 
   // Before the first building, point at a good starting tile.
   $: startTile = $DB && !townHasStarted($DB) ? suggestedStart($DB) : null;
@@ -546,6 +561,8 @@
             crosshair={$settingLiegeLocation && plot.active}
             startHint={startTile?.[0] === x && startTile?.[1] === y}
             occupancy={occupancy?.get(plot.id) ?? null}
+            homeLevel={levels.get(plot.id)?.level ?? 0}
+            levelTrend={levels.get(plot.id)?.trend ?? "steady"}
             tint={overlays[x]?.[y]?.tint ?? null}
             tintLabel={overlays[x]?.[y]?.label ?? null}
             understaffed={(() => {

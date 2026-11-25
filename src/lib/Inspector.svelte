@@ -15,6 +15,7 @@
   import { isAdjacentToWater } from "./utils";
   import PlotTooltip from "./PlotTooltip.svelte";
   import { homeOccupancy, weeklyArrivals } from "./migration";
+  import { levelStatus, MAX_LEVEL } from "./housing";
 
   $: pos = $inspected;
   $: plot = $DB && pos ? $DB.plots[pos.x]?.[pos.y] : null;
@@ -27,6 +28,7 @@
   $: staff = $DB && plot ? staffing($DB).get(plot.id) : undefined;
   $: home = $DB && plot ? homeOccupancy($DB).get(plot.id) : undefined;
   $: arrivals = $DB ? weeklyArrivals($DB) : 0;
+  $: level = $DB && plot && home ? levelStatus(plot, $DB, home.people >= home.capacity) : null;
 
   function replace() {
     if (!pos) return;
@@ -73,6 +75,26 @@
             : ". Nobody is moving in right now."
           : " (full)"}</span
       >
+    {/if}
+    {#if level}
+      <div class="chip bg-yellow-900 text-white flex flex-col gap-1">
+        <span class="font-semibold"
+          >{"★".repeat(level.level)} Level {level.level} home · room for {level.capacity}</span
+        >
+        {#if level.trend === "down"}
+          <span class="text-red-300"
+            >Declining ({level.progress}/{level.weeks} weeks): {level.slipping.join(", ")}</span
+          >
+        {:else if level.trend === "up"}
+          <span class="text-green-300"
+            >Growing to level {level.level + 1} ({level.progress}/{level.weeks} weeks)</span
+          >
+        {:else if level.level < MAX_LEVEL}
+          <span class="opacity-80">To grow, it needs {level.missing.join(", ")}.</span>
+        {:else}
+          <span class="opacity-80">Top level.</span>
+        {/if}
+      </div>
     {/if}
     {#if staff && staff.staffed < staff.needed}
       <span class="chip bg-amber-600 text-white"
