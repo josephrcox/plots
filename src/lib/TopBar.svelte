@@ -333,8 +333,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 58px;
-    padding: 2px 8px;
+    /* Fixed width so the bar doesn't shift as numbers grow and shrink. */
+    width: 78px;
+    flex: none;
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    padding: 2px 6px;
     line-height: 1.15;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.07);
