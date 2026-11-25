@@ -39,10 +39,15 @@
   export let understaffed = false;
   /** For homes that aren't full yet: people living there / room. */
   export let occupancy: { people: number; capacity: number } | null = null;
+  /** Map overlay tint and its number, when an overlay is on. */
+  export let tint: string | null = null;
+  export let tintLabel: string | null = null;
 
   $: option = data.type > -1 ? options[data.type] : undefined;
   $: fill = data.water
     ? "rgb(64, 140, 170)"
+    : tint && !option && !data.mineralSource
+      ? "rgb(205, 200, 185)" // neutral under an overlay, so the tint reads
     : data.mineralSource && !option
       ? "rgb(20, 20, 20)"
       : getColor(data.type, buildable);
@@ -97,6 +102,11 @@
       <span class="title">Start here!</span>
     {/if}
   </div>
+  {#if tint}
+    <div class="overlay" style="background:{tint};">
+      {#if tintLabel}<span class="overlay-label">{tintLabel}</span>{/if}
+    </div>
+  {/if}
   <!-- Badges hang off the outer tile, which keeps its size when the inner
        tile shrinks to show a selection ring, so they never shift. -->
   {#if option && state !== "ghost"}
@@ -152,6 +162,24 @@
   }
   .inner.inset {
     inset: 5px;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .overlay-label {
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 6px;
+    padding: 0 4px;
   }
   .emoji {
     font-size: 1.4rem;

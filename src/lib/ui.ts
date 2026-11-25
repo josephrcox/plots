@@ -27,6 +27,10 @@ export const targetTile = writable<TilePos | null>(null);
 export const inspected = writable<TilePos | null>(null);
 /** The tile under the cursor. */
 export const hovered = writable<TilePos | null>(null);
+/** Map overlay (#59): tint tiles by land value or pollution. */
+export type Overlay = "none" | "land" | "pollution";
+export const overlay = writable<Overlay>("none");
+
 /** Which build bar category is open. */
 export const buildCategory = writable<string>("housing");
 

@@ -28,7 +28,8 @@ import { options } from "./objects/PlotTypeOptions";
 import { achievements } from "./objects/AchievementList";
 import { tutorialMessages } from "./objects/tutorial_messages";
 import { isAdjacentToWater, randomizeNumber, roundTo } from "./utils";
-import { synergyAt, townNeighbourhoodDelta } from "./neighbours";
+import { synergyAt } from "./neighbours";
+import { townHomeEffect, updatePollution } from "./land";
 import { weeklyArrivals } from "./migration";
 import { laws } from "./objects/Laws";
 import { taxMood, taxTolerance } from "./tax";
@@ -807,13 +808,15 @@ function feedCitizens(z: Game) {
 
 /** Homes feel their neighbours: industry hurts, amenities help (#46). */
 function neighbourEffects(z: Game) {
-  const delta = townNeighbourhoodDelta(z);
+  // Industry pollutes the land around it; homes feel their land (#59).
+  updatePollution(z);
+  const delta = townHomeEffect(z);
   z.townInfo.happiness += delta.happiness;
   z.townInfo.health += delta.health;
-  if (delta.nuisancePairs > 0 && !z.neighbourNuisanceLogged) {
-    z.neighbourNuisanceLogged = true;
+  if (delta.pollutedHomes > 0 && !z.pollutionLogged) {
+    z.pollutionLogged = true;
     z = addToTownLog(
-      "Townspeople living next to industry are complaining about the noise and dust. Homes near mines, quarries, mills, smithies and pubs lose health and happiness; parks, churches and healers nearby help.",
+      "Smoke and dust from industry are drifting over homes. Pollution builds up over months within 2 tiles of mines, quarries, smithies and mills, and makes residents sick. Parks and tree farms help clean it up.",
       z,
       Vibe.BAD,
     );

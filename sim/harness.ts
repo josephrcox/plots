@@ -7,7 +7,8 @@ import { rollBaseTolerance } from "../src/lib/tax";
 import { placePlot, isAdjacentToWater } from "../src/lib/utils";
 import { availability, placementCheck } from "../src/lib/ui";
 import { options } from "../src/lib/objects/PlotTypeOptions";
-import { hexNeighbours, homeNeighbourhood } from "../src/lib/neighbours";
+import { hexNeighbours } from "../src/lib/neighbours";
+import { rings, landValue, POLLUTERS, AMENITIES } from "../src/lib/land";
 import type { Game, Plot } from "../src/lib/types";
 
 declare const __seed: (n: number) => void;
@@ -61,9 +62,6 @@ export function stepDays(g: Game, n: number) {
 // Placement
 // ---------------------------------------------------------------------------
 
-const NUIS = new Set(["mine", "quarry", "lumber_mill", "blacksmith", "pub"]);
-const AMEN = new Set(["park", "stables", "church", "library", "Apothecary", "healing_house"]);
-
 function legalTiles(g: Game, id: string): Plot[] {
   const opt = options.find((o) => o.id === id)!;
   const out: Plot[] = [];
@@ -79,20 +77,24 @@ function tileScore(g: Game, id: string, p: Plot): number {
   const opt = options.find((o) => o.id === id)!;
   const nb = hexNeighbours(p.x, p.y, g).filter((n) => n.active && n.type > -1);
   const ids = nb.map((n) => options[n.type].id);
-  const homes = nb.filter((n) => options[n.type].type === "residential").length;
+  const [d1, d2] = rings(p.x, p.y, g);
+  const idOf = (q: Plot) => (q.active && q.type > -1 ? options[q.type].id : "");
+  const homesNear = (ring: Plot[]) => ring.filter((q) => options[q.type]?.type === "residential" && q.active).length;
   let s = 0.2 * nb.length; // compact towns keep options open
   if (opt.revenue_per_week > 0 && isAdjacentToWater(p.x, p.y, g)) s += 3;
   if (opt.type === "residential") {
-    s -= 2 * ids.filter((i) => NUIS.has(i)).length;
-    s += Math.min(2, ids.filter((i) => AMEN.has(i)).length);
+    s += (landValue(p.x, p.y, g).value - 50) / 5;
+    // Industry already nearby will keep polluting this spot.
+    s -= 3 * d1.filter((q) => POLLUTERS[idOf(q)]).length + 1.5 * d2.filter((q) => POLLUTERS[idOf(q)]).length;
   }
-  if (NUIS.has(id)) s -= 2 * homes;
-  if (AMEN.has(id)) s += homes;
+  if (POLLUTERS[id]) s -= 3 * homesNear(d1) + 1.5 * homesNear(d2);
+  const am = AMENITIES[id];
+  if (am) s += Math.sign(am[0]) * (homesNear(d1) + 0.5 * homesNear(d2));
   if (id === "livestock_farm" || id === "bakery") s += ids.some((i) => i === "farm" || i === "adv_farm") ? 2 : 0;
   if (id === "tree_farm" && ids.includes("lumber_mill")) s += 2;
   if (id === "lumber_mill") s += ids.filter((i) => i === "tree_farm").length;
   if (id === "blacksmith" && ids.some((i) => i === "mine" || i === "quarry")) s += 2;
-  if (id === "village_market" || id === "general_store") s += Math.min(3, homes);
+  if (id === "village_market" || id === "general_store") s += Math.min(3, homesNear(d1));
   return s;
 }
 

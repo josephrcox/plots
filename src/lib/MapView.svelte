@@ -26,6 +26,7 @@
     leftPanelOpen,
     rightPanelOpen,
     HUD,
+    overlay,
     type Check,
     type Tool,
   } from "./ui";
@@ -38,6 +39,12 @@
     analyticsEvent,
   } from "./utils";
   import { previewPlacement } from "./neighbours";
+  import {
+    landValue,
+    landValueWord,
+    pollutionAt,
+    pollutionWord,
+  } from "./land";
   import Plot, {
     TILE_W,
     TILE_H,
@@ -132,6 +139,32 @@
         ),
       )
     : null;
+
+  // Overlay tints (#59). Land value: red below ordinary, green above.
+  // Pollution: brown, stronger the dirtier.
+  function overlayFor(p: PlotData, mode: string, z: typeof $DB) {
+    if (mode === "none" || !z || p.water || p.offMap) return null;
+    if (mode === "pollution") {
+      const v = p.pollution ?? 0;
+      if (v < 1) return { tint: "rgba(80, 200, 120, 0.18)", label: null };
+      const a = Math.min(0.85, 0.2 + v / 110);
+      return { tint: `rgba(110, 60, 30, ${a})`, label: String(Math.round(v)) };
+    }
+    const v = landValue(p.x, p.y, z).value;
+    const d = (v - 50) / 50;
+    const tint =
+      d >= 0
+        ? `rgba(40, 190, 90, ${0.15 + d * 0.6})`
+        : `rgba(220, 60, 50, ${0.15 + -d * 0.6})`;
+    return { tint, label: String(v) };
+  }
+  $: overlays = $DB
+    ? $DB.plots.map((row) => row.map((p) => overlayFor(p, $overlay, $DB)))
+    : [];
+
+  function cycleOverlay() {
+    overlay.update((o) => (o === "none" ? "land" : o === "land" ? "pollution" : "none"));
+  }
 
   // Hover card for the build / bulldoze tools.
   let hoverCheck: Check | null = null;
@@ -424,6 +457,8 @@
       startKeyPan();
     } else if (key === "f") {
       fitTown();
+    } else if (key === "o") {
+      cycleOverlay();
     } else if (key === "=" || key === "+") {
       zoomAt(1.2, window.innerWidth / 2, window.innerHeight / 2);
     } else if (key === "-" || key === "_") {
@@ -511,6 +546,8 @@
             crosshair={$settingLiegeLocation && plot.active}
             startHint={startTile?.[0] === x && startTile?.[1] === y}
             occupancy={occupancy?.get(plot.id) ?? null}
+            tint={overlays[x]?.[y]?.tint ?? null}
+            tintLabel={overlays[x]?.[y]?.label ?? null}
             understaffed={(() => {
               const s = staff?.get(plot.id);
               return !!s && s.staffed < s.needed;
@@ -559,7 +596,56 @@
     <button class="cam-btn text-xs" title="Fit town (F)" on:click={fitTown}
       >⤢</button
     >
+    <button
+      class="cam-btn mt-2"
+      class:active={$overlay === "land"}
+      title="Land value overlay (O)"
+      on:click={() => overlay.set($overlay === "land" ? "none" : "land")}>🏡</button
+    >
+    <button
+      class="cam-btn"
+      class:active={$overlay === "pollution"}
+      title="Pollution overlay (O)"
+      on:click={() => overlay.set($overlay === "pollution" ? "none" : "pollution")}
+      >🏭</button
+    >
   </div>
+
+  {#if $overlay !== "none"}
+    <div
+      class="fixed z-20 rounded-lg bg-popupBackground text-white text-xs px-3 py-2 shadow-xl"
+      style="right:{($rightPanelOpen ? HUD.panel + 12 : 12) + 44}px; bottom:{HUD.bottom + 8}px;"
+    >
+      {#if $overlay === "land"}
+        <div class="font-semibold mb-1">🏡 Land value</div>
+        <div class="legend land"></div>
+        <div class="flex justify-between opacity-80"><span>Blighted</span><span>Prime</span></div>
+        <div class="opacity-70 mt-1 w-52">Parks, churches, healers and water raise it; pollution and noise lower it. Homes on good land are happier.</div>
+      {:else}
+        <div class="font-semibold mb-1">🏭 Pollution</div>
+        <div class="legend pollution"></div>
+        <div class="flex justify-between opacity-80"><span>Clean</span><span>Toxic</span></div>
+        <div class="opacity-70 mt-1 w-52">Mines, quarries, smithies and mills pollute 2 tiles around them. It builds up over months and fades slowly. Parks and tree farms clean it.</div>
+      {/if}
+    </div>
+  {/if}
+
+  {#if $overlay !== "none" && $tool.kind === "none" && hoveredPlot && !hoveredPlot.water && !hoveredPlot.offMap && !dragged && $DB}
+    {@const lv = landValue(hoveredPlot.x, hoveredPlot.y, $DB)}
+    {@const pol = pollutionAt($DB, hoveredPlot.x, hoveredPlot.y)}
+    <div
+      class="fixed z-30 pointer-events-none w-56 rounded-lg bg-popupBackground text-white text-xs p-2 shadow-xl flex flex-col gap-1"
+      style="left:{Math.min(mouse.x + 18, window.innerWidth - 240)}px; top:{Math.min(mouse.y + 18, window.innerHeight - 160)}px;"
+    >
+      <span class="font-semibold">🏡 Land: {landValueWord(lv.value)} ({lv.value})</span>
+      {#each lv.parts as part}
+        <span class={part.amount >= 0 ? "text-green-300" : "text-red-300"}
+          >{part.amount >= 0 ? "+" : ""}{part.amount} {part.text}</span
+        >
+      {/each}
+      <span class="font-semibold mt-1">🏭 Air: {pollutionWord(pol)} ({Math.round(pol)})</span>
+    </div>
+  {/if}
 
   {#if $tool.kind !== "none" && hoveredPlot && !hoveredPlot.water && !dragged}
     <HoverCard
@@ -587,5 +673,19 @@
   }
   .cam-btn:hover {
     filter: brightness(0.95);
+  }
+  .cam-btn.active {
+    background: rgb(250, 204, 21);
+  }
+  .legend {
+    height: 8px;
+    border-radius: 4px;
+    width: 208px;
+  }
+  .legend.land {
+    background: linear-gradient(to right, rgba(220, 60, 50, 0.9), rgba(200, 200, 200, 0.3), rgba(40, 190, 90, 0.9));
+  }
+  .legend.pollution {
+    background: linear-gradient(to right, rgba(80, 200, 120, 0.4), rgba(110, 60, 30, 0.95));
   }
 </style>

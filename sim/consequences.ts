@@ -40,13 +40,14 @@ function idle(map: number, activeYears: number) {
 }
 
 // ---------------------------------------------------------- consequences
+const ORDER_STYLE = STYLES.find((s) => s.name === (process.env.STYLE ?? "balanced"))!;
 function ruleOrder(map: number): { week: number; id: string }[] {
   const g = newTown(map);
   const order: { week: number; id: string }[] = [];
   for (let w = 0; w < 3 * W && alive(g); w++) {
     seed(map * 1000 + w);
     const before = g.plotCounts.slice();
-    ruleWeek(g, STYLES[0]);
+    ruleWeek(g, ORDER_STYLE);
     const i = g.plotCounts.findIndex((c, k) => (c ?? 0) > (before[k] ?? 0));
     if (i >= 0) order.push({ week: w, id: options[i].id });
     seed(100_000 + w);

@@ -5,7 +5,7 @@
 import type { Game } from "./types";
 import { taxMood } from "./tax";
 import { hasPlotOfType } from "./store";
-import { townNeighbourhoodDelta } from "./neighbours";
+import { townHomeEffect } from "./land";
 import { FOOD_PER_PERSON, WELL_FED_WEEKS } from "./simulation";
 
 export type Line = { text: string; good: boolean };
@@ -67,7 +67,7 @@ function pct(multiplier: number) {
 /** Causes currently moving each stat, strongest-looking first. */
 export function statDrivers(z: Game): Record<StatKey, Line[]> {
   const info = z.townInfo;
-  const neighbourhood = townNeighbourhoodDelta(z);
+  const neighbourhood = townHomeEffect(z);
   const foodShort = z.resources.food < info.population_count * FOOD_PER_PERSON;
   const { total, recreation } = builtCounts(z);
 
@@ -98,8 +98,8 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   if (Math.abs(neighbourhood.happiness) >= 0.1) {
     happiness.push(
       neighbourhood.happiness > 0
-        ? { text: "Homes near parks and amenities", good: true }
-        : { text: "Homes next to industry or pubs", good: false },
+        ? { text: "Homes on good land (amenities, water)", good: true }
+        : { text: "Homes on poor land (pollution, noise)", good: false },
     );
   }
   if (z.wellFed) {
@@ -115,12 +115,11 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   ) {
     health.push({ text: "Mine dust (a Healing House helps)", good: false });
   }
-  if (Math.abs(neighbourhood.health) >= 0.1) {
-    health.push(
-      neighbourhood.health > 0
-        ? { text: "Homes near parks and healers", good: true }
-        : { text: "Homes next to industry or pubs", good: false },
-    );
+  if (neighbourhood.health <= -0.1) {
+    health.push({
+      text: `Polluted air around ${neighbourhood.pollutedHomes || "some"} home${neighbourhood.pollutedHomes === 1 ? "" : "s"}`,
+      good: false,
+    });
   }
   if (z.wellFed) {
     health.push({ text: `Well fed (${WELL_FED_WEEKS}+ weeks of food)`, good: true });
