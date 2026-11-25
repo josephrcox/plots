@@ -11,10 +11,10 @@ import { options } from "./objects/PlotTypeOptions";
 import type { Game, PlotOption } from "./types";
 
 /** Boredom added per week at the first needs tier; more as the town grows. */
-const WEEKLY_GROWTH = 0.6;
+const WEEKLY_GROWTH = 1.0;
 const GROWTH_PER_TIER = 0.25;
 /** Below this, boredom has no effect. */
-const THRESHOLD = 25;
+const THRESHOLD = 15;
 /** Happiness lost per week per point of boredom above the threshold. */
 const HAPPINESS_PER_POINT = 3 / (100 - THRESHOLD);
 const CASUAL_FACTOR = 0.5;
@@ -27,7 +27,7 @@ export const NOVELTY = {
   build: 4,
   firstOfKind: 3, // multiplier for a building the town has never had
   amenity: 1.5, // multiplier for recreation, services and amenities
-  homeLevelUp: 3,
+  homeLevelUp: 1, // homes grow on their own, so it counts for little
   tier: 20,
   law: 8,
   expansion: 30,

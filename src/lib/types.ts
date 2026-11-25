@@ -2,6 +2,22 @@ import type { CustomAlerts } from "./objects/CustomAlerts";
 
 export type Difficulty = "0" | "1" | "2" | "3";
 export type EndGoal = "land" | "free_play";
+/** A townsperson (people.ts, #64). Age, mood and wishes are derived. */
+export type Person = {
+  id: number;
+  name: string;
+  born: number; // game day of birth
+  arrived: number; // game day they moved in
+  home: string | null; // plot id
+  job: string | null; // plot id, "guard", or null
+  edu: number; // 0–3: none, basic, skilled, scholar
+  dream: string; // career id (people.ts CAREERS)
+  fav: string; // building id they love
+  work: number; // productivity multiplier, 0.8–1.2
+  appetite: number; // food multiplier, 0.8–1.2
+  mood: number; // offset from the town baseline, recomputed weekly
+};
+
 export type Plot = {
   id: string;
   active: boolean;
@@ -132,6 +148,11 @@ export type Game = {
   foodEaten?: number; // food eaten last week
   wellFed?: boolean; // 4+ weeks of food in store at the last weekly check
   amountScale?: number; // 10 once gold/resources use the ÷10 scale (Nov 2026)
+  people?: Person[]; // townspeople (#64); population_count mirrors its length
+  nextPersonId?: number;
+  moodBase?: number; // town happiness before personal moods (option B, #64)
+  moodAverage?: number; // average personal mood offset
+  moodShown?: number; // happiness shown after the last weekly update
   boredom?: number; // hidden 0–100: how stale the town feels (boredom.ts)
   recentBuilds?: { id: string; day: number }[]; // for boredom's repeat check
   needsTier?: number; // highest town-size tier whose needs apply (needs.ts)

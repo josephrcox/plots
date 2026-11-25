@@ -4,6 +4,7 @@
 
 import type { Game } from "./types";
 import { boredomEffect } from "./boredom";
+import { moodSummary } from "./people";
 import { taxMood } from "./tax";
 import { needStatus, needEffect } from "./needs";
 import { hasPlotOfType } from "./store";
@@ -69,8 +70,9 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   }
   const needs = needStatus(z);
   const effect = needEffect(z, needs);
-  for (const n of needs.filter((n) => !n.met && n.service.hurts === "happiness")) {
-    happiness.push({ text: `Not enough ${n.service.title.toLowerCase()} ${n.service.emoji}`, good: false });
+  // Townspeople's own situations (homes, favourite places, jobs, missing services).
+  for (const part of moodSummary(z, 3)) {
+    happiness.push({ text: part.text, good: part.amount > 0 });
   }
   if (needs.length && needs.every((n) => n.met)) {
     happiness.push({ text: "The town's needs are met", good: true });
@@ -82,13 +84,6 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   }
   if (info.health < 50) {
     happiness.push({ text: "Sickness is spreading", good: false });
-  }
-  if (Math.abs(neighbourhood.happiness) >= 0.1) {
-    happiness.push(
-      neighbourhood.happiness > 0
-        ? { text: "Homes on good land (amenities, water)", good: true }
-        : { text: "Homes on poor land (pollution, noise)", good: false },
-    );
   }
   if (boredomEffect(z) < -0.2) {
     happiness.push({ text: "The town feels stale: try something new", good: false });

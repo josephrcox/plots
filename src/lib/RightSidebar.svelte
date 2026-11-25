@@ -18,6 +18,7 @@
   import { formatAmount } from "./utils";
   import { attraction, weeklyArrivals } from "./migration";
   import { needStatus, currentTier, TIERS, SERVICES } from "./needs";
+  import { wishes, personMood } from "./people";
 
   const STATS: { key: StatKey; label: string; icon: string; about: string }[] = [
     {
@@ -72,6 +73,19 @@
 
   $: drivers = $DB ? statDrivers($DB) : null;
   $: needs = $DB ? townNeeds($DB) : [];
+  // Townspeople (#64): how moods are spread, and what people want most.
+  $: folks = $DB?.people ?? [];
+  $: moodSpread = (() => {
+    const s = { unhappy: 0, ok: 0, happy: 0 };
+    for (const p of folks) {
+      const m = personMood(p, $DB!);
+      if (m < 100) s.unhappy++;
+      else if (m < 160) s.ok++;
+      else s.happy++;
+    }
+    return s;
+  })();
+  $: topWishes = $DB && folks.length ? wishes($DB, 3) : [];
   // Service needs of the town's size tier (#48), and what the next tier adds.
   $: services = $DB ? needStatus($DB) : [];
   $: tier = $DB ? currentTier($DB) : -1;
@@ -216,6 +230,26 @@
         {/if}
       </div>
     </div>
+
+    <!-- Townspeople -->
+    {#if folks.length}
+      <div class="flex flex-col gap-1">
+        <span class="heading">Townspeople</span>
+        <div class="goal gap-1.5">
+          <div class="spread" title="Unhappy · content · happy">
+            <div style="flex:{moodSpread.unhappy}" class="bg-red-400"></div>
+            <div style="flex:{moodSpread.ok}" class="bg-yellow-300"></div>
+            <div style="flex:{moodSpread.happy}" class="bg-green-400"></div>
+          </div>
+          <div class="flex flex-row justify-between text-[11px] opacity-80">
+            <span>🙁 {moodSpread.unhappy}</span><span>😐 {moodSpread.ok}</span><span>🙂 {moodSpread.happy}</span>
+          </div>
+          {#each topWishes as w}
+            <span class="text-[11px] opacity-80">{w.text}</span>
+          {/each}
+        </div>
+      </div>
+    {/if}
 
     <!-- Needs -->
     {#if needs.length || services.length || nextTier}
@@ -367,6 +401,13 @@
   .need.good {
     background: rgba(74, 222, 128, 0.12);
     color: rgb(187, 247, 208);
+  }
+  .spread {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
   }
   .bar {
     position: relative;

@@ -6,6 +6,7 @@
 
 import { get } from "svelte/store";
 import { updateBoredom, relieve, NOVELTY } from "./boredom";
+import { syncPeople, assignJobs, updateMoods, updateEducation, educationBoost, personMood, moodParts, townAppetite } from "./people";
 import {
   DB,
   getGame,
@@ -91,6 +92,7 @@ export function simulateDay(db: Game): Game {
 }
 
 function performWeeklyTasks(db: Game) {
+  db = restoreMoodBase(db);
   db = taxRateEffects(db);
   db = healthEffects(db);
   db = checkSpecialPlots(db);
@@ -109,6 +111,7 @@ function performWeeklyTasks(db: Game) {
   db = feedCitizens(db);
   db = moveIn(db);
   db = levelHomes(db);
+  db = peopleWeekly(db);
   const endResources = snapshotResources(db);
   if (db.environment.day % 14 === 0) {
     // Biweekly tasks
@@ -467,6 +470,8 @@ function checkGameLost(z: Game) {
   ) {
     z.tomPettyUsed = true;
     info.happiness = 300;
+    z.moodBase = 300 - (z.moodAverage ?? 0);
+    z.moodShown = 300;
     z.modifiers.happiness = 1;
     info.health = 300;
     z.modifiers.health = 1;
@@ -743,6 +748,10 @@ function calculateKnowledge(z: Game) {
     z.townInfo.knowledge_points += gained;
     weekly += gained;
   });
+  // An educated town gets more out of its schools and libraries.
+  const boost = educationBoost(z);
+  z.townInfo.knowledge_points += weekly * (boost - 1);
+  weekly *= boost;
   z.resource_rate.knowledge = roundTo(weekly, 2);
   return z;
 }
@@ -765,7 +774,7 @@ function bringStatsBackToNormal(z: Game) {
 function feedCitizens(z: Game) {
   // Each citizen eats FOOD_PER_PERSON per week. If there isn't enough,
   // everyone gets a bit less happy and healthy.
-  const foodNeeded = z.townInfo.population_count * FOOD_PER_PERSON;
+  const foodNeeded = townAppetite(z) * FOOD_PER_PERSON;
   let eaten = foodNeeded;
   if (z.resources.food < foodNeeded) {
     eaten = z.resources.food;
@@ -797,7 +806,7 @@ function neighbourEffects(z: Game) {
   // Industry pollutes the land around it; homes feel their land (#59).
   updatePollution(z);
   const delta = townHomeEffect(z);
-  z.townInfo.happiness += delta.happiness;
+  // Land value's effect on happiness is now part of each person's mood (#64).
   z.townInfo.health += delta.health;
   if (delta.pollutedHomes > 0 && !z.pollutionLogged) {
     z.pollutionLogged = true;
@@ -925,6 +934,55 @@ function listenToTownspeople(z: Game) {
   return z;
 }
 
+// ---------------------------------------------------------------------------
+// Townspeople (#64): town happiness = baseline + average personal mood.
+// ---------------------------------------------------------------------------
+
+/**
+ * The weekly tasks below move the town's baseline happiness. Last week's
+ * shown happiness included everyone's personal moods; take that back out,
+ * keeping any change made since (laws, experiments, ...).
+ */
+function restoreMoodBase(z: Game) {
+  const shown = z.townInfo.happiness;
+  const base = z.moodBase ?? shown;
+  z.townInfo.happiness = base + (shown - (z.moodShown ?? shown));
+  return z;
+}
+
+/** Mood below this (baseline + personal) makes a person think about leaving. */
+const LEAVE_BELOW = 45;
+const LEAVE_CHANCE = 0.2;
+
+function peopleWeekly(z: Game) {
+  syncPeople(z);
+  updateEducation(z);
+  assignJobs(z);
+  updateMoods(z);
+  const base = z.townInfo.happiness;
+  z.moodBase = base;
+  // The unhappiest leave, one by one.
+  const leaving = (z.people ?? []).filter(
+    (p) => personMood(p, z) < LEAVE_BELOW && Math.random() < LEAVE_CHANCE,
+  );
+  if (leaving.length) {
+    const gone = new Set(leaving);
+    z.people = z.people!.filter((p) => !gone.has(p));
+    z.townInfo.population_count = z.people.length;
+    assignJobs(z);
+    const first = leaving[0];
+    const why = moodParts(first, z).sort((a, b) => a.amount - b.amount)[0];
+    z = addToTownLog(
+      `🧳 ${first.name}${leaving.length > 1 ? ` and ${leaving.length - 1} other${leaving.length > 2 ? "s" : ""}` : ""} left town${why && why.amount < 0 ? ` (${why.text.toLowerCase()})` : ""}.`,
+      z,
+      Vibe.BAD,
+    );
+  }
+  z.townInfo.happiness = base + (z.moodAverage ?? 0);
+  z.moodShown = z.townInfo.happiness;
+  return z;
+}
+
 /** A town that never changes gets stale (boredom.ts). */
 function boredomEffects(z: Game) {
   const effect = updateBoredom(z);
@@ -1004,7 +1062,7 @@ function levelHomes(z: Game) {
 function movePeopleInMovePeopleOut(z: Game) {
   const info = z.townInfo;
   // Moving in happens weekly (moveIn); this only handles people leaving.
-  if (info.happiness < 50 && info.population_count > 0) {
+  if (!z.people && info.happiness < 50 && info.population_count > 0) {
     // When happiness is low, some people leave.
     const unhappyPeople = Math.round((150 - info.happiness) / 5);
     info.population_count -= unhappyPeople;

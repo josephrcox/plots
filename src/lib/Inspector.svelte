@@ -16,6 +16,7 @@
   import PlotTooltip from "./PlotTooltip.svelte";
   import { homeOccupancy, weeklyArrivals } from "./migration";
   import { levelStatus, MAX_LEVEL } from "./housing";
+  import PersonRow from "./PersonRow.svelte";
 
   $: pos = $inspected;
   $: plot = $DB && pos ? $DB.plots[pos.x]?.[pos.y] : null;
@@ -29,6 +30,9 @@
   $: home = $DB && plot ? homeOccupancy($DB).get(plot.id) : undefined;
   $: arrivals = $DB ? weeklyArrivals($DB) : 0;
   $: level = $DB && plot && home ? levelStatus(plot, $DB, home.people >= home.capacity) : null;
+  // Who lives or works here (#64).
+  $: people = $DB && plot ? ($DB.people ?? []).filter((p) => p.home === plot!.id || p.job === plot!.id) : [];
+  $: peopleLabel = home ? "Residents" : "Workers";
 
   function replace() {
     if (!pos) return;
@@ -127,6 +131,17 @@
         >{effect.text}</span
       >
     {/each}
+
+    {#if people.length}
+      <div class="flex flex-col">
+        <span class="text-[11px] uppercase tracking-wider opacity-55 mb-0.5"
+          >{peopleLabel} ({people.length})</span
+        >
+        {#each people.slice(0, 40) as person (person.id)}
+          <PersonRow {person} />
+        {/each}
+      </div>
+    {/if}
 
     <PlotTooltip {option} checkRequirements={false} showTitle={false} />
 

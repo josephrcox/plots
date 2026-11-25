@@ -7,6 +7,7 @@ import { options } from "./objects/PlotTypeOptions";
 import { taxMood } from "./tax";
 import { homeCapacity } from "./housing";
 import { needEffect } from "./needs";
+import { residents } from "./people";
 
 /** Share of empty spaces filled per week at normal attractiveness. */
 export const BASE_MOVE_IN_RATE = 0.2;
@@ -78,25 +79,13 @@ export type Occupancy = Map<string, { people: number; capacity: number }>;
 
 /** Who lives where: the town's people fill homes oldest first. */
 export function homeOccupancy(z: Game): Occupancy {
-  const homes: Plot[] = [];
+  const result: Occupancy = new Map();
+  const who = residents(z);
   for (const row of z.plots) {
     for (const p of row) {
-      if (!p.active || p.type < 0) continue;
-      if (homeCapacity(p) > 0) {
-        homes.push(p);
-      }
+      const capacity = homeCapacity(p);
+      if (capacity > 0) result.set(p.id, { people: who.get(p.id)?.length ?? 0, capacity });
     }
-  }
-  homes.sort(
-    (a, b) => (a.builtDay ?? 0) - (b.builtDay ?? 0) || a.x - b.x || a.y - b.y,
-  );
-  let left = z.townInfo.population_count;
-  const result: Occupancy = new Map();
-  for (const home of homes) {
-    const capacity = homeCapacity(home);
-    const people = Math.max(0, Math.min(capacity, left));
-    left -= people;
-    result.set(home.id, { people, capacity });
   }
   return result;
 }

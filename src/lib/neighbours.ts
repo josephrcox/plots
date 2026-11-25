@@ -15,6 +15,7 @@ import {
   POLLUTERS,
 } from "./land";
 import { serviceImpact, SERVICES, coverage, servicesAt } from "./needs";
+import { landMood } from "./people";
 
 const LIVESTOCK_NEAR_FARM = 1.25;
 const TREE_FARM_NEAR_MILL = 1.5;
@@ -159,7 +160,7 @@ export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
       text:
         tone === "neutral"
           ? `🏡 Land: ${landValueWord(e.value)} (${e.value}) · no effect`
-          : `🏡 Land: ${landValueWord(e.value)} (${e.value}) · ${e.happiness >= 0 ? "+" : ""}${round1(e.happiness)} 😊/wk`,
+          : `🏡 Land: ${landValueWord(e.value)} (${e.value}) · residents ${landMood(e.value) >= 0 ? "+" : ""}${Math.round(landMood(e.value))} mood`,
       good: tone !== "bad",
       neutral: tone === "neutral",
     });

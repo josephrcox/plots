@@ -249,7 +249,8 @@ export function needEffect(z: Game, status = needStatus(z)): NeedEffect {
   for (const n of status) {
     const gap = Math.max(0, n.target - n.covered);
     shortfall += gap;
-    effect[n.service.hurts] -= (gap / 0.1) * PENALTY_PER_10 * soften;
+    // Unmet happiness needs show up in each person's mood (people.ts).
+    if (n.service.hurts === "health") effect.health -= (gap / 0.1) * PENALTY_PER_10 * soften;
   }
   effect.moveIn = Math.max(0.3, 1 - (shortfall / 0.1) * MOVE_IN_PER_10 * soften);
   return effect;
