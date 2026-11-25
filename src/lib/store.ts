@@ -339,14 +339,16 @@ export function generatePlots(size: number): Plot[][] {
   return grid.map((row, i) => row.map((cell, j) => plotFromCell(i, j, cell)));
 }
 
-// Twice the land of the original sizes (×√2 per side): fog of war makes a
-// bigger first map worth exploring before you ever expand.
-export const GRID_SIZE_BY_DIFFICULTY: Record<Difficulty, number> = {
-  "0": 11,
-  "1": 17,
-  "2": 23,
-  "3": 23,
-};
+/**
+ * Size of a new town's map, the same for every difficulty: about 25 (some
+ * 530 tiles of land) with a random ±15% so some starts are roomier than
+ * others. Fog of war makes a big first map worth exploring before you ever
+ * expand. Difficulty comes from tax tolerance and penalties, not map size.
+ */
+export const MAP_SIZE = 25;
+export function rollMapSize(): number {
+  return Math.round(MAP_SIZE * (0.85 + Math.random() * 0.3));
+}
 
 export function startGame(
   difficulty: Difficulty,
@@ -382,7 +384,7 @@ export function startGame(
     json.resources.metal = 1000000;
   }
 
-  json.plots = generatePlots(GRID_SIZE_BY_DIFFICULTY[difficulty] ?? 12);
+  json.plots = generatePlots(rollMapSize());
   placeSites(json);
   json.sitesPlaced = true;
   initFog(json);

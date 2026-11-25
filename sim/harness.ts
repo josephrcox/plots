@@ -1,7 +1,7 @@
 // Headless runner for Plots: builds a seeded town, steps the real simulation,
 // and lets a policy choose builds. Used by sim/run.ts.
 import { get } from "svelte/store";
-import { DB, createDefaultGame, generatePlots, GRID_SIZE_BY_DIFFICULTY, disabledPlotMenu, clearPlot, userDB } from "../src/lib/store";
+import { DB, createDefaultGame, generatePlots, rollMapSize, disabledPlotMenu, clearPlot, userDB } from "../src/lib/store";
 import { simulateDay } from "../src/lib/simulation";
 import { rollBaseTolerance } from "../src/lib/tax";
 import { placeSites, siteOf } from "../src/lib/sites";
@@ -28,7 +28,7 @@ export function newTown(mapSeed: number, difficulty = 1): Game {
   g.gameSettings = [];
   g.townInfo.name = "Sim";
   g.economyAndLaws.max_tax_rate = rollBaseTolerance(difficulty);
-  g.plots = generatePlots(GRID_SIZE_BY_DIFFICULTY[String(difficulty) as "1"] ?? 17);
+  g.plots = generatePlots(rollMapSize());
   placeSites(g);
   g.sitesPlaced = true;
   initFog(g);

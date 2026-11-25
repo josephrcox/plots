@@ -64,7 +64,10 @@ export function reveal(z: Game, plots: Plot[]) {
   if (found.length) {
     const message = `🔭 Surveyors found ${found.length > 1 ? `${found.slice(0, -1).join(", ")} and ${found[found.length - 1]}` : found[0]} nearby.`;
     z.townLog = z.townLog ?? [];
-    z.townLog.unshift({ message, day: z.environment.day, vibe: Vibe.GOOD });
+    // Same as other log messages: don't repeat one that's already there.
+    if (!z.townLog.some((l) => l.message === message)) {
+      z.townLog.unshift({ message, day: z.environment.day, vibe: Vibe.GOOD });
+    }
   }
 }
 
