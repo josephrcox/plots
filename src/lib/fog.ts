@@ -10,6 +10,8 @@ import { Vibe, type Game, type Plot } from "./types";
 
 /** The colour of unexplored land (the whole map background when fog is on). */
 export const FOG_COLOR = "rgb(188, 196, 206)";
+/** Bare earth: between tiles and beyond the land, once explored. */
+export const GROUND_COLOR = "rgb(100, 78, 54)";
 
 /**
  * Soft cloud puffs drawn over the fog: one background on the map, moved and

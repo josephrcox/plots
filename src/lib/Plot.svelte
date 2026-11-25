@@ -28,6 +28,7 @@
   import { options, getColor } from "./objects/PlotTypeOptions";
   import type { Plot } from "./types";
   import { siteOf, siteFor } from "./sites";
+  import { GROUND_COLOR } from "./fog";
 
   export let data: Plot;
   export let buildable = false;
@@ -55,7 +56,7 @@
   $: fill = fogged
     ? "transparent"
     : data.offMap
-      ? "rgb(104, 80, 56)" // explored edge of the land
+      ? GROUND_COLOR // explored edge of the land
       : data.water
     ? "rgb(64, 140, 170)"
     : tint && !option && !mineral

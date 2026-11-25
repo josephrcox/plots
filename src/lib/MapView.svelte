@@ -61,7 +61,7 @@
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
   import { siteOf, allowedTitles } from "./sites";
-  import { isFogged, showsFog, fogBackground } from "./fog";
+  import { isFogged, showsFog, fogBackground, GROUND_COLOR } from "./fog";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -605,6 +605,20 @@
       class="absolute left-0 top-0 origin-top-left"
       style="width:{worldW}px; height:{worldH}px; transform: translate({cam.x}px, {cam.y}px) scale({cam.zoom});"
     >
+      <!-- Under fog, explored cells sit on earth: a slightly larger hex behind
+           each one, so the gaps between tiles are dirt, not cloud. -->
+      {#if $DB.fog}
+        {#each $DB.plots as row}
+          {#each row as plot (plot.id)}
+            {#if plot.seen}
+              <div
+                class="ground"
+                style="left:{tileLeft(plot.x, plot.y) - 8}px; top:{tileTop(plot.x) - 9}px; background:{GROUND_COLOR};"
+              />
+            {/if}
+          {/each}
+        {/each}
+      {/if}
       {#each $DB.plots as row, x}
         {#each row as plot, y (plot.id)}
           {#if !plot.offMap || $DB.fog}
@@ -756,6 +770,13 @@
 {/if}
 
 <style>
+  .ground {
+    position: absolute;
+    width: 106px;
+    height: 123px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    pointer-events: none;
+  }
   .cam-btn {
     width: 34px;
     height: 34px;
