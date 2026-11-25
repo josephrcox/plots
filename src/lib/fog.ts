@@ -17,18 +17,27 @@ export function isFogged(z: Game, plot: Plot | undefined): boolean {
   return !!z.fog && !!plot && !plot.offMap && !plot.seen;
 }
 
+/**
+ * Whether a cell is drawn as fog: any unexplored cell, including spaces
+ * beyond the land, so the fog hides the map's shape too.
+ */
+export function showsFog(z: Game, plot: Plot | undefined): boolean {
+  return !!z.fog && !!plot && !plot.seen;
+}
+
 /** Reveals land around (x, y); logs any special sites found. */
 export function revealAround(z: Game, x: number, y: number, radius = REVEAL_RADIUS) {
   if (!z.fog) return;
-  reveal(z, tilesWithin(x, y, radius, z));
+  reveal(z, tilesWithin(x, y, radius, z, true));
 }
 
 /** Reveals these plots; logs any special sites found among them. */
 export function reveal(z: Game, plots: Plot[]) {
   const found: string[] = [];
   for (const p of plots) {
-    if (p.offMap || p.seen) continue;
-    p.seen = true;
+    if (p.seen) continue;
+    p.seen = true; // off-map cells too: revealing shows where the land ends
+    if (p.offMap) continue;
     const site = siteOf(p);
     if (site && z.fogReady) found.push(`${site.emoji} ${site.title.toLowerCase()}`);
   }
@@ -47,10 +56,10 @@ export function initFog(z: Game) {
   z.fog = true;
   const built = z.plots.flat().filter((p) => p.active);
   if (built.length) {
-    for (const b of built) reveal(z, tilesWithin(b.x, b.y, REVEAL_RADIUS, z));
+    for (const b of built) reveal(z, tilesWithin(b.x, b.y, REVEAL_RADIUS, z, true));
   } else {
     const start = suggestedStart(z);
-    if (start) reveal(z, tilesWithin(start[0], start[1], START_RADIUS, z));
+    if (start) reveal(z, tilesWithin(start[0], start[1], START_RADIUS, z, true));
   }
   z.fogReady = true;
 }

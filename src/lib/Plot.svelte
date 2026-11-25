@@ -73,6 +73,7 @@
 
 <div
   class="plot_container"
+  class:fogbank={fogged}
   class:dim={state === "dim"}
   class:pulse={state === "placeable"}
   class:crosshair
@@ -95,7 +96,7 @@
     style="background-color:{fill};"
   >
     {#if fogged}
-      <span class="cloud">☁️</span>
+      {#if (data.x * 7 + data.y * 3) % 6 === 0}<span class="cloud">☁️</span>{/if}
     {:else if state === "ghost"}
       <span class="emoji opacity-70">{ghostEmoji}</span>
     {:else if option}
@@ -155,6 +156,7 @@
 <style>
   .plot_container {
     position: absolute;
+    z-index: 1; /* above the fog blanket */
     width: 90px;
     height: 105px;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
@@ -243,13 +245,24 @@
     padding: 0 3px;
     font-size: 0.7rem;
   }
+  /* Fog: tiles grow to overlap and blur into one soft blanket, so neither
+     the grid nor the land's outline shows through. */
+  .plot_container.fogbank {
+    clip-path: none;
+    transform: scale(1.35);
+    z-index: 0;
+    pointer-events: auto;
+  }
   .inner.fog {
-    opacity: 0.55;
-    filter: blur(0.3px);
+    clip-path: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(196, 200, 206) 0%, rgb(170, 176, 186) 55%, rgba(170, 176, 186, 0) 72%) !important;
+    filter: blur(4px);
   }
   .cloud {
-    font-size: 1.1rem;
-    opacity: 0.5;
+    font-size: 1.3rem;
+    opacity: 0.35;
+    filter: blur(1px);
   }
   .site-title {
     font-size: 0.62rem;

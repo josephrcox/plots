@@ -61,7 +61,7 @@
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
   import { siteOf, allowedTitles } from "./sites";
-  import { isFogged } from "./fog";
+  import { isFogged, showsFog } from "./fog";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -559,7 +559,7 @@
     >
       {#each $DB.plots as row, x}
         {#each row as plot, y (plot.id)}
-          {#if !plot.offMap}
+          {#if !plot.offMap || showsFog($DB, plot)}
           <Plot
             data={plot}
             buildable={buildable[x]?.[y] ?? false}
@@ -570,7 +570,7 @@
             crosshair={$settingLiegeLocation && plot.active}
             startHint={startTile?.[0] === x && startTile?.[1] === y}
             occupancy={occupancy?.get(plot.id) ?? null}
-            fogged={isFogged($DB, plot)}
+            fogged={showsFog($DB, plot)}
             homeLevel={levels.get(plot.id)?.level ?? 0}
             levelTrend={levels.get(plot.id)?.trend ?? "steady"}
             tint={overlays[x]?.[y]?.tint ?? null}

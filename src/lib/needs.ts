@@ -99,7 +99,7 @@ const CASUAL_PENALTY = 0.5;
 // ---------------------------------------------------------------------------
 
 /** Tiles within `r` steps of (x, y), including itself. */
-export function tilesWithin(x: number, y: number, r: number, z: Game): Plot[] {
+export function tilesWithin(x: number, y: number, r: number, z: Game, includeOffMap = false): Plot[] {
   const key = (i: number, j: number) => i * 10000 + j;
   const seen = new Set([key(x, y)]);
   let frontier: [number, number][] = [[x, y]];
@@ -113,7 +113,7 @@ export function tilesWithin(x: number, y: number, r: number, z: Game): Plot[] {
         if (seen.has(key(a, b))) continue;
         seen.add(key(a, b));
         const p = z.plots[a]?.[b];
-        if (!p || p.offMap) continue;
+        if (!p || (p.offMap && !includeOffMap)) continue;
         out.push(p);
         next.push([a, b]);
       }
