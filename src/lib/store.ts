@@ -1,3 +1,4 @@
+import { relieve, NOVELTY } from "./boredom";
 import { get, writable, type Writable } from "svelte/store";
 import { default_db, default_user_db } from "./objects/defaults/default_DB";
 import {
@@ -463,6 +464,8 @@ export function clearPlot(x: number, y: number, z: Game) {
   const plot = z.plots[x][y];
   const oldPlotType = plot.type;
   const builtDay = plot.builtDay;
+  const novelty = plot.novelty ?? 0;
+  delete plot.novelty;
   plot.type = plot.water ? -9 : -1;
   plot.typeId = "";
   plot.active = false;
@@ -484,6 +487,8 @@ export function clearPlot(x: number, y: number, z: Game) {
       builtDay != null &&
       z.environment.day - builtDay <= BULLDOZE_REVERSAL_DAYS
     ) {
+      // ...and the boredom relief it gave.
+      z.boredom = Math.min(100, (z.boredom ?? 0) + novelty);
       const info = z.townInfo;
       const change = option.immediate_variable_changes;
       info.happiness = Math.min(
@@ -651,6 +656,7 @@ export function expandTown(z: Game, direction: string): string | undefined {
   }
 
   z.kingdom_expansions++;
+  relieve(z, NOVELTY.expansion);
 
   DB.set(z);
 }

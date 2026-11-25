@@ -1,3 +1,4 @@
+import { recordBuild } from "./boredom";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { syncCapacity } from "./housing";
@@ -430,6 +431,8 @@ export function placePlot(
     2,
   );
   syncEmployment(z);
+
+  plot.novelty = recordBuild(z, plotChosen);
 
   z.plotCounts[typeIndex] = (z.plotCounts[typeIndex] ?? 0) + 1;
   z.lastChangeDay = z.environment.day;

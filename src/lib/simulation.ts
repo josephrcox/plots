@@ -5,6 +5,7 @@
 // (dialogs, confetti, achievements) go through the stores in ./store.
 
 import { get } from "svelte/store";
+import { updateBoredom, relieve, NOVELTY } from "./boredom";
 import {
   DB,
   getGame,
@@ -104,6 +105,7 @@ function performWeeklyTasks(db: Game) {
   db = bringStatsBackToNormal(db);
   db = neighbourEffects(db);
   db = townNeedsEffects(db);
+  db = boredomEffects(db);
   db = feedCitizens(db);
   db = moveIn(db);
   db = levelHomes(db);
@@ -923,6 +925,19 @@ function listenToTownspeople(z: Game) {
   return z;
 }
 
+/** A town that never changes gets stale (boredom.ts). */
+function boredomEffects(z: Game) {
+  const effect = updateBoredom(z);
+  if (effect < -0.5) {
+    z = addToTownLog(
+      '😐 Townspeople are bored: "Same old town, nothing new in ages. Couldn\'t we build something different?"',
+      z,
+      Vibe.BAD,
+    );
+  }
+  return z;
+}
+
 /** The town's needs grow with it (#48). */
 function townNeedsEffects(z: Game) {
   const { status, rewarded } = updateNeeds(z);
@@ -936,6 +951,7 @@ function townNeedsEffects(z: Game) {
     );
   }
   if (rewarded) {
+    relieve(z, NOVELTY.tier);
     z = addToTownLog(
       `🎉 Every need of a ${rewarded.name.toLowerCase()} is met! The townspeople chipped in 💰${rewarded.reward}.`,
       z,
@@ -964,6 +980,7 @@ function levelHomes(z: Game) {
   for (const [id, o] of homeOccupancy(z)) if (o.people >= o.capacity) full.add(id);
   const changes = updateHomeLevels(z, full);
   const ups = changes.filter((c) => c.to > c.from).length;
+  relieve(z, ups * NOVELTY.homeLevelUp);
   const downs = changes.length - ups;
   if (ups && !z.homeLevelLogged) {
     z.homeLevelLogged = true;

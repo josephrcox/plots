@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { relieve, NOVELTY } from "../boredom";
   import {
     DB,
     hasPlotOfType,
@@ -39,6 +40,7 @@
       // Enact
       $DB!.resources.bureaucracy -= law.cost;
       econ.enacted = [...econ.enacted, law.id];
+      relieve($DB, NOVELTY.law);
     } else {
       showAlert("Not enough bureaucracy!");
     }

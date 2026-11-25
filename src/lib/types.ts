@@ -16,6 +16,7 @@ export type Plot = {
   snoozedUntil?: number;
   builtDay?: number; // game day the current building was placed
   pollution?: number; // 0–100, builds up from nearby industry (land.ts)
+  novelty?: number; // boredom relief this building gave (taken back if bulldozed soon)
   level?: number; // homes only: 1–3, see housing.ts (absent = 1)
   levelProgress?: number; // homes only: weeks toward a level change (+ up, − down)
 };
@@ -131,6 +132,8 @@ export type Game = {
   foodEaten?: number; // food eaten last week
   wellFed?: boolean; // 4+ weeks of food in store at the last weekly check
   amountScale?: number; // 10 once gold/resources use the ÷10 scale (Nov 2026)
+  boredom?: number; // hidden 0–100: how stale the town feels (boredom.ts)
+  recentBuilds?: { id: string; day: number }[]; // for boredom's repeat check
   needsTier?: number; // highest town-size tier whose needs apply (needs.ts)
   needsRewarded?: number; // highest tier whose needs were all met once (reward paid)
   homeLevelLogged?: boolean; // the first home-level-up log message was shown

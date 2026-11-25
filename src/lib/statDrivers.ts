@@ -3,6 +3,7 @@
 // the rules in simulation.ts so the panel can say *why*, not just *what*.
 
 import type { Game } from "./types";
+import { boredomEffect } from "./boredom";
 import { taxMood } from "./tax";
 import { needStatus, needEffect } from "./needs";
 import { hasPlotOfType } from "./store";
@@ -88,6 +89,9 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
         ? { text: "Homes on good land (amenities, water)", good: true }
         : { text: "Homes on poor land (pollution, noise)", good: false },
     );
+  }
+  if (boredomEffect(z) < -0.2) {
+    happiness.push({ text: "The town feels stale: try something new", good: false });
   }
   if (z.wellFed) {
     happiness.push({ text: `Well fed (${WELL_FED_WEEKS}+ weeks of food)`, good: true });
