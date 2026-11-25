@@ -4,7 +4,7 @@
 
 import type { Game } from "./types";
 import { taxMood } from "./tax";
-import { needStatus, needEffect, currentTier, TIERS, SERVICES } from "./needs";
+import { needStatus, needEffect } from "./needs";
 import { hasPlotOfType } from "./store";
 import { townHomeEffect } from "./land";
 import { FOOD_PER_PERSON, WELL_FED_WEEKS } from "./simulation";
@@ -158,22 +158,6 @@ export function statEffect(z: Game, key: StatKey): Line {
 /** Needs worth flagging right now (empty when everything is fine). */
 export function townNeeds(z: Game): Line[] {
   const needs: Line[] = [];
-  for (const n of needStatus(z)) {
-    needs.push({
-      text: `${n.service.emoji} ${n.service.title}: ${Math.round(n.covered * 100)}% of homes (wants ${Math.round(n.target * 100)}%)`,
-      good: n.met,
-    });
-  }
-  const next = TIERS[currentTier(z) + 1];
-  if (next) {
-    const casual = z.gameSettings.includes("casual");
-    const adds = SERVICES.filter((s) => next.wants[s.id] != null && TIERS[currentTier(z)]?.wants[s.id] == null);
-    const pct = (s: (typeof SERVICES)[number]) => Math.round(next.wants[s.id]! * (casual ? 0.7 : 1) * 100);
-    needs.push({
-      text: `Next at ${next.population} people (${next.name.toLowerCase()}): ${adds.length ? adds.map((s) => `${s.emoji} ${s.title.toLowerCase()} ${pct(s)}%`).join(", ") : "more of the same"}. Meet it all for 💰${next.reward}.`,
-      good: true,
-    });
-  }
   const foodRate = z.resource_rate.food;
   if (foodRate < 0 && z.resources.food > 0) {
     const weeks = Math.floor(z.resources.food / -foodRate);

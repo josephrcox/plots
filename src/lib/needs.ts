@@ -18,6 +18,8 @@ export type Service = {
   id: ServiceId;
   emoji: string;
   title: string;
+  /** One-word name for compact UI. */
+  short: string;
   /** Building id → how many tiles away it reaches. */
   providers: Record<string, number>;
   /** Which stat suffers when the need goes unmet. */
@@ -27,6 +29,7 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     id: "recreation",
+    short: "Recreation",
     emoji: "🛝",
     title: "Recreation",
     providers: { park: 2, stables: 2, pub: 2, vineyard: 2, village_inn: 3 },
@@ -34,6 +37,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "health",
+    short: "Health",
     emoji: "⚕️",
     title: "Health care",
     providers: { Apothecary: 2, healing_house: 4 },
@@ -41,6 +45,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "shops",
+    short: "Shops",
     emoji: "🛒",
     title: "Shops",
     providers: { bakery: 2, village_market: 3, general_store: 4 },
@@ -48,6 +53,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "faith",
+    short: "Faith",
     emoji: "⛪",
     title: "Faith & culture",
     providers: { church: 3, library: 3 },
@@ -55,6 +61,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "school",
+    short: "School",
     emoji: "🎓",
     title: "Schooling",
     providers: { schoolhouse: 3, academy: 4, university: 5 },

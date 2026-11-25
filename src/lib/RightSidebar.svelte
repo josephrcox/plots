@@ -17,6 +17,7 @@
   } from "./statDrivers";
   import { formatAmount } from "./utils";
   import { attraction, weeklyArrivals } from "./migration";
+  import { needStatus, currentTier, TIERS, SERVICES } from "./needs";
 
   const STATS: { key: StatKey; label: string; icon: string; about: string }[] = [
     {
@@ -71,6 +72,13 @@
 
   $: drivers = $DB ? statDrivers($DB) : null;
   $: needs = $DB ? townNeeds($DB) : [];
+  // Service needs of the town's size tier (#48), and what the next tier adds.
+  $: services = $DB ? needStatus($DB) : [];
+  $: tier = $DB ? currentTier($DB) : -1;
+  $: nextTier = TIERS[tier + 1];
+  $: nextAdds = nextTier
+    ? SERVICES.filter((s) => nextTier.wants[s.id] != null && TIERS[tier]?.wants[s.id] == null)
+    : [];
   $: emptySpaces = $DB ? $DB.townInfo.population_max - $DB.townInfo.population_count : 0;
   $: arrivals = $DB ? weeklyArrivals($DB) : 0;
   $: pull = $DB ? attraction($DB) : { factor: 0, reasons: [] };
@@ -210,9 +218,38 @@
     </div>
 
     <!-- Needs -->
-    {#if needs.length}
+    {#if needs.length || services.length || nextTier}
       <div class="flex flex-col gap-1">
         <span class="heading">Needs</span>
+        {#if services.length || nextTier}
+          <div class="goal gap-1.5">
+            {#each services as n}
+              <div class="flex flex-col gap-0.5" title="{n.service.title}: share of homes within reach of one">
+                <div class="flex flex-row justify-between text-xs">
+                  <span>{n.service.emoji} {n.service.short}</span>
+                  <span class="font-mono" class:text-green-300={n.met} class:text-red-300={!n.met}
+                    >{Math.round(n.covered * 100)}%{n.met ? " ✓" : ` / ${Math.round(n.target * 100)}%`}</span
+                  >
+                </div>
+                <div class="bar">
+                  <div
+                    class="fill"
+                    class:met={n.met}
+                    style="width:{Math.min(100, n.covered * 100)}%"
+                  ></div>
+                  <div class="target" style="left:{n.target * 100}%"></div>
+                </div>
+              </div>
+            {/each}
+            {#if nextTier}
+              <span class="text-[11px] opacity-70"
+                >At {nextTier.population} people: {nextAdds.length
+                  ? nextAdds.map((s) => `+${s.emoji} ${s.short}`).join(" ")
+                  : "higher targets"} · 💰{formatAmount(nextTier.reward)}</span
+              >
+            {/if}
+          </div>
+        {/if}
         {#each needs as need}
           <span
             class="need"
@@ -330,6 +367,27 @@
   .need.good {
     background: rgba(74, 222, 128, 0.12);
     color: rgb(187, 247, 208);
+  }
+  .bar {
+    position: relative;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .bar .fill {
+    height: 100%;
+    border-radius: 2px;
+    background: rgb(248, 113, 113);
+  }
+  .bar .fill.met {
+    background: rgb(74, 222, 128);
+  }
+  .bar .target {
+    position: absolute;
+    top: -2px;
+    width: 2px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.8);
   }
   .goal {
     display: flex;
