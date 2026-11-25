@@ -7,6 +7,7 @@
   import type { EffectLine } from "./neighbours";
   import { formatAmount } from "./utils";
   import { DB, workerBalance } from "./store";
+  import Signal from "./components/Signal.svelte";
 
   export let x: number;
   export let y: number;
@@ -56,8 +57,9 @@
         <span class="opacity-80">👷 {needed} workers ({free} free)</span>
       {:else}
         <span class="text-amber-300"
-          >👷 Only {free} of {needed} workers free: runs at {staffedPct}%</span
+          >👷 Only {free} of {needed} workers free: it'll run short</span
         >
+        <div class="h-1 rounded bg-white/20"><div class="h-1 rounded bg-amber-300" style="width:{staffedPct}%"></div></div>
       {/if}
     {/if}
     {#if !check.ok}
@@ -69,7 +71,11 @@
             ? "text-sky-300"
             : line.good
               ? "text-green-300"
-              : "text-red-300"}>{line.text}</span
+              : "text-red-300"}
+          >{line.text}{#if line.strength}<Signal
+              level={line.strength}
+              tone={line.neutral ? "neutral" : line.good ? "good" : "bad"}
+            />{/if}</span
         >
       {/each}
       <span class="opacity-60">Click to build · Esc to stop</span>

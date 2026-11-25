@@ -13,6 +13,7 @@
 import { options } from "./objects/PlotTypeOptions";
 import { hexNeighbourCoords } from "./neighbours";
 import type { Game, Plot, PlotOption } from "./types";
+import { strength, STEPS } from "./strength";
 
 /** Pollution added per week on the source tile (less further out). */
 export const POLLUTERS: Record<string, number> = {
@@ -190,7 +191,7 @@ export function landValue(x: number, y: number, z: Game): { value: number; parts
   let amenities = 0;
   for (const [id, amount] of bonus) {
     if (amount > 0) amenities += amount;
-    else parts.push({ text: `${options.find((o) => o.id === id)?.title ?? id} nearby`, amount });
+    else if (amount < 0) parts.push({ text: `${options.find((o) => o.id === id)?.title ?? id} nearby`, amount });
   }
   const capped = Math.min(AMENITY_CAP, amenities);
   if (capped > 0) {
@@ -276,7 +277,7 @@ export function townHomeEffect(z: Game): { happiness: number; health: number; po
 // Placement preview
 // ---------------------------------------------------------------------------
 
-export type ImpactLine = { text: string; good: boolean; neutral?: boolean };
+export type ImpactLine = { text: string; good: boolean; neutral?: boolean; strength?: number; exact?: string };
 
 /** What building `id` at (x, y) would do to land and homes around it. */
 export function placementImpact(id: string, x: number, y: number, z: Game): ImpactLine[] {
@@ -288,20 +289,26 @@ export function placementImpact(id: string, x: number, y: number, z: Game): Impa
   if (isHome(option)) {
     const { value } = landValue(x, y, z);
     const pol = pollutionAt(z, x, y);
+    const t = landValueTone(value);
+    const off = Math.max(0, Math.abs(value - BASE_LAND_VALUE) - NEUTRAL_BAND);
     lines.push({
-      text: `Land here: ${landValueWord(value).toLowerCase()} (${value})`,
-      good: landValueTone(value) !== "bad",
-      neutral: landValueTone(value) === "neutral",
+      text: `${landValueWord(value)} land here`,
+      good: t !== "bad",
+      neutral: t === "neutral",
+      strength: t === "neutral" ? 0 : strength(off, [1, 10, 20]),
+      exact: `Land value ${value}`,
     });
-    if (pol >= 5) lines.push({ text: `${pollutionWord(pol)} air: residents' health suffers`, good: false });
+    if (pol >= 5) lines.push({ text: `${pollutionWord(pol)} air: residents' health suffers`, good: false, strength: strength(pol, STEPS.pollution), exact: `Pollution ${Math.round(pol)}` });
   }
   if (POLLUTERS[id]) {
     const near = [...homesIn([...d1, ...d2])];
     if (near.length) {
       const worst = Math.max(...near.map((h) => settledPollution(emissionTo(id, x, y, h.x, h.y, z))));
       lines.push({
-        text: `Pollutes ${near.length} home${near.length > 1 ? "s" : ""} within 2 tiles (builds up to ${Math.round(worst)} over months)`,
+        text: `Pollutes ${near.length} home${near.length > 1 ? "s" : ""} within 2 tiles, building up over months`,
         good: false,
+        strength: strength(worst, STEPS.pollution),
+        exact: `Builds up to ${Math.round(worst)} pollution`,
       });
     } else {
       lines.push({ text: "Pollutes land within 2 tiles; keep homes away", good: true, neutral: true });
@@ -314,6 +321,8 @@ export function placementImpact(id: string, x: number, y: number, z: Game): Impa
       lines.push({
         text: `${amenity[0] > 0 ? "Raises" : "Lowers"} land value for ${near} home${near > 1 ? "s" : ""} nearby`,
         good: amenity[0] > 0,
+        strength: strength(amenity[0], STEPS.land),
+        exact: `${amenity[0] > 0 ? "+" : ""}${amenity[0]} next door, ${amenity[1] > 0 ? "+" : ""}${amenity[1]} two tiles away`,
       });
     }
   }

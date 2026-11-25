@@ -17,6 +17,8 @@
   } from "./people";
   import { options } from "./objects/PlotTypeOptions";
   import type { Person } from "./types";
+  import Signal from "./components/Signal.svelte";
+  import { strength, STEPS } from "./strength";
 
   export let person: Person;
   let open = false;
@@ -71,8 +73,11 @@
         >🎓 {EDU_LEVELS[Math.floor(person.edu)]}{traits.length ? ` · ${traits.join(", ")}` : ""}</span
       >
       {#each parts as part}
-        <span class={part.amount >= 0 ? "text-green-300" : "text-red-300"}
-          >{part.amount >= 0 ? "+" : ""}{Math.round(part.amount)} {part.text}</span
+        <span
+          class={part.amount >= 0 ? "text-green-300" : "text-red-300"}
+          title="{part.amount >= 0 ? '+' : ''}{Math.round(part.amount)} mood"
+          ><Signal level={Math.max(1, strength(part.amount, STEPS.mood))} tone={part.amount >= 0 ? "good" : "bad"} />
+          {part.text}</span
         >
       {/each}
     </div>

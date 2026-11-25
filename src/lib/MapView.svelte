@@ -60,6 +60,8 @@
   import { options } from "./objects/PlotTypeOptions";
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
+  import Signal from "./components/Signal.svelte";
+  import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
   import { Events, type Plot as PlotData } from "./types";
 
@@ -167,16 +169,16 @@
       const v = p.pollution ?? 0;
       if (v < 1) return { tint: "rgba(80, 200, 120, 0.18)", label: null };
       const a = Math.min(0.85, 0.2 + v / 110);
-      return { tint: `rgba(110, 60, 30, ${a})`, label: String(Math.round(v)) };
+      return { tint: `rgba(110, 60, 30, ${a})`, label: null };
     }
     const v = landValue(p.x, p.y, z).value;
-    if (landValueTone(v) === "neutral") return { tint: "rgba(200, 200, 200, 0.15)", label: String(v) };
+    if (landValueTone(v) === "neutral") return { tint: "rgba(200, 200, 200, 0.15)", label: null };
     const d = (v - 50) / 50;
     const tint =
       d >= 0
         ? `rgba(40, 190, 90, ${0.15 + d * 0.6})`
         : `rgba(220, 60, 50, ${0.15 + -d * 0.6})`;
-    return { tint, label: String(v) };
+    return { tint, label: null };
   }
   $: overlays = $DB
     ? $DB.plots.map((row) => row.map((p) => overlayFor(p, $overlay, $DB)))
@@ -661,13 +663,16 @@
       class="fixed z-30 pointer-events-none w-56 rounded-lg bg-popupBackground text-white text-xs p-2 shadow-xl flex flex-col gap-1"
       style="left:{Math.min(mouse.x + 18, window.innerWidth - 240)}px; top:{Math.min(mouse.y + 18, window.innerHeight - 160)}px;"
     >
-      <span class="font-semibold">🏡 Land: {landValueWord(lv.value)} ({lv.value})</span>
+      <span class="font-semibold">🏡 {landValueWord(lv.value)} land</span>
       {#each lv.parts as part}
         <span class={part.amount >= 0 ? "text-green-300" : "text-red-300"}
-          >{part.amount >= 0 ? "+" : ""}{part.amount} {part.text}</span
+          ><Signal level={Math.max(1, strength(part.amount, STEPS.land))} tone={part.amount >= 0 ? "good" : "bad"} />
+          {part.text}</span
         >
       {/each}
-      <span class="font-semibold mt-1">🏭 Air: {pollutionWord(pol)} ({Math.round(pol)})</span>
+      <span class="font-semibold mt-1"
+        >🏭 {pollutionWord(pol)} air{#if pol >= 1}<Signal level={Math.max(1, strength(pol, STEPS.pollution))} tone="bad" />{/if}</span
+      >
     </div>
   {/if}
 

@@ -20,11 +20,17 @@
   import Slider from "./components/ui/slider/slider.svelte";
   import { Vibe } from "./types";
   import { taxMood } from "./tax";
+  import Signal from "./components/Signal.svelte";
+  import { strength, STEPS } from "./strength";
 
   $: hasLab = hasPlotOfType("lab", $DB!).length >= 1;
   $: hasCityHall = hasPlotOfType("city_hall", $DB!).length >= 1;
   // Recomputed whenever the game state or the slider changes.
   $: tax = taxMood($DB!);
+  $: rate = $DB!.economyAndLaws.tax_rate;
+  $: taxWord = rate === 0 ? "None" : rate <= 0.1 ? "Low" : rate <= 0.25 ? "Moderate" : rate <= 0.4 ? "High" : "Very high";
+  $: paceWord =
+    productivity < 50 ? "Leisurely" : productivity < 100 ? "Relaxed" : productivity === 100 ? "Normal" : productivity <= 150 ? "Busy" : "Gruelling";
   $: productivity = $DB!.townInfo.productivity;
   $: output = productivityResourceMultiplier(productivity);
   $: mood = productivityHappinessMultiplier(productivity);
@@ -98,10 +104,10 @@
     </div>
 
     <!-- Tax -->
-    <div class="policy">
+    <div class="policy" title="Tax rate {roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%">
       <div class="flex flex-row justify-between text-sm">
         <span>💰 Tax rate</span>
-        <span class="font-mono">{roundTo($DB.economyAndLaws.tax_rate * 100, 0)}%</span>
+        <span class="text-[11px] opacity-70">{taxWord}</span>
       </div>
       <Slider
         value={[$DB.economyAndLaws.tax_rate]}
@@ -126,10 +132,10 @@
     </div>
 
     <!-- Productivity -->
-    <div class="policy">
+    <div class="policy" title="Productivity {Math.round(productivity)}% · output ×{output}">
       <div class="flex flex-row justify-between text-sm">
         <span>⚒️ Productivity</span>
-        <span class="font-mono">{Math.round(productivity)}%</span>
+        <span class="text-[11px] opacity-70">{paceWord}</span>
       </div>
       <Slider
         value={[productivity]}
@@ -141,10 +147,16 @@
         class="cursor-pointer"
       />
       <span class="text-[11px] opacity-80">
-        Output ×{output}
+        {#if output === 1}Output normal{:else}{output > 1 ? "More output" : "Less output"}<Signal
+            level={Math.max(1, strength(output - 1, STEPS.boost))}
+            tone={output > 1 ? "good" : "bad"}
+          />{/if}
         {#if mood !== 1}
           · <span class={mood > 1 ? "text-green-300" : "text-red-300"}
-            >mood {mood > 1 ? "+" : "−"}{Math.round(Math.abs(mood - 1) * 100)}%/month</span
+            >{mood > 1 ? "rested" : "grumbling"}<Signal
+              level={strength(mood - 1, [0.01, 0.1, 0.2])}
+              tone={mood > 1 ? "good" : "bad"}
+            /></span
           >
         {/if}
       </span>

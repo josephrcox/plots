@@ -17,6 +17,7 @@
   import { homeOccupancy, weeklyArrivals } from "./migration";
   import { levelStatus, MAX_LEVEL } from "./housing";
   import PersonRow from "./PersonRow.svelte";
+  import Signal from "./components/Signal.svelte";
 
   $: pos = $inspected;
   $: plot = $DB && pos ? $DB.plots[pos.x]?.[pos.y] : null;
@@ -82,18 +83,16 @@
       >
     {/if}
     {#if level}
-      <div class="chip bg-yellow-900 text-white flex flex-col gap-1">
+      <div class="chip bg-yellow-900 text-white flex flex-col gap-1" title={level.detail.join("\n")}>
         <span class="font-semibold"
           >{"★".repeat(level.level)} Level {level.level} home · room for {level.capacity}</span
         >
         {#if level.trend === "down"}
-          <span class="text-red-300"
-            >Declining ({level.progress}/{level.weeks} weeks): {level.slipping.join(", ")}</span
-          >
+          <span class="text-red-300">Declining: {level.slipping.join(" and ")}</span>
+          <div class="progress"><div class="fill bad" style="width:{(level.progress / level.weeks) * 100}%"></div></div>
         {:else if level.trend === "up"}
-          <span class="text-green-300"
-            >Growing to level {level.level + 1} ({level.progress}/{level.weeks} weeks)</span
-          >
+          <span class="text-green-300">Growing to level {level.level + 1}</span>
+          <div class="progress"><div class="fill" style="width:{(level.progress / level.weeks) * 100}%"></div></div>
         {:else if level.level < MAX_LEVEL}
           <span class="opacity-80">To grow, it needs {level.missing.join(", ")}.</span>
         {:else}
@@ -108,11 +107,13 @@
           : ""}</span
       >
     {:else if staff && staff.staffed < staff.needed}
-      <span class="chip bg-amber-600 text-white"
-        >👷 {staff.staffed} of {staff.needed} workers: running at {Math.round(
-          (staff.staffed / staff.needed) * 100,
-        )}%. Build homes for more people.</span
+      <div
+        class="chip bg-amber-600 text-white flex flex-col gap-1"
+        title="Running at {Math.round((staff.staffed / staff.needed) * 100)}%"
       >
+        <span>👷 {staff.staffed} of {staff.needed} workers. Build homes for more people.</span>
+        <div class="progress"><div class="fill" style="width:{(staff.staffed / staff.needed) * 100}%"></div></div>
+      </div>
     {:else if staff}
       <span class="chip bg-green-700 text-white"
         >👷 Fully staffed ({staff.needed} workers)</span
@@ -135,7 +136,11 @@
           : effect.good
             ? 'bg-green-700'
             : 'bg-red-700'}"
-        >{effect.text}</span
+        title={effect.exact ?? ""}
+        >{effect.text}{#if effect.strength}<Signal
+            level={effect.strength}
+            tone={effect.neutral ? "neutral" : effect.good ? "good" : "bad"}
+          />{/if}</span
       >
     {/each}
 
@@ -168,6 +173,19 @@
     font-size: 0.72rem;
     padding: 6px 10px;
     border-radius: 12px;
+  }
+  .progress {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .progress .fill {
+    height: 100%;
+    border-radius: 2px;
+    background: rgb(134, 239, 172);
+  }
+  .progress .fill.bad {
+    background: rgb(252, 165, 165);
   }
   .action {
     flex: 1;

@@ -6,7 +6,9 @@
   import { formatAmount, getOptionFromId } from "./utils";
   import type { PlotOption } from "./types";
   import { SERVICES } from "./needs";
-  import { POLLUTERS, AMENITIES } from "./land";
+  import { POLLUTERS, AMENITIES, settledPollution } from "./land";
+  import Signal from "./components/Signal.svelte";
+  import { strength, STEPS } from "./strength";
   import { REQUIRED_EDU, EDU_LEVELS, careerOf } from "./people";
 
   export let option: PlotOption;
@@ -80,18 +82,19 @@
   ];
 
   // Its role in the town: services, land value, pollution (#48, #59).
-  $: roles = [
+  type Role = { text: string; good: boolean; strength?: number };
+  $: roles = <Role[]>[
     ...SERVICES.filter((s) => s.providers[option.id] != null).map((s) => ({
       text: `${s.emoji} ${s.title} for homes within ${s.providers[option.id]} tiles`,
       good: true,
     })),
     ...(AMENITIES[option.id]?.[0] > 0
-      ? [{ text: `🏡 Raises land value nearby (+${AMENITIES[option.id][0]})`, good: true }]
+      ? [{ text: "🏡 Raises land value nearby", good: true, strength: strength(AMENITIES[option.id][0], STEPS.land) }]
       : AMENITIES[option.id]?.[0] < 0
-        ? [{ text: `🔊 Noisy: lowers land value next to it (${AMENITIES[option.id][0]})`, good: false }]
+        ? [{ text: "🔊 Noisy: lowers land value next to it", good: false, strength: strength(AMENITIES[option.id][0], STEPS.land) }]
         : []),
     ...(POLLUTERS[option.id]
-      ? [{ text: "🏭 Pollutes land within 2 tiles; keep homes away", good: false }]
+      ? [{ text: "🏭 Pollutes land within 2 tiles; keep homes away", good: false, strength: strength(settledPollution(POLLUTERS[option.id]) * 0.6, STEPS.pollution) }]
       : []),
     ...(option.id === "park" || option.id === "tree_farm"
       ? [{ text: "🌿 Cleans pollution next to it", good: true }]
@@ -116,7 +119,9 @@
   {#if roles.length}
     <div class="flex flex-col gap-0.5 text-xs">
       {#each roles as role}
-        <span class={role.good ? "text-green-300" : "text-red-300"}>{role.text}</span>
+        <span class={role.good ? "text-green-300" : "text-red-300"}
+          >{role.text}{#if role.strength}<Signal level={role.strength} tone={role.good ? "good" : "bad"} />{/if}</span
+        >
       {/each}
     </div>
   {/if}

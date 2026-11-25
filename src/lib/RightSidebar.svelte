@@ -19,6 +19,7 @@
   import { attraction, weeklyArrivals } from "./migration";
   import { needStatus, currentTier, TIERS, SERVICES } from "./needs";
   import { wishes, personMood, ageMix, currentRequest } from "./people";
+  import Signal from "./components/Signal.svelte";
   import { inspected as inspectedTile } from "./ui";
 
   const STATS: { key: StatKey; label: string; icon: string; about: string }[] = [
@@ -196,13 +197,19 @@
             <span class="opacity-70">{stat.about}</span>
             {#if $DB}
               {@const effect = statEffect($DB, stat.key)}
-              <span class={effect.good ? "text-green-300" : "text-red-300"}
-                >Now: {effect.text}</span
+              <span class={effect.good ? "text-green-300" : "text-red-300"} title={effect.exact ?? ""}
+                >Now: {effect.text}{#if effect.strength}<Signal
+                    level={effect.strength}
+                    tone={effect.good ? "good" : "bad"}
+                  />{/if}</span
               >
             {/if}
             {#each causes as c}
-              <span class={c.good ? "text-green-300" : "text-red-300"}
-                >{c.good ? "▲" : "▼"} {c.text}</span
+              <span class={c.good ? "text-green-300" : "text-red-300"} title={c.exact ?? ""}
+                >{c.good ? "▲" : "▼"} {c.text}{#if c.strength}<Signal
+                    level={c.strength}
+                    tone={c.good ? "good" : "bad"}
+                  />{/if}</span
               >
             {:else}
               <span class="opacity-60">Nothing is pushing it right now.</span>
@@ -278,8 +285,11 @@
               <div class="flex flex-col gap-0.5" title="{n.service.title}: share of homes within reach of one">
                 <div class="flex flex-row justify-between text-xs">
                   <span>{n.service.emoji} {n.service.short}</span>
-                  <span class="font-mono" class:text-green-300={n.met} class:text-red-300={!n.met}
-                    >{Math.round(n.covered * 100)}%{n.met ? " ✓" : ` / ${Math.round(n.target * 100)}%`}</span
+                  <span
+                    class:text-green-300={n.met}
+                    class:text-red-300={!n.met}
+                    title="{Math.round(n.covered * 100)}% of homes reached, wants {Math.round(n.target * 100)}%"
+                    >{n.met ? "✓ Enough" : "Not enough"}</span
                   >
                 </div>
                 <div class="bar">

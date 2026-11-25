@@ -5,13 +5,14 @@
 import type { Game } from "./types";
 import { boredomEffect } from "./boredom";
 import { moodSummary } from "./people";
+import { strength, STEPS } from "./strength";
 import { taxMood } from "./tax";
 import { needStatus, needEffect } from "./needs";
 import { hasPlotOfType } from "./store";
 import { townHomeEffect } from "./land";
 import { FOOD_PER_PERSON, WELL_FED_WEEKS } from "./simulation";
 
-export type Line = { text: string; good: boolean };
+export type Line = { text: string; good: boolean; strength?: number; exact?: string };
 export type StatKey = "happiness" | "health" | "community";
 
 const MIDPOINT = 150;
@@ -72,7 +73,7 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   const effect = needEffect(z, needs);
   // Townspeople's own situations (homes, favourite places, jobs, missing services).
   for (const part of moodSummary(z, 3)) {
-    happiness.push({ text: part.text, good: part.amount > 0 });
+    happiness.push({ text: part.text, good: part.amount > 0, strength: strength(part.amount, STEPS.mood), exact: `${part.amount > 0 ? "+" : ""}${part.amount.toFixed(1)} average mood` });
   }
   if (needs.length && needs.every((n) => n.met)) {
     happiness.push({ text: "The town's needs are met", good: true });
@@ -138,8 +139,10 @@ export function statEffect(z: Game, key: StatKey): Line {
       return { text: "Too unhappy: nobody moves in, people leave", good: false };
     }
     return {
-      text: `Tax income ${pct(income)}${v >= 200 ? " (the most it gets)" : ""}`,
+      text: income >= 1 ? `Boosts tax income${v >= 200 ? " (the most it gets)" : ""}` : "Lowers tax income",
       good: income >= 1,
+      strength: strength(income - 1, STEPS.boost),
+      exact: `Tax income ${pct(income)}`,
     };
   }
   if (key === "health") {
@@ -148,9 +151,9 @@ export function statEffect(z: Game, key: StatKey): Line {
     return { text: "Healthy: nobody leaves from sickness", good: true };
   }
   if (v > MIDPOINT) {
-    return { text: "Income +10%, production +20%", good: true };
+    return { text: "Boosts income and production", good: true, strength: 2, exact: "Income +10%, production +20%" };
   }
-  if (v < 100) return { text: "Income −20%, production −15%", good: false };
+  if (v < 100) return { text: "Lowers income and production", good: false, strength: 2, exact: "Income −20%, production −15%" };
   return { text: "No effect on income or production yet", good: true };
 }
 
@@ -171,8 +174,9 @@ export function townNeeds(z: Game): Line[] {
   }
   if (z.resources.power < 0) {
     needs.push({
-      text: `🔋 Power short by ${Math.round(-z.resources.power * 10) / 10}`,
+      text: "🔋 Power is short: blackouts",
       good: false,
+      exact: `Short by ${Math.round(-z.resources.power * 10) / 10}`,
     });
   }
   return needs;

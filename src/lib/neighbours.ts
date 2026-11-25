@@ -16,6 +16,7 @@ import {
 } from "./land";
 import { serviceImpact, SERVICES, coverage, servicesAt } from "./needs";
 import { landMood } from "./people";
+import { strength, STEPS } from "./strength";
 
 const LIVESTOCK_NEAR_FARM = 1.25;
 const TREE_FARM_NEAR_MILL = 1.5;
@@ -102,19 +103,19 @@ function synergyFor(id: string, x: number, y: number, z: Game): Synergy {
   switch (id) {
     case "livestock_farm":
       return nearAny(FARM_IDS)
-        ? { resource: LIVESTOCK_NEAR_FARM, income: 1, reason: "+25% food (next to a farm)" }
+        ? { resource: LIVESTOCK_NEAR_FARM, income: 1, reason: "More food (next to a farm)" }
         : NO_SYNERGY;
     case "tree_farm":
       return near.includes("lumber_mill")
-        ? { resource: TREE_FARM_NEAR_MILL, income: 1, reason: "+50% wood (next to a lumber mill)" }
+        ? { resource: TREE_FARM_NEAR_MILL, income: 1, reason: "More wood (next to a lumber mill)" }
         : NO_SYNERGY;
     case "bakery":
       return nearAny(FARM_IDS)
-        ? { resource: 1, income: BAKERY_NEAR_FARM, reason: "+25% income (next to a farm)" }
+        ? { resource: 1, income: BAKERY_NEAR_FARM, reason: "More income (next to a farm)" }
         : NO_SYNERGY;
     case "blacksmith":
       return nearAny(DIG_IDS)
-        ? { resource: 1, income: BLACKSMITH_NEAR_DIGS, reason: "+25% income (next to a mine or quarry)" }
+        ? { resource: 1, income: BLACKSMITH_NEAR_DIGS, reason: "More income (next to a mine or quarry)" }
         : NO_SYNERGY;
   }
   if (SHOP_IDS.includes(id)) {
@@ -123,11 +124,10 @@ function synergyFor(id: string, x: number, y: number, z: Game): Synergy {
       hexNeighbours(x, y, z).filter((p) => isHome(builtOption(p))).length,
     );
     if (homes === 0) return NO_SYNERGY;
-    const pct = Math.round(homes * SHOP_PER_HOME * 100);
     return {
       resource: 1,
       income: 1 + homes * SHOP_PER_HOME,
-      reason: `+${pct}% income (${homes} home${homes > 1 ? "s" : ""} next door)`,
+      reason: `More income (${homes} home${homes > 1 ? "s" : ""} next door)`,
     };
   }
   return NO_SYNERGY;
@@ -137,7 +137,17 @@ function synergyFor(id: string, x: number, y: number, z: Game): Synergy {
 // UI descriptions
 // ---------------------------------------------------------------------------
 
-export type EffectLine = { text: string; good: boolean; neutral?: boolean };
+/**
+ * A line describing an effect. `strength` (1–3) is shown as signal bars;
+ * `exact` is the precise figure, shown only on hover.
+ */
+export type EffectLine = { text: string; good: boolean; neutral?: boolean; strength?: number; exact?: string };
+
+/** A synergy as an effect line: strength from the size of the boost. */
+function synergyLine(s: Synergy): EffectLine {
+  const boost = Math.max(s.resource, s.income) - 1;
+  return { text: s.reason, good: true, strength: strength(boost, STEPS.boost), exact: `+${Math.round(boost * 100)}%` };
+}
 
 /** Effects on a built tile, for the inspector. */
 export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
@@ -156,23 +166,25 @@ export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
     });
     const e = homeEffect(x, y, z);
     const tone = landValueTone(e.value);
+    const mood = landMood(e.value);
     lines.push({
-      text:
-        tone === "neutral"
-          ? `🏡 Land: ${landValueWord(e.value)} (${e.value}) · no effect`
-          : `🏡 Land: ${landValueWord(e.value)} (${e.value}) · residents ${landMood(e.value) >= 0 ? "+" : ""}${Math.round(landMood(e.value))} mood`,
+      text: `🏡 ${landValueWord(e.value)} land${tone === "neutral" ? "" : tone === "good" ? ": residents are happier" : ": residents are glum"}`,
       good: tone !== "bad",
       neutral: tone === "neutral",
+      strength: strength(mood, STEPS.mood),
+      exact: `Land value ${e.value} · residents ${mood >= 0 ? "+" : ""}${Math.round(mood)} mood`,
     });
     if (e.pollution >= 1) {
       lines.push({
-        text: `🏭 ${pollutionWord(e.pollution)} air (${Math.round(e.pollution)}) · ${round1(e.health)} ❤️/wk`,
+        text: `🏭 ${pollutionWord(e.pollution)} air: residents' health suffers`,
         good: false,
+        strength: strength(e.pollution, STEPS.pollution),
+        exact: `Pollution ${Math.round(e.pollution)} · ${round1(e.health)} health/wk`,
       });
     }
   }
   const synergy = synergyFor(option.id, x, y, z);
-  if (synergy.reason) lines.push({ text: synergy.reason, good: true });
+  if (synergy.reason) lines.push(synergyLine(synergy));
   const [d1, d2] = rings(x, y, z);
   const homes = [...d1, ...d2].filter((p) => isHome(builtOption(p))).length;
   if (homes > 0 && POLLUTERS[option.id]) {
@@ -203,7 +215,7 @@ export function previewPlacement(
   plot.disabled = false;
   try {
     const own = synergyFor(optionId, x, y, z);
-    if (own.reason) lines.push({ text: own.reason, good: true });
+    if (own.reason) lines.push(synergyLine(own));
   } finally {
     Object.assign(plot, saved);
   }

@@ -24,6 +24,7 @@
   } from "./objects/categories";
   import { getOptionIndex, placePlot, formatAmount, analyticsEvent } from "./utils";
   import { previewPlacement } from "./neighbours";
+  import Signal from "./components/Signal.svelte";
   import PlotTooltip from "./PlotTooltip.svelte";
   import { Events, type PlotOption } from "./types";
   import { options } from "./objects/PlotTypeOptions";
@@ -247,7 +248,10 @@
                         ? 'bg-green-500/20 text-green-200'
                         : 'bg-red-500/20 text-red-200'}"
                   >
-                    {line.text}
+                    {line.text}{#if line.strength}<Signal
+                        level={line.strength}
+                        tone={line.neutral ? "neutral" : line.good ? "good" : "bad"}
+                      />{/if}
                   </div>
                 {/each}
               {/if}

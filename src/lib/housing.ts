@@ -54,10 +54,12 @@ export function syncCapacity(z: Game) {
 export type LevelStatus = {
   level: number;
   capacity: number;
-  /** What's missing for the next level (empty when it's on its way or maxed). */
+  /** What's missing for the next level, in words (empty when it's on its way or maxed). */
   missing: string[];
-  /** Why it's slipping (empty when it's holding). */
+  /** Why it's slipping, in words (empty when it's holding). */
   slipping: string[];
+  /** The exact figures behind `missing` and `slipping`, for hover. */
+  detail: string[];
   trend: "up" | "down" | "steady";
   /** Weeks done toward the change, and weeks needed. */
   progress: number;
@@ -80,15 +82,28 @@ export function levelStatus(
   const { value } = landValue(plot.x, plot.y, z);
   const pollution = pollutionAt(z, plot.x, plot.y);
   const slipping: string[] = [];
+  const detail: string[] = [];
   if (level > 1) {
-    if (value < KEEP[level]) slipping.push(`Land value ${value} is below ${KEEP[level]}`);
-    if (pollution >= MAX_POLLUTION_TO_KEEP) slipping.push(`Polluted air (${Math.round(pollution)})`);
+    if (value < KEEP[level]) {
+      slipping.push("the land around it got worse");
+      detail.push(`Land value ${value}, needs ${KEEP[level]} to keep this level`);
+    }
+    if (pollution >= MAX_POLLUTION_TO_KEEP) {
+      slipping.push("the air is polluted");
+      detail.push(`Pollution ${Math.round(pollution)}`);
+    }
   }
   const missing: string[] = [];
   const next = UP[level + 1];
   if (next) {
-    if (value < next.value) missing.push(`land value ${next.value} (now ${value})`);
-    if (z.townInfo.happiness < next.happiness) missing.push(`town happiness ${next.happiness} (now ${Math.round(z.townInfo.happiness)})`);
+    if (value < next.value) {
+      missing.push(value >= next.value - 5 ? "slightly better land nearby" : "better land nearby (parks, churches, water)");
+      detail.push(`Land value ${value} of ${next.value}`);
+    }
+    if (z.townInfo.happiness < next.happiness) {
+      missing.push("a happier town");
+      detail.push(`Town happiness ${Math.round(z.townInfo.happiness)} of ${next.happiness}`);
+    }
     if (pollution >= MAX_POLLUTION_TO_KEEP) missing.push("cleaner air");
     const needs = needsAllowLevel(z, plot, level + 1, cov);
     if (!needs.ok) missing.push(needs.reason);
@@ -101,6 +116,7 @@ export function levelStatus(
     capacity: homeCapacity(plot),
     missing,
     slipping,
+    detail,
     trend,
     progress: Math.abs(progress),
     weeks: weeks(z, trend === "down" ? "down" : "up"),
