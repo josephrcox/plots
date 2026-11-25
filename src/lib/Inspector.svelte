@@ -119,7 +119,11 @@
     {/if}
     {#each effects as effect}
       <span
-        class="chip text-white {effect.good ? 'bg-green-700' : 'bg-red-700'}"
+        class="chip text-white {effect.neutral
+          ? 'bg-sky-800'
+          : effect.good
+            ? 'bg-green-700'
+            : 'bg-red-700'}"
         >{effect.text}</span
       >
     {/each}

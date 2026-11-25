@@ -188,7 +188,7 @@ function runTask(t: Task): Result {
 let workers: Worker[] = [];
 function pool(tasks: Task[]): Promise<any[]> {
   if (!workers.length) {
-    const n = Math.max(1, availableParallelism() - 1);
+    const n = +(process.env.WORKERS ?? Math.max(1, availableParallelism() - 1));
     workers = Array.from({ length: n }, () => new Worker(new URL(import.meta.url)));
   }
   const out: any[] = new Array(tasks.length);

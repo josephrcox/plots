@@ -6,7 +6,8 @@ export const options: PlotOption[] = [
     emoji: "🏠",
     title: "Homes",
     type: "residential",
-    description: "Room for 16 people, growing to 24 and 32 as it levels up on good land. New homes fill as people move in.",
+    description:
+      "Room for 16 people, growing to 24 and 32 as it levels up on good land. New homes fill as people move in.",
     revenue_per_week: 0,
     requirements: {
       gold: 15,
@@ -72,7 +73,8 @@ export const options: PlotOption[] = [
     emoji: "🏡",
     title: "Large Homes",
     type: "residential",
-    description: "Room for 32 people, growing to 48 and 64 as it levels up on good land. New homes fill as people move in.",
+    description:
+      "Room for 32 people, growing to 48 and 64 as it levels up on good land. New homes fill as people move in.",
     revenue_per_week: 0,
     requirements: {
       gold: 180,
@@ -143,7 +145,7 @@ export const options: PlotOption[] = [
     requirements: {
       gold: 15,
       plots: [],
-      employees: 6,
+      employees: 5,
       knowledge: 0,
       size: 1,
       xp: 0,
@@ -174,7 +176,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 1,
+      food: 2.5,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -274,7 +276,7 @@ export const options: PlotOption[] = [
     title: "Quarry",
     type: "quarry",
     description:
-      "Produces stone, small amounts of metal. Isn't great for health, especially for homes right next to it.",
+      "Produces stone and a little metal. Pollutes the land around it.",
     revenue_per_week: 0,
     requirements: {
       gold: 60,
@@ -313,7 +315,7 @@ export const options: PlotOption[] = [
     generated_resources: {
       food: 0,
       wood: 0,
-      stone: 1.6,
+      stone: 2.5,
       metal: 0.1,
       power: 0,
       bureaucracy: 0,
@@ -341,8 +343,7 @@ export const options: PlotOption[] = [
     emoji: "🌿",
     title: "Apothecary",
     type: "medical",
-    description:
-      "Produces medicine from herbs and plants found in the forest. Increases health overall for a short bit. Fine until you can build a Healing House.",
+    description: "Medicine from herbs: health care for the homes around it.",
     revenue_per_week: 0,
     requirements: {
       gold: 60,
@@ -445,7 +446,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 1.6,
+      food: 4,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -676,7 +677,8 @@ export const options: PlotOption[] = [
     emoji: "🐴",
     title: "Stables",
     type: "recreation",
-    description: "Improves the health of the town and provides recreation.",
+    description:
+      "Horse riding: recreation for the homes around it. Makes a little money.",
     revenue_per_week: 5,
     requirements: {
       gold: 170,
@@ -810,7 +812,7 @@ export const options: PlotOption[] = [
     title: "Pub",
     type: "recreation",
     description:
-      "Generates knowledge, happiness, community. Isn't great for health.",
+      "Makes money and knowledge, and gives nearby homes recreation, but it's noisy.",
     revenue_per_week: 16,
     knowledge_points_per_month: 0.5,
     requirements: {
@@ -981,7 +983,7 @@ export const options: PlotOption[] = [
     affordable: null,
     selected: null,
     generated_resources: {
-      food: 8.5,
+      food: 12,
       wood: 0,
       stone: 0,
       metal: 0,
@@ -1012,7 +1014,7 @@ export const options: PlotOption[] = [
     title: "Vineyard",
     type: "recreation",
     description:
-      "Makes fair money, lowers health. Generates knowledge too similar to a pub.",
+      "Makes fair money and some knowledge, and gives nearby homes recreation.",
     revenue_per_week: 12,
     requirements: {
       gold: 180,
@@ -1281,7 +1283,7 @@ export const options: PlotOption[] = [
     title: "Park",
     type: "recreation",
     description:
-      "Makes people extremely happy & healthy for a period. Improves community.",
+      "Recreation for nearby homes. Raises land value and cleans pollution next to it.",
     revenue_per_week: 0,
     requirements: {
       gold: 60,
@@ -1615,7 +1617,8 @@ export const options: PlotOption[] = [
     emoji: "📕",
     title: "Library",
     type: "recreation",
-    description: "Produces knowledge and happiness",
+    description:
+      "Produces knowledge. Faith & culture for the homes around it; raises land value.",
     revenue_per_week: 0,
     knowledge_points_per_month: 2,
     requirements: {
@@ -1682,7 +1685,7 @@ export const options: PlotOption[] = [
     title: "Lumber Mill",
     type: "industrial",
     description:
-      "Boosts wood from every tree farm it touches by 50%. Build tree farms around it. Noisy: nearby homes lose health and happiness.",
+      "Boosts wood from every tree farm it touches by 50%. Build tree farms around it. Pollutes the land around it.",
     revenue_per_week: 0,
     requirements: {
       gold: 1200,
@@ -1883,7 +1886,8 @@ export const options: PlotOption[] = [
     emoji: "🏥",
     title: "Healing House",
     type: "medical",
-    description: "Treats the sick and continuously improves health.",
+    description:
+      "Health care for every home within 4 tiles; raises land value.",
     revenue_per_week: 0,
     knowledge_points_per_month: 0,
     requirements: {

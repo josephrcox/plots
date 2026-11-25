@@ -42,6 +42,7 @@
   import {
     landValue,
     landValueWord,
+    landValueTone,
     pollutionAt,
     pollutionWord,
   } from "./land";
@@ -168,6 +169,7 @@
       return { tint: `rgba(110, 60, 30, ${a})`, label: String(Math.round(v)) };
     }
     const v = landValue(p.x, p.y, z).value;
+    if (landValueTone(v) === "neutral") return { tint: "rgba(200, 200, 200, 0.15)", label: String(v) };
     const d = (v - 50) / 50;
     const tint =
       d >= 0

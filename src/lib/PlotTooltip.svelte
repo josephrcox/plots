@@ -5,6 +5,8 @@
   import { DB, hasPlotOfType } from "./store";
   import { formatAmount, getOptionFromId } from "./utils";
   import type { PlotOption } from "./types";
+  import { SERVICES } from "./needs";
+  import { POLLUTERS, AMENITIES } from "./land";
 
   export let option: PlotOption;
   /** Mark costs the town can't pay yet (off in the inspector). */
@@ -76,6 +78,25 @@
     })),
   ];
 
+  // Its role in the town: services, land value, pollution (#48, #59).
+  $: roles = [
+    ...SERVICES.filter((s) => s.providers[option.id] != null).map((s) => ({
+      text: `${s.emoji} ${s.title} for homes within ${s.providers[option.id]} tiles`,
+      good: true,
+    })),
+    ...(AMENITIES[option.id]?.[0] > 0
+      ? [{ text: `🏡 Raises land value nearby (+${AMENITIES[option.id][0]})`, good: true }]
+      : AMENITIES[option.id]?.[0] < 0
+        ? [{ text: `🔊 Noisy: lowers land value next to it (${AMENITIES[option.id][0]})`, good: false }]
+        : []),
+    ...(POLLUTERS[option.id]
+      ? [{ text: "🏭 Pollutes land within 2 tiles; keep homes away", good: false }]
+      : []),
+    ...(option.id === "park" || option.id === "tree_farm"
+      ? [{ text: "🌿 Cleans pollution next to it", good: true }]
+      : []),
+  ];
+
   $: rows = [
     { label: "Cost", chips: cost },
     { label: "Makes", chips: makes },
@@ -89,6 +110,14 @@
   {/if}
   {#if option.description}
     <span class="text-xs opacity-75 leading-snug">{option.description}</span>
+  {/if}
+
+  {#if roles.length}
+    <div class="flex flex-col gap-0.5 text-xs">
+      {#each roles as role}
+        <span class={role.good ? "text-green-300" : "text-red-300"}>{role.text}</span>
+      {/each}
+    </div>
   {/if}
 
   <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 items-baseline text-xs">

@@ -35,7 +35,7 @@ const rows = [
   ["Skill gap: lookahead bot vs random (pop)", `${Math.round(s.pop.adaptive)} vs ${Math.round(s.pop.random)}`, "≥ 2×", s.pop.adaptive >= 2 * Math.max(1, s.pop.random)],
   ["Worst layout vs smart, year 3", `${y3("bad")}%`, "≤ −20%", y3("bad") <= -20],
   ["Random tiles vs smart, year 3", `${y3("random")}%`, "≤ −10%", y3("random") <= -10],
-  ["Year-1 mistake gap, years 1/2/3", mistake.map((x) => `${x}%`).join(" / "), "grows", mistake[2] < mistake[1] && mistake[1] < mistake[0]],
+  ["Year-1 mistake gap, years 1/2/3", mistake.map((x) => `${x}%`).join(" / "), "lasts (yr 3 < yr 1)", mistake[2] < mistake[0]],
   ["Decisions with 2+ near-best options", pct(s.choices.shareWithRealChoice), "40–70%", s.choices.shareWithRealChoice >= 0.4 && s.choices.shareWithRealChoice <= 0.7],
   ["First 20 builds identical across maps", pct(s.openingIdentical.first20), "< 20%", s.openingIdentical.first20 < 0.2],
   ["Finished-town similarity", s.compositionSimilarity.toFixed(2), "0.70–0.90", s.compositionSimilarity >= 0.7 && s.compositionSimilarity <= 0.9],

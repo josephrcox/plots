@@ -8,6 +8,7 @@ import type { Game, Plot, PlotOption } from "./types";
 import {
   homeEffect,
   landValueWord,
+  landValueTone,
   pollutionWord,
   placementImpact,
   rings,
@@ -135,7 +136,7 @@ function synergyFor(id: string, x: number, y: number, z: Game): Synergy {
 // UI descriptions
 // ---------------------------------------------------------------------------
 
-export type EffectLine = { text: string; good: boolean };
+export type EffectLine = { text: string; good: boolean; neutral?: boolean };
 
 /** Effects on a built tile, for the inspector. */
 export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
@@ -149,12 +150,18 @@ export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
       text: have.length
         ? `Services nearby: ${SERVICES.filter((s) => have.includes(s.id)).map((s) => `${s.emoji} ${s.title.toLowerCase()}`).join(", ")}`
         : "No services nearby (🛝⚕️🛒⛪🎓)",
-      good: have.length > 0,
+      good: true,
+      neutral: have.length === 0,
     });
     const e = homeEffect(x, y, z);
+    const tone = landValueTone(e.value);
     lines.push({
-      text: `🏡 Land: ${landValueWord(e.value)} (${e.value}) · ${e.happiness >= 0 ? "+" : ""}${round1(e.happiness)} 😊/wk`,
-      good: e.happiness >= 0,
+      text:
+        tone === "neutral"
+          ? `🏡 Land: ${landValueWord(e.value)} (${e.value}) · no effect`
+          : `🏡 Land: ${landValueWord(e.value)} (${e.value}) · ${e.happiness >= 0 ? "+" : ""}${round1(e.happiness)} 😊/wk`,
+      good: tone !== "bad",
+      neutral: tone === "neutral",
     });
     if (e.pollution >= 1) {
       lines.push({

@@ -53,6 +53,8 @@ const AMENITY_CAP = 35;
 const WATER_VALUE = 8;
 const POLLUTION_VALUE = 0.5; // land value lost per point of pollution
 export const BASE_LAND_VALUE = 50;
+/** Land this close to the base value is ordinary: no effect on residents. */
+export const NEUTRAL_BAND = 8;
 
 /** Per home per week, before scaling to the town. */
 const HAPPY_PER_VALUE = 1 / 15; // (value − 50) / 15
@@ -199,10 +201,17 @@ export function landValue(x: number, y: number, z: Game): { value: number; parts
 
 export function landValueWord(v: number) {
   if (v >= 80) return "Prime";
-  if (v >= 65) return "Desirable";
-  if (v >= 45) return "Ordinary";
+  if (v > BASE_LAND_VALUE + NEUTRAL_BAND) return "Desirable";
+  if (v >= BASE_LAND_VALUE - NEUTRAL_BAND) return "Ordinary";
   if (v >= 30) return "Run-down";
   return "Blighted";
+}
+
+/** "good" / "neutral" / "bad", for colouring land value in the UI. */
+export function landValueTone(v: number): "good" | "neutral" | "bad" {
+  if (v > BASE_LAND_VALUE + NEUTRAL_BAND) return "good";
+  if (v < BASE_LAND_VALUE - NEUTRAL_BAND) return "bad";
+  return "neutral";
 }
 
 export function pollutionWord(p: number) {
@@ -223,7 +232,10 @@ export function homeEffect(x: number, y: number, z: Game): HomeEffect {
   const { value } = landValue(x, y, z);
   const pollution = pollutionAt(z, x, y);
   const soften = casual(z);
-  let happiness = (value - BASE_LAND_VALUE) * HAPPY_PER_VALUE;
+  // Ordinary land (within NEUTRAL_BAND of the base) has no effect either way.
+  const off = value - BASE_LAND_VALUE;
+  const beyond = Math.sign(off) * Math.max(0, Math.abs(off) - NEUTRAL_BAND);
+  let happiness = beyond * HAPPY_PER_VALUE;
   if (happiness < 0) happiness *= soften;
   const health = -pollution * HEALTH_PER_POLLUTION * soften;
   return { happiness, health, value, pollution };
@@ -259,7 +271,7 @@ export function townHomeEffect(z: Game): { happiness: number; health: number; po
 // Placement preview
 // ---------------------------------------------------------------------------
 
-export type ImpactLine = { text: string; good: boolean };
+export type ImpactLine = { text: string; good: boolean; neutral?: boolean };
 
 /** What building `id` at (x, y) would do to land and homes around it. */
 export function placementImpact(id: string, x: number, y: number, z: Game): ImpactLine[] {
@@ -271,7 +283,11 @@ export function placementImpact(id: string, x: number, y: number, z: Game): Impa
   if (isHome(option)) {
     const { value } = landValue(x, y, z);
     const pol = pollutionAt(z, x, y);
-    lines.push({ text: `Land here: ${landValueWord(value).toLowerCase()} (${value})`, good: value >= BASE_LAND_VALUE });
+    lines.push({
+      text: `Land here: ${landValueWord(value).toLowerCase()} (${value})`,
+      good: landValueTone(value) !== "bad",
+      neutral: landValueTone(value) === "neutral",
+    });
     if (pol >= 5) lines.push({ text: `${pollutionWord(pol)} air: residents' health suffers`, good: false });
   }
   if (POLLUTERS[id]) {
@@ -283,7 +299,7 @@ export function placementImpact(id: string, x: number, y: number, z: Game): Impa
         good: false,
       });
     } else {
-      lines.push({ text: "Pollutes land within 2 tiles; keep homes away", good: false });
+      lines.push({ text: "Pollutes land within 2 tiles; keep homes away", good: true, neutral: true });
     }
   }
   const amenity = AMENITIES[id];

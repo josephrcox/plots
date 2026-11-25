@@ -124,8 +124,20 @@ function isHome(p: Plot) {
   return builtId(p) != null && options[p.type].type === "residential";
 }
 
+// Coverage only changes when buildings do; cache it per game per day.
+const coverageCache = new WeakMap<Game, { key: string; cov: Map<ServiceId, Set<string>> }>();
+
 /** For each service, the ids of homes it covers. */
 export function coverage(z: Game): Map<ServiceId, Set<string>> {
+  const key = `${z.tick}:${z.lastChangeDay}:${z.plotCounts.join(",")}`;
+  const hit = coverageCache.get(z);
+  if (hit && hit.key === key) return hit.cov;
+  const cov = computeCoverage(z);
+  coverageCache.set(z, { key, cov });
+  return cov;
+}
+
+function computeCoverage(z: Game): Map<ServiceId, Set<string>> {
   const result = new Map<ServiceId, Set<string>>(SERVICES.map((s) => [s.id, new Set()]));
   const providerOf = new Map<string, [ServiceId, number][]>();
   for (const s of SERVICES) {
@@ -258,15 +270,21 @@ export function needsAllowLevel(
 }
 
 /** What a service building at (x, y) would cover, for the placement preview. */
-export function serviceImpact(id: string, x: number, y: number, z: Game): { text: string; good: boolean }[] {
-  const lines: { text: string; good: boolean }[] = [];
+export function serviceImpact(
+  id: string,
+  x: number,
+  y: number,
+  z: Game,
+): { text: string; good: boolean; neutral?: boolean }[] {
+  const lines: { text: string; good: boolean; neutral?: boolean }[] = [];
   for (const s of SERVICES) {
     const r = s.providers[id];
     if (r == null) continue;
     const homes = tilesWithin(x, y, r, z).filter(isHome).length;
     lines.push({
       text: `${s.emoji} ${s.title} for homes within ${r} tiles${homes ? ` (${homes} now)` : ""}`,
-      good: homes > 0,
+      good: true,
+      neutral: homes === 0,
     });
   }
   return lines;

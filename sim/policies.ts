@@ -56,7 +56,7 @@ export function decide(g: Game, s: Style): string | null {
     const f = can.filter((c) => FOOD.includes(c)).sort((a, b) => worth(b, s) - worth(a, s))[0];
     if (f) return f;
   }
-  if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || g.resource_rate.wood < 1 || g.resources.wood < 40) {
+  if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || (g.resource_rate.wood < 1 && g.resources.wood < g.resource_capacity * 0.8) || g.resources.wood < 40) {
     if (can.includes("tree_farm")) return "tree_farm";
   }
   // Unmet town needs: build the cheapest provider of the worst one.
@@ -83,13 +83,15 @@ export function decide(g: Game, s: Style): string | null {
     if (can.includes("large_homes") && g.townInfo.gold > 400) return "large_homes";
     if (can.includes("small_homes")) return "small_homes";
   }
-  const hasQuarry = g.plots.some((r) => r.some((p) => p.typeId === "quarry" || p.typeId === "mine"));
-  if (g.resources.stone < 20 && !hasQuarry) {
+  const quarries = g.plots.flat().filter((p) => p.typeId === "quarry" || p.typeId === "mine").length;
+  if (g.resources.stone < 20 && quarries === 0) {
     // Homes need stone and only a quarry makes it: save up for one.
     return can.includes("quarry") ? "quarry" : null;
   }
+  // Stone keeps running short as the town grows: add quarries.
+  if (g.resources.stone < 40 && quarries < 1 + Math.floor(pop / 150) && can.includes("quarry")) return "quarry";
   // Enough food in store: don't keep adding farms.
-  const fed = g.resources.food >= need * 8;
+  const fed = g.resources.food >= Math.min(need * 6, g.resource_capacity * 0.8);
   const best = can.filter((c) => c !== "small_homes" && c !== "large_homes" && !(fed && FOOD.includes(c))).sort((a, b) => worth(b, s) - worth(a, s))[0];
   // Keep a little gold back unless it's a strong buy.
   return best ?? null;

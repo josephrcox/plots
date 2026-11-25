@@ -55,8 +55,8 @@ const WELL_FED_BONUS = 0.5;
 // slog.
 const PROFIT_BOOST = { casual: 3, normal: 1.25 };
 const VILLAGE_INN_SHOP_BOOST = 1.2;
-/** Weekly wage tax per employed person at a 100% rate (scaled by tax rate). */
-const WAGE_TAX_BASE = 0.4;
+/** Weekly household tax per resident at a 100% rate (scaled by tax rate). */
+const HOUSEHOLD_TAX_BASE = 0.5;
 const RESOURCE_BOOST = { casual: 1.5, normal: 1.1 };
 const POWER_SHORTAGE_MSG =
   "🔋 POWER SHORTAGE. HAPPINESS DROPPING THROUGH BLACKOUTS.";
@@ -316,11 +316,11 @@ function getProfit(
   );
 }
 
-/** Weekly tax paid by employed townspeople. */
+/** Weekly household tax paid by the town's residents. */
 export function residentTax(z: Game): number {
   if (z.economyAndLaws.enacted.includes("tax_free")) return 0;
   const boost = z.gameSettings.includes("casual") ? PROFIT_BOOST.casual : PROFIT_BOOST.normal;
-  return z.townInfo.employees * WAGE_TAX_BASE * z.economyAndLaws.tax_rate * boost;
+  return z.townInfo.population_count * HOUSEHOLD_TAX_BASE * z.economyAndLaws.tax_rate * boost;
 }
 
 function calculateProfits(z: Game) {
@@ -341,7 +341,7 @@ function calculateProfits(z: Game) {
     z.townInfo.gold += profit;
     z.economyAndLaws.weeklyProfit += profit * 7;
   });
-  // Working townspeople pay tax on their wages.
+  // Residents pay household tax.
   const residents = residentTax(z) / 7;
   z.townInfo.gold += residents;
   z.economyAndLaws.weeklyProfit += residents * 7;

@@ -62,8 +62,12 @@
       <span class="text-red-300">{check.reason || "Can't build here"}</span>
     {:else}
       {#each preview as line}
-        <span class={line.good ? "text-green-300" : "text-red-300"}
-          >{line.text}</span
+        <span
+          class={line.neutral
+            ? "text-sky-300"
+            : line.good
+              ? "text-green-300"
+              : "text-red-300"}>{line.text}</span
         >
       {/each}
       <span class="opacity-60">Click to build · Esc to stop</span>
