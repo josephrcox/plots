@@ -131,6 +131,8 @@ export type Game = {
   foodEaten?: number; // food eaten last week
   wellFed?: boolean; // 4+ weeks of food in store at the last weekly check
   amountScale?: number; // 10 once gold/resources use the ÷10 scale (Nov 2026)
+  needsTier?: number; // highest town-size tier whose needs apply (needs.ts)
+  needsRewarded?: number; // highest tier whose needs were all met once (reward paid)
   homeLevelLogged?: boolean; // the first home-level-up log message was shown
   pollutionLogged?: boolean; // the "homes in polluted air" log message was shown
   last_warning_happiness: number;

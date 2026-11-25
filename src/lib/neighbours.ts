@@ -13,6 +13,7 @@ import {
   rings,
   POLLUTERS,
 } from "./land";
+import { serviceImpact, SERVICES, coverage, servicesAt } from "./needs";
 
 const LIVESTOCK_NEAR_FARM = 1.25;
 const TREE_FARM_NEAR_MILL = 1.5;
@@ -143,6 +144,13 @@ export function activeEffects(x: number, y: number, z: Game): EffectLine[] {
   if (!option) return [];
   const lines: EffectLine[] = [];
   if (isHome(option)) {
+    const have = servicesAt(plot!, coverage(z));
+    lines.push({
+      text: have.length
+        ? `Services nearby: ${SERVICES.filter((s) => have.includes(s.id)).map((s) => `${s.emoji} ${s.title.toLowerCase()}`).join(", ")}`
+        : "No services nearby (🛝⚕️🛒⛪🎓)",
+      good: have.length > 0,
+    });
     const e = homeEffect(x, y, z);
     lines.push({
       text: `🏡 Land: ${landValueWord(e.value)} (${e.value}) · ${e.happiness >= 0 ? "+" : ""}${round1(e.happiness)} 😊/wk`,
@@ -172,7 +180,10 @@ export function previewPlacement(
   y: number,
   z: Game,
 ): EffectLine[] {
-  const lines: EffectLine[] = [...placementImpact(optionId, x, y, z)];
+  const lines: EffectLine[] = [
+    ...placementImpact(optionId, x, y, z),
+    ...serviceImpact(optionId, x, y, z),
+  ];
   const plot = z.plots[x]?.[y];
   if (!plot) return lines;
   // Synergies need the building in place to check its neighbours.

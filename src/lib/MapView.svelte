@@ -57,6 +57,7 @@
   import ExpandButton from "./ExpandButton.svelte";
   import { homeOccupancy } from "./migration";
   import { levelStatus, homeCapacity } from "./housing";
+  import { coverage } from "./needs";
   import HoverCard from "./HoverCard.svelte";
   import { Events, type Plot as PlotData } from "./types";
 
@@ -97,11 +98,12 @@
   $: levels = (() => {
     const m = new Map<string, { level: number; trend: "up" | "down" | "steady" }>();
     if (!$DB || !occupancy) return m;
+    const cov = coverage($DB);
     for (const row of $DB.plots) {
       for (const p of row) {
         if (homeCapacity(p) === 0) continue;
         const o = occupancy.get(p.id);
-        const s = levelStatus(p, $DB, !!o && o.people >= o.capacity);
+        const s = levelStatus(p, $DB, !!o && o.people >= o.capacity, cov);
         m.set(p.id, { level: s.level, trend: s.trend });
       }
     }

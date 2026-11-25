@@ -4,6 +4,7 @@
 
 import type { Game } from "./types";
 import { taxMood } from "./tax";
+import { needStatus, needEffect, currentTier, TIERS, SERVICES } from "./needs";
 import { hasPlotOfType } from "./store";
 import { townHomeEffect } from "./land";
 import { FOOD_PER_PERSON, WELL_FED_WEEKS } from "./simulation";
@@ -12,22 +13,6 @@ export type Line = { text: string; good: boolean };
 export type StatKey = "happiness" | "health" | "community";
 
 const MIDPOINT = 150;
-const RECREATION_SHARE = 0.2;
-const RECREATION_FROM = 40; // buildings before recreation is demanded
-
-function builtCounts(z: Game) {
-  let total = 0;
-  let recreation = 0;
-  for (const row of z.plots) {
-    for (const p of row) {
-      if (!p.active || p.type < 0) continue;
-      total++;
-    }
-  }
-  recreation = z.townInfo.recreation;
-  return { total, recreation };
-}
-
 /** A word for how the stat is doing, for the status panel. */
 export function statWord(key: StatKey, v: number): string {
   const scale: Record<StatKey, [number, string][]> = {
@@ -69,7 +54,6 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   const info = z.townInfo;
   const neighbourhood = townHomeEffect(z);
   const foodShort = z.resources.food < info.population_count * FOOD_PER_PERSON;
-  const { total, recreation } = builtCounts(z);
 
   const happiness: Line[] = [];
   const tax = taxMood(z);
@@ -82,10 +66,13 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
   if (z.resources.power < 0) {
     happiness.push({ text: "Power shortage (blackouts)", good: false });
   }
-  if (total > RECREATION_FROM && recreation / total < RECREATION_SHARE) {
-    happiness.push({ text: "Wants more recreation 🛝", good: false });
-  } else if (total > RECREATION_FROM) {
-    happiness.push({ text: "Enough recreation 🛝", good: true });
+  const needs = needStatus(z);
+  const effect = needEffect(z, needs);
+  for (const n of needs.filter((n) => !n.met && n.service.hurts === "happiness")) {
+    happiness.push({ text: `Not enough ${n.service.title.toLowerCase()} ${n.service.emoji}`, good: false });
+  }
+  if (needs.length && needs.every((n) => n.met)) {
+    happiness.push({ text: "The town's needs are met", good: true });
   }
   if (info.productivity > 100) {
     happiness.push({ text: "Overworked (high productivity)", good: false });
@@ -109,6 +96,9 @@ export function statDrivers(z: Game): Record<StatKey, Line[]> {
 
   const health: Line[] = [];
   if (foodShort) health.push({ text: "Not enough food", good: false });
+  if (effect.health < 0) {
+    health.push({ text: "Not enough health care ⚕️", good: false });
+  }
   if (neighbourhood.health <= -0.1) {
     health.push({
       text: `Polluted air around ${neighbourhood.pollutedHomes || "some"} home${neighbourhood.pollutedHomes === 1 ? "" : "s"}`,
@@ -168,12 +158,20 @@ export function statEffect(z: Game, key: StatKey): Line {
 /** Needs worth flagging right now (empty when everything is fine). */
 export function townNeeds(z: Game): Line[] {
   const needs: Line[] = [];
-  const { total, recreation } = builtCounts(z);
-  if (total > RECREATION_FROM * 0.75) {
-    const wanted = Math.ceil(total * RECREATION_SHARE);
+  for (const n of needStatus(z)) {
     needs.push({
-      text: `🛝 Recreation ${recreation} of ${wanted} wanted${total <= RECREATION_FROM ? " (soon)" : ""}`,
-      good: recreation >= wanted,
+      text: `${n.service.emoji} ${n.service.title}: ${Math.round(n.covered * 100)}% of homes (wants ${Math.round(n.target * 100)}%)`,
+      good: n.met,
+    });
+  }
+  const next = TIERS[currentTier(z) + 1];
+  if (next) {
+    const casual = z.gameSettings.includes("casual");
+    const adds = SERVICES.filter((s) => next.wants[s.id] != null && TIERS[currentTier(z)]?.wants[s.id] == null);
+    const pct = (s: (typeof SERVICES)[number]) => Math.round(next.wants[s.id]! * (casual ? 0.7 : 1) * 100);
+    needs.push({
+      text: `Next at ${next.population} people (${next.name.toLowerCase()}): ${adds.length ? adds.map((s) => `${s.emoji} ${s.title.toLowerCase()} ${pct(s)}%`).join(", ") : "more of the same"}. Meet it all for 💰${next.reward}.`,
+      good: true,
     });
   }
   const foodRate = z.resource_rate.food;

@@ -9,6 +9,7 @@ import { availability, placementCheck } from "../src/lib/ui";
 import { options } from "../src/lib/objects/PlotTypeOptions";
 import { hexNeighbours } from "../src/lib/neighbours";
 import { rings, landValue, POLLUTERS, AMENITIES } from "../src/lib/land";
+import { SERVICES, tilesWithin } from "../src/lib/needs";
 import type { Game, Plot } from "../src/lib/types";
 
 declare const __seed: (n: number) => void;
@@ -95,6 +96,11 @@ function tileScore(g: Game, id: string, p: Plot): number {
   if (id === "lumber_mill") s += ids.filter((i) => i === "tree_farm").length;
   if (id === "blacksmith" && ids.some((i) => i === "mine" || i === "quarry")) s += 2;
   if (id === "village_market" || id === "general_store") s += Math.min(3, homesNear(d1));
+  // Service buildings: reach as many homes as possible.
+  for (const svc of SERVICES) {
+    const r = svc.providers[id];
+    if (r != null) s += 0.7 * tilesWithin(p.x, p.y, r, g).filter((q) => q.active && options[q.type]?.type === "residential").length;
+  }
   return s;
 }
 

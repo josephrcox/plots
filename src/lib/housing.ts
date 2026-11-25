@@ -10,7 +10,7 @@
 
 import { options } from "./objects/PlotTypeOptions";
 import { landValue, pollutionAt } from "./land";
-import { needsAllowLevel } from "./needs";
+import { needsAllowLevel, coverage, type ServiceId } from "./needs";
 import type { Game, Plot, PlotOption } from "./types";
 
 export const MAX_LEVEL = 3;
@@ -70,7 +70,12 @@ function weeks(z: Game, dir: "up" | "down") {
 }
 
 /** Where a home stands: what it needs to grow, or why it is shrinking. */
-export function levelStatus(plot: Plot, z: Game, full = true): LevelStatus {
+export function levelStatus(
+  plot: Plot,
+  z: Game,
+  full = true,
+  cov?: Map<ServiceId, Set<string>>,
+): LevelStatus {
   const level = homeLevel(plot);
   const { value } = landValue(plot.x, plot.y, z);
   const pollution = pollutionAt(z, plot.x, plot.y);
@@ -85,7 +90,7 @@ export function levelStatus(plot: Plot, z: Game, full = true): LevelStatus {
     if (value < next.value) missing.push(`land value ${next.value} (now ${value})`);
     if (z.townInfo.happiness < next.happiness) missing.push(`town happiness ${next.happiness} (now ${Math.round(z.townInfo.happiness)})`);
     if (pollution >= MAX_POLLUTION_TO_KEEP) missing.push("cleaner air");
-    const needs = needsAllowLevel(z, level + 1);
+    const needs = needsAllowLevel(z, plot, level + 1, cov);
     if (!needs.ok) missing.push(needs.reason);
     if (!full) missing.push("to be full");
   }
@@ -107,10 +112,11 @@ export type LevelChange = { plot: Plot; from: number; to: number };
 /** Weekly: homes move toward their next level or slide back. */
 export function updateHomeLevels(z: Game, fullHomes: Set<string>): LevelChange[] {
   const changes: LevelChange[] = [];
+  const cov = coverage(z);
   for (const row of z.plots) {
     for (const plot of row) {
       if (!plot.active || plot.disabled || !isHomeOption(options[plot.type])) continue;
-      const s = levelStatus(plot, z, fullHomes.has(plot.id));
+      const s = levelStatus(plot, z, fullHomes.has(plot.id), cov);
       let p = plot.levelProgress ?? 0;
       if (s.trend === "up") p = Math.max(0, p) + 1;
       else if (s.trend === "down") p = Math.min(0, p) - 1;

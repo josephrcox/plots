@@ -4,6 +4,7 @@
 import { buildable, build, options } from "./harness";
 import { countJobs } from "../src/lib/store";
 import { levelStatus } from "../src/lib/housing";
+import { needStatus } from "../src/lib/needs";
 import type { Game } from "../src/lib/types";
 
 export type Style = { name: string; w: Record<string, number>; homesAt: number; taxRate: number };
@@ -57,6 +58,12 @@ export function decide(g: Game, s: Style): string | null {
   }
   if (!g.plots.some((r) => r.some((p) => p.typeId === "tree_farm")) || g.resource_rate.wood < 1 || g.resources.wood < 40) {
     if (can.includes("tree_farm")) return "tree_farm";
+  }
+  // Unmet town needs: build the cheapest provider of the worst one.
+  const unmet = needStatus(g).filter((n) => !n.met).sort((a, b) => (b.target - b.covered) - (a.target - a.covered));
+  for (const n of unmet) {
+    const a = cheapest(g, Object.keys(n.service.providers), can);
+    if (a) return a;
   }
   // Homes stuck below the land value they need to grow: add an amenity
   // (the tile picker puts it next to the most homes).

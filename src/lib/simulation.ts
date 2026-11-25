@@ -30,6 +30,7 @@ import { tutorialMessages } from "./objects/tutorial_messages";
 import { isAdjacentToWater, randomizeNumber, roundTo } from "./utils";
 import { synergyAt } from "./neighbours";
 import { townHomeEffect, updatePollution } from "./land";
+import { updateNeeds } from "./needs";
 import { weeklyArrivals, homeOccupancy } from "./migration";
 import { updateHomeLevels, syncCapacity } from "./housing";
 import { laws } from "./objects/Laws";
@@ -60,10 +61,6 @@ const RESOURCE_BOOST = { casual: 1.5, normal: 1.1 };
 const POWER_SHORTAGE_MSG =
   "🔋 POWER SHORTAGE. HAPPINESS DROPPING THROUGH BLACKOUTS.";
 const NOT_ENOUGH_FOOD_MSG = "There isn't enough food for everyone!";
-const RECREATION_DEMAND_MSG =
-  "The city is growing and citizens are demanding more recreation, look for plots with 🛝 icons.";
-const RECREATION_HAPPY_MSG =
-  "The city is growing and citizens are happy with the amount of recreation available.";
 
 // ---------------------------------------------------------------------------
 // Entry points
@@ -106,6 +103,7 @@ function performWeeklyTasks(db: Game) {
   db = calculateKnowledge(db);
   db = bringStatsBackToNormal(db);
   db = neighbourEffects(db);
+  db = townNeedsEffects(db);
   db = feedCitizens(db);
   db = moveIn(db);
   db = levelHomes(db);
@@ -120,7 +118,6 @@ function performWeeklyTasks(db: Game) {
 function performMonthlyTasks(db: Game) {
   db = reactToProductivity(db);
   db = listenToTownspeople(db);
-  db = recreationImpact(db);
   return db;
 }
 
@@ -926,20 +923,24 @@ function listenToTownspeople(z: Game) {
   return z;
 }
 
-function recreationImpact(z: Game) {
-  const { recreation, total } = countRecreationPlots(z);
-  z.townInfo.recreation = recreation;
-  // Once the city is large enough, citizens want ~20% of plots for recreation.
-  if (total <= 40) return z;
-
-  if (recreation / total < 0.2) {
-    z.modifiers.happiness *= 0.95;
-    removeFromTownLog(z, RECREATION_HAPPY_MSG);
-    z = addToTownLog(RECREATION_DEMAND_MSG, z, Vibe.BAD);
-  } else {
-    z.modifiers.happiness *= 1.03;
-    removeFromTownLog(z, RECREATION_DEMAND_MSG);
-    z = addToTownLog(RECREATION_HAPPY_MSG, z, Vibe.GOOD);
+/** The town's needs grow with it (#48). */
+function townNeedsEffects(z: Game) {
+  const { status, rewarded } = updateNeeds(z);
+  removeFromTownLog(z, "NEEDS:");
+  const unmet = status.filter((n) => !n.met);
+  if (unmet.length) {
+    z = addToTownLog(
+      `NEEDS: ${unmet.map((n) => `${n.service.emoji} ${n.service.title} reaches ${Math.round(n.covered * 100)}% of homes, wants ${Math.round(n.target * 100)}%`).join("; ")}. Build services near homes.`,
+      z,
+      Vibe.BAD,
+    );
+  }
+  if (rewarded) {
+    z = addToTownLog(
+      `🎉 Every need of a ${rewarded.name.toLowerCase()} is met! The townspeople chipped in 💰${rewarded.reward}.`,
+      z,
+      Vibe.GOOD,
+    );
   }
   return z;
 }
