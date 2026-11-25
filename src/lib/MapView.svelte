@@ -294,9 +294,11 @@
   // fog). Zooming out and panning stay within reach of it, so the camera
   // can't drift off into endless fog; the limit loosens as the town grows.
   const VIEW_MARGIN = 3 * COL_STEP;
-  // The fading edge of the fog (recomputed only when exploration changes).
+  // The fading edge of the fog: the real land and water show through, fading
+  // out over three rings (recomputed only when exploration changes).
+  const FRINGE_OPACITY = [0.6, 0.32, 0.12];
   $: seenCount = $DB ? $DB.plots.reduce((n, row) => n + row.filter((p) => p.seen).length, 0) : 0;
-  $: fringe = $DB && seenCount >= 0 ? fogFringe($DB) : [];
+  $: fringe = $DB && seenCount >= 0 ? fogFringe($DB, FRINGE_OPACITY.length) : [];
   $: known = (() => {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const row of $DB?.plots ?? []) {
@@ -612,10 +614,13 @@
            each one, so the gaps between tiles are dirt, not cloud. -->
       {#if $DB.fog}
         {#each fringe as f (f.plot.id)}
-          <div
-            class="fringe"
-            style="left:{tileLeft(f.plot.x, f.plot.y)}px; top:{tileTop(f.plot.x)}px; opacity:{f.ring === 1 ? 0.45 : 0.18};"
-          />
+          {#if !f.plot.offMap}
+            <div
+              class="fringe"
+              class:water={f.plot.water}
+              style="left:{tileLeft(f.plot.x, f.plot.y)}px; top:{tileTop(f.plot.x)}px; opacity:{FRINGE_OPACITY[f.ring - 1]};"
+            />
+          {/if}
         {/each}
         {#each $DB.plots as row}
           {#each row as plot (plot.id)}
@@ -784,8 +789,11 @@
     width: 90px;
     height: 105px;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background: rgb(214, 208, 168);
+    background: rgb(232, 226, 120);
     pointer-events: none;
+  }
+  .fringe.water {
+    background: rgb(64, 140, 170);
   }
   .ground {
     position: absolute;
