@@ -4,6 +4,7 @@
 // view, and land gained by expanding is revealed straight away.
 
 import { tilesWithin } from "./needs";
+import { hexNeighbourCoords } from "./neighbours";
 import { siteOf } from "./sites";
 import { suggestedStart } from "./utils";
 import { Vibe, type Game, type Plot } from "./types";
@@ -81,4 +82,32 @@ export function initFog(z: Game) {
     if (start) reveal(z, tilesWithin(start[0], start[1], START_RADIUS, z, true));
   }
   z.fogReady = true;
+}
+
+/**
+ * Unexplored cells within `depth` steps of explored ones, with their
+ * distance (1 = next to explored land). Drawn as a fading fringe so the land
+ * clearly carries on into the fog, without saying what's there.
+ */
+export function fogFringe(z: Game, depth = 2): { plot: Plot; ring: number }[] {
+  if (!z.fog) return [];
+  const out: { plot: Plot; ring: number }[] = [];
+  const key = (x: number, y: number) => x * 10000 + y;
+  const seen = new Set<number>();
+  let frontier: Plot[] = [];
+  for (const row of z.plots) for (const p of row) if (p.seen) { seen.add(key(p.x, p.y)); frontier.push(p); }
+  for (let ring = 1; ring <= depth; ring++) {
+    const next: Plot[] = [];
+    for (const p of frontier) {
+      for (const [i, j] of hexNeighbourCoords(p.x, p.y)) {
+        const q = z.plots[i]?.[j];
+        if (!q || seen.has(key(i, j))) continue;
+        seen.add(key(i, j));
+        out.push({ plot: q, ring });
+        next.push(q);
+      }
+    }
+    frontier = next;
+  }
+  return out;
 }

@@ -61,7 +61,7 @@
   import { levelStatus, homeCapacity } from "./housing";
   import { coverage } from "./needs";
   import { siteOf, allowedTitles } from "./sites";
-  import { isFogged, showsFog, fogBackground, GROUND_COLOR } from "./fog";
+  import { isFogged, showsFog, fogBackground, GROUND_COLOR, fogFringe } from "./fog";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -294,6 +294,9 @@
   // fog). Zooming out and panning stay within reach of it, so the camera
   // can't drift off into endless fog; the limit loosens as the town grows.
   const VIEW_MARGIN = 3 * COL_STEP;
+  // The fading edge of the fog (recomputed only when exploration changes).
+  $: seenCount = $DB ? $DB.plots.reduce((n, row) => n + row.filter((p) => p.seen).length, 0) : 0;
+  $: fringe = $DB && seenCount >= 0 ? fogFringe($DB) : [];
   $: known = (() => {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const row of $DB?.plots ?? []) {
@@ -608,6 +611,12 @@
       <!-- Under fog, explored cells sit on earth: a slightly larger hex behind
            each one, so the gaps between tiles are dirt, not cloud. -->
       {#if $DB.fog}
+        {#each fringe as f (f.plot.id)}
+          <div
+            class="fringe"
+            style="left:{tileLeft(f.plot.x, f.plot.y)}px; top:{tileTop(f.plot.x)}px; opacity:{f.ring === 1 ? 0.45 : 0.18};"
+          />
+        {/each}
         {#each $DB.plots as row}
           {#each row as plot (plot.id)}
             {#if plot.seen}
@@ -770,6 +779,14 @@
 {/if}
 
 <style>
+  .fringe {
+    position: absolute;
+    width: 90px;
+    height: 105px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: rgb(214, 208, 168);
+    pointer-events: none;
+  }
   .ground {
     position: absolute;
     width: 106px;
