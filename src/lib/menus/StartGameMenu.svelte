@@ -74,6 +74,7 @@
 
   <div class="flex flex-col gap-1.5">
     <span class="label">Perks · bring up to {MAX_PERKS} ({chosen.length} chosen)</span>
+    <span class="text-xs opacity-60 -mt-1">Starting bonuses for this town. Earn achievements to unlock more.</span>
     <div class="grid grid-cols-2 gap-1.5">
       {#each PERKS as perk}
         {@const open = unlocked.has(perk.id)}
@@ -85,12 +86,13 @@
           title={open ? perk.about : `Unlock with the "${unlockedBy(perk.id)?.title}" achievement`}
           on:click={() => togglePerk(perk.id)}
         >
-          <span>{open ? perk.icon : "🔒"}</span>
+          <span>{perk.icon}</span>
           <span class="flex flex-col text-left">
             <span class="font-semibold text-xs">{perk.title}</span>
-            <span class="text-[11px] opacity-70"
-              >{open ? perk.about : `Earn “${unlockedBy(perk.id)?.title}”`}</span
-            >
+            <span class="text-[11px] opacity-80">{perk.about}</span>
+            {#if !open}
+              <span class="text-[11px] text-yellow-200/80">🔒 Unlock: {unlockedBy(perk.id)?.description}</span>
+            {/if}
           </span>
         </button>
       {/each}
@@ -152,7 +154,7 @@
     outline: 1px solid rgba(250, 204, 21, 0.6);
   }
   .perk.locked {
-    opacity: 0.45;
+    opacity: 0.6;
   }
   .perk:disabled:not(.locked) {
     opacity: 0.6;
