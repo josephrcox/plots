@@ -324,7 +324,6 @@
   }
   .building:hover {
     background: rgba(255, 255, 255, 0.14);
-    transform: translateY(-2px);
   }
   .building.selected {
     border-color: rgb(255, 210, 90);
