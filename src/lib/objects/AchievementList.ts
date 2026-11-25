@@ -1,174 +1,99 @@
+// Achievements: earned once for your whole account (across towns). Many
+// unlock a perk you can bring to future towns (perks.ts). Secret ones stay
+// hidden until earned.
 import type { Achievement, Game } from "$lib/types";
-import { taxTolerance } from "../tax";
-import { hasPlotOfType } from "$lib/store";
+import { options } from "./PlotTypeOptions";
+
+const homes = (z: Game) =>
+  z.plots.flat().filter((p) => p.active && options[p.type]?.type === "residential");
+const people = (z: Game) => z.people ?? [];
+const ageOf = (z: Game, born: number) => (z.environment.day - born) / (z.ageScale ?? 72);
+const isRetired = (z: Game, p: { born: number; id: number }) =>
+  ageOf(z, p.born) >= 65 && (p.id * 2654435761) % 10 >= 3;
+
+// Building id → career id, mirroring people.ts (kept here to avoid an import cycle).
+const CAREER_OF: Record<string, string> = {
+  farm: "farmer", livestock_farm: "farmer", adv_farm: "farmer", fishery: "farmer",
+  tree_farm: "lumberjack", lumber_mill: "lumberjack",
+  quarry: "miner", mine: "miner",
+  bakery: "merchant", village_market: "merchant", general_store: "merchant", stockpile: "merchant", adv_stockpile: "merchant",
+  pub: "host", vineyard: "host", village_inn: "host", stables: "host",
+  park: "caretaker", church: "caretaker",
+  Apothecary: "healer", healing_house: "healer",
+  water_wheel: "engineer", adv_water_wheel: "engineer", solar_farm: "engineer",
+  blacksmith: "smith",
+  schoolhouse: "teacher", academy: "teacher", university: "teacher",
+  library: "scholar", lab: "scholar",
+  city_hall: "clerk", bank: "clerk",
+};
 
 export const achievements: Achievement[] = [
-  {
-    id: "happy_town",
-    title: "Happy & Healthy Town",
-    description: "",
-    requirements: "Happiness and Health at the max in one of your towns",
-    icon: "😀",
-    check: (z: Game) => {
-      return z.townInfo.happiness >= 300 && z.townInfo.health >= 300;
-    },
-    prize: 1500,
-  },
-  {
-    id: "10k",
-    title: "💰 1,000",
-    description: "",
-    requirements: "1,000 gold in the bank in one of your towns",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 1000,
-    prize: 250,
-  },
-  {
-    id: "50k",
-    title: "💰 5,000",
-    description: "",
-    requirements: "5,000 gold in the bank in one of your towns",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 5000,
-    prize: 1000,
-  },
-  {
-    id: "250k",
-    title: "💰 25,000",
-    description: "",
-    requirements: "25,000 gold in the bank in one of your towns",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 25000,
-    prize: 5000,
-  },
-  // same as above but with a million
-
-  {
-    id: "1m",
-    title: "💰 100,000",
-    description: "",
-    requirements: "100,000 gold in the bank in one of your towns",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 100000,
-    prize: 15000,
-  },
-  {
-    id: "10m",
-    title: "💰 1,000,000",
-    description: "",
-    requirements: "1,000,000 gold in the bank in one of your towns",
-    icon: "💸",
-    check: (z: Game) => z.townInfo.gold >= 1000000,
-    prize: 50000,
-  },
-  {
-    id: "stayin_frugal",
-    title: "Stayin' Frugal!",
-    description: "",
-    requirements: "Gold under 5 with >=200 population in one of your towns",
-    icon: "🚲",
-    check: (z: Game) => {
-      return z.townInfo.gold <= 5 && z.townInfo.population_count >= 200;
-    },
-    prize: 1000,
-  },
-  {
-    id: "profits_to_the_moon",
-    title: "Profits to the moon!",
-    description: "Now you're making dough!",
-    requirements: "Reach a monthly profit of $1,000",
-    icon: "🌛",
-    check: (z: Game) => {
-      return z.economyAndLaws.weeklyProfit * 4 >= 1000;
-    },
-    prize: 1500,
-  },
-  {
-    id: "happily_dying",
-    title: "Happily Dying!",
-    description: "Not something to be proud of...",
-    requirements: "Happiness > 275, health < 25",
-    icon: "🌛",
-    check: (z: Game) => {
-      return z.townInfo.happiness > 275 && z.townInfo.health < 25;
-    },
-    prize: 1000,
-  },
-  {
-    id: "tax_man",
-    title: "Tax man",
-    description:
-      "Set the tax rate to the absolute max that the town will tolerate.",
-    requirements: "",
-    icon: "🙃",
-    check: (z: Game) => {
-      // The highest 5% step the town currently accepts.
-      const cleanMax = Math.floor(taxTolerance(z) * 20) / 20;
-      return z.economyAndLaws.tax_rate === cleanMax;
-    },
-    prize: 75,
-  },
-  {
-    id: "good_job",
-    title: "Beat 'Fill the grid' game mode",
-    description: "while not in casual mode",
-    requirements: "",
-    icon: "👍",
-    check: (z: Game) => {
-      return (
-        z.endGameDetails.win === true &&
-        z.endGoal === "land" &&
-        !z.gameSettings.includes("casual")
-      );
-    },
-    prize: 1000,
-  },
-  {
-    id: "great_job",
-    title: "Beat 'Fill the grid' game mode (faster)",
-    description: "in under 5 years, while not in casual mode",
-    requirements: "",
-    icon: "👏",
-    check: (z: Game) => {
-      return (
-        z.endGameDetails.win === true &&
-        z.environment.day <= 1825 &&
-        z.endGoal === "land" &&
-        !z.gameSettings.includes("casual")
-      );
-    },
-    prize: 3000,
-  },
-  {
-    id: "superb_job",
-    title: "Beat 'Fill the grid' game mode",
-    description: "while in casual mode",
-    requirements: "",
-    icon: "👌",
-    check: (z: Game) => {
-      return (
-        z.endGameDetails.win === true &&
-        z.endGoal === "land" &&
-        z.gameSettings.includes("casual")
-      );
-    },
-    prize: 1500,
-  },
-
-  {
-    id: "pub_knowledge",
-    title: "Street smartz",
-    description: "You get 25 knowledge without building a school or library.",
-    requirements: "Knowledge >= 25 without building a school or library",
-    icon: "🤓",
-    check: (z: Game) => {
-      return (
-        hasPlotOfType("small_school", z).length === 0 &&
-        hasPlotOfType("large_school", z).length === 0 &&
-        hasPlotOfType("library", z).length === 0 &&
-        z.townInfo.knowledge_points >= 25
-      );
-    },
-    prize: 5000,
-  },
+  // ---- Growing ----
+  { id: "village", icon: "🏘️", title: "A proper village", description: "Reach 100 townspeople.", unlocks: "founders_fund",
+    check: (z) => z.townInfo.population_count >= 100 },
+  { id: "breadbasket", icon: "🥖", title: "Breadbasket", description: "Keep 300 people well fed.", unlocks: "seed_bank",
+    check: (z) => z.townInfo.population_count >= 300 && !!z.wellFed },
+  { id: "timber", icon: "🪓", title: "Timber!", description: "Produce 30 wood a week.", unlocks: "lumber_stock",
+    check: (z) => z.resource_rate.wood >= 30 },
+  { id: "city", icon: "🌆", title: "Big city", description: "Reach 1,000 townspeople.",
+    check: (z) => z.townInfo.population_count >= 1000 },
+  // ---- The land ----
+  { id: "cartographer", icon: "🗺️", title: "Cartographer", description: "Explore nine tenths of your land.", unlocks: "old_maps",
+    check: (z) => {
+      if (!z.fog) return false;
+      const land = z.plots.flat().filter((p) => !p.offMap);
+      return land.filter((p) => p.seen).length >= land.length * 0.9;
+    } },
+  { id: "lay_of_the_land", icon: "🌍", title: "Lay of the land", description: "Make use of four different kinds of special site.", unlocks: "surveyor",
+    check: (z) => new Set(z.plots.flat().filter((p) => p.site && p.active).map((p) => p.site)).size >= 4 },
+  { id: "clean_air", icon: "🌬️", title: "Clean air", description: "300 people, some industry, and not one home in polluted air.",
+    check: (z) =>
+      z.townInfo.population_count >= 300 &&
+      z.plots.flat().some((p) => p.active && ["quarry", "mine", "blacksmith", "lumber_mill"].includes(p.typeId)) &&
+      homes(z).every((h) => (h.pollution ?? 0) < 10) },
+  // ---- Homes ----
+  { id: "skyline", icon: "🏙️", title: "Skyline", description: "Have 10 homes at level 3.", unlocks: "planned_homes",
+    check: (z) => homes(z).filter((h) => (h.level ?? 1) >= 3).length >= 10 },
+  // ---- People ----
+  { id: "golden_years", icon: "🌅", title: "Golden years", description: "Give each of at least 10 retirees somewhere to spend their days.", unlocks: "wise_elders",
+    check: (z) => {
+      const retired = people(z).filter((p) => isRetired(z, p));
+      if (retired.length < 10) return false;
+      const byId = new Map(z.plots.flat().map((q) => [q.id, q]));
+      return retired.every((p) => {
+        const venue = p.job ? byId.get(p.job) : undefined;
+        return !!venue && options[venue.type]?.type === "retirement";
+      });
+    } },
+  { id: "dream_town", icon: "✨", title: "Dream town", description: "With 200 workers, have most of them in their dream job.", unlocks: "dreamers",
+    check: (z) => {
+      const workers = people(z).filter((p) => p.job && p.job !== "guard");
+      if (workers.length < 200) return false;
+      const byId = new Map(z.plots.flat().map((q) => [q.id, q]));
+      const dreaming = workers.filter((p) => {
+        const q = byId.get(p.job!);
+        return q && CAREER_OF[options[q.type]?.id] === p.dream;
+      });
+      return dreaming.length > workers.length / 2;
+    } },
+  { id: "scholars", icon: "🎓", title: "Town of scholars", description: "With 200 people, raise the average schooling to skilled.", unlocks: "learned_settlers",
+    check: (z) => {
+      const ps = people(z);
+      return ps.length >= 200 && ps.reduce((s, p) => s + p.edu, 0) / ps.length >= 2;
+    } },
+  { id: "wish_granted", icon: "🎁", title: "Wish granted", description: "Fulfil five townspeople's requests.", unlocks: "generous",
+    check: (z) => (z.stats?.requestsDone ?? 0) >= 5 },
+  { id: "homegrown", icon: "👶", title: "Homegrown", description: "Welcome 100 babies born in town.",
+    check: (z) => (z.lifeStats?.births ?? 0) >= 100 },
+  { id: "long_life", icon: "🎂", title: "A long life", description: "Have a townsperson reach 90.",
+    check: (z) => people(z).some((p) => ageOf(z, p.born) >= 90) },
+  { id: "phoenix", icon: "🔥", title: "Phoenix", description: "Bring a miserable town back to being happy.", unlocks: "resilient",
+    check: (z) => !!z.stats?.wasMiserable && z.townInfo.happiness >= 170 },
+  // ---- Secret ----
+  { id: "stayin_frugal", icon: "🚲", title: "Stayin' frugal", description: "200 people and under 5 gold in the bank.", secret: true,
+    check: (z) => z.townInfo.gold <= 5 && z.townInfo.population_count >= 200 },
+  { id: "happily_dying", icon: "🙃", title: "Happily dying", description: "Very happy and very sick at the same time.", secret: true,
+    check: (z) => z.townInfo.happiness > 250 && z.townInfo.health < 40 },
+  { id: "ghost_town", icon: "👻", title: "Ghost town", description: "Ten homes' worth of empty space and nobody wants to move in.", secret: true,
+    check: (z) => z.townInfo.population_max - z.townInfo.population_count >= 160 && z.townInfo.happiness < 60 },
 ];

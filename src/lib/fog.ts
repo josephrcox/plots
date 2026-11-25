@@ -6,6 +6,7 @@
 import { tilesWithin } from "./needs";
 import { hexNeighbourCoords } from "./neighbours";
 import { siteOf } from "./sites";
+import { hasPerk } from "./perks";
 import { suggestedStart } from "./utils";
 import { Vibe, type Game, type Plot } from "./types";
 
@@ -82,7 +83,8 @@ export function initFog(z: Game) {
     for (const b of built) reveal(z, tilesWithin(b.x, b.y, REVEAL_RADIUS, z, true));
   } else {
     const start = suggestedStart(z);
-    if (start) reveal(z, tilesWithin(start[0], start[1], START_RADIUS, z, true));
+    const r = hasPerk(z, "old_maps") ? START_RADIUS * 2 : START_RADIUS;
+    if (start) reveal(z, tilesWithin(start[0], start[1], r, z, true));
   }
   z.fogReady = true;
 }

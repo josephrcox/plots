@@ -3,6 +3,7 @@
   import Modal from "$lib/components/Modal.svelte";
   import Btn from "$lib/components/Btn.svelte";
   import { resetMapUi } from "../ui";
+  import { hasPerk } from "$lib/perks";
 
   $: show = $DB != null && $DB.endGameDetails.msg != "";
   // A town can keep playing after its first loss only.
@@ -14,10 +15,11 @@
     if (!canContinue) return;
     $DB!.overtime = true;
     $DB!.endGameDetails = { msg: "", win: false, still_playing: true };
-    $DB!.lossGraceUntil = $DB!.environment.day + LOSS_GRACE_DAYS;
+    const grace = LOSS_GRACE_DAYS * (hasPerk($DB, "resilient") ? 2 : 1);
+    $DB!.lossGraceUntil = $DB!.environment.day + grace;
     paused.set(false);
     showAlert(
-      `Your town gets one more chance. You have ${LOSS_GRACE_DAYS} days to turn things around. If it falls again, it's over for good.`,
+      `Your town gets one more chance. You have ${grace} days to turn things around. If it falls again, it's over for good.`,
     );
   }
 </script>

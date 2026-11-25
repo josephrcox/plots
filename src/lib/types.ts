@@ -161,6 +161,7 @@ export type Game = {
   ageScale?: number; // days per year of age the people's birth days use (#65)
   lifeStats?: { births: number; deaths: number };
   request?: { personId: number; kind: "near" | "job"; target: string; since: number; reward: number }; // happiness shown after the last weekly update
+  stats?: { requestsDone?: number; wasMiserable?: boolean }; // for achievements
   boredom?: number; // hidden 0–100: how stale the town feels (boredom.ts)
   recentBuilds?: { id: string; day: number }[]; // for boredom's repeat check
   needsTier?: number; // highest town-size tier whose needs apply (needs.ts)
@@ -195,9 +196,11 @@ export type Achievement = {
   id: string;
   title: string;
   description: string;
-  requirements: string;
   icon: string;
-  prize: number;
+  /** Perk (perks.ts) this unlocks for future towns. */
+  unlocks?: import("./perks").PerkId;
+  /** Hidden until earned. */
+  secret?: boolean;
   check: (game: Game) => boolean;
 };
 

@@ -62,6 +62,7 @@
   import { coverage } from "./needs";
   import { siteOf, allowedTitles } from "./sites";
   import { isFogged, showsFog, fogBackground, GROUND_COLOR, fogFringe } from "./fog";
+  import { hasPerk } from "./perks";
   import Signal from "./components/Signal.svelte";
   import { strength, STEPS } from "./strength";
   import HoverCard from "./HoverCard.svelte";
@@ -644,6 +645,7 @@
             startHint={startTile?.[0] === x && startTile?.[1] === y}
             occupancy={occupancy?.get(plot.id) ?? null}
             fogged={showsFog($DB, plot)}
+            surveyed={hasPerk($DB, "surveyor")}
             homeLevel={levels.get(plot.id)?.level ?? 0}
             levelTrend={levels.get(plot.id)?.trend ?? "steady"}
             tint={overlays[x]?.[y]?.tint ?? null}

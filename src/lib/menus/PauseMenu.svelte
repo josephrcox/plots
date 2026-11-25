@@ -12,6 +12,7 @@
     loadGameFromFile,
   } from "../store";
   import { achievements } from "$lib/objects/AchievementList";
+  import { PERKS } from "$lib/perks";
   import Modal from "$lib/components/Modal.svelte";
   import Btn from "$lib/components/Btn.svelte";
   import { createAMockTown, formatNumber } from "$lib/utils";
@@ -20,7 +21,6 @@
   import type { Game } from "$lib/types";
 
   let tab: "towns" | "achievements" = "towns";
-  let showCollected = false;
 
   // ---- Towns ----
   $: games = $userDB.games.map((json) => {
@@ -80,31 +80,12 @@
     deleteGame($userDB.selectedGame);
   }
 
-  // ---- Achievements ----
-  type Entry = [string, number, string, boolean?]; // id, day, town, collected
+  // ---- Achievements (earned once per account; many unlock perks) ----
+  type Entry = [string, number, string, boolean?]; // id, day, town
   $: earned = new Map<string, Entry>(($userDB.achievements as Entry[]).map((a) => [a[0], a]));
   $: doneCount = achievements.filter((a) => earned.has(a.id)).length;
-  // Ready to collect first, then not yet earned, then collected.
-  $: list = [...achievements]
-    .map((a) => {
-      const e = earned.get(a.id);
-      const state = !e ? "todo" : e[3] ? "collected" : "ready";
-      return { a, e, state };
-    })
-    .filter((x) => showCollected || x.state !== "collected")
-    .sort((x, y) => order(x.state) - order(y.state));
-  const order = (s: string) => (s === "ready" ? 0 : s === "todo" ? 1 : 2);
-
-  function collect(id: string) {
-    const a = achievements.find((x) => x.id === id);
-    const e = earned.get(id);
-    if (!a || !e || e[3] || !$DB) return;
-    $DB.townInfo.gold += a.prize;
-    $userDB.achievements = ($userDB.achievements as Entry[]).map((x) =>
-      x[0] === id ? ([x[0], x[1], x[2], true] as Entry) : x,
-    );
-  }
-
+  $: list = [...achievements].sort((x, y) => Number(earned.has(y.id)) - Number(earned.has(x.id)));
+  const perkOf = (id?: string) => PERKS.find((p) => p.id === id);
 </script>
 
 <Modal open={$paused} title="Paused" size="lg" onClose={() => ($paused = false)}>
@@ -140,33 +121,24 @@
       {/each}
     </div>
   {:else}
-    <div class="flex flex-row justify-between items-center">
-      <span class="opacity-70">Rewards go to the town you're playing.</span>
-      <label class="text-xs opacity-70 flex items-center gap-1.5 cursor-pointer">
-        <input type="checkbox" bind:checked={showCollected} /> Show collected
-      </label>
-    </div>
-    <div class="flex flex-col gap-1.5">
-      {#each list as { a, e, state } (a.id)}
-        <div class="ach {state}">
-          <span class="text-2xl">{a.icon}</span>
+    <span class="opacity-70">Earned once across all your towns. Many unlock a perk to bring to new towns.</span>
+    <div class="grid grid-cols-2 gap-1.5">
+      {#each list as a (a.id)}
+        {@const e = earned.get(a.id)}
+        {@const perk = perkOf(a.unlocks)}
+        <div class="ach" class:todo={!e}>
+          <span class="text-2xl">{e || !a.secret ? a.icon : "❔"}</span>
           <div class="flex-1 flex flex-col gap-0.5">
-            <span class="font-semibold">{a.title}</span>
-            <span class="text-xs opacity-75">{a.description}</span>
+            <span class="font-semibold">{e || !a.secret ? a.title : "Secret"}</span>
+            <span class="text-xs opacity-75">{e || !a.secret ? a.description : "Keep playing to find out."}</span>
+            {#if perk}
+              <span class="text-[11px] {e ? 'text-yellow-200' : 'opacity-60'}">Unlocks {perk.icon} {perk.title}</span>
+            {/if}
             {#if e}
-              <span class="text-[11px] text-green-300">Earned on day {e[1]} in {e[2]}</span>
+              <span class="text-[11px] text-green-300">✓ Day {e[1]} in {e[2]}</span>
             {/if}
           </div>
-          {#if state === "ready"}
-            <Btn variant="gold" on:click={() => collect(a.id)}>Collect 💰{formatNumber(a.prize, false)}</Btn>
-          {:else if state === "todo"}
-            <span class="text-xs opacity-60">💰{formatNumber(a.prize, false)}</span>
-          {:else}
-            <span class="text-xs text-green-300">✓</span>
-          {/if}
         </div>
-      {:else}
-        <span class="opacity-60">All rewards collected.</span>
       {/each}
     </div>
   {/if}
@@ -198,6 +170,9 @@
     padding: 5px 12px;
     border-radius: 8px;
     opacity: 0.65;
+  }
+  .tabs button:focus:not(:focus-visible) {
+    outline: none;
   }
   .tabs button.on {
     background: rgba(255, 255, 255, 0.1);
@@ -240,8 +215,5 @@
   }
   .ach.todo {
     opacity: 0.55;
-  }
-  .ach.ready {
-    background: rgba(250, 204, 21, 0.12);
   }
 </style>

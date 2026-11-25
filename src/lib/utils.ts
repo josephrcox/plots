@@ -1,6 +1,7 @@
 import { recordBuild } from "./boredom";
 import { type ClassValue, clsx } from "clsx";
 import { revealAround, isFogged } from "./fog";
+import { hasPerk } from "./perks";
 import { twMerge } from "tailwind-merge";
 import { syncCapacity } from "./housing";
 import { cubicOut } from "svelte/easing";
@@ -412,6 +413,7 @@ export function placePlot(
   if (founding) {
     z.townInfo.population_count +=
       plotChosen.immediate_variable_changes.population;
+    if (hasPerk(z, "planned_homes") && plotChosen.type === "residential") plot.level = 2;
   }
   syncCapacity(z);
   z.townInfo.happiness = Math.min(

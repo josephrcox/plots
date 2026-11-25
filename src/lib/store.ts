@@ -1,6 +1,7 @@
 import { relieve, NOVELTY } from "./boredom";
 import { get, writable, type Writable } from "svelte/store";
 import { initFog, reveal } from "./fog";
+import { applyStartingPerks } from "./perks";
 import { default_db, default_user_db } from "./objects/defaults/default_DB";
 import {
   type Difficulty,
@@ -389,6 +390,7 @@ export function startGame(
     json.resources.metal = 1000000;
   }
 
+  applyStartingPerks(json);
   json.plots = generatePlots(rollMapSize());
   placeSites(json);
   json.sitesPlaced = true;

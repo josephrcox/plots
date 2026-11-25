@@ -73,12 +73,7 @@ const NOT_ENOUGH_FOOD_MSG = "There isn't enough food for everyone!";
 /** Whether the clock should advance today, given the game and UI state. */
 export function canAdvanceDay(game: Game | null): game is Game {
   if (!game || isReadOnly) return false;
-  if (
-    get(paused) ||
-    get(disabledPlotMenu).visible ||
-    get(showCityHallMenu) ||
-    get(showAchievementPopup)
-  ) {
+  if (get(paused) || get(disabledPlotMenu).visible || get(showCityHallMenu)) {
     return false;
   }
   if (game.endGameDetails.msg !== "") return false;
@@ -552,6 +547,7 @@ function setTutorialStep(z: Game) {
 }
 
 function checkForAchievements(z: Game) {
+  if (z.townInfo.happiness < 70 && !z.stats?.wasMiserable) z.stats = { ...z.stats, wasMiserable: true };
   if (z.gameSettings.includes("devMode")) return z;
 
   const earned = new Set(get(userDB).achievements.map((a) => a[0]));

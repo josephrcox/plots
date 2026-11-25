@@ -45,6 +45,8 @@
   export let tint: string | null = null;
   /** Homes: level (1–3) and which way it's heading. */
   export let fogged = false;
+  /** Surveyor perk: show a special site's icon even under fog. */
+  export let surveyed = false;
   export let homeLevel = 0;
   export let levelTrend: "up" | "down" | "steady" = "steady";
   export let tintLabel: string | null = null;
@@ -99,7 +101,7 @@
     style="background-color:{fill};"
   >
     {#if fogged}
-      <!-- nothing shows through fog -->
+      <!-- nothing shows through fog (except sites, with the surveyor perk) -->
     {:else if state === "ghost"}
       <span class="emoji opacity-70">{ghostEmoji}</span>
     {:else if option}
@@ -144,6 +146,9 @@
     {:else if understaffed}
       <span class="badge staff" title="Not enough workers">👷</span>
     {/if}
+  {/if}
+  {#if fogged && surveyed && siteOf(data)}
+    <span class="surveyed" title={siteOf(data)?.title}>{siteOf(data)?.emoji}</span>
   {/if}
   {#if site && option && state !== "ghost"}
     <span class="site-badge" class:dim-badge={!usedSite} title={site.title}>{site.emoji}</span>
@@ -259,6 +264,14 @@
   }
   .inner.fog {
     display: none;
+  }
+  .surveyed {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    opacity: 0.8;
   }
   .site-title {
     font-size: 0.62rem;

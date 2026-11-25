@@ -14,6 +14,7 @@ import { landValue, BASE_LAND_VALUE, NEUTRAL_BAND, POLLUTERS } from "./land";
 import { coverage, needStatus, type ServiceId } from "./needs";
 import type { Game, Person, Plot } from "./types";
 import { isVenue, VENUE, RETIREE_MOOD, MEMBER_DEATH_FACTOR } from "./retirement";
+import { hasPerk } from "./perks";
 
 // ---------------------------------------------------------------------------
 // Careers and favourite places
@@ -128,7 +129,7 @@ export function newPerson(z: Game, parent?: Person, spreadAges = false): Person 
     arrived: z.environment.day,
     home: parent?.home ?? null,
     job: null,
-    edu: parent ? 0 : arrivingEducation(),
+    edu: parent ? 0 : Math.min(3, arrivingEducation() + (hasPerk(z, "learned_settlers") && Math.random() < 0.5 ? 1 : 0)),
     restless: Math.random() < 0.1 || undefined,
     dream: pickWeighted(CAREERS, (c) => c.weight).id,
     fav,
@@ -466,7 +467,8 @@ export function workforce(z: Game): Map<string, { staffed: number; needed: numbe
     w.staffed++;
     if (isVenue(plotById(z, p.job))) continue;
     const elder = stageOf(p, z) === "elder" ? ELDER_WORK : 1;
-    w.output += p.work * elder * (worksDream(p, z) ? DREAM_BOOST : OTHER_JOB);
+    const dream = DREAM_BOOST + (hasPerk(z, "dreamers") ? 0.15 : 0);
+    w.output += p.work * elder * (worksDream(p, z) ? dream : OTHER_JOB);
   }
   for (const [id, w] of m) {
     const pl = plotById(z, id);
@@ -577,7 +579,7 @@ export function moodParts(p: Person, z: Game, ctx = moodContext(z)): MoodPart[] 
   }
   if (isRetired(p, z)) {
     const venue = p.job ? plotById(z, p.job) : undefined;
-    if (venue && isVenue(venue)) parts.push({ text: `Spends their days at the ${options[venue.type].title.toLowerCase()}`, amount: RETIREE_MOOD.member });
+    if (venue && isVenue(venue)) parts.push({ text: `Spends their days at the ${options[venue.type].title.toLowerCase()}`, amount: RETIREE_MOOD.member + (hasPerk(z, "wise_elders") ? 3 : 0) });
     else parts.push({ text: "Bored in retirement", amount: RETIREE_MOOD.idle });
   }
   if (home) {
@@ -758,6 +760,7 @@ export function lifeEvents(z: Game): { born: Person[]; died: Person[] } {
       let yearly = DEATH_AT_65 * Math.exp((age - ELDER_AGE) / 6);
       yearly *= healthFactor * (p.home && cov.get("health")!.has(p.home) ? 0.8 : 1);
       if (isMember(p, z)) yearly *= MEMBER_DEATH_FACTOR;
+      if (hasPerk(z, "wise_elders")) yearly *= 0.9;
       if (Math.random() < yearly / WEEKS_PER_AGE_YEAR) died.push(p);
     } else if (age >= 20 && age <= 45 && p.home && Math.random() < BIRTH_CHANCE) {
       // The baby lives with the family, or with relatives if there's no room.
@@ -827,8 +830,10 @@ export function updateRequest(z: Game): { done?: string; expired?: string; rewar
     }
     if (requestMet(z, p)) {
       delete z.request;
-      z.townInfo.gold += r.reward;
-      return { done: `🎁 ${p.name} is delighted: ${describe(r)} at last!`, reward: r.reward };
+      const reward = r.reward * (hasPerk(z, "generous") ? 2 : 1);
+      z.townInfo.gold += reward;
+      z.stats = { ...z.stats, requestsDone: (z.stats?.requestsDone ?? 0) + 1 };
+      return { done: `🎁 ${p.name} is delighted: ${describe(r)} at last!`, reward };
     }
     if (z.environment.day - r.since > REQUEST_WEEKS * 7) {
       delete z.request;
